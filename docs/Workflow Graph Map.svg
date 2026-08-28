@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   sodipodi:docname="Workflow Graph Map.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.35945918"
+     inkscape:cx="89.022627"
+     inkscape:cy="638.45915"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       id="rect2"
+       width="78.689156"
+       height="33.521576"
+       x="50.838444"
+       y="23.029415" />
+    <rect
+       style="font-variation-settings:normal;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;opacity:1;vector-effect:none;-inkscape-stroke:none;stop-opacity:1"
+       id="rect2-8"
+       width="78.526711"
+       height="46.106342"
+       x="50.91967"
+       y="85.268791" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.72731px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:46.8522;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="51.906898"
+       y="41.77137"
+       id="text2"
+       transform="translate(1.7494338,-12.136344)"><tspan
+         x="51.906898"
+         y="41.77137"
+         id="tspan13"><tspan
+           style="font-weight:bold"
+           id="tspan12">User adds </tspan></tspan><tspan
+         x="51.906898"
+         y="47.680509"
+         id="tspan15"><tspan
+           style="font-weight:bold"
+           id="tspan14">connection from </tspan></tspan><tspan
+         x="51.906898"
+         y="53.589647"
+         id="tspan17"><tspan
+           style="font-weight:bold"
+           id="tspan16">node 1 to node 2:
+</tspan></tspan><tspan
+         x="51.906898"
+         y="59.498784"
+         id="tspan19"><tspan
+           style="font-weight:bold"
+           id="tspan18">
+</tspan></tspan><tspan
+         x="51.906898"
+         y="65.407922"
+         id="tspan20">Checks start</tspan></text>
+    <rect
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       id="rect2-1"
+       width="78.607933"
+       height="45.017231"
+       x="50.838444"
+       y="-50.640556" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.72731px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:46.8522;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="51.906898"
+       y="41.77137"
+       id="text2-1"
+       transform="translate(0.01273911,-143.7254)"><tspan
+         x="51.906898"
+         y="41.77137"
+         id="tspan22"><tspan
+           style="font-weight:bold"
+           id="tspan21">Start state:
+</tspan></tspan><tspan
+         x="51.906898"
+         y="47.680509"
+         id="tspan24"><tspan
+           style="font-weight:bold"
+           id="tspan23">
+</tspan></tspan><tspan
+         x="51.906898"
+         y="53.589647"
+         id="tspan25">Workflow_element_1 </tspan><tspan
+         x="51.906898"
+         y="59.498784"
+         id="tspan26">exists in Workflow</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.72731px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:46.8522;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="51.906898"
+       y="41.77137"
+       id="text2-1-2"
+       transform="translate(0.10553911,-87.417984)"><tspan
+         x="51.906898"
+         y="41.77137"
+         id="tspan28"><tspan
+           style="font-weight:bold"
+           id="tspan27">User adds node:
+</tspan></tspan><tspan
+         x="51.906898"
+         y="47.680509"
+         id="tspan30"><tspan
+           style="font-weight:bold"
+           id="tspan29">
+</tspan></tspan><tspan
+         x="51.906898"
+         y="53.589647"
+         id="tspan31">Workflow_element_2 </tspan><tspan
+         x="51.906898"
+         y="59.498784"
+         id="tspan32">added to workflow.
+</tspan><tspan
+         x="51.906898"
+         y="65.407922"
+         id="tspan33">
+</tspan><tspan
+         x="51.906898"
+         y="71.31706"
+         id="tspan34">No input or output </tspan><tspan
+         x="51.906898"
+         y="77.226194"
+         id="tspan35">connections specified</tspan></text>
+    <rect
+       style="font-variation-settings:normal;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.52916667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;opacity:1;stop-opacity:1"
+       id="rect2-1-1"
+       width="78.607933"
+       height="27.60531"
+       x="50.838444"
+       y="-106.96366" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       x="227.42499"
+       y="423.55298"
+       id="text3"
+       transform="matrix(0.26458333,0,0,0.26458333,-6.6561067,-16.34575)"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         x="227.42499"
+         y="423.55298"
+         style="font-weight:bold">Structure check:</tspan><tspan
+         sodipodi:role="line"
+         x="227.42499"
+         y="445.88672"
+         id="tspan4">Is this connection possible?</tspan><tspan
+         sodipodi:role="line"
+         x="227.42499"
+         y="468.22049"
+         id="tspan6">Is it an output to an input?</tspan><tspan
+         sodipodi:role="line"
+         x="227.42499"
+         y="490.55423"
+         id="tspan7">Is it an output to a free input?</tspan><tspan
+         sodipodi:role="line"
+         x="227.42499"
+         y="512.888"
+         id="tspan8">Will it result in a loop?</tspan></text>
+    <rect
+       style="font-variation-settings:normal;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;opacity:1;vector-effect:none;-inkscape-stroke:none;stop-opacity:1"
+       id="rect2-8-0"
+       width="78.526711"
+       height="46.106342"
+       x="50.919674"
+       y="160.09294" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:266.323;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       x="227.42499"
+       y="423.55298"
+       id="text3-6"
+       transform="matrix(0.26458333,0,0,0.26458333,-6.6561022,54.60472)"><tspan
+         x="227.42499"
+         y="423.55298"
+         id="tspan37"><tspan
+           style="font-weight:bold"
+           id="tspan36">Constraint check:
+</tspan></tspan><tspan
+         x="227.42499"
+         y="445.88672"
+         id="tspan39"><tspan
+           style="font-weight:bold"
+           id="tspan38">
+</tspan></tspan><tspan
+         x="227.42499"
+         y="468.22046"
+         id="tspan40">Will the input image fit into the </tspan><tspan
+         x="227.42499"
+         y="490.5542"
+         id="tspan41">node? Or does it need further </tspan><tspan
+         x="227.42499"
+         y="512.88794"
+         id="tspan42">user input to fit e.g. Is it a z-stack </tspan><tspan
+         x="227.42499"
+         y="535.22171"
+         id="tspan43">when a flattened image is </tspan><tspan
+         x="227.42499"
+         y="557.55545"
+         id="tspan44">required?</tspan></text>
+    <rect
+       style="font-variation-settings:normal;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;opacity:1;vector-effect:none;-inkscape-stroke:none;stop-opacity:1"
+       id="rect2-8-0-9"
+       width="78.526711"
+       height="46.106342"
+       x="50.919674"
+       y="234.91708" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:266.323;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       x="227.42499"
+       y="423.55298"
+       id="text3-6-8"
+       transform="matrix(0.26458333,0,0,0.26458333,-6.6561026,135.30915)"><tspan
+         x="227.42499"
+         y="423.55298"
+         id="tspan46"><tspan
+           style="font-weight:bold"
+           id="tspan45">Type check:
+</tspan></tspan><tspan
+         x="227.42499"
+         y="445.88672"
+         id="tspan48"><tspan
+           style="font-weight:bold"
+           id="tspan47">
+</tspan></tspan><tspan
+         x="227.42499"
+         y="468.22046"
+         id="tspan49">Are there simple changes </tspan><tspan
+         x="227.42499"
+         y="490.5542"
+         id="tspan50">required to make the connection </tspan><tspan
+         x="227.42499"
+         y="512.88794"
+         id="tspan51">valid that don't require user input.</tspan></text>
+    <rect
+       style="font-variation-settings:normal;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;opacity:1;vector-effect:none;-inkscape-stroke:none;stop-opacity:1"
+       id="rect2-8-0-9-1"
+       width="78.526703"
+       height="46.106342"
+       x="50.91967"
+       y="309.74124" />
+    <rect
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       id="rect2-8-0-9-1-5"
+       width="78.526703"
+       height="59.723446"
+       x="50.919666"
+       y="384.56543" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:266.323;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       x="227.42499"
+       y="423.55298"
+       id="text3-6-8-4"
+       transform="matrix(0.26458333,0,0,0.26458333,-6.6630278,204.22533)"><tspan
+         x="227.42499"
+         y="423.55298"
+         id="tspan53"><tspan
+           style="font-weight:bold"
+           id="tspan52">Connection made:
+</tspan></tspan><tspan
+         x="227.42499"
+         y="445.88672"
+         id="tspan55"><tspan
+           style="font-weight:bold"
+           id="tspan54">
+</tspan></tspan><tspan
+         x="227.42499"
+         y="468.22046"
+         id="tspan56">Connection visible on graph, </tspan><tspan
+         x="227.42499"
+         y="490.5542"
+         id="tspan57">input image to node 2 processed </tspan><tspan
+         x="227.42499"
+         y="512.88794"
+         id="tspan58">according to workflow_element.
+</tspan><tspan
+         x="227.42499"
+         y="535.22171"
+         id="tspan59">Image saved and UI updated with </tspan><tspan
+         x="227.42499"
+         y="557.55545"
+         id="tspan60">processed image.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:266.323;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       x="227.42499"
+       y="423.55298"
+       id="text3-6-8-4-2"
+       transform="matrix(0.26458333,0,0,0.26458333,-6.6630226,279.04948)"><tspan
+         x="227.42499"
+         y="423.55298"
+         id="tspan62"><tspan
+           style="font-weight:bold"
+           id="tspan61">Update downstream nodes?
+</tspan></tspan><tspan
+         x="227.42499"
+         y="445.88672"
+         id="tspan64"><tspan
+           style="font-weight:bold"
+           id="tspan63">
+</tspan></tspan><tspan
+         x="227.42499"
+         y="468.22046"
+         id="tspan65">If downstream nodes are present, </tspan><tspan
+         x="227.42499"
+         y="490.5542"
+         id="tspan66">set NeedsUpdating flag.
+</tspan><tspan
+         x="227.42499"
+         y="512.88794"
+         id="tspan67">
+</tspan><tspan
+         x="227.42499"
+         y="535.22171"
+         id="tspan68">If updates are not paused, this </tspan><tspan
+         x="227.42499"
+         y="557.55545"
+         id="tspan69">will be done as the connection is </tspan><tspan
+         x="227.42499"
+         y="579.88919"
+         id="tspan70">made.</tspan></text>
+    <rect
+       style="font-variation-settings:normal;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;opacity:1;vector-effect:none;-inkscape-stroke:none;stop-opacity:1"
+       id="rect2-8-0-2"
+       width="73.061745"
+       height="46.106342"
+       x="172.53668"
+       y="160.09294" />
+    <rect
+       style="font-variation-settings:normal;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;opacity:1;vector-effect:none;-inkscape-stroke:none;stop-opacity:1"
+       id="rect2-8-0-2-5"
+       width="73.061745"
+       height="46.106342"
+       x="172.53668"
+       y="85.268791" />
+    <path
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       d="m 129.44638,108.32196 h 43.0903"
+       id="path8" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:244.787;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       x="539.9801"
+       y="537.02942"
+       id="text9"
+       transform="matrix(0.26458333,0,0,0.26458333,32.655832,-38.481683)"><tspan
+         x="539.9801"
+         y="537.02942"
+         id="tspan71">Don't draw connection.
+</tspan><tspan
+         x="539.9801"
+         y="559.36319"
+         id="tspan72">
+</tspan><tspan
+         x="539.9801"
+         y="581.69693"
+         id="tspan73">Pop up explaining why.</tspan></text>
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       d="m 129.44638,183.14611 h 43.0903"
+       id="path8-4" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:264.842;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       x="539.9801"
+       y="537.02942"
+       id="text9-0"
+       transform="matrix(0.26458333,0,0,0.26458333,32.655831,24.524191)"><tspan
+         x="539.9801"
+         y="537.02942"
+         id="tspan74">Don't draw connection.
+</tspan><tspan
+         x="539.9801"
+         y="559.36319"
+         id="tspan75">
+</tspan><tspan
+         x="539.9801"
+         y="581.69693"
+         id="tspan76">Pop up explaining why.
+</tspan><tspan
+         x="539.9801"
+         y="604.03067"
+         id="tspan77">
+</tspan><tspan
+         x="539.9801"
+         y="626.36441"
+         id="tspan78">Pop up suggests existing </tspan><tspan
+         x="539.9801"
+         y="648.69815"
+         id="tspan79">functions that could help output </tspan><tspan
+         x="539.9801"
+         y="671.03189"
+         id="tspan80">image fit input constraints.</tspan></text>
+    <rect
+       style="font-variation-settings:normal;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;opacity:1;vector-effect:none;-inkscape-stroke:none;stop-opacity:1"
+       id="rect2-8-0-2-9"
+       width="73.061745"
+       height="46.106342"
+       x="172.53668"
+       y="234.91707" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:264.842;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       x="539.9801"
+       y="537.02942"
+       id="text9-0-6"
+       transform="matrix(0.26458333,0,0,0.26458333,32.655827,111.63633)"><tspan
+         x="539.9801"
+         y="537.02942"
+         id="tspan81">Automatically update types.
+</tspan><tspan
+         x="539.9801"
+         y="559.36319"
+         id="tspan82">
+</tspan><tspan
+         x="539.9801"
+         y="581.69693"
+         id="tspan83">Don't inform user.</tspan></text>
+    <g
+       id="g11"
+       transform="translate(2.3050895,34.935857)">
+      <rect
+         style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         id="rect11"
+         width="16.009295"
+         height="7.7286248"
+         x="140.68179"
+         y="69.521797" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         x="541.09064"
+         y="235.07536"
+         id="text11"
+         transform="matrix(0.26458333,0,0,0.26458333,0.55204461,12.881041)"><tspan
+           sodipodi:role="line"
+           id="tspan11"
+           x="541.09064"
+           y="235.07536">FAIL</tspan></text>
+    </g>
+    <g
+       id="g11-8"
+       transform="translate(2.3050895,109.76)">
+      <rect
+         style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         id="rect11-2"
+         width="16.009295"
+         height="7.7286248"
+         x="140.68179"
+         y="69.521797" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         x="541.09064"
+         y="235.07536"
+         id="text11-9"
+         transform="matrix(0.26458333,0,0,0.26458333,0.55204461,12.881041)"><tspan
+           sodipodi:role="line"
+           id="tspan11-1"
+           x="541.09064"
+           y="235.07536">FAIL</tspan></text>
+    </g>
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       d="m 129.44638,257.97025 h 43.0903"
+       id="path8-4-3" />
+    <g
+       id="g11-8-8"
+       transform="translate(2.3050895,184.58414)">
+      <rect
+         style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         id="rect11-2-3"
+         width="16.009295"
+         height="7.7286248"
+         x="140.68179"
+         y="69.521797" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         x="541.09064"
+         y="235.07536"
+         id="text11-9-7"
+         transform="matrix(0.26458333,0,0,0.26458333,0.55204461,12.881041)"><tspan
+           sodipodi:role="line"
+           id="tspan11-1-1"
+           x="541.09064"
+           y="235.07536">FAIL</tspan></text>
+    </g>
+    <path
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       d="m 87.450543,131.37514 v 28.7178"
+       id="path14" />
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       d="m 90.183025,56.550991 v 28.7178"
+       id="path14-28" />
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       d="M 90.183023,-5.6883849 V 23.029415"
+       id="path14-28-1" />
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       d="m 90.142412,-79.358356 v 28.7178"
+       id="path14-28-1-2" />
+    <g
+       id="g11-6"
+       transform="translate(-58.503419,72.34793)">
+      <rect
+         style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         id="rect11-1"
+         width="16.009295"
+         height="7.7286248"
+         x="140.68179"
+         y="69.521797" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         x="541.09064"
+         y="235.07536"
+         id="text11-8"
+         transform="matrix(0.26458333,0,0,0.26458333,-0.46003718,12.881041)"><tspan
+           sodipodi:role="line"
+           id="tspan11-4"
+           x="541.09064"
+           y="235.07536">PASS</tspan></text>
+    </g>
+    <g
+       id="g18"
+       transform="translate(-19.950791,-6.2611402)">
+      <path
+         style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         d="m 110.13381,212.46042 v 28.7178"
+         id="path14-3" />
+      <g
+         id="g11-6-7"
+         transform="translate(-38.552628,153.43321)">
+        <rect
+           style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+           id="rect11-1-4"
+           width="16.009295"
+           height="7.7286248"
+           x="140.68179"
+           y="69.521797" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+           x="541.09064"
+           y="235.07536"
+           id="text11-8-3"
+           transform="matrix(0.26458333,0,0,0.26458333,-0.46003718,12.881041)"><tspan
+             sodipodi:role="line"
+             id="tspan11-4-8"
+             x="541.09064"
+             y="235.07536">PASS</tspan></text>
+      </g>
+    </g>
+    <g
+       id="g18-6"
+       transform="translate(-19.950791,68.563017)">
+      <path
+         style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         d="m 110.13381,212.46042 v 28.7178"
+         id="path14-3-8" />
+      <g
+         id="g11-6-7-1"
+         transform="translate(-38.552628,153.43321)">
+        <rect
+           style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+           id="rect11-1-4-9"
+           width="16.009295"
+           height="7.7286248"
+           x="140.68179"
+           y="69.521797" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+           x="541.09064"
+           y="235.07536"
+           id="text11-8-3-8"
+           transform="matrix(0.26458333,0,0,0.26458333,-0.46003718,12.881041)"><tspan
+             sodipodi:role="line"
+             id="tspan11-4-8-9"
+             x="541.09064"
+             y="235.07536">PASS</tspan></text>
+      </g>
+    </g>
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       d="m 90.183019,355.8476 v 28.7178"
+       id="path14-3-8-2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.867px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:201.16;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       x="318.9411"
+       y="610.63959"
+       id="text14"
+       transform="matrix(0.26458333,0,0,0.26458333,-90.808061,14.800661)"><tspan
+         x="318.9411"
+         y="610.63959"
+         id="tspan85"><tspan
+           style="text-align:end;text-anchor:end"
+           id="tspan84">Functions performing </tspan></tspan><tspan
+         x="318.9411"
+         y="632.97336"
+         id="tspan87"><tspan
+           style="text-align:end;text-anchor:end"
+           id="tspan86">these three checks will </tspan></tspan><tspan
+         x="318.9411"
+         y="655.3071"
+         id="tspan89"><tspan
+           style="text-align:end;text-anchor:end"
+           id="tspan88">be part of the Workflow </tspan></tspan><tspan
+         x="318.9411"
+         y="677.64084"
+         id="tspan91"><tspan
+           style="text-align:end;text-anchor:end"
+           id="tspan90">class</tspan></tspan></text>
+    <path
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       d="m 209.06755,281.02342 -1e-5,51.771 h -79.62116"
+       id="path17"
+       sodipodi:nodetypes="ccc" />
+  </g>
+</svg>
