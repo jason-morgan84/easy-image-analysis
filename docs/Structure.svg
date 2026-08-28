@@ -24,12 +24,12 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="0.35685431"
-     inkscape:cx="-330.66716"
-     inkscape:cy="1183.9566"
-     inkscape:window-width="2560"
-     inkscape:window-height="1351"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
+     inkscape:cx="711.77507"
+     inkscape:cy="528.22677"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
   <defs
@@ -70,7 +70,7 @@
          transform="translate(-282.63541,-70.977201)"><tspan
            x="97.893173"
            y="118.86221"
-           id="tspan3">Contains code to run the node.</tspan></text>
+           id="tspan6">Contains code to run the node.</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:68.003;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
@@ -80,10 +80,10 @@
          transform="translate(-282.63541,-63.006801)"><tspan
            x="97.893173"
            y="118.86221"
-           id="tspan4">Contains other data required for node </tspan><tspan
+           id="tspan7">Contains other data required for node </tspan><tspan
            x="97.893173"
            y="122.83096"
-           id="tspan5">class (name, shapes, data types) </tspan></text>
+           id="tspan8">class (name, shapes, data types) </tspan></text>
       <rect
          style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
          id="rect59"
@@ -105,7 +105,7 @@
          y="10.747572">Nodes folder</tspan></text>
     <g
        id="g37"
-       transform="translate(0.3069104,23.513032)">
+       transform="translate(0.3069104,50.575313)">
       <rect
          style="fill:none;stroke:#000000;stroke-width:0.79375;-inkscape-stroke:none"
          id="rect1-5"
@@ -133,13 +133,13 @@
          transform="translate(14.679612)"><tspan
            x="97.893173"
            y="118.86221"
-           id="tspan6">Stores parameters required to run a node </tspan><tspan
+           id="tspan10">Stores parameters required to run a node </tspan><tspan
            x="97.893173"
            y="122.83096"
-           id="tspan7">(ie, sigma for gaussian blur, threshold </tspan><tspan
+           id="tspan11">(ie, sigma for gaussian blur, threshold </tspan><tspan
            x="97.893173"
            y="126.79971"
-           id="tspan8">method for thresholding).</tspan></text>
+           id="tspan14">method for thresholding).</tspan></text>
       <text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:middle;white-space:pre;inline-size:62.0414;display:inline;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
@@ -149,30 +149,30 @@
          transform="translate(167.80266,-4.6131699)"><tspan
            x="-24.209154"
            y="139.71844"
-           id="tspan14"><tspan
+           id="tspan16"><tspan
    style="baseline-shift:baseline;text-anchor:start;vector-effect:none;stop-color:#000000;stop-opacity:1"
-   id="tspan10">For each parameter also stores data</tspan><tspan
+   id="tspan15">For each parameter also stores data</tspan><tspan
    y="139.71844"
-   id="tspan15"> </tspan></tspan><tspan
+   id="tspan17"> </tspan></tspan><tspan
            x="-24.209154"
            y="143.68719"
-           id="tspan36"><tspan
+           id="tspan123"><tspan
    style="baseline-shift:baseline;text-anchor:start;vector-effect:none;stop-color:#000000;stop-opacity:1"
-   id="tspan16">type, limits on data input (eg, integer</tspan><tspan
+   id="tspan122">type, limits on data input (eg, integer</tspan><tspan
    y="143.68719"
-   id="tspan37"> </tspan></tspan><tspan
+   id="tspan124"> </tspan></tspan><tspan
            x="-24.209154"
            y="147.65594"
-           id="tspan39"><tspan
+           id="tspan126"><tspan
    style="baseline-shift:baseline;text-anchor:start;vector-effect:none;stop-color:#000000;stop-opacity:1"
-   id="tspan38">between 0 and 1, string from these</tspan><tspan
+   id="tspan125">between 0 and 1, string from these</tspan><tspan
    y="147.65594"
-   id="tspan40"> </tspan></tspan><tspan
+   id="tspan127"> </tspan></tspan><tspan
            x="-24.209154"
            y="151.62469"
-           id="tspan42"><tspan
+           id="tspan129"><tspan
              style="baseline-shift:baseline;text-anchor:start;vector-effect:none;stop-color:#000000;stop-opacity:1"
-             id="tspan41">possible options).</tspan></tspan></text>
+             id="tspan128">possible options).</tspan></tspan></text>
       <text
          xml:space="preserve"
          style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:65.7408;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
@@ -182,23 +182,23 @@
          transform="translate(20.028394)"><tspan
            x="92.5989"
            y="155.31554"
-           id="tspan45">Aim is to have all required data for a </tspan><tspan
+           id="tspan130">Aim is to have all required data for a </tspan><tspan
            x="92.5989"
            y="159.28428"
-           id="tspan48">node in a consistent format for adding </tspan><tspan
+           id="tspan131">node in a consistent format for adding </tspan><tspan
            x="92.5989"
            y="163.25303"
-           id="tspan55">new nodes and for consistent handling </tspan><tspan
+           id="tspan132">new nodes and for consistent handling </tspan><tspan
            x="92.5989"
            y="167.22178"
-           id="tspan56">by UI (eg automaticaly creating user </tspan><tspan
+           id="tspan133">by UI (eg automaticaly creating user </tspan><tspan
            x="92.5989"
            y="171.19053"
-           id="tspan62">input dialogs from required paramaters)</tspan></text>
+           id="tspan134">input dialogs from required paramaters)</tspan></text>
     </g>
     <g
        id="g32"
-       transform="translate(17.61387,24.92208)">
+       transform="translate(17.61387,51.984361)">
       <g
          id="g98">
         <rect
@@ -228,31 +228,31 @@
            transform="translate(-2.6273573,76.279141)"><tspan
              x="97.893173"
              y="118.86221"
-             id="tspan63">c_dim
+             id="tspan135">c_dim
 </tspan><tspan
              x="97.893173"
              y="122.83096"
-             id="tspan64">
+             id="tspan136">
 </tspan><tspan
              x="97.893173"
              y="126.79971"
-             id="tspan65">z_dim
+             id="tspan137">z_dim
 </tspan><tspan
              x="97.893173"
              y="130.76846"
-             id="tspan66">
+             id="tspan138">
 </tspan><tspan
              x="97.893173"
              y="134.73721"
-             id="tspan67">y_dim
+             id="tspan139">y_dim
 </tspan><tspan
              x="97.893173"
              y="138.70596"
-             id="tspan68">
+             id="tspan140">
 </tspan><tspan
              x="97.893173"
              y="142.67471"
-             id="tspan69">x_dim</tspan></text>
+             id="tspan141">x_dim</tspan></text>
         <text
            xml:space="preserve"
            style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-decoration-color:#000000;white-space:pre;inline-size:52.8077;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
@@ -262,42 +262,42 @@
            transform="translate(0,0.8487516)"><tspan
              x="111.39536"
              y="194.2926"
-             id="tspan70">In image class, gives np.array </tspan><tspan
+             id="tspan142">In image class, gives np.array </tspan><tspan
              x="111.39536"
              y="198.26135"
-             id="tspan71">dimension holding each of these </tspan><tspan
+             id="tspan143">dimension holding each of these </tspan><tspan
              x="111.39536"
              y="202.2301"
-             id="tspan72">image dimensions, or not </tspan><tspan
+             id="tspan144">image dimensions, or not </tspan><tspan
              x="111.39536"
              y="206.19885"
-             id="tspan73">present (-1).
+             id="tspan145">present (-1).
 </tspan><tspan
              x="111.39536"
              y="210.1676"
-             id="tspan74">
+             id="tspan146">
 </tspan><tspan
              x="111.39536"
              y="214.13635"
-             id="tspan75">In function, gives desired </tspan><tspan
+             id="tspan147">In function, gives desired </tspan><tspan
              x="111.39536"
              y="218.1051"
-             id="tspan76">inputs/outputs in given </tspan><tspan
+             id="tspan148">inputs/outputs in given </tspan><tspan
              x="111.39536"
              y="222.07385"
-             id="tspan77">channels, or no preference (-1).</tspan></text>
+             id="tspan149">channels, or no preference (-1).</tspan></text>
       </g>
     </g>
     <g
        id="g34"
        transform="translate(-100.6602,2.2098555)">
       <rect
-         style="fill:none;stroke:#000000;stroke-width:0.793753;-inkscape-stroke:none"
+         style="fill:none;stroke:#000000;stroke-width:0.936397;-inkscape-stroke:none"
          id="rect1-5-7"
-         width="73.987808"
-         height="67.314911"
-         x="207.57224"
-         y="56.108879" />
+         width="73.845161"
+         height="93.863831"
+         x="207.64355"
+         y="56.180202" />
       <text
          xml:space="preserve"
          style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
@@ -318,7 +318,7 @@
          transform="translate(115.4506,-52.267887)"><tspan
            x="97.893173"
            y="118.86221"
-           id="tspan78">Image pixel data</tspan></text>
+           id="tspan150">Image pixel data</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
@@ -350,115 +350,139 @@
          transform="translate(100.46409,-8.7118303)"><tspan
            x="112.87909"
            y="96.697441"
-           id="tspan79">Image dimensions (as opposed to array </tspan><tspan
+           id="tspan151">Image dimensions (as opposed to array </tspan><tspan
            x="112.87909"
            y="100.66619"
-           id="tspan80">dimensions)
+           id="tspan152">dimensions)
 </tspan><tspan
            x="112.87909"
            y="104.63494"
-           id="tspan81">
+           id="tspan153">
 </tspan><tspan
            x="112.87909"
            y="108.60369"
-           id="tspan82">In order to avoid repeated transposition </tspan><tspan
+           id="tspan154">Includes properties to iterate through </tspan><tspan
            x="112.87909"
            y="112.57244"
-           id="tspan83">and confusion in what image dimension is </tspan><tspan
+           id="tspan155">each image dimension, regardless of its </tspan><tspan
            x="112.87909"
            y="116.54119"
-           id="tspan84">in what array dimension, includes </tspan><tspan
+           id="tspan156">array location - this is to avoid confusion </tspan><tspan
            x="112.87909"
            y="120.50994"
-           id="tspan85">properties to iterate through each image </tspan><tspan
+           id="tspan157">about what image dimension is in what </tspan><tspan
            x="112.87909"
            y="124.47869"
-           id="tspan86">dimension, regardless of its array </tspan><tspan
+           id="tspan158">array dimension.
+</tspan><tspan
            x="112.87909"
            y="128.44744"
-           id="tspan87">location. </tspan></text>
+           id="tspan159">
+</tspan><tspan
+           x="112.87909"
+           y="132.41618"
+           id="tspan160">Image type changes (where appropriate) </tspan><tspan
+           x="112.87909"
+           y="136.38493"
+           id="tspan161">- between 0-1 floats, 0-255 ints etc - as </tspan><tspan
+           x="112.87909"
+           y="140.35368"
+           id="tspan162">requested by workflow. </tspan></text>
     </g>
     <g
        id="g99"
        transform="translate(0,13.631068)">
       <rect
-         style="fill:none;stroke:#000000;stroke-width:0.793748;-inkscape-stroke:none"
+         style="fill:none;stroke:#000000;stroke-width:0.804843;-inkscape-stroke:none"
          id="rect1-5-1-1"
-         width="74.70874"
-         height="69.065758"
-         x="107.10815"
-         y="245.45551" />
+         width="74.697647"
+         height="71.020683"
+         x="107.11369"
+         y="272.52335" />
       <text
          xml:space="preserve"
          style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
          x="109.22658"
-         y="250.17397"
+         y="277.23624"
          id="text1-2-8-6"><tspan
            sodipodi:role="line"
            id="tspan1-7-9-5"
            style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
            x="109.22658"
-           y="250.17397">Data type list class</tspan></text>
+           y="277.23624">Data type list class</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:68.003;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
          x="97.893173"
          y="118.86221"
          id="text2-6-2-7"
-         transform="translate(14.98652,137.07875)"><tspan
+         transform="translate(14.98652,164.14103)"><tspan
            x="97.893173"
            y="118.86221"
-           id="tspan88">Handles standard data types (int, float) </tspan><tspan
+           id="tspan163">List of all allowed data types for image </tspan><tspan
            x="97.893173"
            y="122.83096"
-           id="tspan89">and their conversions.</tspan></text>
+           id="tspan164">input/output to/from nodes.
+</tspan><tspan
+           x="97.893173"
+           y="126.79971"
+           id="tspan165">
+</tspan><tspan
+           x="97.893173"
+           y="130.76846"
+           id="tspan166">Includes other relevant data such as limts</tspan></text>
       <rect
-         style="fill:none;stroke:#000000;stroke-width:0.793746;-inkscape-stroke:none"
+         style="fill:none;stroke:#000000;stroke-width:0.825354;-inkscape-stroke:none"
          id="rect1-5-1-1-8"
-         width="58.06311"
-         height="34.857018"
-         x="116.9126"
-         y="276.05444" />
+         width="58.031502"
+         height="37.708904"
+         x="116.9284"
+         y="303.13254" />
       <text
          xml:space="preserve"
          style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
          x="119.03103"
-         y="280.77292"
+         y="307.83521"
          id="text1-2-8-6-6"><tspan
            sodipodi:role="line"
            id="tspan1-7-9-5-0"
            style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
            x="119.03103"
-           y="280.77292">Data type class</tspan></text>
+           y="307.83521">Data type class</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:68.003;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
          x="97.893173"
          y="118.86221"
          id="text2-6-2-7-2"
-         transform="translate(24.790971,167.67768)"><tspan
+         transform="translate(24.790971,194.73996)"><tspan
            x="97.893173"
            y="118.86221"
-           id="tspan90">Applicable data types</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;white-space:pre;inline-size:57.1427;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="112.42336"
-         y="251.1602"
-         id="text34"
-         transform="translate(29.092648,15.199364)"><tspan
-           x="112.42336"
-           y="251.1602"
-           id="tspan92"><tspan
-   style="text-align:start;text-anchor:start"
-   id="tspan91">Handles custom/semi-custom data</tspan><tspan
-   y="251.1602"
-   id="tspan93"> </tspan></tspan><tspan
-           x="112.42336"
-           y="255.12895"
-           id="tspan95"><tspan
-             style="text-align:start;text-anchor:start"
-             id="tspan94">types (binarised, segmented)</tspan></tspan></text>
+           id="tspan167">Applicable data types:
+</tspan><tspan
+           x="97.893173"
+           y="122.83096"
+           id="tspan168">
+</tspan><tspan
+           x="97.893173"
+           y="126.79971"
+           id="tspan169">     Int (0-255)
+</tspan><tspan
+           x="97.893173"
+           y="130.76846"
+           id="tspan170">     Float (0-255)
+</tspan><tspan
+           x="97.893173"
+           y="134.73721"
+           id="tspan171">     Float (0-1)
+</tspan><tspan
+           x="97.893173"
+           y="138.70596"
+           id="tspan172">     Binary (0/1)
+</tspan><tspan
+           x="97.893173"
+           y="142.67471"
+           id="tspan173">     Segmented (int in limts)</tspan></text>
     </g>
     <text
        xml:space="preserve"
@@ -480,7 +504,7 @@
        style="fill:none;stroke:#000000;stroke-width:0.793753;-inkscape-stroke:none"
        id="rect1"
        width="50.854362"
-       height="57.932041"
+       height="79.255333"
        x="39.408703"
        y="111.14562" />
     <text
@@ -514,47 +538,71 @@
        transform="translate(1.6611302,1.6682228)"><tspan
          x="44.076454"
          y="121.63106"
-         id="tspan96">Name
+         id="tspan174">Name
 </tspan><tspan
          x="44.076454"
          y="125.5998"
-         id="tspan97">
+         id="tspan175">
 </tspan><tspan
          x="44.076454"
          y="129.56855"
-         id="tspan98">Parameters
+         id="tspan176">Parameters
 </tspan><tspan
          x="44.076454"
          y="133.5373"
-         id="tspan99">
+         id="tspan177">
 </tspan><tspan
          x="44.076454"
          y="137.50605"
-         id="tspan100">Input dimensions
+         id="tspan178">Input dimensions
 </tspan><tspan
          x="44.076454"
          y="141.4748"
-         id="tspan101">Output dimensions
+         id="tspan179">Output dimensions
 </tspan><tspan
          x="44.076454"
          y="145.44355"
-         id="tspan102">
+         id="tspan180">
 </tspan><tspan
          x="44.076454"
          y="149.4123"
-         id="tspan103">Input data type
+         id="tspan181">Input data type
 </tspan><tspan
          x="44.076454"
          y="153.38105"
-         id="tspan104">Output data type
+         id="tspan182">Output data type
 </tspan><tspan
          x="44.076454"
          y="157.3498"
-         id="tspan105">
+         id="tspan183">
 </tspan><tspan
          x="44.076454"
          y="161.31855"
-         id="tspan106">Function to be run
+         id="tspan184">Function to be run
+</tspan><tspan
+         x="44.076454"
+         y="165.2873"
+         id="tspan185">
+</tspan><tspan
+         x="44.076454"
+         y="169.25605"
+         id="tspan186">Link to documentation
+</tspan><tspan
+         x="44.076454"
+         y="173.2248"
+         id="tspan187">
+</tspan><tspan
+         x="44.076454"
+         y="177.19355"
+         id="tspan188">Alerts (e.g., background </tspan><tspan
+         x="44.076454"
+         y="181.1623"
+         id="tspan189">subtract over large </tspan><tspan
+         x="44.076454"
+         y="185.13105"
+         id="tspan191">radius is <tspan
+   style="font-weight:bold;-inkscape-font-specification:'sans-serif Bold'"
+   id="tspan190">slow</tspan>).
 </tspan></text>
     <text
        xml:space="preserve"
@@ -565,23 +613,23 @@
        transform="translate(23.162668)"><tspan
          x="6.1567307"
          y="76.656303"
-         id="tspan107">Contains all existing node class </tspan><tspan
+         id="tspan192">Contains all existing node class </tspan><tspan
          x="6.1567307"
          y="80.62505"
-         id="tspan108">members and code needed to </tspan><tspan
+         id="tspan193">members and code needed to </tspan><tspan
          x="6.1567307"
          y="84.5938"
-         id="tspan109">initialise list from all files in </tspan><tspan
+         id="tspan194">initialise list from all files in </tspan><tspan
          x="6.1567307"
          y="88.56255"
-         id="tspan110">function directory.</tspan></text>
+         id="tspan195">function directory.</tspan></text>
     <rect
        style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.79375;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
        id="rect58"
        width="67.766548"
-       height="110.29313"
+       height="135.72032"
        x="26.869831"
-       y="62.836391" />
+       y="62.836395" />
     <text
        xml:space="preserve"
        style="font-size:4.23333px;line-height:normal;font-family:sans-serif;text-decoration-color:#000000;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
@@ -602,7 +650,7 @@
        style="fill:none;stroke:#000000;stroke-width:0.793748;-inkscape-stroke:none"
        id="rect43"
        width="56.375591"
-       height="49.793232"
+       height="64.436523"
        x="-68.958115"
        y="139.45631" />
     <text
@@ -625,46 +673,60 @@
        transform="translate(12.041883,28.310694)"><tspan
          x="-72.209251"
          y="121.63106"
-         id="tspan111">Node to be run
+         id="tspan196">Node to be run
 </tspan><tspan
          x="-72.209251"
          y="125.5998"
-         id="tspan112">
+         id="tspan197">
 </tspan><tspan
          x="-72.209251"
          y="129.56855"
-         id="tspan113">Output image
+         id="tspan198">Output image
 </tspan><tspan
          x="-72.209251"
          y="133.5373"
-         id="tspan114">
+         id="tspan199">
 </tspan><tspan
          x="-72.209251"
          y="137.50605"
-         id="tspan115">Input connection(s)
+         id="tspan200">Input connection(s)
 </tspan><tspan
          x="-72.209251"
          y="141.4748"
-         id="tspan116">
+         id="tspan201">
 </tspan><tspan
          x="-72.209251"
          y="145.44355"
-         id="tspan117">Output connection(s)
+         id="tspan202">Output connection(s)
 </tspan><tspan
          x="-72.209251"
          y="149.4123"
-         id="tspan118">
+         id="tspan203">
 </tspan><tspan
          x="-72.209251"
          y="153.38105"
-         id="tspan119">ID - unique identifier for </tspan><tspan
+         id="tspan204">ID - unique identifier for </tspan><tspan
          x="-72.209251"
          y="157.3498"
-         id="tspan120">referring to/from UI
+         id="tspan205">referring to/from UI
 </tspan><tspan
          x="-72.209251"
          y="161.31855"
-         id="tspan121">
+         id="tspan206">
+</tspan><tspan
+         x="-72.209251"
+         y="165.2873"
+         id="tspan207">NeedsUpdating - set if this </tspan><tspan
+         x="-72.209251"
+         y="169.25605"
+         id="tspan208">node needs to be rerun </tspan><tspan
+         x="-72.209251"
+         y="173.2248"
+         id="tspan209">(upstream node changed)
+</tspan><tspan
+         x="-72.209251"
+         y="177.19355"
+         id="tspan210">
 </tspan></text>
     <rect
        style="fill:none;stroke:#000000;stroke-width:0.79375;-inkscape-stroke:none"
@@ -693,59 +755,62 @@
        transform="translate(4.1583869,-48.309231)"><tspan
          x="-72.209251"
          y="121.63106"
-         id="tspan122">Checks correct data types for connections 
+         id="tspan211">Checks correct data types for connections 
 </tspan><tspan
          x="-72.209251"
          y="125.5998"
-         id="tspan123">
+         id="tspan212">
 </tspan><tspan
          x="-72.209251"
          y="129.56855"
-         id="tspan124">Simple type conversions
-</tspan><tspan
+         id="tspan213">Arranges simple type conversions </tspan><tspan
          x="-72.209251"
          y="133.5373"
-         id="tspan125">
+         id="tspan214">(conversions in image class)
 </tspan><tspan
          x="-72.209251"
          y="137.50605"
-         id="tspan126">Highlights other type conflicts to user </tspan><tspan
-         x="-72.209251"
-         y="141.4748"
-         id="tspan127">(eg, non-binarised data to binary </tspan><tspan
-         x="-72.209251"
-         y="145.44355"
-         id="tspan128">processing)
+         id="tspan215">
 </tspan><tspan
          x="-72.209251"
+         y="141.4748"
+         id="tspan216">Highlights other type conflicts to user </tspan><tspan
+         x="-72.209251"
+         y="145.44355"
+         id="tspan217">(eg, non-binarised data to binary </tspan><tspan
+         x="-72.209251"
          y="149.4123"
-         id="tspan129">
+         id="tspan218">processing)
 </tspan><tspan
          x="-72.209251"
          y="153.38105"
-         id="tspan130">Checks image shape
+         id="tspan219">
 </tspan><tspan
          x="-72.209251"
          y="157.3498"
-         id="tspan131">
+         id="tspan220">Checks image shape
 </tspan><tspan
          x="-72.209251"
          y="161.31855"
-         id="tspan132">Highlights inappropriate image shape to </tspan><tspan
-         x="-72.209251"
-         y="165.2873"
-         id="tspan133">user
+         id="tspan221">
 </tspan><tspan
          x="-72.209251"
+         y="165.2873"
+         id="tspan222">Highlights inappropriate image shape to </tspan><tspan
+         x="-72.209251"
          y="169.25605"
-         id="tspan134">
+         id="tspan223">user
 </tspan><tspan
          x="-72.209251"
          y="173.2248"
-         id="tspan135">Checks other nodes that could fix shape/</tspan><tspan
+         id="tspan224">
+</tspan><tspan
          x="-72.209251"
          y="177.19355"
-         id="tspan136">type conflicts and suggests to user</tspan></text>
+         id="tspan225">Checks other nodes that could fix shape/</tspan><tspan
+         x="-72.209251"
+         y="181.1623"
+         id="tspan226">type conflicts and suggests to user</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:4.23333px;line-height:normal;font-family:sans-serif;text-decoration-color:#000000;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
@@ -766,7 +831,7 @@
        style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none"
        id="rect60"
        width="278.12619"
-       height="313.82901"
+       height="339.38443"
        x="-86.504852"
        y="20.708738" />
     <text
