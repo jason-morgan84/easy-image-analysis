@@ -21,829 +21,1037 @@
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
+     inkscape:deskcolor="#ffffff"
      inkscape:document-units="mm"
-     inkscape:zoom="0.35685431"
-     inkscape:cx="711.77507"
-     inkscape:cy="528.22677"
+     inkscape:zoom="0.5046682"
+     inkscape:cx="481.50448"
+     inkscape:cy="593.45923"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer1"
+     showborder="false" />
   <defs
-     id="defs1" />
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="marker192"
+       refX="3"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path192" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker170"
+       refX="0"
+       refY="0"
+       orient="270.00"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path170" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker192-6"
+       refX="1"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path192-4" />
+    </marker>
+  </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <rect
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       id="rect192"
+       width="642.84412"
+       height="280.53128"
+       x="-177.74048"
+       y="9.0200129" />
     <g
        id="g31-4"
        transform="translate(-63.713922,27.008483)" />
-    <g
-       id="g100">
-      <rect
-         style="fill:none;stroke:#000000;stroke-width:0.793748;-inkscape-stroke:none"
-         id="rect1-5-1-1-5"
-         width="74.70874"
-         height="29.745371"
-         x="-190.51378"
-         y="35.906719" />
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="-188.39536"
-         y="40.625164"
-         id="text1-2-8-6-9"><tspan
-           sodipodi:role="line"
-           id="tspan1-7-9-5-9"
-           style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
-           x="-188.39536"
-           y="40.625164">operation files</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:68.003;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="97.893173"
-         y="118.86221"
-         id="text2-6-2-7-6"
-         transform="translate(-282.63541,-70.977201)"><tspan
-           x="97.893173"
-           y="118.86221"
-           id="tspan6">Contains code to run the node.</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:68.003;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="97.893173"
-         y="118.86221"
-         id="text40"
-         transform="translate(-282.63541,-63.006801)"><tspan
-           x="97.893173"
-           y="118.86221"
-           id="tspan7">Contains other data required for node </tspan><tspan
-           x="97.893173"
-           y="122.83096"
-           id="tspan8">class (name, shapes, data types) </tspan></text>
-      <rect
-         style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
-         id="rect59"
-         width="87.118301"
-         height="52.270981"
-         x="-196.69112"
-         y="20.708738" />
-    </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:5.64444px;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:middle;white-space:normal;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
-       x="-197.87624"
-       y="10.747572"
-       id="text59"><tspan
-         sodipodi:role="line"
-         id="tspan59"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:5.64444px;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
-         x="-197.87624"
-         y="10.747572">Nodes folder</tspan></text>
-    <g
-       id="g37"
-       transform="translate(0.3069104,50.575313)">
-      <rect
-         style="fill:none;stroke:#000000;stroke-width:0.79375;-inkscape-stroke:none"
-         id="rect1-5"
-         width="74.70874"
-         height="71.432037"
-         x="106.80125"
-         y="108.37677" />
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="108.91967"
-         y="113.09521"
-         id="text1-2"><tspan
-           sodipodi:role="line"
-           id="tspan1-7"
-           style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
-           x="108.91967"
-           y="113.09521">Parameter Class</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:70.8865;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="97.893173"
-         y="118.86221"
-         id="text2-6"
-         transform="translate(14.679612)"><tspan
-           x="97.893173"
-           y="118.86221"
-           id="tspan10">Stores parameters required to run a node </tspan><tspan
-           x="97.893173"
-           y="122.83096"
-           id="tspan11">(ie, sigma for gaussian blur, threshold </tspan><tspan
-           x="97.893173"
-           y="126.79971"
-           id="tspan14">method for thresholding).</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:middle;white-space:pre;inline-size:62.0414;display:inline;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
-         x="-24.209154"
-         y="139.71844"
-         id="text9"
-         transform="translate(167.80266,-4.6131699)"><tspan
-           x="-24.209154"
-           y="139.71844"
-           id="tspan16"><tspan
-   style="baseline-shift:baseline;text-anchor:start;vector-effect:none;stop-color:#000000;stop-opacity:1"
-   id="tspan15">For each parameter also stores data</tspan><tspan
-   y="139.71844"
-   id="tspan17"> </tspan></tspan><tspan
-           x="-24.209154"
-           y="143.68719"
-           id="tspan123"><tspan
-   style="baseline-shift:baseline;text-anchor:start;vector-effect:none;stop-color:#000000;stop-opacity:1"
-   id="tspan122">type, limits on data input (eg, integer</tspan><tspan
-   y="143.68719"
-   id="tspan124"> </tspan></tspan><tspan
-           x="-24.209154"
-           y="147.65594"
-           id="tspan126"><tspan
-   style="baseline-shift:baseline;text-anchor:start;vector-effect:none;stop-color:#000000;stop-opacity:1"
-   id="tspan125">between 0 and 1, string from these</tspan><tspan
-   y="147.65594"
-   id="tspan127"> </tspan></tspan><tspan
-           x="-24.209154"
-           y="151.62469"
-           id="tspan129"><tspan
-             style="baseline-shift:baseline;text-anchor:start;vector-effect:none;stop-color:#000000;stop-opacity:1"
-             id="tspan128">possible options).</tspan></tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:65.7408;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="92.5989"
-         y="155.31554"
-         id="text10"
-         transform="translate(20.028394)"><tspan
-           x="92.5989"
-           y="155.31554"
-           id="tspan130">Aim is to have all required data for a </tspan><tspan
-           x="92.5989"
-           y="159.28428"
-           id="tspan131">node in a consistent format for adding </tspan><tspan
-           x="92.5989"
-           y="163.25303"
-           id="tspan132">new nodes and for consistent handling </tspan><tspan
-           x="92.5989"
-           y="167.22178"
-           id="tspan133">by UI (eg automaticaly creating user </tspan><tspan
-           x="92.5989"
-           y="171.19053"
-           id="tspan134">input dialogs from required paramaters)</tspan></text>
-    </g>
-    <g
-       id="g32"
-       transform="translate(17.61387,51.984361)">
-      <g
-         id="g98">
-        <rect
-           style="fill:none;stroke:#000000;stroke-width:0.793748;-inkscape-stroke:none"
-           id="rect1-5-1"
-           width="74.70874"
-           height="43.252426"
-           x="89.494286"
-           y="184.65591" />
-        <text
-           xml:space="preserve"
-           style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-           x="91.612701"
-           y="189.37436"
-           id="text1-2-8"><tspan
-             sodipodi:role="line"
-             id="tspan1-7-9"
-             style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
-             x="91.612701"
-             y="189.37436">Dimension class</tspan></text>
-        <text
-           xml:space="preserve"
-           style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:68.003;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-           x="97.893173"
-           y="118.86221"
-           id="text2-6-2"
-           transform="translate(-2.6273573,76.279141)"><tspan
-             x="97.893173"
-             y="118.86221"
-             id="tspan135">c_dim
-</tspan><tspan
-             x="97.893173"
-             y="122.83096"
-             id="tspan136">
-</tspan><tspan
-             x="97.893173"
-             y="126.79971"
-             id="tspan137">z_dim
-</tspan><tspan
-             x="97.893173"
-             y="130.76846"
-             id="tspan138">
-</tspan><tspan
-             x="97.893173"
-             y="134.73721"
-             id="tspan139">y_dim
-</tspan><tspan
-             x="97.893173"
-             y="138.70596"
-             id="tspan140">
-</tspan><tspan
-             x="97.893173"
-             y="142.67471"
-             id="tspan141">x_dim</tspan></text>
-        <text
-           xml:space="preserve"
-           style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-decoration-color:#000000;white-space:pre;inline-size:52.8077;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-           x="111.39536"
-           y="194.2926"
-           id="text96"
-           transform="translate(0,0.8487516)"><tspan
-             x="111.39536"
-             y="194.2926"
-             id="tspan142">In image class, gives np.array </tspan><tspan
-             x="111.39536"
-             y="198.26135"
-             id="tspan143">dimension holding each of these </tspan><tspan
-             x="111.39536"
-             y="202.2301"
-             id="tspan144">image dimensions, or not </tspan><tspan
-             x="111.39536"
-             y="206.19885"
-             id="tspan145">present (-1).
-</tspan><tspan
-             x="111.39536"
-             y="210.1676"
-             id="tspan146">
-</tspan><tspan
-             x="111.39536"
-             y="214.13635"
-             id="tspan147">In function, gives desired </tspan><tspan
-             x="111.39536"
-             y="218.1051"
-             id="tspan148">inputs/outputs in given </tspan><tspan
-             x="111.39536"
-             y="222.07385"
-             id="tspan149">channels, or no preference (-1).</tspan></text>
-      </g>
-    </g>
-    <g
-       id="g34"
-       transform="translate(-100.6602,2.2098555)">
-      <rect
-         style="fill:none;stroke:#000000;stroke-width:0.936397;-inkscape-stroke:none"
-         id="rect1-5-7"
-         width="73.845161"
-         height="93.863831"
-         x="207.64355"
-         y="56.180202" />
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="209.69066"
-         y="60.827316"
-         id="text1-2-4"><tspan
-           sodipodi:role="line"
-           id="tspan1-7-2"
-           style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
-           x="209.69066"
-           y="60.827316">Image Class</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:70.8865;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="97.893173"
-         y="118.86221"
-         id="text2-6-7"
-         transform="translate(115.4506,-52.267887)"><tspan
-           x="97.893173"
-           y="118.86221"
-           id="tspan150">Image pixel data</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="213.34317"
-         y="73.437065"
-         id="text23-6"><tspan
-           sodipodi:role="line"
-           style="text-align:start;text-anchor:start;stroke-width:1.32292"
-           x="213.34317"
-           y="73.437065"
-           id="tspan23-5">Image name</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="213.34317"
-         y="80.776871"
-         id="text24"><tspan
-           sodipodi:role="line"
-           style="text-align:start;text-anchor:start;stroke-width:1.32292"
-           x="213.34317"
-           y="80.776871"
-           id="tspan24">Image filename</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:68.2169;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="112.87909"
-         y="96.697441"
-         id="text25"
-         transform="translate(100.46409,-8.7118303)"><tspan
-           x="112.87909"
-           y="96.697441"
-           id="tspan151">Image dimensions (as opposed to array </tspan><tspan
-           x="112.87909"
-           y="100.66619"
-           id="tspan152">dimensions)
-</tspan><tspan
-           x="112.87909"
-           y="104.63494"
-           id="tspan153">
-</tspan><tspan
-           x="112.87909"
-           y="108.60369"
-           id="tspan154">Includes properties to iterate through </tspan><tspan
-           x="112.87909"
-           y="112.57244"
-           id="tspan155">each image dimension, regardless of its </tspan><tspan
-           x="112.87909"
-           y="116.54119"
-           id="tspan156">array location - this is to avoid confusion </tspan><tspan
-           x="112.87909"
-           y="120.50994"
-           id="tspan157">about what image dimension is in what </tspan><tspan
-           x="112.87909"
-           y="124.47869"
-           id="tspan158">array dimension.
-</tspan><tspan
-           x="112.87909"
-           y="128.44744"
-           id="tspan159">
-</tspan><tspan
-           x="112.87909"
-           y="132.41618"
-           id="tspan160">Image type changes (where appropriate) </tspan><tspan
-           x="112.87909"
-           y="136.38493"
-           id="tspan161">- between 0-1 floats, 0-255 ints etc - as </tspan><tspan
-           x="112.87909"
-           y="140.35368"
-           id="tspan162">requested by workflow. </tspan></text>
-    </g>
-    <g
-       id="g99"
-       transform="translate(0,13.631068)">
-      <rect
-         style="fill:none;stroke:#000000;stroke-width:0.804843;-inkscape-stroke:none"
-         id="rect1-5-1-1"
-         width="74.697647"
-         height="71.020683"
-         x="107.11369"
-         y="272.52335" />
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="109.22658"
-         y="277.23624"
-         id="text1-2-8-6"><tspan
-           sodipodi:role="line"
-           id="tspan1-7-9-5"
-           style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
-           x="109.22658"
-           y="277.23624">Data type list class</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:68.003;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="97.893173"
-         y="118.86221"
-         id="text2-6-2-7"
-         transform="translate(14.98652,164.14103)"><tspan
-           x="97.893173"
-           y="118.86221"
-           id="tspan163">List of all allowed data types for image </tspan><tspan
-           x="97.893173"
-           y="122.83096"
-           id="tspan164">input/output to/from nodes.
-</tspan><tspan
-           x="97.893173"
-           y="126.79971"
-           id="tspan165">
-</tspan><tspan
-           x="97.893173"
-           y="130.76846"
-           id="tspan166">Includes other relevant data such as limts</tspan></text>
-      <rect
-         style="fill:none;stroke:#000000;stroke-width:0.825354;-inkscape-stroke:none"
-         id="rect1-5-1-1-8"
-         width="58.031502"
-         height="37.708904"
-         x="116.9284"
-         y="303.13254" />
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="119.03103"
-         y="307.83521"
-         id="text1-2-8-6-6"><tspan
-           sodipodi:role="line"
-           id="tspan1-7-9-5-0"
-           style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
-           x="119.03103"
-           y="307.83521">Data type class</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:68.003;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-         x="97.893173"
-         y="118.86221"
-         id="text2-6-2-7-2"
-         transform="translate(24.790971,194.73996)"><tspan
-           x="97.893173"
-           y="118.86221"
-           id="tspan167">Applicable data types:
-</tspan><tspan
-           x="97.893173"
-           y="122.83096"
-           id="tspan168">
-</tspan><tspan
-           x="97.893173"
-           y="126.79971"
-           id="tspan169">     Int (0-255)
-</tspan><tspan
-           x="97.893173"
-           y="130.76846"
-           id="tspan170">     Float (0-255)
-</tspan><tspan
-           x="97.893173"
-           y="134.73721"
-           id="tspan171">     Float (0-1)
-</tspan><tspan
-           x="97.893173"
-           y="138.70596"
-           id="tspan172">     Binary (0/1)
-</tspan><tspan
-           x="97.893173"
-           y="142.67471"
-           id="tspan173">     Segmented (int in limts)</tspan></text>
-    </g>
+       style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:70.8865;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
+       x="97.893173"
+       y="118.86221"
+       id="text2-6-7-2"
+       transform="translate(-51.09853,-582.49133)" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
-       x="106.49837"
-       y="48.757286"
-       id="text11"><tspan
-         sodipodi:role="line"
-         id="tspan9"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
-         x="106.49837"
-         y="48.757286">Characeteristics classes</tspan><tspan
-         sodipodi:role="line"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
-         x="106.49837"
-         y="54.04895"
-         id="tspan34">(characteristics_class.py)</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;inline-size:208.224;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       x="-19.70577"
+       y="30.747581"
+       id="text15-8-9"><tspan
+         x="-19.70577"
+         y="30.747581"
+         id="tspan4"><tspan
+           style="font-weight:bold;baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
+           id="tspan3">Workflow class
+</tspan></tspan><tspan
+         x="-19.70577"
+         y="36.039242"
+         id="tspan6"><tspan
+           style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
+           id="tspan5">
+</tspan></tspan><tspan
+         x="-19.70577"
+         y="41.330906"
+         id="tspan8"><tspan
+           style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
+           id="tspan7">Contains lists of all nodes, ports and connections.
+</tspan></tspan><tspan
+         x="-19.70577"
+         y="46.62257"
+         id="tspan10"><tspan
+           style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
+           id="tspan9">
+</tspan></tspan><tspan
+         x="-19.70577"
+         y="51.914234"
+         id="tspan12"><tspan
+           style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
+           id="tspan11">Ports form part of node accepting inputs and delivering outputs. They act as a buffer interpreting </tspan></tspan><tspan
+         x="-19.70577"
+         y="57.205898"
+         id="tspan119"><tspan
+           style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
+           id="tspan118">ImageOperation outputs for other backend code.
+</tspan></tspan><tspan
+         x="-19.70577"
+         y="62.497562"
+         id="tspan121"><tspan
+           style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
+           id="tspan120">
+</tspan></tspan><tspan
+         x="-19.70577"
+         y="67.789227"
+         id="tspan123"><tspan
+           style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
+           id="tspan122">Connections connect ports between nodes. They deal with data checking.
+</tspan></tspan><tspan
+         x="-19.70577"
+         y="73.080891"
+         id="tspan125"><tspan
+           style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
+           id="tspan124">
+</tspan></tspan><tspan
+         x="-19.70577"
+         y="78.372555"
+         id="tspan127"><tspan
+           style="baseline-shift:baseline;white-space:normal;vector-effect:none;stop-color:#000000;stop-opacity:1"
+           id="tspan126">Functions to create nodes, ports and connections.</tspan></tspan></text>
     <rect
-       style="fill:none;stroke:#000000;stroke-width:0.793753;-inkscape-stroke:none"
-       id="rect1"
-       width="50.854362"
-       height="79.255333"
-       x="39.408703"
-       y="111.14562" />
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       id="rect2-2"
+       width="109.88451"
+       height="68.522736"
+       x="-156.33383"
+       y="118.24862" />
     <text
        xml:space="preserve"
-       style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="41.52713"
-       y="115.86407"
-       id="text1"><tspan
+       style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:107.612;display:inline;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="120.80676"
+       y="-269.33859"
+       id="text15-3"
+       transform="translate(-274.86813,395.67701)"><tspan
+         x="120.80676"
+         y="-269.33859"
+         id="tspan132"><tspan
+           style="font-weight:bold"
+           id="tspan131">ImageOperation class
+</tspan></tspan><tspan
+         x="120.80676"
+         y="-264.04695"
+         id="tspan137">
+</tspan><tspan
+         x="120.80676"
+         y="-258.75529"
+         id="tspan138">Imports from all files in ImageOperation folder.
+</tspan><tspan
+         x="120.80676"
+         y="-253.46363"
+         id="tspan139">
+</tspan><tspan
+         x="120.80676"
+         y="-248.17198"
+         id="tspan140">Contains code, required inputs, delivered outputs, </tspan><tspan
+         x="120.80676"
+         y="-242.88032"
+         id="tspan141">parameters, documentation (including alerts to users in </tspan><tspan
+         x="120.80676"
+         y="-237.58866"
+         id="tspan142">UI), category(s) of operation.
+</tspan><tspan
+         x="120.80676"
+         y="-232.29701"
+         id="tspan143">
+</tspan><tspan
+         x="120.80676"
+         y="-227.00535"
+         id="tspan144">For future proofing, also contains ImageOperation </tspan><tspan
+         x="120.80676"
+         y="-221.7137"
+         id="tspan145">version it was written under (if future changes in back </tspan><tspan
+         x="120.80676"
+         y="-216.42204"
+         id="tspan146">end code change how ImageOperations interact with </tspan><tspan
+         x="120.80676"
+         y="-211.13038"
+         id="tspan147">other code).</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       x="-162.76312"
+       y="86.642845"
+       id="text15-8"><tspan
          sodipodi:role="line"
-         id="tspan1"
-         style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
-         x="41.52713"
-         y="115.86407">node class</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="28.988258"
-       y="67.55484"
-       id="text1-7"><tspan
+         id="tspan15-2"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         x="-162.76312"
+         y="86.642845">ImageOperation directory class</tspan><tspan
          sodipodi:role="line"
-         id="tspan1-1"
-         style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
-         x="28.988258"
-         y="67.55484">node directory class</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         x="-162.76312"
+         y="91.934502"
+         id="tspan16-4" /><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         x="-162.76312"
+         y="97.226158"
+         id="tspan136-2">All ImageOperation classes</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         x="-162.76312"
+         y="102.51785"
+         id="tspan151" /><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         x="-162.76312"
+         y="107.8095"
+         id="tspan152">Code for importing ImageOperation classes</tspan></text>
+    <rect
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       id="rect136"
+       width="129.75066"
+       height="117.51704"
+       x="-168.10187"
+       y="78.714684" />
+    <rect
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       id="rect153"
+       width="212.04965"
+       height="263.3248"
+       x="-27.229712"
+       y="20.141502" />
+    <rect
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       id="rect157"
+       width="71.177505"
+       height="76.367538"
+       x="-19.073965"
+       y="84.481674" />
     <text
        xml:space="preserve"
-       style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:39.2828;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="44.076454"
-       y="121.63106"
-       id="text2"
-       transform="translate(1.6611302,1.6682228)"><tspan
-         x="44.076454"
-         y="121.63106"
-         id="tspan174">Name
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:251.263;display:inline;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       x="-430.97623"
+       y="-1566.3757"
+       id="text158"
+       transform="matrix(0.26458333,0,0,0.26458333,98.697795,504.87379)"><tspan
+         x="-430.97623"
+         y="-1566.3757"
+         id="tspan153"><tspan
+           style="font-weight:bold"
+           id="tspan148">Node class
+</tspan></tspan><tspan
+         x="-430.97623"
+         y="-1546.3758"
+         id="tspan154">
 </tspan><tspan
-         x="44.076454"
-         y="125.5998"
-         id="tspan175">
+         x="-430.97623"
+         y="-1526.3758"
+         id="tspan155">Defines ImageOperation to be run
 </tspan><tspan
-         x="44.076454"
-         y="129.56855"
-         id="tspan176">Parameters
+         x="-430.97623"
+         y="-1506.3758"
+         id="tspan156">
 </tspan><tspan
-         x="44.076454"
-         y="133.5373"
+         x="-430.97623"
+         y="-1486.3758"
+         id="tspan157">Has unique ID
+</tspan><tspan
+         x="-430.97623"
+         y="-1466.3758"
+         id="tspan158">
+</tspan><tspan
+         x="-430.97623"
+         y="-1446.3758"
+         id="tspan159">Has flags: IsReady, NeedsUpdate
+</tspan><tspan
+         x="-430.97623"
+         y="-1426.3758"
+         id="tspan160">
+</tspan><tspan
+         x="-430.97623"
+         y="-1406.3758"
+         id="tspan161">Contains input and output ports </tspan><tspan
+         x="-430.97623"
+         y="-1386.3758"
+         id="tspan162">defined by ImageOperation class
+</tspan><tspan
+         x="-430.97623"
+         y="-1366.3758"
+         id="tspan163">
+</tspan><tspan
+         x="-430.97623"
+         y="-1346.3758"
+         id="tspan164">Holds output image</tspan></text>
+    <rect
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       id="rect157-6"
+       width="109.732"
+       height="76.367538"
+       x="70.593124"
+       y="84.481674" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:395.544;display:inline;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       x="-430.97623"
+       y="-1566.3757"
+       id="text158-0"
+       transform="matrix(0.26458333,0,0,0.26458333,188.36489,504.87379)"><tspan
+         x="-430.97623"
+         y="-1566.3757"
+         id="tspan166"><tspan
+           style="font-weight:bold"
+           id="tspan165">Port class
+</tspan></tspan><tspan
+         x="-430.97623"
+         y="-1546.3758"
+         id="tspan168"><tspan
+           style="font-weight:bold"
+           id="tspan167">
+</tspan></tspan><tspan
+         x="-430.97623"
+         y="-1526.3758"
+         id="tspan171">Added to node class on creation
+</tspan><tspan
+         x="-430.97623"
+         y="-1506.3758"
+         id="tspan172">
+</tspan><tspan
+         x="-430.97623"
+         y="-1486.3758"
+         id="tspan173">Has PortID and NodeID
+</tspan><tspan
+         x="-430.97623"
+         y="-1466.3758"
+         id="tspan174">
+</tspan><tspan
+         x="-430.97623"
+         y="-1446.3758"
+         id="tspan175">Allows the code governing inputs and outputs to nodes </tspan><tspan
+         x="-430.97623"
+         y="-1426.3758"
+         id="tspan176">to be changed independently of ImageOperations
+</tspan><tspan
+         x="-430.97623"
+         y="-1406.3758"
          id="tspan177">
 </tspan><tspan
-         x="44.076454"
-         y="137.50605"
-         id="tspan178">Input dimensions
+         x="-430.97623"
+         y="-1386.3758"
+         id="tspan178">Has isInput flag:
 </tspan><tspan
-         x="44.076454"
-         y="141.4748"
-         id="tspan179">Output dimensions
+         x="-430.97623"
+         y="-1366.3758"
+         id="tspan179">     Inputs allow one connection to a previous output
 </tspan><tspan
-         x="44.076454"
-         y="145.44355"
-         id="tspan180">
+         x="-430.97623"
+         y="-1346.3758"
+         id="tspan180">     Outputs allow multiple connections to other inputs
 </tspan><tspan
-         x="44.076454"
-         y="149.4123"
-         id="tspan181">Input data type
+         x="-430.97623"
+         y="-1326.3758"
+         id="tspan181">
 </tspan><tspan
-         x="44.076454"
-         y="153.38105"
-         id="tspan182">Output data type
-</tspan><tspan
-         x="44.076454"
-         y="157.3498"
-         id="tspan183">
-</tspan><tspan
-         x="44.076454"
-         y="161.31855"
-         id="tspan184">Function to be run
-</tspan><tspan
-         x="44.076454"
-         y="165.2873"
-         id="tspan185">
-</tspan><tspan
-         x="44.076454"
-         y="169.25605"
-         id="tspan186">Link to documentation
-</tspan><tspan
-         x="44.076454"
-         y="173.2248"
-         id="tspan187">
-</tspan><tspan
-         x="44.076454"
-         y="177.19355"
-         id="tspan188">Alerts (e.g., background </tspan><tspan
-         x="44.076454"
-         y="181.1623"
-         id="tspan189">subtract over large </tspan><tspan
-         x="44.076454"
-         y="185.13105"
-         id="tspan191">radius is <tspan
-   style="font-weight:bold;-inkscape-font-specification:'sans-serif Bold'"
-   id="tspan190">slow</tspan>).
-</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:54.0047;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="6.1567307"
-       y="76.656303"
-       id="text2-9"
-       transform="translate(23.162668)"><tspan
-         x="6.1567307"
-         y="76.656303"
-         id="tspan192">Contains all existing node class </tspan><tspan
-         x="6.1567307"
-         y="80.62505"
-         id="tspan193">members and code needed to </tspan><tspan
-         x="6.1567307"
-         y="84.5938"
-         id="tspan194">initialise list from all files in </tspan><tspan
-         x="6.1567307"
-         y="88.56255"
-         id="tspan195">function directory.</tspan></text>
+         x="-430.97623"
+         y="-1306.3758"
+         id="tspan182">Defines required data type and shape of input</tspan></text>
     <rect
-       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.79375;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
-       id="rect58"
-       width="67.766548"
-       height="135.72032"
-       x="26.869831"
-       y="62.836395" />
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       id="rect157-6-8"
+       width="109.732"
+       height="110.84415"
+       x="70.593124"
+       y="169.53166" />
     <text
        xml:space="preserve"
-       style="font-size:4.23333px;line-height:normal;font-family:sans-serif;text-decoration-color:#000000;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="26.192352"
-       y="49.625828"
-       id="text11-4"><tspan
-         sodipodi:role="line"
-         id="tspan9-3"
-         style="font-weight:bold;font-size:4.23333px;stroke-width:1.32292"
-         x="26.192352"
-         y="49.625828">Node classes</tspan><tspan
-         sodipodi:role="line"
-         style="font-weight:bold;font-size:4.23333px;stroke-width:1.32292"
-         x="26.192352"
-         y="54.917488"
-         id="tspan34-1">(node_class.py)</tspan></text>
-    <rect
-       style="fill:none;stroke:#000000;stroke-width:0.793748;-inkscape-stroke:none"
-       id="rect43"
-       width="56.375591"
-       height="64.436523"
-       x="-68.958115"
-       y="139.45631" />
-    <text
-       xml:space="preserve"
-       style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="-66.839684"
-       y="144.17476"
-       id="text43"><tspan
-         sodipodi:role="line"
-         id="tspan43"
-         style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
-         x="-66.839684"
-         y="144.17476">Workflow element class</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:43.4905;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="-72.209251"
-       y="121.63106"
-       id="text44"
-       transform="translate(12.041883,28.310694)"><tspan
-         x="-72.209251"
-         y="121.63106"
-         id="tspan196">Node to be run
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;shape-padding:0;shape-margin:0;inline-size:393.607;display:inline;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       x="-430.97623"
+       y="-1566.3757"
+       id="text158-0-2"
+       transform="matrix(0.26458333,0,0,0.26458333,188.35868,589.92381)"><tspan
+         x="-430.97623"
+         y="-1566.3757"
+         id="tspan184"><tspan
+           style="font-weight:bold"
+           id="tspan183">Connection class
+</tspan></tspan><tspan
+         x="-430.97623"
+         y="-1546.3758"
+         id="tspan186"><tspan
+           style="font-weight:bold"
+           id="tspan185">
+</tspan></tspan><tspan
+         x="-430.97623"
+         y="-1526.3758"
+         id="tspan187">Created on connection between nodes by user
 </tspan><tspan
-         x="-72.209251"
-         y="125.5998"
-         id="tspan197">
+         x="-430.97623"
+         y="-1506.3758"
+         id="tspan188">
 </tspan><tspan
-         x="-72.209251"
-         y="129.56855"
-         id="tspan198">Output image
+         x="-430.97623"
+         y="-1486.3758"
+         id="tspan189">Has direction - defined input and output
 </tspan><tspan
-         x="-72.209251"
-         y="133.5373"
+         x="-430.97623"
+         y="-1466.3758"
+         id="tspan190">
+</tspan><tspan
+         x="-430.97623"
+         y="-1446.3758"
+         id="tspan191">One connection carries one item from one output to </tspan><tspan
+         x="-430.97623"
+         y="-1426.3758"
+         id="tspan195">one input
+</tspan><tspan
+         x="-430.97623"
+         y="-1406.3758"
+         id="tspan196">
+</tspan><tspan
+         x="-430.97623"
+         y="-1386.3758"
+         id="tspan197">Carries out type structure/constraint/type checking (see </tspan><tspan
+         x="-430.97623"
+         y="-1366.3758"
+         id="tspan198">Workflow graph map)
+</tspan><tspan
+         x="-430.97623"
+         y="-1346.3758"
          id="tspan199">
 </tspan><tspan
-         x="-72.209251"
-         y="137.50605"
-         id="tspan200">Input connection(s)
+         x="-430.97623"
+         y="-1326.3758"
+         id="tspan200">Where possible, carries out type conversions to allow </tspan><tspan
+         x="-430.97623"
+         y="-1306.3758"
+         id="tspan201">data flow between ports
 </tspan><tspan
-         x="-72.209251"
-         y="141.4748"
-         id="tspan201">
+         x="-430.97623"
+         y="-1286.3758"
+         id="tspan202">
 </tspan><tspan
-         x="-72.209251"
-         y="145.44355"
-         id="tspan202">Output connection(s)
+         x="-430.97623"
+         y="-1266.3758"
+         id="tspan203">Otherwise, tries to suggest ImageOperations that may </tspan><tspan
+         x="-430.97623"
+         y="-1246.3758"
+         id="tspan204">fix incompatible shape/type
 </tspan><tspan
-         x="-72.209251"
-         y="149.4123"
-         id="tspan203">
+         x="-430.97623"
+         y="-1226.3758"
+         id="tspan205">
 </tspan><tspan
-         x="-72.209251"
-         y="153.38105"
-         id="tspan204">ID - unique identifier for </tspan><tspan
-         x="-72.209251"
-         y="157.3498"
-         id="tspan205">referring to/from UI
+         x="-430.97623"
+         y="-1206.3758"
+         id="tspan206">Otherwise, returns defined error type (layout error, </tspan><tspan
+         x="-430.97623"
+         y="-1186.3758"
+         id="tspan207">shape error etc)
 </tspan><tspan
-         x="-72.209251"
-         y="161.31855"
-         id="tspan206">
+         x="-430.97623"
+         y="-1166.3758"
+         id="tspan209"><tspan
+           style="font-weight:bold"
+           id="tspan208">
+</tspan></tspan></text>
+    <g
+       id="g192"
+       transform="translate(167.76699,504.87379)">
+      <rect
+         style="font-variation-settings:normal;vector-effect:none;fill:#cccccc;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         id="rect168"
+         width="8.5264721"
+         height="19.091885"
+         x="-177.3877"
+         y="-353.57053" />
+      <rect
+         style="font-variation-settings:normal;vector-effect:none;fill:#cccccc;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         id="rect168-2"
+         width="8.5264721"
+         height="19.091885"
+         x="-157.46989"
+         y="-353.57056" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       x="-363.59375"
+       y="-1324.0698"
+       id="text169"
+       transform="matrix(0.26458333,0,0,0.26458333,95.780364,507.60783)"><tspan
+         sodipodi:role="line"
+         id="tspan169"
+         x="-363.59375"
+         y="-1324.0698">Ports</tspan></text>
+    <path
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#Triangle);stop-color:#000000;stop-opacity:1"
+       d="m -5.3574668,170.39516 v 40.62426"
+       id="path169" />
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#marker170);stop-color:#000000"
+       d="m 14.560343,170.39512 v 40.62426"
+       id="path169-5" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.714682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       x="-324.36206"
+       y="-1194.4651"
+       id="text170"
+       transform="matrix(0.26458333,0,0,0.26458333,102.26267,508.25796)"><tspan
+         sodipodi:role="line"
+         id="tspan170"
+         x="-324.36206"
+         y="-1194.4651">Connections</tspan></text>
+    <path
+       style="font-variation-settings:normal;opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.05833;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker192);stop-color:#000000;stop-opacity:1"
+       d="m -38.351217,108.74267 h 19.27725"
+       id="path191" />
+    <path
+       style="font-variation-settings:normal;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.05833;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker192-6);stop-color:#000000"
+       d="M 70.593127,114.50966 H 54.527663"
+       id="path191-1" />
+    <text
+       xml:space="preserve"
+       style="font-size:8.46667px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="-178.62518"
+       y="0.86428165"
+       id="text192"><tspan
+         sodipodi:role="line"
+         id="tspan192"
+         style="font-size:8.46667px;stroke-width:0.189093"
+         x="-178.62518"
+         y="0.86428165">Backend Folder</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="-27.563192"
+       y="17.920219"
+       id="text192-6"><tspan
+         sodipodi:role="line"
+         id="tspan192-8"
+         style="font-size:5.64444px;stroke-width:0.189093"
+         x="-27.563192"
+         y="17.920219">WorkflowClasses.py</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="208.11211"
+       y="17.920219"
+       id="text192-6-97"><tspan
+         sodipodi:role="line"
+         id="tspan192-8-6"
+         style="font-size:5.64444px;stroke-width:0.189093"
+         x="208.11211"
+         y="17.920219">CharacteristicsClasses.py</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="-168.43536"
+       y="76.816826"
+       id="text192-6-9"><tspan
+         sodipodi:role="line"
+         id="tspan192-8-9"
+         style="font-size:5.64444px;stroke-width:0.189093"
+         x="-168.43536"
+         y="76.816826">ImageOperationClasses.py</tspan></text>
+    <g
+       id="g193"
+       transform="translate(167.76699,513.35719)">
+      <rect
+         style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         id="rect2"
+         width="119.52313"
+         height="79.924988"
+         x="-489.05777"
+         y="-401.5961" />
+      <text
+         xml:space="preserve"
+         style="font-size:3.52778px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:start;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+         x="-486.78531"
+         y="-393.50629"
+         id="text15"><tspan
+           sodipodi:role="line"
+           id="tspan15"
+           style="font-weight:bold;font-size:4.23333px;text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-393.50629">ImageOperation file</tspan><tspan
+           sodipodi:role="line"
+           style="font-size:3.52778px;text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-388.85016"
+           id="tspan16" /><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-384.44043"
+           id="tspan17">defines inputs to function (name, type, shape)</tspan><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-379.99197"
+           id="tspan149" /><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-375.54352"
+           id="tspan150">defines function parameters</tspan><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-371.09509"
+           id="tspan128" /><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-366.64664"
+           id="tspan129">defines outputs to function (name, type, shape)</tspan><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-362.19818"
+           id="tspan193" /><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-357.74973"
+           id="tspan194">defines documentation and alerts</tspan><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-353.30127"
+           id="tspan130" /><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-348.85284"
+           id="tspan133">def ImageFunction(input1, input2, output1, parameters):</tspan><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-344.40439"
+           id="tspan134">#Do something to input1 using input2</tspan><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-339.95593"
+           id="tspan135" /><tspan
+           sodipodi:role="line"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
+           x="-486.78531"
+           y="-335.50748"
+           id="tspan136">return output1</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:8.46667px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="-322.34497"
+       y="105.56606"
+       id="text192-1"><tspan
+         sodipodi:role="line"
+         id="tspan192-4"
+         style="font-size:8.46667px;stroke-width:0.189093"
+         x="-322.34497"
+         y="105.56606">ImageOperation Folder</tspan></text>
+    <path
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.05833;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#marker192);stop-color:#000000;stop-opacity:1"
+       d="m -201.76763,151.72357 h 45.4338"
+       id="path193" />
+    <g
+       id="g238"
+       transform="translate(296.15332,284.82889)">
+      <rect
+         style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529168;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         id="rect1-5-7-9-6-0-2"
+         width="112.58501"
+         height="91.467598"
+         x="41.094425"
+         y="-257.7796" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:109.832;display:inline;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+         x="43.847683"
+         y="-250.62613"
+         id="text215-5"><tspan
+           x="43.847683"
+           y="-250.62613"
+           id="tspan211"><tspan
+             style="font-weight:bold"
+             id="tspan210">Data type list class
+</tspan></tspan><tspan
+           x="43.847683"
+           y="-245.33447"
+           id="tspan213"><tspan
+             style="font-weight:bold"
+             id="tspan212">
+</tspan></tspan><tspan
+           x="43.847683"
+           y="-240.04281"
+           id="tspan214">List of all allowed data types for inputs/outputs (includes </tspan><tspan
+           x="43.847683"
+           y="-234.75116"
+           id="tspan224">image and non-image data types.</tspan></text>
+      <rect
+         style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529168;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         id="rect1-5-7-9-6-0-2-0"
+         width="73.145126"
+         height="60.062748"
+         x="44.11224"
+         y="-229.50581" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:109.832;display:inline;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+         x="43.847683"
+         y="-250.62613"
+         id="text215-5-0"
+         transform="translate(3.0178183,28.273783)"><tspan
+           x="43.847683"
+           y="-250.62613"
+           id="tspan226"><tspan
+             style="font-weight:bold"
+             id="tspan225">Data type class
+</tspan></tspan><tspan
+           x="43.847683"
+           y="-245.33447"
+           id="tspan228"><tspan
+             style="font-weight:bold"
+             id="tspan227">
+</tspan></tspan><tspan
+           x="43.847683"
+           y="-240.04281"
+           id="tspan229">Applicable data types:     
 </tspan><tspan
-         x="-72.209251"
-         y="165.2873"
-         id="tspan207">NeedsUpdating - set if this </tspan><tspan
-         x="-72.209251"
-         y="169.25605"
-         id="tspan208">node needs to be rerun </tspan><tspan
-         x="-72.209251"
-         y="173.2248"
-         id="tspan209">(upstream node changed)
+           x="43.847683"
+           y="-234.75116"
+           id="tspan230">
 </tspan><tspan
-         x="-72.209251"
-         y="177.19355"
-         id="tspan210">
-</tspan></text>
+           x="43.847683"
+           y="-229.4595"
+           id="tspan231">IntImage(0-255)
+</tspan><tspan
+           x="43.847683"
+           y="-224.16784"
+           id="tspan232">FloatImage (0-255) 
+</tspan><tspan
+           x="43.847683"
+           y="-218.87619"
+           id="tspan233">FloatImage (0-1)
+</tspan><tspan
+           x="43.847683"
+           y="-213.58453"
+           id="tspan234">BinaryImage (0/1)
+</tspan><tspan
+           x="43.847683"
+           y="-208.29287"
+           id="tspan235">SegmentedImage (int in limts)
+</tspan><tspan
+           x="43.847683"
+           y="-203.00122"
+           id="tspan236">Int (just integer)</tspan></text>
+    </g>
     <rect
-       style="fill:none;stroke:#000000;stroke-width:0.79375;-inkscape-stroke:none"
-       id="rect43-8"
-       width="83.899864"
-       height="157.73973"
-       x="-76.841614"
-       y="62.836395" />
-    <text
-       xml:space="preserve"
-       style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:center;text-decoration-color:#000000;text-anchor:middle;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="-74.72319"
-       y="67.554832"
-       id="text43-2"><tspan
-         sodipodi:role="line"
-         id="tspan43-4"
-         style="font-weight:bold;text-align:start;text-anchor:start;stroke-width:1.32292"
-         x="-74.72319"
-         y="67.554832">Workflow class</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:3.175px;line-height:normal;font-family:sans-serif;text-align:start;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:67.2163;display:inline;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="-72.209251"
-       y="121.63106"
-       id="text44-5"
-       transform="translate(4.1583869,-48.309231)"><tspan
-         x="-72.209251"
-         y="121.63106"
-         id="tspan211">Checks correct data types for connections 
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+       id="rect238"
+       width="248.82791"
+       height="218.72284"
+       x="208.86142"
+       y="20.345116" />
+    <g
+       id="g251"
+       transform="translate(175.62355,508.04522)">
+      <rect
+         style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         id="rect1-5-7-9-6"
+         width="112.58501"
+         height="70.558517"
+         x="41.094425"
+         y="-408.91122" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;inline-size:109.795;display:inline;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         x="-59.545723"
+         y="-545.39929"
+         id="text15-8-9-5-3"
+         transform="translate(103.42981,143.69322)"><tspan
+           x="-59.545723"
+           y="-545.39929"
+           id="tspan238"><tspan
+   style="font-weight:bold"
+   id="tspan237">Parameter Class</tspan>
 </tspan><tspan
-         x="-72.209251"
-         y="125.5998"
-         id="tspan212">
+           x="-59.545723"
+           y="-540.10759"
+           id="tspan239">
 </tspan><tspan
-         x="-72.209251"
-         y="129.56855"
-         id="tspan213">Arranges simple type conversions </tspan><tspan
-         x="-72.209251"
-         y="133.5373"
-         id="tspan214">(conversions in image class)
+           x="-59.545723"
+           y="-534.8159"
+           id="tspan240">Stores parameters require to run ImageOperation (eg </tspan><tspan
+           x="-59.545723"
+           y="-529.52421"
+           id="tspan241">sigma for gaussian blur).
 </tspan><tspan
-         x="-72.209251"
-         y="137.50605"
-         id="tspan215">
+           x="-59.545723"
+           y="-524.23252"
+           id="tspan242">
 </tspan><tspan
-         x="-72.209251"
-         y="141.4748"
-         id="tspan216">Highlights other type conflicts to user </tspan><tspan
-         x="-72.209251"
-         y="145.44355"
-         id="tspan217">(eg, non-binarised data to binary </tspan><tspan
-         x="-72.209251"
-         y="149.4123"
-         id="tspan218">processing)
+           x="-59.545723"
+           y="-518.94084"
+           id="tspan243">Stores data type and limits on input.
 </tspan><tspan
-         x="-72.209251"
-         y="153.38105"
-         id="tspan219">
+           x="-59.545723"
+           y="-513.64915"
+           id="tspan244">
 </tspan><tspan
-         x="-72.209251"
-         y="157.3498"
-         id="tspan220">Checks image shape
+           x="-59.545723"
+           y="-508.35746"
+           id="tspan245">Stores input method for UI.
 </tspan><tspan
-         x="-72.209251"
-         y="161.31855"
-         id="tspan221">
+           x="-59.545723"
+           y="-503.06581"
+           id="tspan246">
 </tspan><tspan
-         x="-72.209251"
-         y="165.2873"
-         id="tspan222">Highlights inappropriate image shape to </tspan><tspan
-         x="-72.209251"
-         y="169.25605"
-         id="tspan223">user
+           x="-59.545723"
+           y="-497.77415"
+           id="tspan247">Aim to have all data required to add as node in a </tspan><tspan
+           x="-59.545723"
+           y="-492.48249"
+           id="tspan248">consistent format to allow user input without each image </tspan><tspan
+           x="-59.545723"
+           y="-487.19084"
+           id="tspan249">operation coding its own UI element.</tspan></text>
+    </g>
+    <g
+       id="g239"
+       transform="translate(175.62355,503.77446)">
+      <rect
+         style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         id="rect1-5-7-9-6-0"
+         width="112.58501"
+         height="55.878906"
+         x="41.094425"
+         y="-327.28958" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+         x="43.847683"
+         y="-320.13611"
+         id="text215"><tspan
+           sodipodi:role="line"
+           id="tspan215"
+           style="font-weight:bold;stroke-width:0.189093"
+           x="43.847683"
+           y="-320.13611">Dimension class</tspan><tspan
+           sodipodi:role="line"
+           style="font-weight:bold;stroke-width:0.189093"
+           x="43.847683"
+           y="-314.84445"
+           id="tspan216" /><tspan
+           sodipodi:role="line"
+           style="font-weight:normal;stroke-width:0.189093"
+           x="43.847683"
+           y="-309.5528"
+           id="tspan217">c_dim</tspan><tspan
+           sodipodi:role="line"
+           style="font-weight:normal;stroke-width:0.189093"
+           x="43.847683"
+           y="-304.26111"
+           id="tspan218" /><tspan
+           sodipodi:role="line"
+           style="font-weight:normal;stroke-width:0.189093"
+           x="43.847683"
+           y="-298.96945"
+           id="tspan219">z_dim</tspan><tspan
+           sodipodi:role="line"
+           style="font-weight:normal;stroke-width:0.189093"
+           x="43.847683"
+           y="-293.6778"
+           id="tspan220" /><tspan
+           sodipodi:role="line"
+           style="font-weight:normal;stroke-width:0.189093"
+           x="43.847683"
+           y="-288.38614"
+           id="tspan221">y_dim</tspan><tspan
+           sodipodi:role="line"
+           style="font-weight:normal;stroke-width:0.189093"
+           x="43.847683"
+           y="-283.09448"
+           id="tspan222" /><tspan
+           sodipodi:role="line"
+           style="font-weight:normal;stroke-width:0.189093"
+           x="43.847683"
+           y="-277.8028"
+           id="tspan223">x_dim</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:77.3119;display:inline;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+         x="76.367531"
+         y="-309.548"
+         id="text224"
+         transform="translate(-3.9320393)"><tspan
+           x="76.367531"
+           y="-309.548"
+           id="tspan250">In image class, gives array dimension </tspan><tspan
+           x="76.367531"
+           y="-304.25636"
+           id="tspan251">holding each image dimension (or -1 for </tspan><tspan
+           x="76.367531"
+           y="-298.9647"
+           id="tspan252">not present)</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:73.8073;display:inline;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+         x="72.319389"
+         y="-285.82217"
+         id="text225"
+         transform="translate(0,2.678109)"><tspan
+           x="72.319389"
+           y="-285.82217"
+           id="tspan253">In ImageOperation, gives desired </tspan><tspan
+           x="72.319389"
+           y="-280.53053"
+           id="tspan254">dimensions or no preference (-1)</tspan></text>
+    </g>
+    <g
+       id="g250"
+       transform="translate(175.62355,505.81098)">
+      <rect
+         style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         id="rect1-5-7-9"
+         width="112.58501"
+         height="65.292336"
+         x="41.094425"
+         y="-478.76169" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:98.8298;display:inline;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+         x="55.236713"
+         y="-577.94647"
+         id="text241"
+         transform="translate(-11.357641,104.17125)"><tspan
+           x="55.236713"
+           y="-577.94647"
+           id="tspan256"><tspan
+   style="font-weight:bold"
+   id="tspan255">Image class</tspan>
 </tspan><tspan
-         x="-72.209251"
-         y="173.2248"
-         id="tspan224">
+           x="55.236713"
+           y="-572.65477"
+           id="tspan257">
 </tspan><tspan
-         x="-72.209251"
-         y="177.19355"
-         id="tspan225">Checks other nodes that could fix shape/</tspan><tspan
-         x="-72.209251"
-         y="181.1623"
-         id="tspan226">type conflicts and suggests to user</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:4.23333px;line-height:normal;font-family:sans-serif;text-decoration-color:#000000;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="-78.488197"
-       y="49.625828"
-       id="text58"><tspan
-         sodipodi:role="line"
-         id="tspan44"
-         style="font-weight:bold;font-size:4.23333px;stroke-width:1.32292"
-         x="-78.488197"
-         y="49.625828">Workflow classes</tspan><tspan
-         sodipodi:role="line"
-         style="font-weight:bold;font-size:4.23333px;stroke-width:1.32292"
-         x="-78.488197"
-         y="54.917488"
-         id="tspan58">(workflow_class.py)</tspan></text>
-    <rect
-       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.32292;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none"
-       id="rect60"
-       width="278.12619"
-       height="339.38443"
-       x="-86.504852"
-       y="20.708738" />
-    <text
-       xml:space="preserve"
-       style="font-size:5.64444px;line-height:normal;font-family:sans-serif;text-decoration-color:#000000;fill:#000000;stroke-width:1.32292;-inkscape-stroke:none;stop-color:#000000"
-       x="-87.689964"
-       y="10.747572"
-       id="text60"><tspan
-         sodipodi:role="line"
-         id="tspan60"
-         style="font-weight:bold;font-size:5.64444px;stroke-width:1.32292"
-         x="-87.689964"
-         y="10.747572">Backend folder</tspan></text>
+           x="55.236713"
+           y="-567.36308"
+           id="tspan258">Pixel data
+</tspan><tspan
+           x="55.236713"
+           y="-562.07139"
+           id="tspan259">
+</tspan><tspan
+           x="55.236713"
+           y="-556.7797"
+           id="tspan260">Image dimensions
+</tspan><tspan
+           x="55.236713"
+           y="-551.48802"
+           id="tspan261">
+</tspan><tspan
+           x="55.236713"
+           y="-546.19633"
+           id="tspan262">Map from image dimensions to array dimensions
+</tspan><tspan
+           x="55.236713"
+           y="-540.90464"
+           id="tspan263">
+</tspan><tspan
+           x="55.236713"
+           y="-535.61296"
+           id="tspan264">Properties to iterate through each image dimension, </tspan><tspan
+           x="55.236713"
+           y="-530.32127"
+           id="tspan265">regarldess of its array location. Avoids confusion </tspan><tspan
+           x="55.236713"
+           y="-525.02958"
+           id="tspan266">about what image dimension is in what array </tspan><tspan
+           x="55.236713"
+           y="-519.7379"
+           id="tspan267">dimension</tspan></text>
+    </g>
   </g>
 </svg>
