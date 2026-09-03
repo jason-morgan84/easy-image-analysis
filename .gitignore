@@ -1,0 +1,26 @@
+# --- Python Artifacts ---
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/.pytest_cache/
+**/.ruff_cache/
+
+# --- Python Environments ---
+**/env/
+**/.env/
+**/venv/
+**/.venv/
+**/ENV/
+
+# --- Development Environment & OS ---
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- Future Flutter/Dart Artifacts ---
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub-cache/
+**/.pub/
