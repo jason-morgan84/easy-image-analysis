@@ -1,6 +1,6 @@
 import numpy as np
 import numbers
-from constants import DataType
+from core.constants import DataType
 
 
 

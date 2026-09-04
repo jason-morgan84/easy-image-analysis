@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from core.type import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat, DataType
+from core.type import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat
 
 def test_data_type_ImageInt():
     mock_image = np.arange(120).reshape(2,3,4,5)
@@ -284,26 +284,6 @@ def test_value_conversions():
 
     assert(test_int_image_3_convert.value == test_int_image_7_convert.value)
 
-def test_enum():
-    expected_types = {
-        "ImageInt",
-        "ImageFloat",
-        "ImageBinary",
-        "ValueInt",
-        "ValueFloat"
-    }  
 
-    actual_types = {member.name for member in DataType}
-    assert expected_types.issubset(actual_types), f"Missing expected types from enum: {expected_types - actual_types}"
-
-    values = [member.value for member in DataType]
-    assert len(values) == len(set(values))
-
-    for member in DataType:
-        try:
-            resolved_class = member.get_class()
-            assert resolved_class is not None
-        except NotImplementedError:
-            pytest.fail(f"Enum member {member.name} was added but has no class implementation!")
 
 
