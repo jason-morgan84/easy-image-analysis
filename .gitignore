@@ -24,3 +24,6 @@ Thumbs.db
 **/.flutter-plugins-dependencies
 **/.pub-cache/
 **/.pub/
+
+# --- Messing around ---
+test.py
