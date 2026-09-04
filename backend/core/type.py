@@ -1,71 +1,104 @@
 import numpy as np
+import numbers
 
 class ImageInt:
-    def __init__(self, value:int):
+    def __init__(self, value):
         self.value = value
 
     @property
-    def value(self) -> int:
-        return self.value
+    def value(self):
+        return self._value
 
     @value.setter
-    def value(self,val:int):
-        if not isinstance(val,int):
-            raise TypeError (f"Expected integer, got {type(val)}")
-        if not (0<=val<=255):
-            raise ValueError(f"Value {val} out of bounds (must be 0-255)")
-        self.value = val
+    def value(self, val):
+        if not isinstance(val, np.ndarray):
+            if not isinstance(val, list):
+                raise TypeError (f"Expected list or np.array, got {type(val)}")
+        val = np.array(val)
+
+        if not np.issubdtype(val.dtype, np.integer):
+            raise TypeError (f"Expected integer, got {val.dtype}")
+        
+        if val.max() > 255 or val.min() < 0:
+            raise ValueError(f"Value out of bounds (must be 0-255)")
+        
+        self._value = val
+
+    @property
+    def shape(self):
+        return self.value.shape
 
     def to_ImageFloat(self):
-        return ImageFloat(self.value/255)
+        return ImageFloat(round(self.value/255))
 
     def to_ImageBinary(self):
         return ImageBinary(self.value)
 
     def to_uint8(self):
-        return self.value.astype(np.uint8)
+        return np.array(self.value,np.uint8)
 
 class ImageFloat:
-    def __init__(self, value:float):
+    def __init__(self, value):
         self.value = value
 
     @property
-    def value(self) -> float:
-        return self.value
+    def value(self):
+        return self._value
 
     @value.setter
-    def value(self,val:int):
-        if not isinstance(val,float):
-            raise TypeError ("Value must be a float.")
-        if not (0<=val<=1):
-            raise ValueError(f"Value {val} out of bounds (must be 0-1)")
-        self.value = val
+    def value(self, val):
+        if not isinstance(val, np.ndarray):
+            if not isinstance(val, list):
+                raise TypeError (f"Expected list or np.array, got {type(val)}")
+        val = np.array(val)
+
+        if not np.issubdtype(val.dtype, np.floating):
+            raise TypeError (f"Expected float, got {val.dtype}")
+        
+        if val.max() > 1 or val.min() < 0:
+            raise ValueError(f"Value out of bounds (must be 0-1)")
+        
+        self._value = val
+
+    @property
+    def shape(self):
+        return self.value.shape
 
     def to_ImageInt(self):
-        return ImageInt(round(self.value * 255))
+        return ImageFloat(round(self.value * 255))
 
     def to_ImageBinary(self):
         return ImageBinary(self.value)
 
     def to_float64(self):
-        return self.value.astype(np.float64)
-
+        return np.array(self.value,np.float64)
 
 class ImageBinary:
-    def __init__(self, value:int):
+    def __init__(self, value):
         self.value = value
 
     @property
-    def value(self) -> int:
-        return self.value
+    def value(self):
+        return self._value
 
     @value.setter
-    def value(self,val:int):
-        if not isinstance(val,int):
-            raise TypeError ("Value must be an integer.")
-        if not (0<=val<=1):
-            raise ValueError(f"Value {val} out of bounds (must be 0 or 1)")
-        self.value = val
+    def value(self, val):
+        if not isinstance(val, np.ndarray):
+            if not isinstance(val, list):
+                raise TypeError (f"Expected list or np.array, got {type(val)}")
+        val = np.array(val)
+
+        if not np.issubdtype(val.dtype, np.number):
+            raise TypeError (f"Expected number, got {val.dtype}")
+        
+        if np.any(~np.isin(val, [0, 1])):
+            raise ValueError(f"Value out of bounds (must be 0 or 1)")
+        
+        self._value = val
+
+    @property
+    def shape(self):
+        return self.value.shape
 
     def to_ImageFloat(self):
         return ImageFloat(self.value)
@@ -74,7 +107,47 @@ class ImageBinary:
         return ImageInt(self.value)
 
     def to_uint8(self):
-        return self.value.astype(np.uint8)
+        return np.array(self.value,np.uint8)
 
     def to_boolean(self):
-        return self.value.astype(np.bool)
+        return np.array(self.value,np.bool)
+
+class ValueInt:
+    def __init__(self, value):
+        self.value = value
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self,val):
+        if not isinstance(val,int):
+            raise TypeError (f"Expected integer, got {type(val)}")
+        self._value = val
+
+    def to_ValueFloat(self):
+        return ValueFloat(self.value)
+
+    def to_uint8(self):
+        return np.uint8(self.value)
+
+class ValueFloat:
+    def __init__(self, value):
+        self.value = value
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self,val):
+        if not isinstance(val,(np.number,numbers.Number)):
+            raise TypeError ("Value must be a number.")
+        self._value = np.float64(val)
+
+    def to_ValueInt(self):
+        return ValueInt(round(self.value))
+
+    def to_float64(self):
+        return np.float64(self.value)
