@@ -1,9 +1,16 @@
 import numpy as np
 import numbers
+from constants import DataType
+
+
 
 class ImageInt:
+    data_type = DataType.ImageInt
     def __init__(self, value):
         self.value = value
+
+    def __getitem__(self, index):
+        return self.value[index]
 
     @property
     def value(self):
@@ -29,7 +36,7 @@ class ImageInt:
         return self.value.shape
 
     def to_ImageFloat(self):
-        return ImageFloat(round(self.value/255))
+        return ImageFloat(self.value/255)
 
     def to_ImageBinary(self):
         return ImageBinary(self.value)
@@ -38,8 +45,13 @@ class ImageInt:
         return np.array(self.value,np.uint8)
 
 class ImageFloat:
+    data_type = DataType.ImageFloat
+
     def __init__(self, value):
         self.value = value
+
+    def __getitem__(self, index):
+        return self.value[index]
 
     @property
     def value(self):
@@ -52,8 +64,8 @@ class ImageFloat:
                 raise TypeError (f"Expected list or np.array, got {type(val)}")
         val = np.array(val)
 
-        if not np.issubdtype(val.dtype, np.floating):
-            raise TypeError (f"Expected float, got {val.dtype}")
+        if not np.issubdtype(val.dtype, np.number):
+            raise TypeError (f"Expected number, got {val.dtype}")
         
         if val.max() > 1 or val.min() < 0:
             raise ValueError(f"Value out of bounds (must be 0-1)")
@@ -65,7 +77,7 @@ class ImageFloat:
         return self.value.shape
 
     def to_ImageInt(self):
-        return ImageFloat(round(self.value * 255))
+        return ImageInt(np.uint8(np.round(self.value * 255)))
 
     def to_ImageBinary(self):
         return ImageBinary(self.value)
@@ -74,6 +86,8 @@ class ImageFloat:
         return np.array(self.value,np.float64)
 
 class ImageBinary:
+
+    data_type = DataType.ImageBinary
     def __init__(self, value):
         self.value = value
 
@@ -113,6 +127,9 @@ class ImageBinary:
         return np.array(self.value,np.bool)
 
 class ValueInt:
+
+    data_type = DataType.ValueInt
+
     def __init__(self, value):
         self.value = value
 
@@ -133,6 +150,9 @@ class ValueInt:
         return np.uint8(self.value)
 
 class ValueFloat:
+
+    data_type = DataType.ValueFloat
+
     def __init__(self, value):
         self.value = value
 
@@ -151,3 +171,5 @@ class ValueFloat:
 
     def to_float64(self):
         return np.float64(self.value)
+
+     

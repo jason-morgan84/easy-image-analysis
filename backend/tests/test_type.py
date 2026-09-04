@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from core.type import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat
+from core.type import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat, DataType
 
 def test_data_type_ImageInt():
     mock_image = np.arange(120).reshape(2,3,4,5)
@@ -138,6 +138,11 @@ def test_data_type_ValueInt():
     assert isinstance(mock_value_ValueInt.to_uint8(),np.uint8)
     assert mock_value_ValueInt.to_uint8() == mock_value
 
+    #test immutability
+    mock_value_ValueInt = ValueInt(mock_value)
+    mock_value = 3
+    assert(mock_value_ValueInt != mock_value)
+
 def test_data_type_ValueFloat():
     mock_value = 2
     mock_value_float = 2.0
@@ -148,16 +153,157 @@ def test_data_type_ValueFloat():
         ValueFloat(mock_value_string)
 
     #check correct type
-
     mock_value_ValueFloat = ValueFloat(mock_value)
     assert isinstance(mock_value_ValueFloat,ValueFloat)
 
     mock_value_ValueFloat = ValueFloat(mock_value_float)
     assert isinstance(mock_value_ValueFloat,ValueFloat)
 
-
-
-    #test conversion to np uint8
+    #test conversion to np float64
     assert isinstance(mock_value_ValueFloat.to_float64(),np.float64)
     assert mock_value_ValueFloat.to_float64() == mock_value_float
+
+    #test immutability
+    mock_value_ValueFloat = ValueFloat(mock_value_float)
+    mock_value_float = 3.0
+    assert(mock_value_ValueFloat != mock_value_float)
+
+def test_image_conversions_ImageInt():
+
+    mock_int_image = ImageInt(np.arange(120).reshape(2,3,4,5))
+    #mock_int_image[0][0][0][0] = 5
+    mock_float_image = (np.arange(120)/125).reshape(2,3,4,5)
+    mock_binary_image = ImageInt(np.random.randint(2, size=120).reshape(2,3,4,5))
+    #test single conversions - function and shape
+    
+    #test single conversion int to float, correct shape
+    mock_int_image_convert = mock_int_image.to_ImageFloat()
+    assert(mock_int_image_convert.shape == mock_int_image.shape)
+
+    #test single conversion int to binary, correct shape
+    mock_binary_image_convert = mock_binary_image.to_ImageBinary()
+    assert(mock_binary_image_convert.shape == mock_binary_image.shape)
+
+    #test single conversion int to float, correct value
+    specific_int_image = ImageInt([0,51,102,153,204,255])
+    specific_float_image = ImageFloat([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    np.testing.assert_array_almost_equal(specific_int_image.to_ImageFloat().value, specific_float_image.value)
+
+    #test single conversion int to binary, correct value
+    specific_int_image = ImageInt([0,0,0,0,1,1,1,1])
+    specific_binary_image = ImageBinary([0, 0, 0, 0, 1, 1, 1, 1])
+    np.testing.assert_array_almost_equal(specific_int_image.to_ImageBinary().value, specific_binary_image.value)
+
+    """#test single conversion float to int, correct shape
+    mock_int_image_convert = mock_int_image_convert.to_ImageInt()
+    assert(mock_int_image_convert.shape == mock_int_image.shape)"""
+
+    #test that repeated int to float conversions don't lead to drift in values
+    for i in range(3):
+       mock_int_image_3_convert = mock_int_image.to_ImageFloat().to_ImageInt()
+
+    for i in range(7):
+        mock_int_image_7_convert = mock_int_image.to_ImageFloat().to_ImageInt()
+
+    np.testing.assert_array_equal(mock_int_image_3_convert.shape,mock_int_image_7_convert.shape)
+
+
+def test_image_conversions_ImageFloat():
+
+    mock_int_image = ImageInt(np.arange(120).reshape(2,3,4,5))
+    mock_float_image = ImageFloat((np.arange(120)/125).reshape(2,3,4,5))
+    mock_binary_image = ImageFloat(np.float64(np.random.randint(2, size=120)).reshape(2,3,4,5))
+    #test single conversions - function and shape
+    
+    #test single conversion float to int, correct shape
+    mock_int_image_convert = mock_float_image.to_ImageInt()
+    assert(mock_int_image_convert.shape == mock_int_image.shape)
+
+    #test single conversion float to binary, correct shape
+    mock_binary_image_convert = mock_binary_image.to_ImageBinary()
+    assert(mock_binary_image_convert.shape == mock_binary_image.shape)
+
+    #test single conversion float to int, correct value
+    specific_int_image = ImageInt([0,51,102,153,204,255])
+    specific_float_image = ImageFloat([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    np.testing.assert_array_almost_equal(specific_float_image.to_ImageInt().value, specific_int_image.value)
+
+    #test single conversion float to binary, correct value
+    specific_float_image = ImageFloat([0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0])
+    specific_binary_image = ImageBinary([0, 0, 0, 0, 1, 1, 1, 1])
+    np.testing.assert_array_almost_equal(specific_float_image.to_ImageBinary().value, specific_binary_image.value)
+
+def test_binary_conversions_ImageFloat():
+
+    mock_binary_image = ImageBinary(np.random.randint(2, size=120).reshape(2,3,4,5))
+    #test single conversions - function and shape
+    
+    #test single conversion binary to int, correct shape
+    mock_binary_image_convert = mock_binary_image.to_ImageInt()
+    assert(mock_binary_image_convert.shape == mock_binary_image.shape)
+
+    #test single conversion binary to float, correct shape
+    mock_binary_image_convert = mock_binary_image.to_ImageFloat()
+    assert(mock_binary_image_convert.shape == mock_binary_image.shape)
+
+    #test single conversion binary to int, correct value
+    specific_binary_image = ImageBinary([0, 0, 0, 1, 1, 1])
+    specific_int_image = ImageInt([0, 0, 0, 1, 1, 1])
+    np.testing.assert_array_equal(specific_binary_image.to_ImageInt().value, specific_int_image.value)
+
+    #test single conversion binary to float, correct value
+    specific_binary_image = ImageBinary([0, 0, 0, 1, 1, 1])
+    specific_float_image = ImageBinary([0.0, 0.0, 0.0, 1.0, 1.0, 1.0])
+    np.testing.assert_array_almost_equal(specific_binary_image.to_ImageFloat().value, specific_float_image.value)
+
+    #test that repeated binary to float conversions don't lead to drift in values
+    for i in range(3):
+       mock_binary_image_3_convert = mock_binary_image.to_ImageFloat().to_ImageBinary()
+
+    for i in range(7):
+        mock_binary_image_7_convert = mock_binary_image.to_ImageFloat().to_ImageBinary()
+
+    np.testing.assert_array_equal(mock_binary_image_3_convert.shape,mock_binary_image_7_convert.shape)
+
+def test_value_conversions():
+    # test single conversions - function and shape
+    test_int = 2
+    test_float = 3.0
+
+    assert((ValueFloat(test_float).to_ValueInt().value) == 3)
+
+    assert((ValueInt(test_int).to_ValueFloat().value) == 2.0)
+
+    # test repeated conversions between int and float - any drift?
+
+    for i in range(3):
+       test_int_image_3_convert = ValueInt(test_int).to_ValueFloat().to_ValueInt()
+
+    for i in range(7):
+        test_int_image_7_convert = ValueInt(test_int).to_ValueFloat().to_ValueInt()
+
+    assert(test_int_image_3_convert.value == test_int_image_7_convert.value)
+
+def test_enum():
+    expected_types = {
+        "ImageInt",
+        "ImageFloat",
+        "ImageBinary",
+        "ValueInt",
+        "ValueFloat"
+    }  
+
+    actual_types = {member.name for member in DataType}
+    assert expected_types.issubset(actual_types), f"Missing expected types from enum: {expected_types - actual_types}"
+
+    values = [member.value for member in DataType]
+    assert len(values) == len(set(values))
+
+    for member in DataType:
+        try:
+            resolved_class = member.get_class()
+            assert resolved_class is not None
+        except NotImplementedError:
+            pytest.fail(f"Enum member {member.name} was added but has no class implementation!")
+
 
