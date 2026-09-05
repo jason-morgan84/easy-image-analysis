@@ -273,7 +273,8 @@ On creation of a new connection, it will check for structure, constraint or type
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Insert wrong type|	Type Error	| <ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
 |Value constraints |Insert out of bounds value |	Value Error |	<ul><li>Out-of-bounds value added to type</li><li>Value coerced to bounds</li></ul>
-|Immutability   |   Define DataType *x* based on variable *y*, then change *y* |	Values in DataType do not change |<ul><li> Values in DataType change </li></ul>|
+|Immutability   |   Define DataType *x* based on standard python variable *y*, then change *y* |	Values in DataType do not change |<ul><li> Values in DataType change </li></ul>|
+|Immutability  |   Define DataType *x* based on np variable *y*, then change *y* |	Values in DataType do not change |<ul><li> Values in DataType change </li></ul>|
 |Explicit Type Conversions | Member of DataType *x* converted to DataType *y* | Correctly converted with expected value | <ul><li>Not converted to expected DataType</li><li>Not converted to expected value</li></ul>|
 |Explicit Type conversions | Convert to standard NumPy type | Array/values type matches that expected | <ul><li>Array/value data type does not match that expected</li></ul>|
 |Explicit Type conversions|	Convert between int and float types then back again repeatedly	| Array values are consistent over time	|	<ul><li>Array values drift over time</ul></li>|
