@@ -13,7 +13,7 @@
 |03/09/26	|0.4.0		|Added description of UI and UI diagram|
 |05/09/26	|0.5.0		|Merged in test plans|
 |05/09/26	|0.6.0		|Converted to markdown document|
-|05/09/26   |0.7.0      |Added type and shape conversions to description of Shape class|
+|05/09/26   |0.7.0      |Added type and shape conversions to description of Shape|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -279,8 +279,10 @@ On creation of a new connection, it will check for structure, constraint or type
 ### 6.1.3 Image
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
+|Type constraints	|Insert type	|Type Error	|<ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
+|Type constraints	|Insert acceptable type where array type does not match DataType	|Type Error	|<ul><li>Wrong type ignored</li></ul>|
 |Type constraints	|Insert wrong type	|Type Error	|<ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
-|Shape constraints	|Input pixel data of unexpected shape|	Shape Error	|	<ul><li>Wrong shape ignored</li></ul>
+|Shape constraints	|Input pixel data with different number of dimensions to image_shape|Value Error	|	<ul><li>Wrong shape ignored</li></ul>
 |Shape constraints	|Input incorrect mapping (ie, shape data says z_dim = 5, but mapping associates z with an array dimension of size 3)  |	Shape Error	|<ul><li>Wrong shape ignore</li></ul>|
 |Type conversions|Pixel data array shape| Same shape after type conversion | <ul><li>Different shape after type conversion</li></ul>|
 |Type conversions|Pixel data array value | Expected values after type conversion | <ul><li>Wrong values after type conversion</li></ul>|
