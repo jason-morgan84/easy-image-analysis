@@ -127,7 +127,7 @@ As for the data type class, it exists purely to transmit images between nodes wi
 4.	Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
 
 It also contains functions required to:
-* Convert between DataTypes
+* ~~Convert between DataTypes~~ No longer required after implementation of implicit Type conversions.
 * Carry out shape changes
 * Unsqueeze images where output from an ImageOperation is in less than 4 dimensions
 
