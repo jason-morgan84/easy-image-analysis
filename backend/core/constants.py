@@ -8,8 +8,13 @@ class DataType(Enum):
     ValueFloat = auto()  
 
     #categorise DataTypes into image_types, for multi-dimensional arrays, and value_types, for 1d variables.
-    image_types = {ImageInt, ImageFloat, ImageBinary}
-    value_types = {ValueInt, ValueFloat}
+    @classmethod
+    def image_types(cls) -> set:
+        return {cls.ImageInt, cls.ImageFloat, cls.ImageBinary}
+
+    @classmethod
+    def value_types(cls) -> set:
+        return {cls.ValueInt, cls.ValueFloat}
 
     def __call__(self, *args, **kwargs):
         from core.type import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat
