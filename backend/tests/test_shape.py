@@ -37,4 +37,11 @@ def test_shape_immutability():
     assert(test_shape.y == 3)
     assert(test_shape.x == 4)
 
+def test_shape_iteration():
+    test_shape = Shape(c = 2, x = 4, y = 1, z = -1)
+
+    values = [item for item in test_shape]
+
+    assert(values == [2,-1,1,4])
+
 
