@@ -9,69 +9,72 @@ class Image:
         self.image_shape = image_shape          # the shape of the *image* - note: this is distinct from the size of the array
         self.image_mapping = image_mapping      # mapping of image dimensions (c,z,y,x) to Array dimensions (0,1,2,3 etc)
 
-        @property
-        def array(self):
-            return self._array
+    @property
+    def array(self):
+        return self._array
 
-        @array.setter
-        def array(self, arr):
-            # check array is of one of the acceptable data types
-            if arr.data_type not in DataType.image_types:
-                raise TypeError (f"Expected Image data type (see constants.py) got {type(arr)}")
+    @array.setter
+    def array(self, arr):
+        # check array is of one of the acceptable data types
+        array_dtype = getattr(arr, "data_type", None)
 
-            self._array = arr
+        if array_dtype not in DataType.image_types() or array_dtype == None:
+            raise TypeError (f"Expected Image data type (see constants.py) got {type(arr)}")
 
-        @property
-        def array_dtype(self):
-            return self._array_dtype
+        self._array = arr
 
-        @array_dtype.setter
-        def array_dtype(self, dtype):
-            # check dtype matches array type
-            if dtype != self.array.data_type:
-                raise TypeError (f"array_dtype {dtype} does not match array data type {type(self.array)}")
+    @property
+    def array_dtype(self):
+        return self._array_dtype
 
-            self._array_dtype = dtype
+    @array_dtype.setter
+    def array_dtype(self, dtype):
+        # check dtype matches array type
+        if dtype != self.array.data_type:
+            raise TypeError (f"array_dtype {dtype} does not match array data type {type(self.array)}")
 
-        @property 
-        def image_shape(self):
-            return self._image_shape
+        self._array_dtype = dtype
 
-        @image_shape.setter
-        def image_shape(self, shape):
-            # checks the number of defined image dimensions in image_shape matches the size of the array
-            ndim += sum(1 for item in self.image_shape if item > 0)
-            array_shape = len(self.array.value.shape)
+    @property 
+    def image_shape(self):
+        return self._image_shape
 
-            # give ValueError if they don't match
-            if (ndim != array_shape):
-                raise ValueError (f"image_shape {shape} defines {ndim} dimensions but array contains {array_shape}")
+    @image_shape.setter
+    def image_shape(self, shape):
+        ndim = 0
+        # checks the number of defined image dimensions in image_shape matches the size of the array
+        ndim += sum(1 for item in shape if item > 0)
+        array_shape = len(self.array.value.shape)
 
-            self._image_shape = shape
+        # give ValueError if they don't match
+        if (ndim != array_shape):
+            raise ValueError (f"image_shape {shape} defines {ndim} dimensions but array contains {array_shape}")
 
-        @property
-        def image_mapping(self):
-            return self._image_mapping
+        self._image_shape = shape
 
-        @image_mapping.setter
-        def image_mapping(self, map):
-            # check that if, for example, image shape says channel c has size 4 and image mapping says channel c maps to array dimension 0,
-            # array dimension 0 also has size 4, else return ValueError
-            
-            array_shape = self.array.value.shape
-            if array_shape[map.c] != image_shape.c:
-                raise ValueError (f"c dimension of size {image_shape.c} is mapped to array dimension of size {array_shape[map.c]}")
+    @property
+    def image_mapping(self):
+        return self._image_mapping
 
-            if array_shape[map.z] != image_shape.z:
-                raise ValueError (f"z dimension of size {image_shape.z} is mapped to array dimension of size {array_shape[map.z]}")
+    @image_mapping.setter
+    def image_mapping(self, map):
+        # check that if, for example, image shape says channel c has size 4 and image mapping says channel c maps to array dimension 0,
+        # array dimension 0 also has size 4, else return ValueError
+        
+        array_shape = self.array.value.shape
+        if array_shape[map.c] != self.image_shape.c:
+            raise ValueError (f"c dimension of size {self.image_shape.c} is mapped to array dimension of size {array_shape[map.c]}")
 
-            if array_shape[map.y] != image_shape.y:
-                raise ValueError (f"y dimension of size {image_shape.y} is mapped to array dimension of size {array_shape[map.y]}")
+        if array_shape[map.z] != self.image_shape.z:
+            raise ValueError (f"z dimension of size {self.image_shape.z} is mapped to array dimension of size {array_shape[map.z]}")
 
-            if array_shape[map.x] != image_shape.x:
-                raise ValueError (f"x dimension of size {image_shape.x} is mapped to array dimension of size {array_shape[map.x]}")
+        if array_shape[map.y] != self.image_shape.y:
+            raise ValueError (f"y dimension of size {self.image_shape.y} is mapped to array dimension of size {array_shape[map.y]}")
 
-            self._image_mapping = map
+        if array_shape[map.x] != self.image_shape.x:
+            raise ValueError (f"x dimension of size {self.image_shape.x} is mapped to array dimension of size {array_shape[map.x]}")
+
+        self._image_mapping = map
 
 
 
