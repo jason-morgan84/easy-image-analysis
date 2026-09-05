@@ -18,22 +18,41 @@ class ImageInt:
 
     @value.setter
     def value(self, val):
-        if not isinstance(val, np.ndarray):
-            if not isinstance(val, list):
-                raise TypeError (f"Expected list or np.array, got {type(val)}")
-        val = np.array(val)
 
-        if not np.issubdtype(val.dtype, np.integer):
-            raise TypeError (f"Expected integer, got {val.dtype}")
-        
-        if val.max() > 255 or val.min() < 0:
-            raise ValueError(f"Value out of bounds (must be 0-255)")
+        # checks whether input val is a member of any of the Image data types defined as image_types in constants.py
+        array_dtype = getattr(val, "data_type", None)
+        if array_dtype in DataType.image_types():
+            # if it is, call relevant function converting to int
+            val = val.to_ImageInt()
+        else:
+            # if not an np.array or list, give type error
+            if not isinstance(val, np.ndarray):
+                if not isinstance(val, list):
+                    raise TypeError (f"Expected list or np.array, got {type(val)}")
+
+                # if its a list, convert to np.array
+                val = np.array(val)
+            else:
+                # if it is a np array; for lists, conversion to np.array is sufficient for immutability but np.arrays need to be copied
+                val = val.copy()
+            
+
+            # if elements aren't integers or np.integers, type error
+            if not np.issubdtype(val.dtype, np.integer):
+                raise TypeError (f"Expected integer, got {val.dtype}")
+
+            # if it contains elements > 255 or < 0, value error
+            if val.max() > 255 or val.min() < 0:
+                raise ValueError(f"Value out of bounds (must be 0-255)")
         
         self._value = val
 
     @property
     def shape(self):
         return self.value.shape
+
+    def _to_ImageInt(self):
+        return self.value
 
     def to_ImageFloat(self):
         return ImageFloat(self.value/255)
@@ -59,22 +78,37 @@ class ImageFloat:
 
     @value.setter
     def value(self, val):
-        if not isinstance(val, np.ndarray):
-            if not isinstance(val, list):
-                raise TypeError (f"Expected list or np.array, got {type(val)}")
-        val = np.array(val)
-
-        if not np.issubdtype(val.dtype, np.number):
-            raise TypeError (f"Expected number, got {val.dtype}")
-        
-        if val.max() > 1 or val.min() < 0:
-            raise ValueError(f"Value out of bounds (must be 0-1)")
+        # checks whether input val is a member of any of the Image data types defined as image_types in constants.py
+        array_dtype = getattr(val, "data_type", None)
+        if array_dtype in DataType.image_types():
+            # if it is, call relevant function converting to int
+            val = val.to_ImageFloat()
+        else:
+            # if not an np.array or list, give type error
+            if not isinstance(val, np.ndarray):
+                if not isinstance(val, list):
+                    raise TypeError (f"Expected list or np.array, got {type(val)}")
+                # if its a list, convert to np.array
+                val = np.array(val)
+            else:
+                # if it is a np array; for lists, conversion to np.array is sufficient for immutability but np.arrays need to be copied
+                val = val.copy()
+            # if elements aren't integers or np.integers, type error
+            if not np.issubdtype(val.dtype, np.number):
+                raise TypeError (f"Expected number, got {val.dtype}")
+            
+            # if it contains elements > 1 or < 0, value error
+            if val.max() > 1 or val.min() < 0:
+                raise ValueError(f"Value out of bounds (must be 0-1)")
         
         self._value = val
 
     @property
     def shape(self):
         return self.value.shape
+
+    def _to_ImageFloat(self):
+        return self.value
 
     def to_ImageInt(self):
         return ImageInt(np.uint8(np.round(self.value * 255)))
@@ -97,22 +131,40 @@ class ImageBinary:
 
     @value.setter
     def value(self, val):
-        if not isinstance(val, np.ndarray):
-            if not isinstance(val, list):
-                raise TypeError (f"Expected list or np.array, got {type(val)}")
-        val = np.array(val)
 
-        if not np.issubdtype(val.dtype, np.number):
-            raise TypeError (f"Expected number, got {val.dtype}")
-        
-        if np.any(~np.isin(val, [0, 1])):
-            raise ValueError(f"Value out of bounds (must be 0 or 1)")
+        # checks whether input val is a member of any of the Image data types defined as image_types in constants.py
+        array_dtype = getattr(val, "data_type", None)
+        if array_dtype in DataType.image_types():
+            # if it is, call relevant function converting to int
+            val = val.to_ImageBinary()
+        else:
+            # if not an np.array or list, give type error
+            if not isinstance(val, np.ndarray):
+                if not isinstance(val, list):
+                    raise TypeError (f"Expected list or np.array, got {type(val)}")
+                
+                # if its a list, convert to np.array
+                val = np.array(val)
+            else:
+                # if it is a np array; for lists, conversion to np.array is sufficient for immutability but np.arrays need to be copied
+                val = val.copy()
+
+            # if elements aren't integers or np.integers, type error
+            if not np.issubdtype(val.dtype, np.number):
+                raise TypeError (f"Expected number, got {val.dtype}")
+            
+            # if it contains elements > 255 or < 0, value error
+            if np.any(~np.isin(val, [0, 1])):
+                raise ValueError(f"Value out of bounds (must be 0 or 1)")
         
         self._value = val
 
     @property
     def shape(self):
         return self.value.shape
+
+    def _to_ImageBinary(self):
+        return self.value
 
     def to_ImageFloat(self):
         return ImageFloat(self.value)

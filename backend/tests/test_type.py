@@ -8,38 +8,49 @@ def test_data_type_ImageInt():
     mock_image_low = np.array([-1,2,3,4,5,6,7,8,9,10,11,12]).reshape(2,2,3)
     mock_image_float = np.array([1.5,2,3,4,5,6,7,8,9,10,11,12]).reshape(2,2,3)
     mock_image_string = np.array(["1.5",2,3,4,5,6,7,8,9,10,11,12]).reshape(2,2,3)
+    mock_image_list = [[0,0,0],[1,1,1],[2,2,2],[3,3,3]]
+    mock_image_np = np.array([0,1,2])
 
-    #test with out of bounds low value
+    # test with out of bounds low value
     with pytest.raises(ValueError):
         ImageInt(mock_image_low)
 
-    #test with out of bounds high value
+    # test with out of bounds high value
     with pytest.raises(ValueError):
         ImageInt(mock_image_high)
 
-    #test with wrong type float
+    # test with wrong type float
     with pytest.raises(TypeError):
         ImageInt(mock_image_float)
 
-    #test with wrong type string
+    # test with wrong type string
     with pytest.raises(TypeError):
         ImageInt(mock_image_string)
 
-    #test conversion of 4d numpy array
-    mock_image_ImageInt = ImageInt(mock_image)
-    assert mock_image_ImageInt.shape == (2,3,4,5)
+    # test conversion of 4d list
+    mock_image_ImageInt_list = ImageInt(mock_image_list)
+    assert mock_image_ImageInt_list.shape == (4,3)
 
-    #test conversion to np uint8
+    # test conversion of 4d numpy array
+    mock_image_ImageInt = ImageInt(mock_image)
+    assert mock_image_ImageInt.shape == mock_image.shape
+
+    # test conversion to np uint8
     assert isinstance(mock_image_ImageInt.to_uint8(),np.ndarray)
     assert mock_image_ImageInt.to_uint8().dtype == np.uint8
     assert mock_image_ImageInt.to_uint8().all() == mock_image.all()
 
-    #test immutability
-    mock_image[0][0][0][0] = 25
-    assert (mock_image_ImageInt.to_uint8() != mock_image).any()
+    #test immutability of list inputs
+    mock_image_np_ImageInt = ImageInt(mock_image_np)
+    mock_image_np[0] = 12
+    assert (mock_image_np_ImageInt.value[0] != mock_image_np[0])
+
+    # test immutability of np.array inputst
+    mock_image_list[0][0] = 12
+    assert (mock_image_ImageInt_list.to_uint8()[0][0] != np.uint8(mock_image_list[0][0]))
 
 def test_data_type_ImageFloat():
-    mock_image = (np.arange(120)/125).reshape(2,3,4,5)
+    mock_image = (np.float64(np.arange(120))/125).reshape(2,3,4,5)
     mock_image_high = np.array([0,0.5,1,0.8,0.9,0,1,0.7,0.8,0.1,0.8,2]).reshape(2,2,3)
     mock_image_low = np.array([0,0.5,1,0.8,0.9,0,1,0.7,0.8,0.1,0.8,-0.5]).reshape(2,2,3)
     mock_image_string = np.array([0,0.5,1,0.8,0.9,0,1,0.7,0.8,0.1,0.8,"0.5"]).reshape(2,2,3)
@@ -65,9 +76,15 @@ def test_data_type_ImageFloat():
     assert mock_image_ImageFloat.to_float64().dtype == np.float64
     assert mock_image_ImageFloat.to_float64().all() == mock_image.all()
 
-    #test immutability
-    mock_image[0][0][0][0] = 1
-    assert (mock_image_ImageFloat.to_float64() != mock_image).any()
+    #test immutability of np inputs
+    mock_image[0][0][0][1] = 1
+    assert (mock_image_ImageFloat.value[0][0][0][1] != mock_image[0][0][0][1])
+
+    #test immutability of lists
+    mock_list_image = [0.1,0.2,0.3]
+    mock_list_image_FloatImage = ImageFloat(mock_list_image)
+    mock_list_image[0] = 1
+    assert (mock_list_image_FloatImage.value[0] != mock_list_image[0])
 
 def test_data_type_ImageBinary():
     mock_image = np.random.randint(2, size=120).reshape(2,3,4,5)
@@ -111,11 +128,16 @@ def test_data_type_ImageBinary():
     assert mock_image_ImageBinary.to_boolean().dtype == np.bool
     assert mock_image_ImageBinary.to_boolean().all() == mock_image.all()
 
-    #test immutability
+    #test immutability of np inputs
     mock_image_ImageBinary = ImageBinary(mock_image_small)
     mock_image_small[0][0] = 1
-
     assert (mock_image_ImageBinary.to_uint8() != mock_image_small).any()
+
+    #test immutability of list inputs
+    mock_list_image = [0,1,0]
+    mock_list_image_ImageBinary = ImageBinary(mock_list_image)
+    mock_list_image[0] = 1
+    assert (mock_list_image_ImageBinary.value[0] != mock_list_image[0])
 
 def test_data_type_ValueInt():
     mock_value = 2
@@ -287,6 +309,41 @@ def test_value_conversions():
 
     assert(test_int_image_3_convert.value == test_int_image_7_convert.value)
 
+#test implicit conversion ImageFloat or ImageBianary to ImageInt
+def test_implicit_conversion_to_int():
+    mock_float_image = ImageFloat((np.arange(120)/125).reshape(2,3,4,5))
+    mock_binary_image = ImageBinary(np.random.randint(2, size=120).reshape(2,3,4,5))
 
+    #test single conversion int to float, correct shape
+    mock_int_image_convert = ImageInt(mock_float_image)
+    assert(mock_int_image_convert.shape == mock_float_image.shape)
+
+    #test single conversion int to binary, correct shape
+    mock_int_image_convert = ImageInt(mock_binary_image)
+    assert(mock_int_image_convert.shape == mock_binary_image.shape)
+
+def test_implicit_conversion_to_float():
+    mock_int_image = ImageInt((np.arange(120)).reshape(2,3,4,5))
+    mock_binary_image = ImageBinary(np.random.randint(2, size=120).reshape(2,3,4,5))
+
+    #test single conversion int to float, correct shape
+    mock_int_image_convert = ImageFloat(mock_int_image)
+    assert(mock_int_image_convert.shape == mock_int_image.shape)
+
+    #test single conversion int to binary, correct shape
+    mock_int_image_convert = ImageFloat(mock_binary_image)
+    assert(mock_int_image_convert.shape == mock_binary_image.shape)
+
+def test_implicit_conversion_to_binary():
+    mock_int_image = ImageInt([[0,0,0],[1,1,1]])
+    mock_float_image = ImageFloat([[0,0,0],[1,1,1]])
+
+    #test single conversion int to float, correct shape
+    mock_int_image_convert = ImageBinary(mock_int_image)
+    assert(mock_int_image_convert.shape == mock_int_image.shape)
+
+    #test single conversion int to binary, correct shape
+    mock_int_image_convert = ImageBinary(mock_float_image)
+    assert(mock_int_image_convert.shape == mock_float_image.shape)
 
 
