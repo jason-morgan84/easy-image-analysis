@@ -16,6 +16,8 @@
 |05/09/26   |0.7.0      |Added type and shape conversions to description of Image|
 |05/09/26   |0.7.1      |Added __iter__ to Shape class and included in unit testing|
 |05/09/26   |0.7.2      |Made it explicit in description of Image class that images should always have four dimensions|
+|05/09/26   |0.7.3      |Added Image.Unsqueeze to Image class description and unit testing|
+|05/09/26   |0.7.4      |Added description of implicit and explicit type conversions to Image DataTypes|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -89,6 +91,8 @@ ValueFloat - float
 Each Image type will have __init__, value property and value.getter functions along with conversion functions for the other two image types and the relevant standard numpy type.
 
 The value types will have similar functions for converting between themselves.
+
+Conversions can be explicit (eg, by using ImageInt.to_ImageFloat) or implicit (eg, by calling ImageFloat(x) where x is an ImageInt).
 
 They will all be wrapped in an Enum to help ensure type safety. Also, if data types need to be changed in the future, this will help with refactoring.
 
@@ -270,16 +274,17 @@ On creation of a new connection, it will check for structure, constraint or type
 |Type constraints|	Insert wrong type|	Type Error	| <ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
 |Value constraints |Insert out of bounds value |	Value Error |	<ul><li>Out-of-bounds value added to type</li><li>Value coerced to bounds</li></ul>
 |Immutability   |   Define DataType *x* based on variable *y*, then change *y* |	Values in DataType do not change |<ul><li> Values in DataType change </li></ul>|
-|Type Conversions | Member of DataType *x* converted to DataType *y* | Correctly converted with expected value | <ul><li>Not converted to expected DataType</li><li>Not converted to expected value</li></ul>|
-|Type conversions | Convert to standard NumPy type | Array/values type matches that expected | <ul><li>Array/value data type does not match that expected</li></ul>|
-|Type conversions|	Convert between int and float types then back again repeatedly	| Array values are consistent over time	|	<ul><li>Array values drift over time</ul></li>|
+|Explicit Type Conversions | Member of DataType *x* converted to DataType *y* | Correctly converted with expected value | <ul><li>Not converted to expected DataType</li><li>Not converted to expected value</li></ul>|
+|Explicit Type conversions | Convert to standard NumPy type | Array/values type matches that expected | <ul><li>Array/value data type does not match that expected</li></ul>|
+|Explicit Type conversions|	Convert between int and float types then back again repeatedly	| Array values are consistent over time	|	<ul><li>Array values drift over time</ul></li>|
+|Implicit Type Conversions| Test implicit type conversions | Implicit type conversions correctly convert type |<ul><li>Implicity type conversions don't work</li><li>Implicity type conversions don't maintain shape</li><li>Implicit type conversions don't maintain values</li></ul>
 
 **Image DataTypes**
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Matrix input| Input 4D numpy array|Array shape maintained|<ul><li>Array shape changes</li></ul>
-|Type conversions|Test each conversion on array|Array elements change type correctly| <ul><li>Array elements do not change to correct type</li></ul>|
-|Type conversions| Test each conversion on 4D numpy array|Array shape maintained|<ul><li>Array shape changes</ul></li>|
+|Explicit Type conversions| Test each conversion on array|Array elements change type correctly| <ul><li>Array elements do not change to correct type</li></ul>|
+|Explicit Type conversions| Test each conversion on 4D numpy array|Array shape maintained|<ul><li>Array shape changes</ul></li>|
 
 
 
