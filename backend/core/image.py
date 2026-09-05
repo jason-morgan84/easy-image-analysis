@@ -15,11 +15,16 @@ class Image:
 
     @array.setter
     def array(self, arr):
-        # check array is of one of the acceptable data types
+        # check array is of one of the acceptable data types defined by DataType.image_types() in constants.py
         array_dtype = getattr(arr, "data_type", None)
 
         if array_dtype not in DataType.image_types() or array_dtype == None:
             raise TypeError (f"Expected Image data type (see constants.py) got {type(arr)}")
+
+        # check array has 4 dimensions
+        array_size = len(arr.value.shape)
+        if array_size != 4:
+            raise ValueError (f"array should have 4 dimensions (c,z,y,x) but has {array_size}")
 
         self._array = arr
 
@@ -29,7 +34,7 @@ class Image:
 
     @array_dtype.setter
     def array_dtype(self, dtype):
-        # check dtype matches array type
+        # check defined array_dtype matches actual array data type
         if dtype != self.array.data_type:
             raise TypeError (f"array_dtype {dtype} does not match array data type {type(self.array)}")
 
@@ -42,13 +47,13 @@ class Image:
     @image_shape.setter
     def image_shape(self, shape):
         ndim = 0
-        # checks the number of defined image dimensions in image_shape matches the size of the array
+        # checks the number of defined image dimensions in image_shape matches the actual size of the array
         ndim += sum(1 for item in shape if item > 0)
-        array_shape = len(self.array.value.shape)
+        array_size = len(self.array.value.shape)
 
         # give ValueError if they don't match
-        if (ndim != array_shape):
-            raise ValueError (f"image_shape {shape} defines {ndim} dimensions but array contains {array_shape}")
+        if (ndim != array_size):
+            raise ValueError (f"image_shape {shape} defines {ndim} dimensions but array contains {array_size}")
 
         self._image_shape = shape
 

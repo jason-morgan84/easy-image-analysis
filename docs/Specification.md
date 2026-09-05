@@ -300,7 +300,7 @@ On creation of a new connection, it will check for structure, constraint or type
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Use unexpected data type (not ImageInt, ImageFloat or ImageBinary)|	Type Error	| <ul><li>Type converted to correct type</li><li>Incorrectly type data used anyway</li></ul>|
 |Type constraints	|Insert acceptable type where array type does not match DataType	|Type Error	|<ul><li>Wrong type ignored</li></ul>|
-|Type constraints	|Insert wrong type	|Type Error	|<ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
+|Shape constraints	|Insert input array with more or less than 4 dimensions |Value Error	|	<ul><li>Wrong shape array accepted</li></ul>
 |Shape constraints	|Input pixel data with different number of dimensions to image_shape|Value Error	|	<ul><li>Wrong shape ignored</li></ul>
 |Shape constraints	|Input incorrect mapping (ie, shape data says z_dim = 5, but mapping associates z with an array dimension of size 3)  |	Shape Error	|<ul><li>Wrong shape ignore</li></ul>|
 |Type conversions|Pixel data array shape| Same shape after type conversion | <ul><li>Different shape after type conversion</li></ul>|
