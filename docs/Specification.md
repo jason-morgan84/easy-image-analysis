@@ -92,7 +92,15 @@ They will all be wrapped in an Enum to help ensure type safety. Also, if data ty
 
 ### 3.2.2 Shape class
 
-This exists to hold data related to the shape of transmitted images. It will hold integer values for c_dim (channels), z_dim (depth), y_dim (height) and x_dim (width) and will be used to hold shape related information in a number of classes and contexts:
+This exists to hold data related to the shape of transmitted images. It will hold integer values for:
+* c (channels)
+* z (depth)
+* y (height)
+* x (width) 
+
+It has __iter__ dunder to return values in the order c --> z --> y --> x
+
+Shape will be used to hold shape related information in a number of classes and contexts:
 
 * Image class – this will reflect which dimension of the multi-dimensional array holds which dimension of the image.
 * ImageOperation class:
@@ -275,6 +283,7 @@ On creation of a new connection, it will check for structure, constraint or type
 |:--        |:--    |:--                |:--                |  
 |Type constraints	|Insert wrong type	|Type Error	| <ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
 |Immutability|Input values based on variable then change variable |Values in DataType do not change|<ul><li>Values change</ul></li>
+|Itterability|Test iteration|Iteration returns correct values|<ul><li>Iteration returns incorrect values</ul></li>
 
 ### 6.1.3 Image
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
