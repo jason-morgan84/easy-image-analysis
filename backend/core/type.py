@@ -139,7 +139,7 @@ class ValueInt:
 
     @value.setter
     def value(self,val):
-        if not isinstance(val,int):
+        if not isinstance(val,int) and not isinstance(val,np.integer):
             raise TypeError (f"Expected integer, got {type(val)}")
         self._value = val
 

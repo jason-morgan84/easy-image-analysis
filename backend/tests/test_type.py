@@ -119,8 +119,11 @@ def test_data_type_ImageBinary():
 
 def test_data_type_ValueInt():
     mock_value = 2
+    mock_value_np = np.uint8(2)
     mock_value_float = 2.0
     mock_value_string = "2"
+
+    mock_value_np_ValueInt = ValueInt(mock_value_np)
 
     #test with wrong type float
     with pytest.raises(TypeError):
