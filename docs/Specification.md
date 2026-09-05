@@ -13,6 +13,7 @@
 |03/09/26	|0.4.0		|Added description of UI and UI diagram|
 |05/09/26	|0.5.0		|Merged in test plans|
 |05/09/26	|0.6.0		|Converted to markdown document|
+|05/09/26   |0.7.0      |Added type and shape conversions to description of Shape class|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -99,6 +100,7 @@ This exists to hold data related to the shape of transmitted images. It will hol
     2.	Effects on output – what effect an operation will have on the image shape, for example Z-projection will result in a Z of 1, while other dimensions will be left unchanged (-1).
 * Node and Port classes – this will mirror the usage in ImageOperation classes
 * Connection class – this may be required to reshape the image from the shape given by the input port to the shape given by the output port.
+
 ### 3.2.3 Image Class
 
 This holds the image data. As for the data type class, it exists purely to transmit images between nodes with a clearly defined shape and data type. It contains four instance variables:
@@ -108,6 +110,10 @@ This holds the image data. As for the data type class, it exists purely to trans
 3.	Image shape, using Shape class.
 4.	Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
 
+It also contains functions required to:
+* Convert between DataTypes
+* Carry out shape changes
+
 ### 3.2.4 Parameters Class
 The parameter class holds information for ImageOperations defining the required user inputs (as opposed to image/values inputted via the workflow). The aim is to allow the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements. 
 * Name – the name of the parameter
@@ -115,6 +121,7 @@ The parameter class holds information for ImageOperations defining the required 
 * value – its value
 * ui_element – the desired UI element for input (text box, drop down box, check box, slider etc)
 * ui_element_options – Any other options related to that UI element (slider min/max, drop down box options etc).
+
 ### 3.2.5 ImageOperation Class/File
 A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
 * name: name of ImageOperation
@@ -130,8 +137,10 @@ A key aim of this project is expandability, to allow the inclusion of new image 
 * alerts – any warnings to user (e.g, “Background subtraction with a large radius is a very slow process”)
 * version – version of software code ImageOperation was written for. This is to future proof code, so changes to base code that affect ImageOperations don’t mean all existing ImageOperations need to be rewritten. 
 * execute – function with code to execute
+
 ### 3.2.6 ImageOperationDirectory Class
 This class acts as a holder for a list of all ImageOperation classes, along with the code required to import them.
+
 ### 3.2.7 Node Class
 The ImageOperation class defines the image analysis function to be carried out on the image. The Node class is responsible for positioning an ImageOperation in the WorkFlow – this means there can be multiple nodes containing the same ImageOperation. While the ImageOperation class is responsible purely for image analysis, the Node class is responsible for interacting with other elements of the WorkFlow. As such, it has the following instance variables:
 * image_operation – the image analysis function to be run, as an ImageOperation class
