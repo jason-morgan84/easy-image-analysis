@@ -13,7 +13,9 @@
 |03/09/26	|0.4.0		|Added description of UI and UI diagram|
 |05/09/26	|0.5.0		|Merged in test plans|
 |05/09/26	|0.6.0		|Converted to markdown document|
-|05/09/26   |0.7.0      |Added type and shape conversions to description of Shape|
+|05/09/26   |0.7.0      |Added type and shape conversions to description of Image|
+|05/09/26   |0.7.1      |Added __iter__ to Shape class and included in unit testing|
+|05/09/26   |0.7.2      |Made it explicit in description of Image class that images should always have four dimensions|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -111,7 +113,9 @@ Shape will be used to hold shape related information in a number of classes and 
 
 ### 3.2.3 Image Class
 
-This holds the image data. As for the data type class, it exists purely to transmit images between nodes with a clearly defined shape and data type. It contains four instance variables:
+This holds the image data as a 4D array. If the image does not require all four dimensions, for example a flat, greyscale image, the unneeded dimensions should still be present with size 1.
+
+As for the data type class, it exists purely to transmit images between nodes with a clearly defined shape and data type. It contains four instance variables:
 
 1.	Image pixel data, in a multi-dimensional array of defined size and type.
 2.	Image data type, as a member of DataType.
@@ -121,6 +125,7 @@ This holds the image data. As for the data type class, it exists purely to trans
 It also contains functions required to:
 * Convert between DataTypes
 * Carry out shape changes
+* Unsqueeze images where output from an ImageOperation is in less than 4 dimensions
 
 ### 3.2.4 Parameters Class
 The parameter class holds information for ImageOperations defining the required user inputs (as opposed to image/values inputted via the workflow). The aim is to allow the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements. 
@@ -301,6 +306,10 @@ On creation of a new connection, it will check for structure, constraint or type
 |Shape conversions|Maintains type |Expected type after type conversion | <ul><li>Wrong type after shape conversion</li></ul>|
 |Shape conversions|Image shape variable updated to new shape | Image shape variable matches new shape | <ul><li>Image shape variable changes to incorrect values</li><li>Image shape variable doesn't change</li></ul>
 |Shape conversions|Dimension mapping updated to new shape | Each image dimension maps to correct new array dimension | <ul><li>Image dimensions map to incorrect values</li><li>Image dimension map doesn't change</li></ul>
+|Unsqueeze|Unsqueeze adds a new dimension | Unsqueezed image has 1 more dimension | <ul><li>Unsqueezed image has the same number of dimensions</li></ul>|
+|Unsqueeze|New dimension is properly assigned to image | image_shape records the presence of the previously missing dimension with size 1 | <ul><li>image_shape does not record the presence of a new dimension with size 1</li><li>Value of 1 is assigned to the wrong dimension</li></ul>|
+|Unsqueeze|New dimension is properly mapped | image_mapping correctly maps to previously existing dimensions | <ul><li>image_shape does correctly map to previously existing dimensions</ul>|
+|Unsqueeze|New dimension is properly mapped | image_mapping correctly maps to newly added dimensions | <ul><li>image_shape does correctly map to newly added existing dimensions</ul>|
 
 ## Stage 6.2 – Backend Image Operation Classes
 * Parameters
