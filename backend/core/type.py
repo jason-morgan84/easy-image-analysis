@@ -60,6 +60,9 @@ class ImageInt:
     def to_ImageBinary(self):
         return ImageBinary(self.value)
 
+    def to_numpy(self):
+        return self.to_uint8()
+
     def to_uint8(self):
         return np.array(self.value,np.uint8)
 
