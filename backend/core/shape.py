@@ -9,6 +9,8 @@ class Shape:
                         2: {"name": "y", "variable": lambda self: self.y},
                         3: {"name": "x", "variable": lambda self: self.x}}
 
+     order_index_lookup = {item["name"]: key for key, item in dimension_order.items()}
+
      def __init__(self, c, z, y, x):
             self.c = c
             self.z = z
@@ -22,6 +24,9 @@ class Shape:
      def __getitem__(self, key):
 
           return self.dimension_order[key]["variable"]
+
+     def __str__(self):
+          return str((self.c,self.z,self.y,self.x))
 
      
      @property
