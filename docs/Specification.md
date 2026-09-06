@@ -89,7 +89,7 @@ ImageBinary - 0 or 1
 ValueInt - int
 ValueFloat - float
 
-Each Image type will have __init__, value property and value.getter functions along with conversion functions for the other two image types and the relevant standard numpy type.
+Each Image type will have __init__, value property and value.getter functions along with conversion functions for the other two image types and the relevant standard numpy type. For numpy conversion, this will be available as an explicit function (to_uint8 or to_float64) or as a generic function (to_numpy).
 
 The value types will have similar functions for converting between themselves.
 
@@ -139,6 +139,7 @@ As for the data type class, it exists purely to transmit images between nodes wi
 It also contains the following functions:
 * ~~Convert between DataTypes~~ No longer required after implementation of implicit Type conversions.
 * transpose(Shape) - takes a parameter of type Shape defining which array dimension each image dimension should be moved to.
+    - expect a list/tuple with four, non-duplicate string elements which are members of Shape.dimension_order eg, (x,y,z,c)
 * ~~Unsqueeze images where output from an ImageOperation is in less than 4 dimensions~~ Unsqueeze can be carried out on collection of image from an ImageOperation using no.unsqueeze prior to converting to custom ImageType.
 
 ### 3.2.4 Parameters Class
@@ -288,6 +289,7 @@ On creation of a new connection, it will check for structure, constraint or type
 |Explicit Type Conversions | Member of DataType *x* converted to DataType *y* | Correctly converted with expected value | <ul><li>Not converted to expected DataType</li><li>Not converted to expected value</li></ul>|
 |Explicit Type conversions | Convert to standard NumPy type | Array/values type matches that expected | <ul><li>Array/value data type does not match that expected</li></ul>|
 |Explicit Type conversions|	Convert between int and float types then back again repeatedly	| Array values are consistent over time	|	<ul><li>Array values drift over time</ul></li>|
+|Explicit Type conversions|	Test to_numpy() works in the same way as to_uint8 or to_float64 functions	| They give the expected value	|	<ul><li>They give unexpected values</li><li>They give errors</li></ul>|
 |Implicit Type Conversions| Test implicit type conversions | Implicit type conversions correctly convert type |<ul><li>Implicity type conversions don't work</li><li>Implicity type conversions don't maintain shape</li><li>Implicit type conversions don't maintain values</li></ul>
 
 **Image DataTypes**
