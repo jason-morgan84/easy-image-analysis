@@ -18,6 +18,7 @@
 |05/09/26   |0.7.2      |Made it explicit in description of Image class that images should always have four dimensions|
 |05/09/26   |0.7.3      |Added Image.Unsqueeze to Image class description and unit testing|
 |05/09/26   |0.7.4      |Added description of implicit and explicit type conversions to Image DataTypes|
+|06/09/26|0.7.5|Added description of class variables to Shape and removed unsqueeze from Image classes|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -94,7 +95,9 @@ The value types will have similar functions for converting between themselves.
 
 Conversions can be explicit (eg, by using ImageInt.to_ImageFloat) or implicit (eg, by calling ImageFloat(x) where x is an ImageInt).
 
-They will all be wrapped in an Enum to help ensure type safety. Also, if data types need to be changed in the future, this will help with refactoring.
+To simplify the code for implicit conversions, each class should have conversion functions for all members of it's sub group (defined below), including itself.
+
+They will all be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type.
 
 ### 3.2.2 Shape class
 
@@ -103,8 +106,15 @@ This exists to hold data related to the shape of transmitted images. It will hol
 * z (depth)
 * y (height)
 * x (width) 
+And contains class variables to define limits on image Shape:
 
-It has __iter__ dunder to return values in the order c --> z --> y --> x
+*max_image_dimensions - the max number of dimensions an image should have (4).
+
+*min_image_dimensions - the minimum number of dimensions an image should have. This is currently set at 4, the same as max, to allow for consistent expectations for image processing. Un-used dimensions should have size 1.
+
+*dimension_order - the order in which to expect dimensions (c, z, y, x). This is in the form of a dictionary to define the return order of the __iter__ dunder below.
+
+It has __iter__ dunder to return values in the order defined above.
 
 Shape will be used to hold shape related information in a number of classes and contexts:
 
@@ -129,7 +139,7 @@ As for the data type class, it exists purely to transmit images between nodes wi
 It also contains functions required to:
 * ~~Convert between DataTypes~~ No longer required after implementation of implicit Type conversions.
 * Carry out shape changes
-* Unsqueeze images where output from an ImageOperation is in less than 4 dimensions
+* ~~Unsqueeze images where output from an ImageOperation is in less than 4 dimensions~~ Unsqueeze can be carried out on collection of image from an ImageOperation using no.unsqueeze prior to converting to custom ImageType.
 
 ### 3.2.4 Parameters Class
 The parameter class holds information for ImageOperations defining the required user inputs (as opposed to image/values inputted via the workflow). The aim is to allow the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements. 
@@ -176,7 +186,7 @@ The port class acts as a buffer between a node and an ImageOperation. It has two
 * connection_id – unique identifier for connected connections
 * is_input – flag for whether port is an input or output. Inputs only allow one connection, outputs allow multiple
 * to_workflow – converts data types from those used in ImageOperations to those used in WorkFlow
-* from_workflow – converts data types from those used in WorkFlow to those used in ImageOperations
+* from_workflow – converts data types from those used in WorkFlow to those used in ImageOperations, including Unsqueeze where necessary.
 * type – WorkFlow associated data type
 * shape – WorkFlow associated image shape
 
