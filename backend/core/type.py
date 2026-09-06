@@ -60,7 +60,7 @@ class ImageInt:
     def to_ImageBinary(self):
         return ImageBinary(self.value)
 
-    def to_numpy(self):
+    def _to_numpy(self):
         return self.to_uint8()
 
     def to_uint8(self):
@@ -119,6 +119,9 @@ class ImageFloat:
     def to_ImageBinary(self):
         return ImageBinary(self.value)
 
+    def _to_numpy(self):
+        return self.to_float64()
+
     def to_float64(self):
         return np.array(self.value,np.float64)
 
@@ -175,6 +178,9 @@ class ImageBinary:
     def to_ImageInt(self):
         return ImageInt(self.value)
 
+    def _to_numpy(self):
+        return self.to_uint8()
+
     def to_uint8(self):
         return np.array(self.value,np.uint8)
 
@@ -201,6 +207,9 @@ class ValueInt:
     def to_ValueFloat(self):
         return ValueFloat(self.value)
 
+    def _to_numpy(self):
+        return self.to_uint8()
+
     def to_uint8(self):
         return np.uint8(self.value)
 
@@ -223,6 +232,9 @@ class ValueFloat:
 
     def to_ValueInt(self):
         return ValueInt(round(self.value))
+
+    def _to_numpy(self):
+        return self.to_float64()
 
     def to_float64(self):
         return np.float64(self.value)

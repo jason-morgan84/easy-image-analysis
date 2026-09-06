@@ -92,3 +92,19 @@ def test_image_non_mapping_shape():
         test_image_wrong= Image(mock_image, DataType.ImageInt, image_shape, image_map_wrong_repeat)
 
     test_image_right = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
+
+
+#Shape conversion: converts to correct shape
+def test_image_shape_conversion_output_shape():
+    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
+
+
+    image_shape = Shape(2,3,4,5)
+    image_map_right = Shape(0,1,2,3)
+
+
+    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
+
+    assert (test_image.array.shape == (2,3,4,5))
+
+    assert ((test_image.transpose(("z","c","y","x"))).array.shape == (3,2,4,5))

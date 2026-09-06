@@ -81,6 +81,51 @@ class Image:
 
         self._image_mapping = map
 
+    def transpose(self, new_shape):
+
+        # expect a list/tuple with four, non-duplicate string elements which are members of Shape.dimension_order
+        if not isinstance(new_shape, tuple) and not isinstance(new_shape,list):
+            raise TypeError (f"Expected tuple/list of ordered channel names, got {type(new_shape)}")
+
+        if len(new_shape)!=4:
+            raise ValueError (f"Expected 4 ordered channel names, got {len(new_shape)}")
+
+        if (len(new_shape)!=len(set(new_shape))):
+            raise ValueError ("List/tuple describing new shape contains duplicate dimensions")
+
+        if not isinstance(new_shape[0],str):
+            raise TypeError (f"Expected tuple/list of strings, got {type(new_shape[0])}")
+
+        for item in new_shape:
+                if not any(dim["name"] == item.lower() for dim in Shape.dimension_order.values()):
+                    raise ValueError (f"List/tuple describing new shape contains incorrect dimension {item} dimensions")
+
+
+        transpose =[]
+
+        # receives input of new channel order, such as z,c,y,x
+        # to use numpy transpose, needs to go from string z to array map for that dimension and append to list transpose
+        # transpose used as input for np.transpose
+
+        for item in new_shape:
+            for n, dim in enumerate(self.image_mapping):
+                if Shape.dimension_order[dim]["name"] == item.lower():
+                    transpose.append(dim)
+
+        transposed_array = np.transpose(self.array.to_numpy(),transpose)
+        
+        return Image(array = self.array_dtype(transposed_array),
+                     array_dtype = self.array_dtype,
+                     image_shape = self.image_shape,
+                     image_mapping = Shape(*transpose))
+
+
+
+
+        
+        
+
+
 
 
 
