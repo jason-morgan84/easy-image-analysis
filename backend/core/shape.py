@@ -4,10 +4,10 @@ class Shape:
 
      max_image_dimensions = 4
      min_image_dimensions = 4
-     dimension_order = {"c": lambda self: self.c,
-                        "z": lambda self: self.z,
-                        "y": lambda self: self.y,
-                        "x": lambda self: self.x}
+     dimension_order = {0: {"name": "c", "variable": lambda self: self.c},
+                        1: {"name": "z", "variable": lambda self: self.z},
+                        2: {"name": "y", "variable": lambda self: self.y},
+                        3: {"name": "x", "variable": lambda self: self.x}}
 
      def __init__(self, c, z, y, x):
             self.c = c
@@ -17,7 +17,12 @@ class Shape:
 
      def __iter__(self):
           for item in self.dimension_order.values:
-               yield item
+               yield item["variable"]
+
+     def __getitem__(self, key):
+
+          return self.dimension_order[key]["variable"]
+
      
      @property
      def c(self):
