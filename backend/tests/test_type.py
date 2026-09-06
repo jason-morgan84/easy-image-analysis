@@ -168,10 +168,15 @@ def test_data_type_ValueInt():
     mock_value = 3
     assert(mock_value_ValueInt != mock_value)
 
+    mock_value_ValueInt = ValueInt(mock_value_np)
+    mock_value_np = 3
+    assert(mock_value_ValueInt != mock_value_np)
+
 def test_data_type_ValueFloat():
     mock_value = 2
     mock_value_float = 2.0
     mock_value_string = "2"
+    mock_value_float_np = np.float64(2.1)
 
     #test with wrong type float
     with pytest.raises(TypeError):
@@ -192,6 +197,10 @@ def test_data_type_ValueFloat():
     mock_value_ValueFloat = ValueFloat(mock_value_float)
     mock_value_float = 3.0
     assert(mock_value_ValueFloat != mock_value_float)
+
+    mock_value_ValueFloat = ValueFloat(mock_value_float_np)
+    mock_value_float = 5.1
+    assert(mock_value_ValueFloat != mock_value_float_np)
 
 def test_image_conversions_ImageInt():
 
@@ -346,4 +355,17 @@ def test_implicit_conversion_to_binary():
     mock_int_image_convert = ImageBinary(mock_float_image)
     assert(mock_int_image_convert.shape == mock_float_image.shape)
 
+# test implicit conversions to Value_int
+def test_implicit_conversion_value_int():
+    float_value = 2.4
+
+    test = ValueFloat(float_value)
+    test_implicit_int = ValueInt(test)
+
+# test implicit conversions to Value_float
+def test_implicit_conversion_value_float():
+    int_value = 2
+
+    test = ValueInt(int_value)
+    test_implicit_float = ValueFloat(test)
 

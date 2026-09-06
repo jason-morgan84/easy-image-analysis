@@ -20,8 +20,8 @@ class ImageInt:
     def value(self, val):
 
         # checks whether input val is a member of any of the Image data types defined as image_types in constants.py
-        array_dtype = getattr(val, "data_type", None)
-        if array_dtype in DataType.image_types():
+        value_dtype = getattr(val, "data_type", None)
+        if value_dtype in DataType.image_types() and value_dtype != ImageInt:
             # if it is, call relevant function converting to int
             val = val.to_ImageInt()
         else:
@@ -51,16 +51,13 @@ class ImageInt:
     def shape(self):
         return self.value.shape
 
-    def _to_ImageInt(self):
-        return self.value
-
     def to_ImageFloat(self):
         return ImageFloat(self.value/255)
 
     def to_ImageBinary(self):
         return ImageBinary(self.value)
 
-    def _to_numpy(self):
+    def to_numpy(self):
         return self.to_uint8()
 
     def to_uint8(self):
@@ -82,8 +79,8 @@ class ImageFloat:
     @value.setter
     def value(self, val):
         # checks whether input val is a member of any of the Image data types defined as image_types in constants.py
-        array_dtype = getattr(val, "data_type", None)
-        if array_dtype in DataType.image_types():
+        value_dtype = getattr(val, "data_type", None)
+        if value_dtype in DataType.image_types() and value_dtype != ImageFloat:
             # if it is, call relevant function converting to int
             val = val.to_ImageFloat()
         else:
@@ -110,16 +107,13 @@ class ImageFloat:
     def shape(self):
         return self.value.shape
 
-    def _to_ImageFloat(self):
-        return self.value
-
     def to_ImageInt(self):
         return ImageInt(np.uint8(np.round(self.value * 255)))
 
     def to_ImageBinary(self):
         return ImageBinary(self.value)
 
-    def _to_numpy(self):
+    def to_numpy(self):
         return self.to_float64()
 
     def to_float64(self):
@@ -139,8 +133,8 @@ class ImageBinary:
     def value(self, val):
 
         # checks whether input val is a member of any of the Image data types defined as image_types in constants.py
-        array_dtype = getattr(val, "data_type", None)
-        if array_dtype in DataType.image_types():
+        value_dtype = getattr(val, "data_type", None)
+        if value_dtype in DataType.image_types() and value_dtype != ImageBinary:
             # if it is, call relevant function converting to int
             val = val.to_ImageBinary()
         else:
@@ -169,16 +163,13 @@ class ImageBinary:
     def shape(self):
         return self.value.shape
 
-    def _to_ImageBinary(self):
-        return self.value
-
     def to_ImageFloat(self):
         return ImageFloat(self.value)
 
     def to_ImageInt(self):
         return ImageInt(self.value)
 
-    def _to_numpy(self):
+    def to_numpy(self):
         return self.to_uint8()
 
     def to_uint8(self):
@@ -200,9 +191,15 @@ class ValueInt:
 
     @value.setter
     def value(self,val):
-        if not isinstance(val,int) and not isinstance(val,np.integer):
-            raise TypeError (f"Expected integer, got {type(val)}")
-        self._value = val
+        value_dtype = getattr(val, "data_type", None)
+        if value_dtype in DataType.value_types() and value_dtype != ValueInt:
+            # if it is, call relevant function converting to int
+            val = val.to_ValueInt()
+        else:
+
+            if not isinstance(val,int) and not isinstance(val,np.integer):
+                raise TypeError (f"Expected integer, got {type(val)}")
+            self._value = val
 
     def to_ValueFloat(self):
         return ValueFloat(self.value)
@@ -226,9 +223,14 @@ class ValueFloat:
 
     @value.setter
     def value(self,val):
-        if not isinstance(val,(np.number,numbers.Number)):
-            raise TypeError ("Value must be a number.")
-        self._value = np.float64(val)
+        value_dtype = getattr(val, "data_type", None)
+        if value_dtype in DataType.value_types() and value_dtype != ValueFloat:
+            # if it is, call relevant function converting to int
+            val = val.to_ValueFloat()
+        else:
+            if not isinstance(val,(np.number,numbers.Number)):
+                raise TypeError ("Value must be a number.")
+            self._value = np.float64(val)
 
     def to_ValueInt(self):
         return ValueInt(round(self.value))

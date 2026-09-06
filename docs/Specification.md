@@ -95,7 +95,7 @@ The value types will have similar functions for converting between themselves.
 
 Conversions can be explicit (eg, by using ImageInt.to_ImageFloat) or implicit (eg, by calling ImageFloat(x) where x is an ImageInt).
 
-To simplify the code for implicit conversions, each class should have conversion functions for all members of it's sub group (defined below), including itself.
+To allow implicit conversions, each class should have conversion functions for all members of it's sub group (defined below).
 
 They will all be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type.
 
