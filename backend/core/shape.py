@@ -16,8 +16,8 @@ class Shape:
             self.x = x
 
      def __iter__(self):
-          for item in self.dimension_order.values:
-               yield item["variable"]
+          for item in self.dimension_order.values():
+               yield item["variable"](self)
 
      def __getitem__(self, key):
 
