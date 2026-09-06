@@ -1,6 +1,14 @@
 import numpy as np
 
 class Shape:
+
+     max_image_dimensions = 4
+     min_image_dimensions = 4
+     dimension_order = {"c": lambda self: self.c,
+                        "z": lambda self: self.z,
+                        "y": lambda self: self.y,
+                        "x": lambda self: self.x}
+
      def __init__(self, c, z, y, x):
             self.c = c
             self.z = z
@@ -8,10 +16,8 @@ class Shape:
             self.x = x
 
      def __iter__(self):
-          yield self.c
-          yield self.z
-          yield self.y
-          yield self.x
+          for item in self.dimension_order.values:
+               yield item
      
      @property
      def c(self):
