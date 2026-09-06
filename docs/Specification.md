@@ -108,13 +108,13 @@ This exists to hold data related to the shape of transmitted images. It will hol
 * x (width) 
 And contains class variables to define limits on image Shape:
 
-*max_image_dimensions - the max number of dimensions an image should have (4).
+* max_image_dimensions - the max number of dimensions an image should have (4).
 
-*min_image_dimensions - the minimum number of dimensions an image should have. This is currently set at 4, the same as max, to allow for consistent expectations for image processing. Un-used dimensions should have size 1.
+* min_image_dimensions - the minimum number of dimensions an image should have. This is currently set at 4, the same as max, to allow for consistent expectations for image processing. Un-used dimensions should have size 1.
 
-*dimension_order - the order in which to expect dimensions (c, z, y, x). This is in the form of a dictionary to define the return order of the __iter__ dunder below.
+* dimension_order - the order in which to expect dimensions (c, z, y, x). This is in the form of two nested dictionaries defining the order, used in the __iter__ and __getitem__ dunders below. Dictionary format is {index: {"name": x, "variable": y}} where index is an integer, x is a string and y is a lambda to a variable (eg, self.c).
 
-It has __iter__ dunder to return values in the order defined above.
+It has __iter__ dunder to return values in the order defined above and __getitem__ dunder to return specific values.
 
 Shape will be used to hold shape related information in a number of classes and contexts:
 
@@ -136,9 +136,9 @@ As for the data type class, it exists purely to transmit images between nodes wi
 3.	Image shape, using Shape class.
 4.	Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
 
-It also contains functions required to:
+It also contains the following functions:
 * ~~Convert between DataTypes~~ No longer required after implementation of implicit Type conversions.
-* Carry out shape changes
+* transpose(Shape) - takes a parameter of type Shape defining which array dimension each image dimension should be moved to.
 * ~~Unsqueeze images where output from an ImageOperation is in less than 4 dimensions~~ Unsqueeze can be carried out on collection of image from an ImageOperation using no.unsqueeze prior to converting to custom ImageType.
 
 ### 3.2.4 Parameters Class
@@ -322,10 +322,10 @@ On creation of a new connection, it will check for structure, constraint or type
 |Shape conversions|Maintains type |Expected type after type conversion | <ul><li>Wrong type after shape conversion</li></ul>|
 |Shape conversions|Image shape variable updated to new shape | Image shape variable matches new shape | <ul><li>Image shape variable changes to incorrect values</li><li>Image shape variable doesn't change</li></ul>
 |Shape conversions|Dimension mapping updated to new shape | Each image dimension maps to correct new array dimension | <ul><li>Image dimensions map to incorrect values</li><li>Image dimension map doesn't change</li></ul>
-|Unsqueeze|Unsqueeze adds a new dimension | Unsqueezed image has 1 more dimension | <ul><li>Unsqueezed image has the same number of dimensions</li></ul>|
-|Unsqueeze|New dimension is properly assigned to image | image_shape records the presence of the previously missing dimension with size 1 | <ul><li>image_shape does not record the presence of a new dimension with size 1</li><li>Value of 1 is assigned to the wrong dimension</li></ul>|
-|Unsqueeze|New dimension is properly mapped | image_mapping correctly maps to previously existing dimensions | <ul><li>image_shape does correctly map to previously existing dimensions</ul>|
-|Unsqueeze|New dimension is properly mapped | image_mapping correctly maps to newly added dimensions | <ul><li>image_shape does correctly map to newly added existing dimensions</ul>|
+|~~Unsqueeze~~|~~Unsqueeze adds a new dimension ~~| ~~Unsqueezed image has 1 more dimension~~ | <ul><li>~~Unsqueezed image has the same number of dimensions~~/li></ul>|
+|~~Unsqueeze~~|~~New dimension is properly assigned to image~~ | ~~image_shape records the presence of the previously missing dimension with size 1~~ | <ul><li>~~image_shape does not record the presence of a new dimension with size 1~~</li><li>~~Value of 1 is assigned to the wrong dimension~~</li></ul>|
+|~~Unsqueeze~~|~~New dimension is properly mapped ~~|~~ image_mapping correctly maps to previously existing dimensions~~ | <ul><li>~~image_shape does correctly map to previously existing dimensions~~</ul>|
+|~~Unsqueeze~~|~~New dimension is properly mapped ~~| ~~image_mapping correctly maps to newly added dimensions~~ | <ul><li>~~image_shape does correctly map to newly added existing dimensions~~</ul>|
 
 ## Stage 6.2 – Backend Image Operation Classes
 * Parameters
