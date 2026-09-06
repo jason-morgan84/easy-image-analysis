@@ -85,10 +85,10 @@ class Image:
 
         # expect a list/tuple with four, non-duplicate string elements which are members of Shape.dimension_order
         if not isinstance(new_shape, tuple) and not isinstance(new_shape,list):
-            raise TypeError (f"Expected tuple/list of ordered channel names, got {type(new_shape)}")
+            raise TypeError (f"Expected tuple/list of channel names, got {type(new_shape)}")
 
         if len(new_shape)!=4:
-            raise ValueError (f"Expected 4 ordered channel names, got {len(new_shape)}")
+            raise ValueError (f"Expected 4 channel names, got {len(new_shape)}")
 
         if (len(new_shape)!=len(set(new_shape))):
             raise ValueError ("List/tuple describing new shape contains duplicate dimensions")
@@ -102,22 +102,31 @@ class Image:
 
 
         transpose =[]
+        new_map = []
 
         # receives input of new channel order, such as z,c,y,x
         # to use numpy transpose, needs to go from string z to array map for that dimension and append to list transpose
         # transpose used as input for np.transpose
 
-        for item in new_shape:
-            for n, dim in enumerate(self.image_mapping):
+
+        for n, item in enumerate(new_shape):
+            for dim in self.image_mapping:
                 if Shape.dimension_order[dim]["name"] == item.lower():
                     transpose.append(dim)
 
+        shape_index_lookup = {item.lower(): idx for idx, item in enumerate(new_shape)}
+
+        new_map = [shape_index_lookup[item["name"]] for item in Shape.dimension_order.values()]
+
         transposed_array = np.transpose(self.array.to_numpy(),transpose)
+        print(new_shape,transposed_array.shape,new_map)
+        print(self.image_shape)
         
         return Image(array = self.array_dtype(transposed_array),
                      array_dtype = self.array_dtype,
                      image_shape = self.image_shape,
-                     image_mapping = Shape(*transpose))
+                     #image_shape = Shape(*transposed_array.shape),
+                     image_mapping = Shape(*new_map))
 
 
 

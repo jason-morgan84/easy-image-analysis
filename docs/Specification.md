@@ -319,9 +319,14 @@ On creation of a new connection, it will check for structure, constraint or type
 |Type conversions|Pixel data array shape| Same shape after type conversion | <ul><li>Different shape after type conversion</li></ul>|
 |Type conversions|Pixel data array value | Expected values after type conversion | <ul><li>Wrong values after type conversion</li></ul>|
 |Type conversions|Converts to correct type | Expected type after type conversion | <ul><li>Wrong type after type conversion</li></ul>|
+|Shape conversions|Test input with incorrect type - not string | Type error | <ul><li>Incorrect type ignored</li></ul>|
+|Shape conversions|Test input with incorrect type - not list or tuple | Type error | <ul><li>Incorrect type ignored</li></ul>|
+|Shape conversions|Test input with incorrect type - not 4 elements in list or tuple| Value error | <ul><li>Incorrect list size ignored</li></ul>|
+|Shape conversions|Test input with incorrect type - duplicate elements| Value error | <ul><li>Duplicate elements ignored</li></ul>|
+|Shape conversions|Test input with incorrect type - elements that aren't valid image dimension identifiers| Value error | <ul><li>Incorrect identifiers ignored</li></ul>|
 |Shape conversions|Converts to correct shape | Expected shape after shape conversion | <ul><li>Wrong shape after shape conversion</li></ul>|
-|Shape conversions|Maintains values | Expected values after type conversion  | <ul><li>Wrong values after shape conversion</ul></li>|
-|Shape conversions|Maintains type |Expected type after type conversion | <ul><li>Wrong type after shape conversion</li></ul>|
+|Shape conversions|Maintains values after conversion | Expected values after type conversion  | <ul><li>Wrong values after shape conversion</ul></li>|
+|Shape conversions|Maintains type after conversion|Expected type after type conversion | <ul><li>Wrong type after shape conversion</li></ul>|
 |Shape conversions|Image shape variable updated to new shape | Image shape variable matches new shape | <ul><li>Image shape variable changes to incorrect values</li><li>Image shape variable doesn't change</li></ul>
 |Shape conversions|Dimension mapping updated to new shape | Each image dimension maps to correct new array dimension | <ul><li>Image dimensions map to incorrect values</li><li>Image dimension map doesn't change</li></ul>
 |~~Unsqueeze~~|~~Unsqueeze adds a new dimension ~~| ~~Unsqueezed image has 1 more dimension~~ | <ul><li>~~Unsqueezed image has the same number of dimensions~~/li></ul>|

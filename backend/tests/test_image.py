@@ -94,12 +94,22 @@ def test_image_non_mapping_shape():
     test_image_right = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
 
 
+
+# Test input with incorrect type - not string	
+# Test input with incorrect type - not list or tuple	
+# Test input with incorrect type - not 4 elements in list or tuple	
+# Test input with incorrect type - duplicate elements	
+# Test input with incorrect type - elements that aren't valid image dimension identifiers	
+
 #Shape conversion: converts to correct shape
 def test_image_shape_conversion_output_shape():
     mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
 
 
-    image_shape = Shape(2,3,4,5)
+    image_shape = Shape(c = 2,
+                        z = 3,
+                        y = 4,
+                        x = 5)
     image_map_right = Shape(0,1,2,3)
 
 
@@ -108,3 +118,10 @@ def test_image_shape_conversion_output_shape():
     assert (test_image.array.shape == (2,3,4,5))
 
     assert ((test_image.transpose(("z","c","y","x"))).array.shape == (3,2,4,5))
+    assert ((test_image.transpose(("x","y","z","c"))).array.shape == (5,4,3,2))
+    assert ((test_image.transpose(("c","y","x","z"))).array.shape == (2,4,5,3))
+
+# Maintains values after conversion
+# Maintains type	
+# Image shape variable updated to new shape	
+# Dimension mapping updated to new shape
