@@ -20,6 +20,7 @@
 |05/09/26   |0.7.4      |Added description of implicit and explicit type conversions to Image DataTypes|
 |06/09/26|0.7.5|Added description of class variables to Shape and removed unsqueeze from Image classes|
 |07/09/26|0.7.6|Updated description of Shape class to include new definitions of dimensions and class functions|
+|07/09/26|0.8.0|Added description of parameter unit testing|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -342,6 +343,7 @@ On creation of a new connection, it will check for structure, constraint or type
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Input value in a format not defined in data_type|	Type Error	| <ul><li>Incorrectly type data used in incorrect format</li></ul>|
+|Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
 
 * ImageOperation
 * ImageOperationDirectory
