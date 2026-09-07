@@ -151,7 +151,7 @@ The parameter class holds information for ImageOperations defining the required 
 * dtype – the data type of the parameter
 * value – its value
 * ui_element – the desired UI element for input (text box, drop down box, check box, slider etc)
-* ui_element_options – Any other options related to that UI element (slider min/max, drop down box options etc).
+* ui_element_options – Dictionary of other options related to that UI element (slider min/max, drop down box options etc).
 
 ### 3.2.5 ImageOperation Class/File
 A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
@@ -338,7 +338,11 @@ On creation of a new connection, it will check for structure, constraint or type
 |~~Unsqueeze~~|~~New dimension is properly mapped ~~| ~~image_mapping correctly maps to newly added dimensions~~ | <ul><li>~~image_shape does correctly map to newly added existing dimensions~~</ul>|
 
 ## Stage 6.2 – Backend Image Operation Classes
-* Parameters
+### Parameters
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                |  
+|Type constraints|	Input value in a format not defined in data_type|	Type Error	| <ul><li>Incorrectly type data used in incorrect format</li></ul>|
+
 * ImageOperation
 * ImageOperationDirectory
 
