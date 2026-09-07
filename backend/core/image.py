@@ -63,21 +63,15 @@ class Image:
 
     @image_mapping.setter
     def image_mapping(self, map):
-        # check that if, for example, image shape says channel c has size 4 and image mapping says channel c maps to array dimension 0,
+        # for each dimension, check that if, for example, image shape says channel c has size 4 and image mapping says channel c maps to array dimension 0,
         # array dimension 0 also has size 4, else return ValueError
         
         array_shape = self.array.value.shape
-        if array_shape[map.c] != self.image_shape.c:
-            raise ValueError (f"c dimension of size {self.image_shape.c} is mapped to array dimension of size {array_shape[map.c]}")
-
-        if array_shape[map.z] != self.image_shape.z:
-            raise ValueError (f"z dimension of size {self.image_shape.z} is mapped to array dimension of size {array_shape[map.z]}")
-
-        if array_shape[map.y] != self.image_shape.y:
-            raise ValueError (f"y dimension of size {self.image_shape.y} is mapped to array dimension of size {array_shape[map.y]}")
-
-        if array_shape[map.x] != self.image_shape.x:
-            raise ValueError (f"x dimension of size {self.image_shape.x} is mapped to array dimension of size {array_shape[map.x]}")
+        for dimension in Shape.dimensions:
+            dimension_array_shape = array_shape[getattr(map, dimension)]
+            dimension_image_shape = getattr(self.image_shape,dimension)
+            if dimension_array_shape != dimension_image_shape:
+                raise ValueError (f"{dimension} dimension of size {dimension_image_shape} is mapped to array dimension of size {dimension_array_shape}")
 
         self._image_mapping = map
 
@@ -97,7 +91,7 @@ class Image:
             raise TypeError (f"Expected tuple/list of strings, got {type(new_shape[0])}")
 
         for item in new_shape:
-                if not any(dim["name"] == item.lower() for dim in Shape.dimension_order.values()):
+                if not any(dim == item.lower() for dim in Shape.dimensions):
                     raise ValueError (f"List/tuple describing new shape contains incorrect dimension {item} dimensions")
 
 
@@ -109,19 +103,21 @@ class Image:
         # transpose used as input for np.transpose
 
 
-        for n, item in enumerate(new_shape):
-            for dim in self.image_mapping:
-                if Shape.dimension_order[dim]["name"] == item.lower():
-                    transpose.append(dim)
+        #for n, item in enumerate(new_shape):
+        #    for dim in self.image_mapping:
+        #        if Shape.dimensions[dim] == item.lower():
+        #            transpose.append(dim)
 
+        # convert new dimension order in new_shape as strings to same order in transpose as integers
+        transpose = [self.image_mapping[item] for item in new_shape]
+
+        # get new shape map - ie, get the position of c,z,y,x in new_shape
         shape_index_lookup = {item.lower(): idx for idx, item in enumerate(new_shape)}
+        new_map = [shape_index_lookup[item] for item in Shape.dimensions]
 
-        new_map = [shape_index_lookup[item["name"]] for item in Shape.dimension_order.values()]
-
-        transposed_array = np.transpose(self.array.to_numpy(),transpose)
-        print(new_shape,transposed_array.shape,new_map)
-        print(self.image_shape)
         
+        transposed_array = np.transpose(self.array.to_numpy(),transpose)
+
         return Image(array = self.array_dtype(transposed_array),
                      array_dtype = self.array_dtype,
                      image_shape = self.image_shape,
