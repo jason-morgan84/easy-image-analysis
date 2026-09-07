@@ -87,7 +87,7 @@ class Image:
         if not isinstance(new_shape, tuple) and not isinstance(new_shape,list):
             raise TypeError (f"Expected tuple/list of channel names, got {type(new_shape)}")
 
-        if len(new_shape)!=4:
+        if len(new_shape)>Shape.max_image_dimensions or len(new_shape)<Shape.min_image_dimensions:
             raise ValueError (f"Expected 4 channel names, got {len(new_shape)}")
 
         if (len(new_shape)!=len(set(new_shape))):

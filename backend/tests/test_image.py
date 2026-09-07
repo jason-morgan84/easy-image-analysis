@@ -96,10 +96,88 @@ def test_image_non_mapping_shape():
 
 
 # Test input with incorrect type - not string	
+def test_shape_conversion_with_incorrect_type():
+    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
+
+
+    image_shape = Shape(c = 2,
+                        z = 3,
+                        y = 4,
+                        x = 5)
+    image_map_right = Shape(0,1,2,3)
+
+
+    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
+    with pytest.raises(TypeError):
+        test_image = test_image.transpose([1,2,3,4])
+
+
+
 # Test input with incorrect type - not list or tuple	
+
+def test_shape_conversion_not_list():
+    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
+
+
+    image_shape = Shape(c = 2,
+                        z = 3,
+                        y = 4,
+                        x = 5)
+    image_map_right = Shape(0,1,2,3)
+
+
+    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
+    with pytest.raises(TypeError):
+        test_image = test_image.transpose("z","c","y","x")
+
 # Test input with incorrect type - not 4 elements in list or tuple	
+def test_shape_conversion_not_4_elemets():
+    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
+
+
+    image_shape = Shape(c = 2,
+                        z = 3,
+                        y = 4,
+                        x = 5)
+    image_map_right = Shape(0,1,2,3)
+
+
+    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
+    with pytest.raises(ValueError):
+        test_image = test_image.transpose(["c","z","x"])
+    with pytest.raises(ValueError):
+        test_image = test_image.transpose(["c","z","x","y","f"])
+
 # Test input with incorrect type - duplicate elements	
+def test_shape_conversion_duplicate_elements():
+    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
+
+
+    image_shape = Shape(c = 2,
+                        z = 3,
+                        y = 4,
+                        x = 5)
+    image_map_right = Shape(0,1,2,3)
+
+
+    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
+    with pytest.raises(ValueError):
+        test_image = test_image.transpose(["c","z","x","x"])
 # Test input with incorrect type - elements that aren't valid image dimension identifiers	
+def test_shape_conversion_invalid_identifiers():
+    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
+
+
+    image_shape = Shape(c = 2,
+                        z = 3,
+                        y = 4,
+                        x = 5)
+    image_map_right = Shape(0,1,2,3)
+
+
+    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
+    with pytest.raises(ValueError):
+        test_image = test_image.transpose(["a","b","c","f"])
 
 #Shape conversion: converts to correct shape
 def test_image_shape_conversion_output_shape():
