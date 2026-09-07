@@ -19,6 +19,7 @@
 |05/09/26   |0.7.3      |Added Image.Unsqueeze to Image class description and unit testing|
 |05/09/26   |0.7.4      |Added description of implicit and explicit type conversions to Image DataTypes|
 |06/09/26|0.7.5|Added description of class variables to Shape and removed unsqueeze from Image classes|
+|07/09/26|0.7.6|Updated description of Shape class to include new definitions of dimensions and class functions|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -112,9 +113,11 @@ And contains class variables to define limits on image Shape:
 
 * min_image_dimensions - the minimum number of dimensions an image should have. This is currently set at 4, the same as max, to allow for consistent expectations for image processing. Un-used dimensions should have size 1.
 
-* dimension_order - the order in which to expect dimensions (c, z, y, x). This is in the form of two nested dictionaries defining the order, used in the __iter__ and __getitem__ dunders below. Dictionary format is {index: {"name": x, "variable": y}} where index is an integer, x is a string and y is a lambda to a variable (eg, self.c).
+* dimensions- the current dimensions and default order (c, z, y, x). This is in the form of a tuple defining the order, used in the __iter__ and __getitem__ dunders below.
 
-It has __iter__ dunder to return values in the order defined above and __getitem__ dunder to return specific values.
+Shape has __iter__ dunder to return values in the order defined above and __getitem__ and __setitem__ dunders to return and set values. __getitem__ and __setitem__ accept and return values as either strings (c,z,y,x) or integer indices (0,1,2,3 - as defined by order in dimensions).
+
+Shape also has functions to convert between dimensions in string and integer formats.
 
 Shape will be used to hold shape related information in a number of classes and contexts:
 
