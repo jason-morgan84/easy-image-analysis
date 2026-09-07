@@ -4,13 +4,12 @@ class Shape:
 
      max_image_dimensions = 4
      min_image_dimensions = 4
-     dimension_order = {0: {"name": "c", "variable": lambda self: self.c},
-                        1: {"name": "z", "variable": lambda self: self.z},
-                        2: {"name": "y", "variable": lambda self: self.y},
-                        3: {"name": "x", "variable": lambda self: self.x}}
 
-     order_index_lookup = {item["name"]: key for key, item in dimension_order.items()}
+     # defines acceptable dimensions and default order
+     dimensions = ('c','z','y','x')
 
+     # arguements in __init_ must equal dimensions above
+     # in future, consider change to kwargs to remove hardcoded dimensions
      def __init__(self, c, z, y, x):
             self.c = c
             self.z = z
@@ -18,12 +17,34 @@ class Shape:
             self.x = x
 
      def __iter__(self):
-          for item in self.dimension_order.values():
-               yield item["variable"](self)
+        for dimension in self.dimensions:
+             yield getattr(self, dimension)
 
+     # allows getitem or setitem by dimension name or by dimension index
      def __getitem__(self, key):
+          if isinstance(key, int):
+               return getattr(self, self.dimensions[key])
+          elif isinstance(key, str):
+               return getattr(self, key.lower())
+          else:
+               raise TypeError("Key must be an integer index or a string identifier")
 
-          return self.dimension_order[key]["variable"]
+     def __setitem__(self, key, value):
+          if isinstance(key, int):
+               setattr(self,self.dimensions[key],value)
+          elif isinstance(key, str):
+               setattr(self,key,value)
+          else:
+               raise TypeError("Key must be an integer index or a string identifier")
+
+     # translates back and forward between dimension name and dimension index
+     @classmethod
+     def to_name(cls, index: int) -> str:
+        return cls.dimensions[index]
+
+     @classmethod
+     def to_index(cls, name: str) -> int:
+        return cls.dimensions.index(name.lower())
 
      def __str__(self):
           return str((self.c,self.z,self.y,self.x))

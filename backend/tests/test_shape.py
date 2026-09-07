@@ -42,6 +42,6 @@ def test_shape_iteration():
 
     values = [item for item in test_shape]
 
-    assert(values == [2,-1,1,4])
+    assert(values == [2,-1,1,4]); print(values)
 
 
