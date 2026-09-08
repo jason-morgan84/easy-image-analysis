@@ -381,6 +381,8 @@ def test_test_sample_for_ImageInt():
         ImageInt.test_sample((1.0,2.0))
 
     assert(ImageInt.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
+    assert(ImageInt.test_sample((2,3,4,5), zero = True).value.shape == (2,3,4,5))
+    assert(isinstance(ImageInt.test_sample((2,3,4,5), zero = True),ImageInt))
 
 # test test_sample for ImageFloat
 def test_test_sample_for_ImageFloat():
@@ -394,6 +396,8 @@ def test_test_sample_for_ImageFloat():
         ImageFloat.test_sample((1.0,2.0))
 
     assert(ImageFloat.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
+    assert(ImageFloat.test_sample((2,3,4,5),zero = True).value.shape == (2,3,4,5))
+    assert(isinstance(ImageFloat.test_sample((2,3,4,5), zero = True),ImageFloat))
 
 # test test_sample for ImageBinary
 def test_test_sample_for_ImageBinary():
@@ -407,6 +411,8 @@ def test_test_sample_for_ImageBinary():
         ImageBinary.test_sample((1.0,2.0))
 
     assert(ImageBinary.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
+    assert(ImageBinary.test_sample((2,3,4,5),zero = True).value.shape == (2,3,4,5))
+    assert(isinstance(ImageBinary.test_sample((2,3,4,5), zero = True),ImageBinary))
 
 # test test_sample for ValueInt
 def test_test_sample_for_ValueInt():

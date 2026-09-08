@@ -48,11 +48,13 @@ class ImageInt:
         self._value = val
 
     # returns a test variable of size "shape" of random integers between 0 and 255
-    def test_sample(shape):
+    def test_sample(shape, zero = False):
         if not isinstance(shape, list) and not isinstance(shape, tuple):
             raise TypeError(f"Expected shape as list or tuple, got  {type(shape)}")
         elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
             raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
+        elif zero == True:
+            return ImageInt(np.uint8(np.zeros(shape)))
         else:
             return ImageInt(np.random.randint(low=0, high=255, size=shape))
 
@@ -113,11 +115,13 @@ class ImageFloat:
         self._value = val
 
     # returns a test variable of size "shape" of random integers between 0 and 1
-    def test_sample(shape):
+    def test_sample(shape, zero = False):
         if not isinstance(shape, list) and not isinstance(shape, tuple):
             raise TypeError(f"Expected shape as list or tuple, got  {type(shape)}")
         elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
             raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
+        elif zero == True:
+            return ImageFloat(np.zeros(shape))
         else:
             return ImageFloat(np.random.random(size=shape))
 
@@ -178,13 +182,15 @@ class ImageBinary:
         self._value = val
 
     # returns a test variable of size "shape" of random integers either 0 or 1
-    def test_sample(shape):
+    def test_sample(shape, zero = False):
         if not isinstance(shape, list) and not isinstance(shape, tuple):
             raise TypeError(f"Expected shape as list or tuple, got  {type(shape)}")
         elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
             raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
+        elif zero == True:
+            return ImageBinary(np.uint8(np.zeros(shape)))
         else:
-            return ImageInt(np.random.randint(low=0, high=1, size=shape))
+            return ImageBinary(np.random.randint(low=0, high=1, size=shape))
 
     @property
     def shape(self):
@@ -230,8 +236,11 @@ class ValueInt:
 
 
     # returns a test variable
-    def test_sample():
-        return ValueInt(np.random.randint(low = 0, high = 255))
+    def test_sample(zero = False):
+        if zero:
+            return ValueInt(0)
+        else:
+            return ValueInt(np.random.randint(low = 0, high = 255))
 
     def to_ValueFloat(self):
         return ValueFloat(self.value)
@@ -265,8 +274,11 @@ class ValueFloat:
             self._value = np.float64(val)
 
     # returns a test variable
-    def test_sample():
-        return ValueFloat(np.random.random())
+    def test_sample(zero = False):
+        if zero:
+            return ValueFloat(0)
+        else:
+            return ValueFloat(np.random.random())
 
     def to_ValueInt(self):
         return ValueInt(round(self.value))
