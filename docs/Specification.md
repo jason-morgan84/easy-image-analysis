@@ -158,20 +158,20 @@ The parameter class holds information for ImageOperations defining the required 
 A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
 * name: name of ImageOperation
 * category: logical category (“Threshold”, “Filter” etc)
-* inputs: list of workflow input names
-* input_types: list of workflow input data types
-* input_shapes – list of workflow input shapes
-* outputs – list of workflow output names
-* output_types – list of workflow output data types
-* output_shapes – list of workflow output shapes
-* parameters – dictionary of parameter classes for input variables from frontend
-* docs – documentation to explain function, effects, parameters etc.
+* inputs: dictionary defining inputs in the form {name: Str; dtype: DataType; shape: Shape}
+* outputs: dictionary defining outputs in the form {name: Str; dtype: DataType; shape: Shape}
+* parameters – dictionary of Parameter classes for input variables from frontend
+* docs – documentation to explain function, effects, parameters etc
 * alerts – any warnings to user (e.g, “Background subtraction with a large radius is a very slow process”)
 * version – version of software code ImageOperation was written for. This is to future proof code, so changes to base code that affect ImageOperations don’t mean all existing ImageOperations need to be rewritten. 
 * execute – function with code to execute
 
 ### 3.2.6 ImageOperationDirectory Class
 This class acts as a holder for a list of all ImageOperation classes, along with the code required to import them.
+
+Importing ImageOperation classes will also require testing under the same testing protocol described for ImageOperation in the testing section. This will be carried out using pytest parametization. 
+
+ImageOperations will only be imported if they were made using a compatible version.
 
 ### 3.2.7 Node Class
 The ImageOperation class defines the image analysis function to be carried out on the image. The Node class is responsible for positioning an ImageOperation in the WorkFlow – this means there can be multiple nodes containing the same ImageOperation. While the ImageOperation class is responsible purely for image analysis, the Node class is responsible for interacting with other elements of the WorkFlow. As such, it has the following instance variables:
@@ -346,6 +346,15 @@ On creation of a new connection, it will check for structure, constraint or type
 |Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
 
 * ImageOperation
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                |  
+|Input Type|Supply input with incorrect data type| Type Error | <ul><li>Incorrectly data type ignored</li></ul>|
+|Input Shape|Supply input with incorrect data shape| Value Error | <ul><li>Incorrectly data shape ignored</li></ul>|
+|Output Type|Sample code provides output with data type different to defined| Type Error | <ul><li>Incorrectly data type ignored</li></ul>|
+|Output Shape|Sample code provides output with shape different to defined| Value Error | <ul><li>Incorrectly data shape ignored</li></ul>|
+|Output|Code provided does not supply output|Value Error|<ul><li>No error given</li></ul>|
+|Execute|Code provided creates an error|Error|<ul><li>No error passed on</li></ul>|
+|Version|
 * ImageOperationDirectory
 
 
