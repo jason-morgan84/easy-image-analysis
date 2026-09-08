@@ -99,7 +99,7 @@ Conversions can be explicit (eg, by using ImageInt.to_ImageFloat) or implicit (e
 
 To allow implicit conversions, each class should have conversion functions for all members of it's sub group (defined below).
 
-Each DataType includes a test_sample() function, which creates a variable of that type for testing.
+Each DataType includes a test_sample() function, which creates a variable of that type for testing and providing default values. This can be generated as random numbers (for testing) or 0s (for instantiating default input and output variables for ImageOperations, if zero = True - by default, zero = False).
 
 All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type.
 
@@ -149,10 +149,11 @@ It also contains the following functions:
 * ~~Unsqueeze images where output from an ImageOperation is in less than 4 dimensions~~ Unsqueeze can be carried out on collection of image from an ImageOperation using no.unsqueeze prior to converting to custom ImageType.
 
 ### 3.2.4 Parameters Class
-The parameter class holds information for ImageOperations defining the required user inputs (as opposed to image/values inputted via the workflow). The aim is to allow the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements. 
+The parameter class holds information for inputs and outputs to ImageOperations defining the required user inputs (as opposed to image/values inputted via the workflow). The aim is to allow the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements. 
 * Name – the name of the parameter
 * dtype – the data type of the parameter
 * value – its value
+* shape - its shape
 * ui_element – the desired UI element for input (text box, drop down box, check box, slider etc)
 * ui_element_options – Dictionary of other options related to that UI element (slider min/max, drop down box options etc).
 
@@ -352,10 +353,19 @@ On creation of a new connection, it will check for structure, constraint or type
 ### ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Input Type|Supply input with incorrect data type| Type Error | <ul><li>Incorrectly data type ignored</li></ul>|
-|Input Shape|Supply input with incorrect data shape| Value Error | <ul><li>Incorrectly data shape ignored</li></ul>|
-|Output Type|Sample code provides output with data type different to defined| Type Error | <ul><li>Incorrectly data type ignored</li></ul>|
-|Output Shape|Sample code provides output with shape different to defined| Value Error | <ul><li>Incorrectly data shape ignored</li></ul>|
+|Input Type|Supply input in incorrect format (not as a dictionary)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
+|Input Type|Supply input in incorrect format (not as a dictionary of Parameter class)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
+|Input Values|Supply input where dtype not a member of DataType| Value Error | <ul><li>Incorrect dtype accepted</li></ul>|
+|Input Values|Supply input where input value does not match defined shape| Value Error | <ul><li>Incorrect shape accepted</li></ul>|
+|Input Value Type|Supply input where input data type doesn't match dtype arguement| Type Error | <ul><li>Incorrect data type accepted</li></ul>|
+|Input Shape Type|Supply shape where shape not a tuple or list| Type Error | <ul><li>Incorrect shape format accepted</li></ul>|
+|Input Shape Type|Supply shape where shape not a tuple or list of integers| Type Error | <ul><li>Incorrect shape format accepted</li></ul>|
+|Input Shape Value|Supply shape where shape doesn't include sufficient dimensions (defined by Shape.min_image_dimensions and Shape.max_image_dimensions) | Value Error | <ul><li>Incorrect shape accepted</li></ul>|
+|Output Type|Supply output in incorrect format (not as a dictionary)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
+|Output Type|Supply output in incorrect format (not as a dictionary of Parameter class)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
+|Output Values|Supply output where dtype not a member of DataType| Value Error | <ul><li>Incorrect dtype accepted</li></ul>|
+|Output Value Type|Supply input where input data type doesn't match dtype arguement| Type Error | <ul><li>Incorrect data type accepted</li></ul>|
+|Output Values|Supply output where output value does not match defined shape| Value Error | <ul><li>Incorrect shape accepted</li></ul>|
 |Output|Code provided does not supply output|Value Error|<ul><li>No error given</li></ul>|
 |Execute|Code provided creates an error|Error|<ul><li>No error passed on</li></ul>|
 
