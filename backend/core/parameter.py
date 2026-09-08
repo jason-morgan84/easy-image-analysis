@@ -8,7 +8,7 @@ The parameter class holds information for ImageOperations defining the required 
 from core.constants import DataType
 
 class Parameter:
-    def __init__ (self, name, dtype, ui_element, value = 0, ui_element_options = {}):
+    def __init__ (self, name, dtype, value = 0, shape = None, ui_element = None, ui_element_options = None):
         self.name = name
         self.dtype = dtype
         self.ui_element = ui_element
