@@ -349,7 +349,7 @@ On creation of a new connection, it will check for structure, constraint or type
 |Type constraints|	Input value in a format not defined in data_type|	Type Error	| <ul><li>Incorrectly type data used in incorrect format</li></ul>|
 |Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
 
-* ImageOperation
+### ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Input Type|Supply input with incorrect data type| Type Error | <ul><li>Incorrectly data type ignored</li></ul>|
@@ -358,7 +358,7 @@ On creation of a new connection, it will check for structure, constraint or type
 |Output Shape|Sample code provides output with shape different to defined| Value Error | <ul><li>Incorrectly data shape ignored</li></ul>|
 |Output|Code provided does not supply output|Value Error|<ul><li>No error given</li></ul>|
 |Execute|Code provided creates an error|Error|<ul><li>No error passed on</li></ul>|
-|Version|
+
 * ImageOperationDirectory
 
 
