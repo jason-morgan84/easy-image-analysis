@@ -99,7 +99,9 @@ Conversions can be explicit (eg, by using ImageInt.to_ImageFloat) or implicit (e
 
 To allow implicit conversions, each class should have conversion functions for all members of it's sub group (defined below).
 
-They will all be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type.
+Each DataType includes a test_sample() function, which creates a variable of that type for testing.
+
+All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type.
 
 ### 3.2.2 Shape class
 
@@ -295,6 +297,7 @@ On creation of a new connection, it will check for structure, constraint or type
 |Explicit Type conversions|	Convert between int and float types then back again repeatedly	| Array values are consistent over time	|	<ul><li>Array values drift over time</ul></li>|
 |Explicit Type conversions|	Test to_numpy() works in the same way as to_uint8 or to_float64 functions	| They give the expected value	|	<ul><li>They give unexpected values</li><li>They give errors</li></ul>|
 |Implicit Type Conversions| Test implicit type conversions | Implicit type conversions correctly convert type |<ul><li>Implicity type conversions don't work</li><li>Implicity type conversions don't maintain shape</li><li>Implicit type conversions don't maintain values</li></ul>
+|Sample Values|test_sample values give appropriate values| test_sample gives values appropriate for data type | <ul><li>Test sample returns inappropriate values</li><li>Test sample causes type error</li></ul>
 
 **Image DataTypes**
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
@@ -302,6 +305,7 @@ On creation of a new connection, it will check for structure, constraint or type
 |Matrix input| Input 4D numpy array|Array shape maintained|<ul><li>Array shape changes</li></ul>
 |Explicit Type conversions| Test each conversion on array|Array elements change type correctly| <ul><li>Array elements do not change to correct type</li></ul>|
 |Explicit Type conversions| Test each conversion on 4D numpy array|Array shape maintained|<ul><li>Array shape changes</ul></li>|
+|Sample Values|Pass inappropriate shape variabel (not list, tuple and integer)| Returns type error | <ul>Does not return type error</ul>
 
 
 
