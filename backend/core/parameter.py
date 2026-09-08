@@ -7,7 +7,7 @@ The parameter class holds information for ImageOperations defining the required 
 * ui_element_options – Dictionary of other options related to that UI element (slider min/max, drop down box options etc)."""
 from core.constants import DataType
 
-class Parameters:
+class Parameter:
     def __init__ (self, name, dtype, ui_element, value = 0, ui_element_options = {}):
         self.name = name
         self.dtype = dtype

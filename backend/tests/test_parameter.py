@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from core.parameters import Parameters
+from core.parameter import Parameter
 from core.constants import DataType
 
 """|Type constraints|	Input value in a format not defined in data_type|	Type Error	| <ul><li>Incorrectly type data used in incorrect format</li></ul>|
@@ -9,24 +9,24 @@ from core.constants import DataType
 
 def test_incorrect_data_type():
     with pytest.raises(TypeError):
-        Parameters("Test",int,"Slider")
+        Parameter("Test",int,"Slider")
 
     with pytest.raises(TypeError):
-        Parameters("Test",str,"Slider")
+        Parameter("Test",str,"Slider")
 
     # test correct data type
-    Parameters("Test2",DataType.ValueInt,"test",2)
+    Parameter("Test2",DataType.ValueInt,"test",2)
 
 
 def test_incompatible_value_type():
     with pytest.raises(TypeError):
-        Parameters("Test",DataType.ValueInt,"test","should be an integer value")
+        Parameter("Test",DataType.ValueInt,"test","should be an integer value")
 
     with pytest.raises(TypeError):
-        Parameters("Test",DataType.ValueFloat,"test","should be a number")    
+        Parameter("Test",DataType.ValueFloat,"test","should be a number")    
 
     with pytest.raises(TypeError):
-        Parameters("Test",DataType.ValueInt,"test",5.18)    
+        Parameter("Test",DataType.ValueInt,"test",5.18)    
 
     
         
