@@ -369,3 +369,52 @@ def test_implicit_conversion_value_float():
     test = ValueInt(int_value)
     test_implicit_float = ValueFloat(test)
 
+# test test_sample for ImageInt
+def test_test_sample_for_ImageInt():
+    with pytest.raises(TypeError):
+        ImageInt.test_sample(2)
+
+    with pytest.raises(TypeError):
+        ImageInt.test_sample("2")
+
+    with pytest.raises(TypeError):
+        ImageInt.test_sample((1.0,2.0))
+
+    assert(ImageInt.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
+
+# test test_sample for ImageFloat
+def test_test_sample_for_ImageFloat():
+    with pytest.raises(TypeError):
+        ImageFloat.test_sample(2)
+
+    with pytest.raises(TypeError):
+        ImageFloat.test_sample("2")
+
+    with pytest.raises(TypeError):
+        ImageFloat.test_sample((1.0,2.0))
+
+    assert(ImageFloat.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
+
+# test test_sample for ImageBinary
+def test_test_sample_for_ImageBinary():
+    with pytest.raises(TypeError):
+        ImageBinary.test_sample(2)
+
+    with pytest.raises(TypeError):
+        ImageBinary.test_sample("2")
+
+    with pytest.raises(TypeError):
+        ImageBinary.test_sample((1.0,2.0))
+
+    assert(ImageBinary.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
+
+# test test_sample for ValueInt
+def test_test_sample_for_ValueInt():
+
+    assert(isinstance(ValueInt.test_sample(),ValueInt))
+
+
+# test test_sample for ValueInt
+def test_test_sample_for_ValueFloat():
+
+    assert(isinstance(ValueFloat.test_sample(),ValueFloat))

@@ -54,7 +54,7 @@ class ImageInt:
         elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
             raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
         else:
-            return ImageInt(np.random.random_integers(low=0, high=255, size=shape))
+            return ImageInt(np.random.randint(low=0, high=255, size=shape))
 
     @property
     def shape(self):
@@ -184,7 +184,7 @@ class ImageBinary:
         elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
             raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
         else:
-            return ImageInt(np.random.random_integers(low=0, high=1, size=shape))
+            return ImageInt(np.random.randint(low=0, high=1, size=shape))
 
     @property
     def shape(self):
@@ -230,8 +230,8 @@ class ValueInt:
 
 
     # returns a test variable
-    def test_sample(shape):
-        return ValueInt(np.random.random_integers())
+    def test_sample():
+        return ValueInt(np.random.randint(low = 0, high = 255))
 
     def to_ValueFloat(self):
         return ValueFloat(self.value)
@@ -265,7 +265,7 @@ class ValueFloat:
             self._value = np.float64(val)
 
     # returns a test variable
-    def test_sample(shape):
+    def test_sample():
         return ValueFloat(np.random.random())
 
     def to_ValueInt(self):
