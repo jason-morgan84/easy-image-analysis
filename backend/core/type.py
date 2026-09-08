@@ -49,7 +49,12 @@ class ImageInt:
 
     # returns a test variable of size "shape" of random integers between 0 and 255
     def test_sample(shape):
-        return ImageInt(np.random.random_integers(low=0, high=255, size=shape))
+        if not isinstance(shape, list) and not isinstance(shape, tuple):
+            raise TypeError(f"Expected shape as list or tuple, got  {type(shape)}")
+        elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
+            raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
+        else:
+            return ImageInt(np.random.random_integers(low=0, high=255, size=shape))
 
     @property
     def shape(self):
@@ -109,7 +114,12 @@ class ImageFloat:
 
     # returns a test variable of size "shape" of random integers between 0 and 1
     def test_sample(shape):
-        return ImageFloat(np.random.random(size=shape))
+        if not isinstance(shape, list) and not isinstance(shape, tuple):
+            raise TypeError(f"Expected shape as list or tuple, got  {type(shape)}")
+        elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
+            raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
+        else:
+            return ImageFloat(np.random.random(size=shape))
 
     @property
     def shape(self):
@@ -169,7 +179,12 @@ class ImageBinary:
 
     # returns a test variable of size "shape" of random integers either 0 or 1
     def test_sample(shape):
-        return ImageInt(np.random.random_integers(low=0, high=1, size=shape))
+        if not isinstance(shape, list) and not isinstance(shape, tuple):
+            raise TypeError(f"Expected shape as list or tuple, got  {type(shape)}")
+        elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
+            raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
+        else:
+            return ImageInt(np.random.random_integers(low=0, high=1, size=shape))
 
     @property
     def shape(self):
