@@ -380,8 +380,15 @@ def test_test_sample_for_ImageInt():
     with pytest.raises(TypeError):
         ImageInt.test_sample((1.0,2.0))
 
+    # check corret shape
     assert(ImageInt.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
     assert(ImageInt.test_sample((2,3,4,5), zero = True).value.shape == (2,3,4,5))
+
+    # check zero = true gives an array of 0s
+    assert(ImageInt.test_sample((2,3,4,5),zero = True).value.max() == 0)
+    assert(ImageInt.test_sample((2,3,4,5),zero = True).value.min() == 0)
+
+    # check array is of correct type
     assert(isinstance(ImageInt.test_sample((2,3,4,5), zero = True),ImageInt))
 
 # test test_sample for ImageFloat
@@ -395,8 +402,15 @@ def test_test_sample_for_ImageFloat():
     with pytest.raises(TypeError):
         ImageFloat.test_sample((1.0,2.0))
 
+    # check corret shape
     assert(ImageFloat.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
     assert(ImageFloat.test_sample((2,3,4,5),zero = True).value.shape == (2,3,4,5))
+
+    # check zero = true gives an array of 0s
+    assert(ImageFloat.test_sample((2,3,4,5),zero = True).value.max()== 0)
+    assert(ImageFloat.test_sample((2,3,4,5),zero = True).value.min() == 0)
+
+    # check array is of correct type
     assert(isinstance(ImageFloat.test_sample((2,3,4,5), zero = True),ImageFloat))
 
 # test test_sample for ImageBinary
@@ -410,8 +424,15 @@ def test_test_sample_for_ImageBinary():
     with pytest.raises(TypeError):
         ImageBinary.test_sample((1.0,2.0))
 
+    # check corret shape
     assert(ImageBinary.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
     assert(ImageBinary.test_sample((2,3,4,5),zero = True).value.shape == (2,3,4,5))
+
+    # check zero = true gives an array of 0s
+    assert(ImageBinary.test_sample((2,3,4,5),zero = True).value.max()== 0)
+    assert(ImageBinary.test_sample((2,3,4,5),zero = True).value.min() == 0)
+
+    # check array is of correct type
     assert(isinstance(ImageBinary.test_sample((2,3,4,5), zero = True),ImageBinary))
 
 # test test_sample for ValueInt
