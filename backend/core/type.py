@@ -47,6 +47,10 @@ class ImageInt:
         
         self._value = val
 
+    # returns a test variable of size "shape" of random integers between 0 and 255
+    def test_sample(shape):
+        return ImageInt(np.random.random_integers(low=0, high=255, size=shape))
+
     @property
     def shape(self):
         return self.value.shape
@@ -102,6 +106,10 @@ class ImageFloat:
                 raise ValueError(f"Value out of bounds (must be 0-1)")
         
         self._value = val
+
+    # returns a test variable of size "shape" of random integers between 0 and 1
+    def test_sample(shape):
+        return ImageFloat(np.random.random(size=shape))
 
     @property
     def shape(self):
@@ -159,6 +167,10 @@ class ImageBinary:
         
         self._value = val
 
+    # returns a test variable of size "shape" of random integers either 0 or 1
+    def test_sample(shape):
+        return ImageInt(np.random.random_integers(low=0, high=1, size=shape))
+
     @property
     def shape(self):
         return self.value.shape
@@ -201,6 +213,11 @@ class ValueInt:
                 raise TypeError (f"Expected integer, got {type(val)}")
             self._value = val
 
+
+    # returns a test variable
+    def test_sample(shape):
+        return ValueInt(np.random.random_integers())
+
     def to_ValueFloat(self):
         return ValueFloat(self.value)
 
@@ -231,6 +248,10 @@ class ValueFloat:
             if not isinstance(val,(np.number,numbers.Number)):
                 raise TypeError ("Value must be a number.")
             self._value = np.float64(val)
+
+    # returns a test variable
+    def test_sample(shape):
+        return ValueFloat(np.random.random())
 
     def to_ValueInt(self):
         return ValueInt(round(self.value))
