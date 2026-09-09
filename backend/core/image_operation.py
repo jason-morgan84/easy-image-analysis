@@ -12,10 +12,26 @@ class ImageOperation:
         self.version = version
         self.docs = docs
         self.alerts = alerts 
-        self.inputs = inputs
-        self.outputs = outputs
+        self.inputs = inputs # inputs as dictionary {"Name": Parameter class}
+        self.outputs = outputs # outputs as dictionary {"Name": Parameter class}
         self.parameters = parameters
 
+        #TODO Change parameters name
+
+
+    """Note for types: For input type checking, ImageOperation will be a part of a WorkFlow Node. Data will flow into the Node through a Port, which will transmit the data
+    to the ImageOperation class. 
+
+    Ports will carry out type conversions of any inputting data from custom DataTypes used to manage types in data transmission to standard numpy data types
+    used in actual image analysis.
+    
+    This means that while input["input_name"].dtype will be of a DataType class, the actual input data will be off DataType.numpy type, and should be checked against
+    that data type"""
+
+    """Note for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
+    
+    This means that input["input_name"].shape does not give array dimensions, but desired array dimensions - a specific value if a strict size is needed for that
+    dimension, or -1 if the analysis function is indifferent to size in that dimension."""
     @property
     def inputs(self):
         return self._inputs
