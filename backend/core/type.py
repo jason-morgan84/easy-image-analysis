@@ -6,6 +6,9 @@ from core.constants import DataType
 
 class ImageInt:
     data_type = DataType.ImageInt
+    numpy = np.uint8
+    description = "Data type to hold multi-dimensional arrays for images as integers in the range 0 - 255 inclusive"
+
     def __init__(self, value):
         self.value = value
 
@@ -69,13 +72,15 @@ class ImageInt:
         return ImageBinary(self.value)
 
     def to_numpy(self):
-        return self.to_uint8()
+        return np.array(self.value, self.numpy)
 
     def to_uint8(self):
         return np.array(self.value,np.uint8)
 
 class ImageFloat:
     data_type = DataType.ImageFloat
+    numpy = np.float64
+    description = "Data type to hold multi-dimensional arrays for images as floats in the range 0 - 1 inclusive"
 
     def __init__(self, value):
         self.value = value
@@ -136,7 +141,7 @@ class ImageFloat:
         return ImageBinary(self.value)
 
     def to_numpy(self):
-        return self.to_float64()
+        return np.array(self.value,self.numpy)
 
     def to_float64(self):
         return np.array(self.value,np.float64)
@@ -144,6 +149,9 @@ class ImageFloat:
 class ImageBinary:
 
     data_type = DataType.ImageBinary
+    numpy = np.uint8
+    description = "Data type to hold multi-dimensional arrays for images as either 1 or 0"
+
     def __init__(self, value):
         self.value = value
 
@@ -203,7 +211,7 @@ class ImageBinary:
         return ImageInt(self.value)
 
     def to_numpy(self):
-        return self.to_uint8()
+        return np.array(self.value,self.numpy)
 
     def to_uint8(self):
         return np.array(self.value,np.uint8)
@@ -214,6 +222,8 @@ class ImageBinary:
 class ValueInt:
 
     data_type = DataType.ValueInt
+    numpy = np.uint8
+    description = "Data type to hold single variables as integers"
 
     def __init__(self, value):
         self.value = value
@@ -245,8 +255,8 @@ class ValueInt:
     def to_ValueFloat(self):
         return ValueFloat(self.value)
 
-    def _to_numpy(self):
-        return self.to_uint8()
+    def to_numpy(self):
+        return self.numpy(self.value)
 
     def to_uint8(self):
         return np.uint8(self.value)
@@ -254,6 +264,8 @@ class ValueInt:
 class ValueFloat:
 
     data_type = DataType.ValueFloat
+    numpy = np.float64
+    description = "Data type to hold single variables as floats"
 
     def __init__(self, value):
         self.value = value
@@ -284,7 +296,7 @@ class ValueFloat:
         return ValueInt(round(self.value))
 
     def _to_numpy(self):
-        return self.to_float64()
+        return self.numpy(self.value)
 
     def to_float64(self):
         return np.float64(self.value)
