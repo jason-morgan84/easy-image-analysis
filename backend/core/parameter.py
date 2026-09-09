@@ -10,10 +10,16 @@ import numpy as np
 
 class Parameter:
     def __init__ (self, name, dtype, value = 0, shape = None, ui_element = None, ui_element_options = None):
+
+        # initialise private variables
+        self._dtype = None
+        self._shape = None
+        self._value = None
+    
         self.name = name # name of the parameter
         self.dtype = dtype # relevant data type from DataType
-        self.value = value # value of parameter
         self.shape = shape
+        self.value = value # value of parameter
         self.ui_element = ui_element # definition of UI element required for user input, if relevant
         self.ui_element_options = ui_element_options # any options associated with that UI element (such as min/max values for sliders, list options for lists)
 

@@ -2,9 +2,10 @@ import numpy as np
 import pytest
 from core.parameter import Parameter
 from core.constants import DataType
+from core.shape import Shape
 
 """|Type constraints|	|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
-|Type constraints|	Input an ImageType without a shape|	Type Error	| <ul><li>Incorrectly shape accepted</li></ul>|"""
+|Type constraints|	|	Type Error	| <ul><li>Incorrectly shape accepted</li></ul>|"""
 
 # Input data type not a member of DataType.value_type
 def test_incorrect_data_type():
@@ -63,7 +64,8 @@ def test_incompatible_value_type():
 
     Parameter(name = "Test",
                   dtype = DataType.ImageFloat,
-                  value = DataType.ImageFloat.numpy([0.14,0.16]))  
+                  value = DataType.ImageFloat.numpy([0.14,0.16]),
+                  shape = Shape(1,2,3,4))  
 
     # should be array of np.uint8
     with pytest.raises(TypeError):
@@ -73,7 +75,8 @@ def test_incompatible_value_type():
 
     Parameter(name = "Test",
                   dtype = DataType.ImageInt,
-                  value = DataType.ImageInt.numpy([0.14,0.16]))  
+                  value = DataType.ImageInt.numpy([0.14,0.16]),
+                  shape = Shape(1,2,3,4))  
 
 
 #Input a value that is of type DataType.dtype
@@ -95,3 +98,20 @@ def test_DataType_shape_type():
                   dtype = DataType.ImageInt,
                   value = DataType.ImageInt([1,2,3]),
                   shape = (2,1,4,5))
+
+        Parameter(name = "Test",
+                  dtype = DataType.ImageInt,
+                  value = DataType.ImageInt([1,2,3]),
+                  shape = Shape(2,1,4,5))
+
+# Input an ImageType without a shape
+def test_ImageType_no_shape():
+    with pytest.raises(TypeError):
+        Parameter(name = "Test",
+                  dtype = DataType.ImageInt,
+                  value = DataType.ImageInt([1,2,3]))
+
+        Parameter(name = "Test",
+                  dtype = DataType.ImageInt,
+                  value = DataType.ImageInt([1,2,3]),
+                  shape = Shape(2,1,4,5))
