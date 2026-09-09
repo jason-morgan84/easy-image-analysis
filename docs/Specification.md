@@ -20,7 +20,12 @@
 |05/09/26   |0.7.4      |Added description of implicit and explicit type conversions to Image DataTypes|
 |06/09/26|0.7.5|Added description of class variables to Shape and removed unsqueeze from Image classes|
 |07/09/26|0.7.6|Updated description of Shape class to include new definitions of dimensions and class functions|
-|07/09/26|0.8.0|Added description of parameter unit testing|
+|07/09/26|0.8.0|Added description of Parameter unit testing|
+|08/09/26|0.8.1|Added description of ImageOperation unit testing|
+|08/09/26|0.8.2|Added test_sample function to documentation and unit test plans for Type classes|
+|08/09/26|0.8.3|added reference to DataTypes.test_sample being given as 0sg|
+|09/09/26|0.8.4|Type classes: added description of numpy class variable and changes to to_numpy functions.|
+|09/09/26|0.8.5|Parameter class: added shape arguement and updated unit testing|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -151,13 +156,21 @@ It also contains the following functions:
 * ~~Unsqueeze images where output from an ImageOperation is in less than 4 dimensions~~ Unsqueeze can be carried out on collection of image from an ImageOperation using no.unsqueeze prior to converting to custom ImageType.
 
 ### 3.2.4 Parameters Class
-The parameter class holds information for inputs and outputs to ImageOperations defining the required user inputs (as opposed to image/values inputted via the workflow). The aim is to allow the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements. 
+The parameter class holds information for ImageOperations defining the required inputs, from the user and from the workflow.
+
+The aim is to allow data to be passed to and from an ImageOperation in the relevant standard numpy formats, and, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
+
 * Name – the name of the parameter
 * dtype – the data type of the parameter
 * value – its value
-* shape - its shape
-* ui_element – the desired UI element for input (text box, drop down box, check box, slider etc)
-* ui_element_options – Dictionary of other options related to that UI element (slider min/max, drop down box options etc).
+* shape - its shape, where relevant
+* ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc)
+* ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
+
+Type checking is carried out on dtype, to ensure its a member of DataType, and shape, to ensure its of Shape class.
+
+Because the Parameter class deals with inputs and outputs to ImageOperations, which work with standard numpy data types, type checking for "value" is to ensure it is of type DataType.dtype.numpy.
+
 
 ### 3.2.5 ImageOperation Class/File
 A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
@@ -349,22 +362,28 @@ On creation of a new connection, it will check for structure, constraint or type
 ### Parameters
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Type constraints|	Input value in a format not defined in data_type|	Type Error	| <ul><li>Incorrectly type data used in incorrect format</li></ul>|
 |Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
+|Type constraints|	Input a value that is not of type DataType.dtype.numpy|	Type Error	| <ul><li>Incorrectly typed data accepted</li></ul>|
+|Type constraints|	Input a value that is of type DataType.dtype|	Type Error	| <ul><li>Incorrectly typed data accepted</li></ul>|
+|Type constraints|	Input a shape that is of class Shape|	Type Error	| <ul><li>Incorrectly shape accepted</li></ul>|
+
 
 ### ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Input Type|Supply input in incorrect format (not as a dictionary)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
-|Input Type|Supply input in incorrect format (not as a dictionary of Parameter class)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
-|Input Values|Supply input where dtype not a member of DataType| Value Error | <ul><li>Incorrect dtype accepted</li></ul>|
-|Input Values|Supply input where input value does not match defined shape| Value Error | <ul><li>Incorrect shape accepted</li></ul>|
-|Input Value Type|Supply input where input data type doesn't match dtype arguement| Type Error | <ul><li>Incorrect data type accepted</li></ul>|
+|Input Type|Supply input arguement in incorrect format (not as a dictionary)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
+|Input Type|Supply input arguement in incorrect format - dictionary, but not with value as Parameter class| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
+
+|Input Values|Supply input["Name"].Parameter.dtype where dtype not a member of DataType| Value Error | <ul><li>Incorrect dtype accepted</li></ul>|
+|Input Values|Supply input["Name"].Parameter.shape where dtype not of Shape class| Type Error | <ul><li>Incorrect dtype accepted</li></ul>|
+|Input Values|Supply input["Name"].Parameter.value where value not of input["Name"].Parameter.dtype.numpy type| Type Error | <ul><li>Incorrect dtype accepted</li></ul>|
+
+|Input Value Shape|Supply input with image_type DataType where input["Name"].Parameter.value does not match defined shape| Value Error | <ul><li>Incorrect shape accepted</li></ul>|
 |Input Shape Type|Supply shape where shape not a tuple or list| Type Error | <ul><li>Incorrect shape format accepted</li></ul>|
 |Input Shape Type|Supply shape where shape not a tuple or list of integers| Type Error | <ul><li>Incorrect shape format accepted</li></ul>|
 |Input Shape Value|Supply shape where shape doesn't include sufficient dimensions (defined by Shape.min_image_dimensions and Shape.max_image_dimensions) | Value Error | <ul><li>Incorrect shape accepted</li></ul>|
-|Output Type|Supply output in incorrect format (not as a dictionary)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
-|Output Type|Supply output in incorrect format (not as a dictionary of Parameter class)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
+|Output Type|Supply output arguement in incorrect format (not as a dictionary)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
+|Output Type|Supply output arguement in incorrect format (not as a dictionary of Parameter class)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
 |Output Values|Supply output where dtype not a member of DataType| Value Error | <ul><li>Incorrect dtype accepted</li></ul>|
 |Output Value Type|Supply input where input data type doesn't match dtype arguement| Type Error | <ul><li>Incorrect data type accepted</li></ul>|
 |Output Values|Supply output where output value does not match defined shape| Value Error | <ul><li>Incorrect shape accepted</li></ul>|
