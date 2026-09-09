@@ -16,7 +16,9 @@ class DataType(Enum):
     def value_types(cls) -> set:
         return {cls.ValueInt, cls.ValueFloat}
 
-    def __call__(self, *args, **kwargs):
+    # allows resolving of target class from DataType (e.g, can access DataType.ValueInt.to_numpy() as DataType.ValueInt.target_class.to_numpy()
+    @property
+    def target_class(self):
         from core.type import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat
         
         mapping = {
@@ -27,8 +29,16 @@ class DataType(Enum):
             DataType.ValueFloat: ValueFloat,
         }
         
-        target_class = mapping.get(self)
-        if target_class is None:
+        cls_ = mapping.get(self)
+        if cls_ is None:
             raise NotImplementedError(f"No class mapped for data type: {self.name}")
-            
-        return target_class(*args, **kwargs)
+        return cls_
+
+    # gets to numpy class variable using DataType.Type.numpy rather than DataType.Type.target_class.numpy
+    @property
+    def numpy(self):
+        return self.target_class.numpy
+
+    # allows direct instantiation of target_class (ie, can say a = DataType.ValueInt(5) and a will be a member of ValueInt with value = 5)
+    def __call__(self, *args, **kwargs):
+        return self.target_class(*args, **kwargs)
