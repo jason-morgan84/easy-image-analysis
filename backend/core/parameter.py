@@ -13,6 +13,7 @@ class Parameter:
         self.name = name # name of the parameter
         self.dtype = dtype # relevant data type from DataType
         self.value = value # value of parameter
+        self.shape = shape
         self.ui_element = ui_element # definition of UI element required for user input, if relevant
         self.ui_element_options = ui_element_options # any options associated with that UI element (such as min/max values for sliders, list options for lists)
 
@@ -34,8 +35,11 @@ class Parameter:
 
     @shape.setter
     def shape(self, shp):
-        if not isinstance(shp, Shape):
-            raise TypeError (f"For shape, expected Shape class, got {type(shp)}")
+        if self.dtype in DataType.image_types():
+            if not isinstance(shp, Shape):
+                raise TypeError (f"For shape, expected Shape class, got {type(shp)}")
+        self._shape = shp
+
 
 
     # Because the Parameter class deals with inputs and outputs to ImageOperations, which work with standard numpy data types, 
@@ -49,11 +53,13 @@ class Parameter:
         if self.dtype in DataType.image_types():
             if not isinstance(val, np.ndarray):
                 raise TypeError (f"For dtype {self.dtype}, expected np.ndarray, got{type(val)}")
-            if not isinstance(val[0],DataType.dtype.numpy):
-                raise TypeError (f"For dtype {self.dtype}, exepceted array of {DataType.dtype.numpy}, got {type(val[0])}")
+            if not isinstance(val[0],self.dtype.numpy):
+                raise TypeError (f"For dtype {self.dtype}, expected array of {self.dtype.numpy}, got {type(val[0])}")
+            if (self.shape == None):
+                raise ValueError (f"For dtype {self.dtype}, array shape is expected")
         elif self.dtype in DataType.value_types():
-            if not isinstance(val[0],DataType.dtype.numpy):
-                raise TypeError (f"For dtype {self.dtype}, exepceted {DataType.dtype.numpy}, got {type(val)}")
+            if not isinstance(val,self.dtype.numpy):
+                raise TypeError (f"For dtype {self.dtype}, expected {self.dtype.numpy}, got {type(val)}")
             
-        self._value = self.val
+        self._value = val
 
