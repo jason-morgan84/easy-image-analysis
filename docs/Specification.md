@@ -27,6 +27,7 @@
 |09/09/26|0.8.4|Type classes: added description of numpy class variable and changes to to_numpy functions.|
 |09/09/26|0.8.5|Parameter class: added shape arguement and updated unit testing|
 |09/09/26|0.8.6|Type class: clarified description of use cases of Type classes|
+|09/09/26|0.8.7|Parameter Class: Updated unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -375,7 +376,8 @@ On creation of a new connection, it will check for structure, constraint or type
 |Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
 |Type constraints|	Input a value that is not of type DataType.dtype.numpy|	Type Error	| <ul><li>Incorrectly typed data accepted</li></ul>|
 |Type constraints|	Input a value that is of type DataType.dtype|	Type Error	| <ul><li>Incorrectly typed data accepted</li></ul>|
-|Type constraints|	Input a shape that is of class Shape|	Type Error	| <ul><li>Incorrectly shape accepted</li></ul>|
+|Value constraints|	Input data with an image_type without a shape|	Value Error	| <ul><li>Data accepted</li></ul>|
+|Type constraints|	Input a shape that is not of class Shape|	Type Error	| <ul><li>Incorrectly shape accepted</li></ul>|
 
 
 ### ImageOperation
