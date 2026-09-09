@@ -26,6 +26,8 @@
 |08/09/26|0.8.3|added reference to DataTypes.test_sample being given as 0sg|
 |09/09/26|0.8.4|Type classes: added description of numpy class variable and changes to to_numpy functions.|
 |09/09/26|0.8.5|Parameter class: added shape arguement and updated unit testing|
+|09/09/26|0.8.6|Type class: clarified description of use cases of Type classes|
+
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -84,9 +86,17 @@ They can then draw connections between the nodes. A single node has a defined nu
 
 ### 3.2.1 DataType Classes
 
-The aim of the data classes is to allow data to be transferred through the workflow in a reliable and predictable way. When developing image analysis functions, this should make the permissible input and output formats clear, it should allow automatic conversion between compatible formats and give clear feedback to users where formats aren't compatible. 
+The aim of the data classes is to allow data to be transferred through the workflow in a reliable and predictable way.
 
-These data types exist purely for transferring data between nodes in the workflow: actual image manipulation within image analysis functions will be carried out using standard numpy data types. This means there's no requirement to be able to carry out calculations or comparisons with these data types.
+Data can **only** be passed through the workflow as a DataType class - equivalent types such as np.uint8 or np.float64 **will** result in type errors.
+
+This may seem overly strict, but its a deliberate design choice to have control and consistency in how data moves through the WorkFlow.
+
+The only exception to this is in the ImageOperation class, where the actual image analysis takes place. Input and output data to ImageOperations will be in **defined** numpy equivalents to DataType classes and this conversion will take place in the relevant Port for each input and output. This means image analysis can be carried out using standard types and functions, and there is no requirement for data manipulation using the DataType classes. 
+
+The interaction between DataTypes, Ports and ImageOperations will be described in more detail in the Port and ImageOperation class descriptions.
+
+When developing image analysis functions, this should make the permissible input and output formats clear, it should allow automatic conversion between compatible formats and give clear feedback to users where formats aren't compatible. 
 
 There will be three data types for image data and two for non-image data:
 
