@@ -22,7 +22,7 @@ class ImageInt:
     @value.setter
     def value(self, val):
 
-        # checks whether input val is a member of any of the Image data types defined as image_types in constants.py
+        # checks whether val is a member of any of another type defined as an image_types in constants.py
         value_dtype = getattr(val, "data_type", None)
         if value_dtype in DataType.image_types() and value_dtype != ImageInt:
             # if it is, call relevant function converting to int
@@ -36,10 +36,9 @@ class ImageInt:
                 # if its a list, convert to np.array
                 val = np.array(val)
             else:
-                # if it is a np array; for lists, conversion to np.array is sufficient for immutability but np.arrays need to be copied
+                # if it is a np array, create a copy; for lists, conversion to np.array is sufficient for immutability but np.arrays need to be copied
                 val = val.copy()
             
-
             # if elements aren't integers or np.integers, type error
             if not np.issubdtype(val.dtype, np.integer):
                 raise TypeError (f"Expected integer, got {val.dtype}")

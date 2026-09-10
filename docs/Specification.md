@@ -28,7 +28,11 @@
 |09/09/26|0.8.5|Parameter class: added shape arguement and updated unit testing|
 |09/09/26|0.8.6|Type class: clarified description of use cases of Type classes|
 |09/09/26|0.8.7|Parameter Class: Updated unit testing|
+<<<<<<< HEAD
 |10/09/26|0.9.0|Started major re-write of description of classes, class heirarchy and type checking|
+=======
+|09/09/26|0.8.8|Type class: Added description of future potential bug|
+>>>>>>> 13e65bee47d96f64ffb3b6e01ecf46b4d1af547d
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -180,6 +184,10 @@ To allow implicit conversions, each class should have conversion functions for a
 Each DataType includes a test_sample() function, which creates a variable of that type for testing and providing default values. This can be generated as random numbers (for testing) or 0s (for instantiating default input and output variables for ImageOperations, if zero = True - by default, zero = False).
 
 All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type.
+
+
+#### Potential bug
+Type is used in a number of instances as a proxy for whether a variable is 1d or multi-dimensional. This could lead to widespread problems if an array/list is required for a non-image variable.
 
 ### 3.2.2 Shape class
 
