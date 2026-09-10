@@ -28,6 +28,7 @@
 |09/09/26|0.8.5|Parameter class: added shape arguement and updated unit testing|
 |09/09/26|0.8.6|Type class: clarified description of use cases of Type classes|
 |09/09/26|0.8.7|Parameter Class: Updated unit testing|
+|10/09/26|0.9.0|Started major re-write of description of classes, class heirarchy and type checking|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -84,6 +85,65 @@ Each node is associated with a given ImageOperation and the parameters of that o
 They can then draw connections between the nodes. A single node has a defined number of inputs (defined by the ImageOperation) but can output to as many other nodes as required. On drawing the connection, the WorkFlow class checks that the connection can provide an image/value in the proper data type and shape. If so, the ImageOperation is carried out allowing immediate feedback in one of the two image views. If not, and the connection cannot carry out simple shape or type conversions, the user is warned of the problem. Where possible, this warning will provide hints towards available ImageOperations that could be used to fix the problems with the data (for example, carry out a Z-projection to flatten the image). 
 
 ## 3.2 Classes
+
+### Class Hierachy
+
+The classes are designed as a heirarchy. The base is a foundational layer which define custom data types and provide constraints on values (for example, an integer 8bit image should not contain values above 255 or below 0). These carry out deep checks of all data to make sure it fits that class type, after which higher layers can safely assume data passed to them is of an appropriate format.
+
+The next layer is the composition layer, the Image and Parameter class, which are made up of combinations of the foundational classes to safely define and constrain their values as they are passed through the WorkFlow graph.
+
+The next two layers are both present in Nodes. The WorkFlow interface layer contains the Port class, which sits inside a Node and provides a buffer and translation between the WorkFlow graph and actual image analysis code. The Port layer takes an input from a member of the Composition layer, carries out a final check to ensure it matches the requiered data type, then outpus the data in a standard numpy format (defined by the original foundation data class).
+
+The final layer is the execution layer, which also stands slightly outside the other layers. This layer is purely involved in execution of image analysis code. As such, it doesn't receive or send data using data types from the other layers, but works in standard numpy data types. However, it does define the expectations for inputs and outputs in terms of foundational layer data classes, to safely manage communication with the DataFlow graph, via ports.
+
+This heirachy does not explicitly define the roles of the Connection, Node and WorkFlow classes in defining the WorkFlow graph. This is described in more detail in the WorkFlow section.
+
+
+```mermaid
+graph TD
+    classDef found fill:#f9f9f9,stroke:#333,stroke-width:1px,color:#000000;
+    classDef comp fill:#e1f5fe,stroke:#0288d1,stroke-width:1px,color:#000000;
+    classDef iface fill:#fff3e0,stroke:#f57c00,stroke-width:1px,color:#000000;
+    classDef exec fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000000;
+    classDef exec fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000000;
+
+    subgraph Foundational_Layer ["1. Foundational Data & Type Layer"]
+        Shape["<b>Shape</b><br>• Checks for ints<br>• Contains image min/max dimensions<br>• Checks size within min/max"]:::found
+        ImageType["<b>ImageType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
+        ValueType["<b>ValueType</b><br>• Checks for int/float<br>• Checks for 0 dimensionality"]:::found
+        ArrayType["<b>ArrayType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
+    end
+
+    subgraph Composition_Layer ["2. Structural Composition Layer"]
+        Image["<b>Image</b><br>• Check array_dtype is an ImageType<br>• Check shape is a Shape<br>• Check array matches array_dtype<br>• Check array dimensions match shape*"]:::comp
+        Parameter["<b>Parameter</b><br>• Check dtype is a ValueType or ArrayType<br>• Check value matches dtype"]:::comp
+    end
+    subgraph Composition_layer ["Node"]
+        subgraph Interface_Layer ["3. WorkFlow Interface Layer"]
+            Port["<b>Port (Gatekeeper & Translator)</b><br>• Always associated with a node/operation<br>• Accepts Image or Parameter<br>• Outputs raw NumPy array or scalar<br>• Validates array_dtype & shape compatibility"]:::iface
+        end
+
+        subgraph Execution_Layer ["4. Execution Layer"]
+            ImageOperation["<b>ImageOperation</b><br>• Requires Image input (+ optional parameters)<br>• Final array type & size check<br>• Algorithm execution"]:::exec
+        end
+    end
+
+
+    Shape --> Image
+    ImageType --> Image
+    ValueType --> Parameter
+    ArrayType --> Parameter
+
+    Image --> Port
+    Parameter --> Port
+
+    Port --> ImageOperation
+```
+
+
+
+
+
 
 ### 3.2.1 DataType Classes
 
