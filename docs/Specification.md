@@ -28,11 +28,8 @@
 |09/09/26|0.8.5|Parameter class: added shape arguement and updated unit testing|
 |09/09/26|0.8.6|Type class: clarified description of use cases of Type classes|
 |09/09/26|0.8.7|Parameter Class: Updated unit testing|
-<<<<<<< HEAD
 |10/09/26|0.9.0|Started major re-write of description of classes, class heirarchy and type checking|
-=======
-|09/09/26|0.8.8|Type class: Added description of future potential bug|
->>>>>>> 13e65bee47d96f64ffb3b6e01ecf46b4d1af547d
+|11/09/26|0.9.1|Re-wrote description of DataType classes to explain base class/child class structure|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -144,50 +141,58 @@ graph TD
     Port --> ImageOperation
 ```
 
-
-
-
-
-
 ### 3.2.1 DataType Classes
 
-The aim of the data classes is to allow data to be transferred through the workflow in a reliable and predictable way.
+The aim of the DataType classes is to allow data to be transferred through the WorkFlow in a reliable and predictable way.
 
-Data can **only** be passed through the workflow as a DataType class - equivalent types such as np.uint8 or np.float64 **will** result in type errors.
+Data can **only** be passed through the WorkFlow as a DataType class - equivalent types such as np.uint8 or np.float64 **will** result in type errors.
 
-This may seem overly strict, but its a deliberate design choice to have control and consistency in how data moves through the WorkFlow.
+This is a deliberate design choice to maintain control and consistency in how data moves through the WorkFlow.
 
-The only exception to this is in the ImageOperation class, where the actual image analysis takes place. Input and output data to ImageOperations will be in **defined** numpy equivalents to DataType classes and this conversion will take place in the relevant Port for each input and output. This means image analysis can be carried out using standard types and functions, and there is no requirement for data manipulation using the DataType classes. 
+A distinction should be made between data transferred through the WorkFlow and data used for image manipulation in members of the ImageOperation class. Input and output data to ImageOperations will be in **defined** numpy equivalents to DataType classes. The conversion from DataType classes to their numpy equivalent will take place in the Port for each input and output. This means image analysis can be carried out using standard types and functions, and there is no requirement for data manipulation using the DataType classes. 
+
+While image manipulation is carried out using standard Numpy types, DataTypes are still used to define the format of expected inputs to and output from ImageOperations.
 
 The interaction between DataTypes, Ports and ImageOperations will be described in more detail in the Port and ImageOperation class descriptions.
 
-When developing image analysis functions, this should make the permissible input and output formats clear, it should allow automatic conversion between compatible formats and give clear feedback to users where formats aren't compatible. 
+DataTypes are all based on a defined base class, BaseType. This defines the characteristics of a custom data type with the following variables. The first three variables are required - the class types will not function without them and will fail unit testing. The remaining four variables are optional:
 
-There will be three data types for image data and two for non-image data:
+* data_type - this provides a reference to this DataType in the DataType enum in constant.py
+* numpy - the defines the equivalent numpy data type (eg np.uint8, np.bool, np.float64)
+* allowed_sub_types - a tuple of allowed data types (eg np.integers, bool, numbers.Number)
 
-ImageInt - 0 ≤ int ≤ 255
-ImageFloat - 0 ≤ float ≤ 1
-ImageBinary - 0 or 1
-ValueInt - int
-ValueFloat - float
+* description - text description of class and what its for
+* min_value - if the value must be with a range, this defines a minimum value (default is None)
+* max_value - maximum allowed value, if defined (default is None)
+* is_array - type classes must define as either a 1d or multi-dimensional data type (default is False)
+
+By default, seven custom data types are defined. Three are used to define images, two to define 1D variables and two to define non-image arrays:
+
+* ImageInt - For images stored as integers in the range 0 ≤ int ≤ 255
+* ImageFloat - For images stored as floats in the range 0 ≤ float ≤ 1
+* ImageBinary - For binarised images. Stored as integer 0 or 1, will accept boolean values.
+
+* ValueInt - For 1D integer variables
+* ValueFloat - For 1D float variables
+
+* ArrayInt - for multi dimensional integer variables
+* ArrayFloat - for multi dimensional float variables
+
+Note again that these data types are for transferring data through the WorkFlow, for example an image threshold value may be transmitted from one node to the next as a ValueInt. They are not expected to be used in coding unrelated to data transfer.
+
+For new DataTypes, conversion between types will result in a NotImplementedError. To fix this, implement a custom to(self, dtype) function in your custom class defining the possible conversions.
+
+By default, each ImageType can be converted to each other. Likewise ValueTypes and ArrayTypes can be converted to other members of the same type.
+
+Where the 'to' function has been implemented, conversions can be explicit (eg, by using ImageInt.to(DataType.ImageFloat)) or implicit (eg, by calling ImageFloat(x) where x is an ImageInt).
 
 Each Image type has __init__, value property and value.getter functions along with conversion functions for the other two image types and the relevant standard numpy type. For numpy conversion, this will be available as an explicit function (to_uint8 or to_float64) or as a generic function (to_numpy).
 
 The comparable numpy data type is stored in the numpy class variable. This is used in the to_numpy function and for type checking once the DataType class has been converted to a standard numpy class for image analysis in a Port.
 
-The value types will have similar functions for converting between themselves.
+~~Each DataType includes a test_sample() function, which creates a variable of that type for testing and providing default values. This can be generated as random numbers (for testing) or 0s (for instantiating default input and output variables for ImageOperations, if zero = True - by default, zero = False).~~
 
-Conversions can be explicit (eg, by using ImageInt.to_ImageFloat) or implicit (eg, by calling ImageFloat(x) where x is an ImageInt).
-
-To allow implicit conversions, each class should have conversion functions for all members of it's sub group (defined below).
-
-Each DataType includes a test_sample() function, which creates a variable of that type for testing and providing default values. This can be generated as random numbers (for testing) or 0s (for instantiating default input and output variables for ImageOperations, if zero = True - by default, zero = False).
-
-All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type.
-
-
-#### Potential bug
-Type is used in a number of instances as a proxy for whether a variable is 1d or multi-dimensional. This could lead to widespread problems if an array/list is required for a non-image variable.
+All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type. For each type, the data_type class variable **must** point to the relevant name in the Enum (stored in constants.py).
 
 ### 3.2.2 Shape class
 
@@ -383,6 +388,7 @@ On creation of a new connection, it will check for structure, constraint or type
 **All DataTypes**
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
+|
 |Type constraints|	Insert wrong type|	Type Error	| <ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
 |Value constraints |Insert out of bounds value |	Value Error |	<ul><li>Out-of-bounds value added to type</li><li>Value coerced to bounds</li></ul>
 |Immutability   |   Define DataType *x* based on standard python variable *y*, then change *y* |	Values in DataType do not change |<ul><li> Values in DataType change </li></ul>|
