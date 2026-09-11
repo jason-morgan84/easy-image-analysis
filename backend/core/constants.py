@@ -6,6 +6,8 @@ class DataType(Enum):
     ImageBinary = auto()       
     ValueInt = auto()      
     ValueFloat = auto()  
+    ArrayFloat = auto()
+    ArrayInt = auto()
 
     #categorise DataTypes into image_types, for multi-dimensional arrays, and value_types, for 1d variables.
     @classmethod
@@ -16,10 +18,14 @@ class DataType(Enum):
     def value_types(cls) -> set:
         return {cls.ValueInt, cls.ValueFloat}
 
+    @classmethod
+    def array_types(cls) -> set:
+        return {cls.ArrayInt, cls.ArrayFloat}
+
     # allows resolving of target class from DataType (e.g, can access DataType.ValueInt.to_numpy() as DataType.ValueInt.target_class.to_numpy()
     @property
     def target_class(self):
-        from core.type import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat
+        from core.type import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat, ArrayInt, ArrayFloat
         
         mapping = {
             DataType.ImageInt: ImageInt,
@@ -27,6 +33,8 @@ class DataType(Enum):
             DataType.ImageBinary: ImageBinary,
             DataType.ValueInt: ValueInt,
             DataType.ValueFloat: ValueFloat,
+            DataType.ArrayInt: ArrayInt,
+            DataType.ArrayFloat: ArrayFloat
         }
         
         cls_ = mapping.get(self)
