@@ -35,9 +35,11 @@ class BaseType:
         else:
             # defines different validation methods is data type is an array (is_array = True) or not (is_array = False)
             if self.is_array:
-                self.validate_array()
+                self.validate_array(val)
             else:
-                self.validate_scalar()
+                self.validate_scalar(val)
+
+        self._value = val
 
     def validate_array(self, val):
         # if input value is not a np array, list or tuple then give error
@@ -57,7 +59,6 @@ class BaseType:
             (self.max_value != None and val.max() > self.max_value)):
                 raise ValueError(f"Value out of bounds (must be {self.min_value}-{self.max_value})")
             
-        self._value = val
 
     def validate_scalar(self, val):
         # check value is a an allowed sub type
@@ -83,9 +84,9 @@ class ImageInt(BaseType):
     description = "Data type to hold multi-dimensional arrays for images as integers in the range 0 - 255 inclusive"
     numpy = np.uint8
     is_array = True
-    min_val = 0
-    max_val = 255
-    allowed_subdtypes = (np.integer, int)
+    min_value = 0
+    max_value = 255
+    allowed_sub_types = (np.integer)
 
     def to(self, dtype):
         if dtype == DataType.ImageFloat:
@@ -100,9 +101,9 @@ class ImageFloat(BaseType):
     description = "Data type to hold multi-dimensional arrays for images as floats in the range 0 - 1 inclusive"
     numpy = np.float64
     is_array = True
-    min_val = 0
-    max_val = 1
-    allowed_subdtypes = (numbers.Number, np.number)
+    min_value = 0.0
+    max_value = 1.0
+    allowed_sub_types = (np.number)
 
     def to(self, dtype):
         if dtype == DataType.ImageInt:
@@ -117,9 +118,9 @@ class ImageBinary(BaseType):
     description = "Data type to hold multi-dimensional arrays for images as either 1 or 0"
     numpy = np.uint8
     is_array = True
-    min_val = 0
-    max_val = 1
-    allowed_subdtypes = (int, np.integer, np.bool, bool)
+    min_value = 0
+    max_value = 1
+    allowed_sub_types = (np.integer)
 
     def to(self, dtype):
         if dtype == DataType.ImageFloat:
@@ -133,7 +134,7 @@ class ValueInt(BaseType):
     data_type = DataType.ValueInt
     description = "Data type to hold single variables as integers"
     numpy = np.uint8
-    allowed_subdtypes = (int, np.integer)
+    allowed_sub_types = (int, np.integer)
 
     def to(self, dtype):
         if dtype == DataType.ValueFloat:
@@ -145,7 +146,7 @@ class ValueFloat(BaseType):
     data_type = DataType.ValueFloat
     description = "Data type to hold single variables as floats"
     numpy = np.float64
-    allowed_subdtypes = (numbers.Number, np.number)
+    allowed_sub_types = (numbers.Number, np.number)
 
     def to(self, dtype):
         if dtype == DataType.ValueInt:
@@ -157,7 +158,7 @@ class ArrayInt(BaseType):
     data_type = DataType.ArrayInt
     description = "Data type to hold variables lists as ints"
     numpy = np.uint8
-    allowed_subdtypes = (int, np.integer)
+    allowed_sub_types = (np.integer)
 
     def to(self, dtype):
         if dtype == DataType.ArrayFloat:
@@ -169,7 +170,7 @@ class ArrayFloat(BaseType):
     data_type = DataType.ArrayFloat
     description = "Data type to hold variables lists as floats"
     numpy = np.float64
-    allowed_subdtypes = (numbers.Number, np.number)
+    allowed_sub_types = (np.number)
 
     def to(self, dtype):
         if dtype == DataType.ArrayInt:
