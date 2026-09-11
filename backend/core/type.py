@@ -3,6 +3,89 @@ import numbers
 from core.constants import DataType
 
 
+class BaseType:
+    data_type = None            # reference to this data type in DataType enum in constant.py
+    numpy = None                # default numpy equivalent data_type   
+    description = None          # text description of class and what its for
+    allowed_sub_types = None    # tuple of allowed data types eg (np.integers, int)
+    min_value = None            # minimum allowed value, if defined
+    max_value = None            # maximum allowed value, if defined
+    is_array = False            # type classes must define either an 1d or multi-dimensional data type.
+
+    def __init__(self, value):
+        self.value = value
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self,val):
+        # if val is already a member of a DataType class but is not the current data type class, call self.to(self.data_type) function for implicit conversion
+        value_dtype = getattr(val, "data_type", None)
+        if isinstance(value_dtype,DataType) and value_dtype != self.data_type:
+            val = val.to(self.data_type)
+        else:
+            # defines different validation methods is data type is an array (is_array = True) or not (is_array = False)
+            if self.is_array:
+                self.validate_array()
+            else:
+                self.validate_scalar()
+
+    def validate_array(self, val):
+        # if input value is not a np array, list or tuple then give error
+        if not isinstance(val, (np.ndarray, list, tuple)):
+            raise TypeError (f"Expected list or np.array, got {type(val)}")
+        # if a collection but not np.array, convert to np.array, else copy the np.array
+        # this is required for immutability
+        val = np.array(val) if isinstance(val, (list,tuple)) else val.copy()
+
+        # if array members are not one of the allowed data subtypes, give type error
+        if not np.issubdtype(val.dtype, self.allowed_sub_types):
+            raise TypeError (f"Expected {self.allowed_sub_types}, got {val.dtype}")
+
+        # if min and max values are defined, check value is within the boundaries else give error
+        # these are explicit boundaries and not constraints - an error is given if unacceptable data is passed in, data is not changed to be within boundaries
+        if self.min_value != None and self.max_value!=None:
+            if val.max() > self.max_value or val.min() < self.min_value:
+                raise ValueError(f"Value out of bounds (must be {self.min_value}-{self.max_value})")
+
+        self._value = val
+
+    def validate_scalar(self, val):
+        # check value is a an allowed sub type
+        if not isinstance(val, self.allowed_sub_types):
+            raise TypeError (f"Expected {self.allowed_sub_types}, got {type(val)}")
+
+        # check value is within range, if appropriate
+        if self.min_value != None and self.max_value!=None:
+            if val > self.max_value or val < self.min_value:
+                raise ValueError(f"Value out of bounds (must be {self.min_value}-{self.max_value})")
+
+    def to_numpy(self):
+        if self.is_array:
+            return np.array(self.value, self.numpy)
+        else:
+            return self.numpy(self.value)
+
+    # def to(self,dtype):
+    # this is a required function for conversion to other data types but must be defined in each daughter data type.
+
+def test_sample(dtype, shape = None, low = 0, high = 1, zero = False):
+    if not isinstance(shape, list) and not isinstance(shape, tuple):
+        raise TypeError(f"Expected shape as list or tuple, got  {type(shape)}")
+    elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
+        raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
+    # check shape for array or not
+    
+    # check dtype is a DataType
+    elif zero == True:
+        return dtype(dtype.numpy(np.zeros(shape)))
+    else:
+        range = abs(high) + abs(low)
+        random_array = np.random.random(size = shape) # gives random array between 0 and 1 of desired shape
+        random_array = (random_array * range) + low # gets array between min and max values
+        return dtype(dtype.numpy(random_array)) # returns array in correct format
 
 class ImageInt:
     data_type = DataType.ImageInt
