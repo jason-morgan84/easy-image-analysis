@@ -35,9 +35,9 @@ class BaseType:
         else:
             # defines different validation methods is data type is an array (is_array = True) or not (is_array = False)
             if self.is_array:
-                self.validate_array(val)
+                val = self.validate_array(val)
             else:
-                self.validate_scalar(val)
+                val = self.validate_scalar(val)
 
         self._value = val
 
@@ -58,6 +58,8 @@ class BaseType:
         if ((self.min_value != None and val.min() < self.min_value) or 
             (self.max_value != None and val.max() > self.max_value)):
                 raise ValueError(f"Value out of bounds (must be {self.min_value}-{self.max_value})")
+
+        return val.copy()
             
 
     def validate_scalar(self, val):
@@ -69,6 +71,7 @@ class BaseType:
         if self.min_value != None and self.max_value!=None:
             if val > self.max_value or val < self.min_value:
                 raise ValueError(f"Value out of bounds (must be {self.min_value}-{self.max_value})")
+        return val
 
     def to_numpy(self):
         if self.is_array:
@@ -159,6 +162,7 @@ class ArrayInt(BaseType):
     description = "Data type to hold variables lists as ints"
     numpy = np.uint8
     allowed_sub_types = (np.integer)
+    is_array = True
 
     def to(self, dtype):
         if dtype == DataType.ArrayFloat:
@@ -171,6 +175,7 @@ class ArrayFloat(BaseType):
     description = "Data type to hold variables lists as floats"
     numpy = np.float64
     allowed_sub_types = (np.number)
+    is_array = True
 
     def to(self, dtype):
         if dtype == DataType.ArrayInt:
@@ -179,22 +184,33 @@ class ArrayFloat(BaseType):
             raise TypeError(f"ArrayFloat cannot be converted to type {dtype}")
 
 def sample_data(dtype, shape = None, zero = False):
-    # used for generating sample data sets of given type
-    if dtype not in DataType.types():
+    value_dtype = getattr(dtype, "data_type", None)
+    if value_dtype == None or value_dtype not in DataType.types():
         raise TypeError (f"Expected Image data type (see constants.py) got {dtype}")
+    # used for generating sample data sets of given type
+
+        
     if dtype.is_array:
         if shape == None:
             raise TypeError (f"Array data type ({dtype}) supplied without shape")
+        if type(shape) not in [list,tuple]:
+            raise TypeError (f"Expected shape as list or tuple, got {type(shape)}")
+        if not isinstance(shape[0],(int,np.integer)):
+            raise TypeError (f"Shape should be array of integers, not {type(shape[0])}")
         if zero:
             return dtype(dtype.numpy(np.zeros(shape)))
         else:
-            range = dtype.max_value - dtype.min_value
+            max = 255 if dtype.max_value == None else dtype.max_value
+            min = 0 if dtype.min_value == None else dtype.min_value
+            range = max - min
             random_array = np.random.random(size = shape) # gives random array between 0 and 1 of desired shape
-            random_array = (random_array * range) + dtype.min_value # gets array between min and max values
+            random_array = (random_array * range) + min # gets array between min and max values
             return dtype(dtype.numpy(random_array)) # returns array in correct format
     else:
         if zero:
             return dtype(dtype.numpy(0))
         else:
-            range = dtype.max_value - dtype.min_value
-            return dtype(dtype.numpy(np.random.random() * range + dtype.min_value))
+            max = 255 if dtype.max_value == None else dtype.max_value
+            min = 0 if dtype.min_value == None else dtype.min_value
+            range = max - min
+            return dtype(dtype.numpy(np.random.random() * range + min))

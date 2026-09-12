@@ -385,28 +385,48 @@ On creation of a new connection, it will check for structure, constraint or type
 # 6 Testing - Backend
 ## 6.1 – Backend Image Classes
 ### 6.1.1 DataType
-**All DataTypes**
+**BaseType**
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|
-|Type constraints|	Insert wrong type|	Type Error	| <ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
-|Value constraints |Insert out of bounds value |	Value Error |	<ul><li>Out-of-bounds value added to type</li><li>Value coerced to bounds</li></ul>
-|Immutability   |   Define DataType *x* based on standard python variable *y*, then change *y* |	Values in DataType do not change |<ul><li> Values in DataType change </li></ul>|
-|Immutability  |   Define DataType *x* based on np variable *y*, then change *y* |	Values in DataType do not change |<ul><li> Values in DataType change </li></ul>|
-|Explicit Type Conversions | Member of DataType *x* converted to DataType *y* | Correctly converted with expected value | <ul><li>Not converted to expected DataType</li><li>Not converted to expected value</li></ul>|
-|Explicit Type conversions | Convert to standard NumPy type | Array/values type matches that expected | <ul><li>Array/value data type does not match that expected</li></ul>|
-|Explicit Type conversions|	Convert between int and float types then back again repeatedly	| Array values are consistent over time	|	<ul><li>Array values drift over time</ul></li>|
-|Explicit Type conversions|	Test to_numpy() works in the same way as to_uint8 or to_float64 functions	| They give the expected value	|	<ul><li>They give unexpected values</li><li>They give errors</li></ul>|
-|Implicit Type Conversions| Test implicit type conversions | Implicit type conversions correctly convert type |<ul><li>Implicity type conversions don't work</li><li>Implicity type conversions don't maintain shape</li><li>Implicit type conversions don't maintain values</li></ul>
-|Sample Values|test_sample values give appropriate values| test_sample gives values appropriate for data type | <ul><li>Test sample returns inappropriate values</li><li>Test sample causes type error</li></ul>
+|allowed_subtypes | Use test value of type where type not listed in allowed_subtypes | Type Error | No type error |
+|is_array validation | Enter [1, 2] to data type expecting scalar values | Type Error | Data accepted |
+|is_array validation | Enter 2 to data type expecting list values | Type Error | Data accepted |
+|Array shape | Enter multi-dimensional array to type expecting multi-dimensional array | Array maintains shape | Array shape changed |
+|Min/Max bounds | Enter value above max_value | Value Error | Value accepted |
+|Min/Max bounds | Enter value below min_value | Value Error | Value accepted |
+|to_numpy| Convert value using to_numpy function | Expected value of correct type | Incorrect value<br>Incorrect type |
+|Immutability | Modify original input list after instantiation of array data type | Value doesn't change | Value does change |
+|Immutability | Modify original input np.array after instantiation of array data type | Value doesn't change | Value does change |
+|Immutability | Modify original input value after instantiation of scalar data type | Value doesn't change | Value does change |
+|Immutability | Modify original numpy type value after instantiation of scalar data type | Value doesn't change | Value does change |
 
-**Image DataTypes**
+**Every child class** 
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Matrix input| Input 4D numpy array|Array shape maintained|<ul><li>Array shape changes</li></ul>
-|Explicit Type conversions| Test each conversion on array|Array elements change type correctly| <ul><li>Array elements do not change to correct type</li></ul>|
-|Explicit Type conversions| Test each conversion on 4D numpy array|Array shape maintained|<ul><li>Array shape changes</ul></li>|
-|Sample Values|Pass inappropriate shape variabel (not list, tuple and integer)| Returns type error | <ul>Does not return type error</ul>
+|Required class variables | Test that DataType.numpy, DataType.allowed_sub_types and DataType.data_type are not None | Test pass| Test fail |
+
+**Every conversion of every child class**
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                |  
+| Output type | Output type matches dtype arguement following explicit conversion using (.to(dtype))| Test pass| Test fail |
+| Output type | Output type matches dtype arguement following implicit conversion (dtype(value))| Test pass| Test fail |
+| Output value | Output value matches dtype arguement following explicit conversion ((.to(dtype))| Test pass| Test fail |
+| Output value | Output value matches dtype arguement following implicit conversion (dtype(value))| Test pass| Test fail |
+| Value drift | Carry out repeated conversions between data types| No drift in values| Drift in values |
+
+**sample_data**
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                |  
+|dtype checks | Input value of non DataType type    |Type error |Value accepted| 
+|shape checks | Input value dtype where is_array = true but no shape passed   |Type error |Value accepted| 
+|shape checks | Shape passed, but not as np.array, tuple or list   |Type error |Value accepted| 
+|shape checks | Shape passed, but not as array of integers   |Type error |Value accepted| 
+|type checks| Input value of DataType type | Output of expected type | Output of different type|
+|shape checks | For array dtype, does output have expected shape with randomized values | Shape matches shape arguement | shape doesn't match shape arguement|
+|shape checks | For array dtype, does output have expected shape with 0 values | Shape matches shape arguement | shape doesn't match shape arguement|
+|value constraint check | For array dtype with min, max values, do random values conform to min and max | values conform | values out of range/value error from underlying type |
+
+
 
 
 
