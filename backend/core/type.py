@@ -180,7 +180,7 @@ class ArrayFloat(BaseType):
 
 def sample_data(dtype, shape = None, zero = False):
     # used for generating sample data sets of given type
-    if not isinstance(dtype, DataType):
+    if dtype not in DataType.types():
         raise TypeError (f"Expected Image data type (see constants.py) got {dtype}")
     if dtype.is_array:
         if shape == None:
