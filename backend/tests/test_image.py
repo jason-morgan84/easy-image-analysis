@@ -5,201 +5,64 @@ from core.shape import Shape
 from core.constants import DataType
 
 #Insert wrong type
+
 def test_image_type_constraints():
     mock_image_int = np.int8(np.arange(120).reshape(2,3,4,5))
     mock_float_image = (np.arange(120)/125).reshape(2,3,4,5)
     mock_binary_image = np.bool(np.random.randint(2, size=120)).reshape(2,3,4,5)
 
-    image_shape = Shape(2,3,4,5)
     image_map = Shape(0,1,2,3)
 
     with pytest.raises(TypeError):
-        test_int_image = Image(mock_image_int,np.int8,image_shape,image_map), print(getattr(mock_image_int, "data_type", None))
+        test_int_image = Image(pixel_array = mock_image_int,
+                               image_map = image_map)
 
     with pytest.raises(TypeError):
-        test_float_image = Image(mock_float_image,DataType.ImageFloat,image_shape,image_map)
+        test_float_image = Image(pixel_array = mock_float_image,
+                                 image_map = image_map)
 
     with pytest.raises(TypeError):
-        test_binary_image = Image(mock_binary_image,DataType.ImageFloat,image_shape,image_map)
+        test_binary_image = Image(pixel_array = mock_binary_image,
+                                  image_map = image_map)
 
-#Insert acceptable type where array type does not match DataType
-def test_image_non_matching_types():
-    mock_image_int = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
-    mock_float_image = DataType.ImageFloat((np.arange(120)/125).reshape(2,3,4,5))
-    mock_binary_image = DataType.ImageBinary(np.random.randint(2, size=120).reshape(2,3,4,5))
-
-    image_shape = Shape(2,3,4,5)
-    image_map = Shape(0,1,2,3)
-
-    with pytest.raises(TypeError):
-        test_int_image = Image(mock_image_int,DataType.ImageFloat,image_shape,image_map)
-
-    with pytest.raises(TypeError):
-        test_float_image = Image(mock_float_image,DataType.ImageInt,image_shape,image_map)
-
-    with pytest.raises(TypeError):
-        test_binary_image = Image(mock_binary_image,DataType.ImageInt,image_shape,image_map)
-
-    test_int_image = Image(mock_image_int,DataType.ImageInt,image_shape,image_map)
-
-    test_float_image = Image(mock_float_image,DataType.ImageFloat,image_shape,image_map)
-
-    test_binary_image = Image(mock_binary_image,DataType.ImageBinary,image_shape,image_map)
+    correct_image = Image(pixel_array = DataType.ImageInt(mock_image_int),
+                          image_map = Shape(2,3,4,5))
 
 #Insert input array with more or less than 4 dimensions
 def test_image_wrong_shape():
     mock_image_small = DataType.ImageInt(np.arange(120).reshape(6,4,5))
     mock_image_large = DataType.ImageInt(np.arange(120).reshape(2,3,2,2,5))
 
-    image_shape = Shape(0,6,4,5)
     image_map = Shape(0,1,2,3)
 
     with pytest.raises(ValueError):
-        test_image_small = Image(mock_image_small, DataType.ImageInt, image_shape, image_map)
+        test_image_small = Image(pixel_array = mock_image_small, 
+                                 image_map = image_map)
 
     with pytest.raises(ValueError):
-        test_image_large = Image(mock_image_large, DataType.ImageInt, image_shape, image_map)
+        test_image_large = Image(pixel_array = mock_image_large,
+                                 image_map = image_map)
 
-#Input pixel data with different number of dimensions to image_shape
-def test_image_non_matching_shape():
-    mock_image_small = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
+#Input shape data not in Shape class
+def test_image_wrong_class():
+    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
 
+    image_map = (0,1,2,3)
 
-    image_shape_wrong = Shape(2,3,4,0)
-    image_shape_right = Shape(2,3,4,5)
+    with pytest.raises(TypeError):
+        test_image = Image(pixel_array = mock_image, 
+                                 image_map = image_map)
+
+#Get image shape of various shape pixel arrays 
+def test_get_image():
+    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
     image_map = Shape(0,1,2,3)
 
-    with pytest.raises(ValueError):
-        test_image_wrong= Image(mock_image_small, DataType.ImageInt, image_shape_wrong, image_map)
+    for n, dimension in enumerate(Image(mock_image, image_map).get_image_shape()):
+        assert dimension == mock_image.value.shape[image_map[n]], f"{dimension}, {n}"
 
-    test_image_right = Image(mock_image_small, DataType.ImageInt, image_shape_right, image_map)
-
-
-#Input incorrect mapping (ie, shape data says z_dim = 5, but mapping associates z with an array dimension of size 3)
-def test_image_non_mapping_shape():
-    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
-
-
-    image_shape = Shape(2,3,4,5)
-    image_map_wrong = Shape(0,1,3,2)
-    image_map_wrong_repeat = Shape(0,1,1,1)
-    image_map_right = Shape(0,1,2,3)
-
-    with pytest.raises(ValueError):
-        test_image_wrong= Image(mock_image, DataType.ImageInt, image_shape, image_map_wrong)
-
-    with pytest.raises(ValueError):
-        test_image_wrong= Image(mock_image, DataType.ImageInt, image_shape, image_map_wrong_repeat)
-
-    test_image_right = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
-
-
-
-# Test input with incorrect type - not string	
-def test_shape_conversion_with_incorrect_type():
-    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
-
-
-    image_shape = Shape(c = 2,
-                        z = 3,
-                        y = 4,
-                        x = 5)
-    image_map_right = Shape(0,1,2,3)
-
-
-    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
-    with pytest.raises(TypeError):
-        test_image = test_image.transpose([1,2,3,4])
-
-
-
-# Test input with incorrect type - not list or tuple	
-
-def test_shape_conversion_not_list():
-    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
-
-
-    image_shape = Shape(c = 2,
-                        z = 3,
-                        y = 4,
-                        x = 5)
-    image_map_right = Shape(0,1,2,3)
-
-
-    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
-    with pytest.raises(TypeError):
-        test_image = test_image.transpose("z","c","y","x")
-
-# Test input with incorrect type - not 4 elements in list or tuple	
-def test_shape_conversion_not_4_elemets():
-    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
-
-
-    image_shape = Shape(c = 2,
-                        z = 3,
-                        y = 4,
-                        x = 5)
-    image_map_right = Shape(0,1,2,3)
-
-
-    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
-    with pytest.raises(ValueError):
-        test_image = test_image.transpose(["c","z","x"])
-    with pytest.raises(ValueError):
-        test_image = test_image.transpose(["c","z","x","y","f"])
-
-# Test input with incorrect type - duplicate elements	
-def test_shape_conversion_duplicate_elements():
-    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
-
-
-    image_shape = Shape(c = 2,
-                        z = 3,
-                        y = 4,
-                        x = 5)
-    image_map_right = Shape(0,1,2,3)
-
-
-    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
-    with pytest.raises(ValueError):
-        test_image = test_image.transpose(["c","z","x","x"])
-# Test input with incorrect type - elements that aren't valid image dimension identifiers	
-def test_shape_conversion_invalid_identifiers():
-    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
-
-
-    image_shape = Shape(c = 2,
-                        z = 3,
-                        y = 4,
-                        x = 5)
-    image_map_right = Shape(0,1,2,3)
-
-
-    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
-    with pytest.raises(ValueError):
-        test_image = test_image.transpose(["a","b","c","f"])
-
-#Shape conversion: converts to correct shape
-def test_image_shape_conversion_output_shape():
-    mock_image = DataType.ImageInt(np.arange(120).reshape(2,3,4,5))
-
-
-    image_shape = Shape(c = 2,
-                        z = 3,
-                        y = 4,
-                        x = 5)
-    image_map_right = Shape(0,1,2,3)
-
-
-    test_image = Image(mock_image, DataType.ImageInt, image_shape, image_map_right)
-
-    assert (test_image.array.shape == (2,3,4,5))
-
-    assert ((test_image.transpose(("z","c","y","x"))).array.shape == (3,2,4,5))
-    assert ((test_image.transpose(("x","y","z","c"))).array.shape == (5,4,3,2))
-    assert ((test_image.transpose(("c","y","x","z"))).array.shape == (2,4,5,3))
-
-# Maintains values after conversion
-# Maintains type	
-# Image shape variable updated to new shape	
-# Dimension mapping updated to new shape
+    image_map = Shape(2,3,1,0)
+    for n, dimension in enumerate(Image(mock_image, image_map).get_image_shape()):
+            print(dimension)
+            assert dimension == mock_image.value.shape[image_map[n]], f"{dimension}, {n}"
+    
