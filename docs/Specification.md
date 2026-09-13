@@ -30,6 +30,7 @@
 |09/09/26|0.8.7|Parameter Class: Updated unit testing|
 |10/09/26|0.9.0|Started major re-write of description of classes, class heirarchy and type checking|
 |11/09/26|0.9.1|Re-wrote description of DataType classes to explain base class/child class structure|
+|13/09/26|0.9.2|Re-wrote description of Image classes and Image unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -109,19 +110,19 @@ graph TD
     classDef exec fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000000;
 
     subgraph Foundational_Layer ["1. Foundational Data & Type Layer"]
-        Shape["<b>Shape</b><br>• Checks for ints<br>• Contains image min/max dimensions<br>• Checks size within min/max"]:::found
+        Shape["<b>Shape</b><br>• Checks for ints<br>• Contains image min/max dimensions"]:::found
         ImageType["<b>ImageType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
         ValueType["<b>ValueType</b><br>• Checks for int/float<br>• Checks for 0 dimensionality"]:::found
         ArrayType["<b>ArrayType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
     end
 
     subgraph Composition_Layer ["2. Structural Composition Layer"]
-        Image["<b>Image</b><br>• Check array_dtype is an ImageType<br>• Check shape is a Shape<br>• Check array matches array_dtype<br>• Check array dimensions match shape*"]:::comp
+        Image["<b>Image</b><br>• Check array_dtype is an ImageType<br>"]:::comp
         Parameter["<b>Parameter</b><br>• Check dtype is a ValueType or ArrayType<br>• Check value matches dtype"]:::comp
     end
     subgraph Composition_layer ["Node"]
         subgraph Interface_Layer ["3. WorkFlow Interface Layer"]
-            Port["<b>Port (Gatekeeper & Translator)</b><br>• Always associated with a node/operation<br>• Accepts Image or Parameter<br>• Outputs raw NumPy array or scalar<br>• Validates array_dtype & shape compatibility"]:::iface
+            Port["<b>Port (Gatekeeper & Translator)</b><br>• Always associated with a node/operation<br>• Accepts Image or Parameter<br>• Outputs raw NumPy array or scalar<br>• Validates array_dtype & shape match ImageOperation requirements"]:::iface
         end
 
         subgraph Execution_Layer ["4. Execution Layer"]
@@ -178,7 +179,7 @@ By default, seven custom data types are defined. Three are used to define images
 * ArrayInt - for multi dimensional integer variables
 * ArrayFloat - for multi dimensional float variables
 
-Note again that these data types are for transferring data through the WorkFlow, for example an image threshold value may be transmitted from one node to the next as a ValueInt. They are not expected to be used in coding unrelated to data transfer.
+Note again that these data types are for transferring data through the WorkFlow, for example an image threshold value may be transmitted from one node to the next as a ValueInt. They are not expected to be used in any code unrelated to data transfer.
 
 For new DataTypes, conversion between types will result in a NotImplementedError. To fix this, implement a custom to(self, dtype) function in your custom class defining the possible conversions.
 
@@ -201,6 +202,7 @@ This exists to hold data related to the shape of transmitted images. It will hol
 * z (depth)
 * y (height)
 * x (width) 
+
 And contains class variables to define limits on image Shape:
 
 * max_image_dimensions - the max number of dimensions an image should have (4).
@@ -224,20 +226,14 @@ Shape will be used to hold shape related information in a number of classes and 
 
 ### 3.2.3 Image Class
 
-This holds the image data as a 4D array. If the image does not require all four dimensions, for example a flat, greyscale image, the unneeded dimensions should still be present with size 1.
+This holds the image data as a multi-dimensional array, with max and min dimensions defined in the Shape class.
 
-As for the data type class, it exists purely to transmit images between nodes with a clearly defined shape and data type. It contains four instance variables:
+The Image class exists purely to hold images for input to and output from ImageOperations within Nodes. Members of the Image class are instantiated on the creation of the Node and ImageOperation initially as arrays of 0s of the defined size and type. This means that, for each Image, the shape and data type of the pixel array is pre-defined and invariate. Any changes to the Image class which do not match the requirments of the attached Port will result in an error.
 
-1.	Image pixel data, in a multi-dimensional array of defined size and type.
-2.	Image data type, as a member of DataType.
-3.	Image shape, using Shape class.
-4.	Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
+Therefore, the image data can be described with two instance variables:
 
-It also contains the following functions:
-* ~~Convert between DataTypes~~ No longer required after implementation of implicit Type conversions.
-* transpose(Shape) - takes a parameter of type Shape defining which array dimension each image dimension should be moved to.
-    - expect a list/tuple with four, non-duplicate string elements which are members of Shape.dimension_order eg, (x,y,z,c)
-* ~~Unsqueeze images where output from an ImageOperation is in less than 4 dimensions~~ Unsqueeze can be carried out on collection of image from an ImageOperation using no.unsqueeze prior to converting to custom ImageType.
+1.	pixel_array: Contains Image pixel data, in a multi-dimensional array of defined size and type.
+2.	image_map: Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
 
 ### 3.2.4 Parameters Class
 The parameter class holds information for ImageOperations defining the required inputs, from the user and from the workflow.
@@ -335,6 +331,8 @@ It also contains the following functions:
 * port_create
 * port_edit
 * port_remove
+* Transpose - tranposes pixel_arrays passing through the graph, given requirements of input and output Ports. Previously part of Image class./
+* Squeeze/unsqueeze - changes array shape, as Tranpose.
 
 On creation of a new connection, it will check for structure, constraint or type violations. Where these can be fixed through image type or shape changes, it will do so, otherwise it will prompt the user to adjust the WorkFlow. 
 
@@ -426,42 +424,22 @@ On creation of a new connection, it will check for structure, constraint or type
 |shape checks | For array dtype, does output have expected shape with 0 values | Shape matches shape arguement | shape doesn't match shape arguement|
 |value constraint check | For array dtype with min, max values, do random values conform to min and max | values conform | values out of range/value error from underlying type |
 
-
-
-
-
 ### 6.1.2 Shape
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Type constraints	|Insert wrong type	|Type Error	| <ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
-|Immutability|Input values based on variable then change variable |Values in DataType do not change|<ul><li>Values change</ul></li>
-|Itterability|Test iteration|Iteration returns correct values|<ul><li>Iteration returns incorrect values</ul></li>
+|Type constraints	|Insert wrong type	|Type Error	| Type converted to correct type<br>Wrong type ignored|
+|Immutability|Input values based on variable then change variable |Values in DataType do not change|Values change|
+|Itterability|Test iteration|Iteration returns correct values|Iteration returns incorrect values|
+|get_item|Test getting items using either index or dimension string| returns correct values|Returns incorrect values|
+|set_item|Test setting items using either index or dimension string| Sets correct values|Sets incorrect values|
 
 ### 6.1.3 Image
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Type constraints|	Use unexpected data type (not ImageInt, ImageFloat or ImageBinary)|	Type Error	| <ul><li>Type converted to correct type</li><li>Incorrectly type data used anyway</li></ul>|
-|Type constraints	|Insert acceptable type where array type does not match DataType	|Type Error	|<ul><li>Wrong type ignored</li></ul>|
-|Shape constraints	|Insert input array with more or less than 4 dimensions |Value Error	|	<ul><li>Wrong shape array accepted</li></ul>
-|Shape constraints	|Input pixel data with different number of dimensions to image_shape|Value Error	|	<ul><li>Wrong shape ignored</li></ul>
-|Shape constraints	|Input incorrect mapping (ie, shape data says z_dim = 5, but mapping associates z with an array dimension of size 3)  |	Shape Error	|<ul><li>Wrong shape ignore</li></ul>|
-|Type conversions|Pixel data array shape| Same shape after type conversion | <ul><li>Different shape after type conversion</li></ul>|
-|Type conversions|Pixel data array value | Expected values after type conversion | <ul><li>Wrong values after type conversion</li></ul>|
-|Type conversions|Converts to correct type | Expected type after type conversion | <ul><li>Wrong type after type conversion</li></ul>|
-|Shape conversions|Test input with incorrect type - not string | Type error | <ul><li>Incorrect type ignored</li></ul>|
-|Shape conversions|Test input with incorrect type - not list or tuple | Type error | <ul><li>Incorrect type ignored</li></ul>|
-|Shape conversions|Test input with incorrect type - not 4 elements in list or tuple| Value error | <ul><li>Incorrect list size ignored</li></ul>|
-|Shape conversions|Test input with incorrect type - duplicate elements| Value error | <ul><li>Duplicate elements ignored</li></ul>|
-|Shape conversions|Test input with incorrect type - elements that aren't valid image dimension identifiers| Value error | <ul><li>Incorrect identifiers ignored</li></ul>|
-|Shape conversions|Converts to correct shape | Expected shape after shape conversion | <ul><li>Wrong shape after shape conversion</li></ul>|
-|Shape conversions|Maintains values after conversion | Expected values after type conversion  | <ul><li>Wrong values after shape conversion</ul></li>|
-|Shape conversions|Maintains type after conversion|Expected type after type conversion | <ul><li>Wrong type after shape conversion</li></ul>|
-|Shape conversions|Image shape variable updated to new shape | Image shape variable matches new shape | <ul><li>Image shape variable changes to incorrect values</li><li>Image shape variable doesn't change</li></ul>
-|Shape conversions|Dimension mapping updated to new shape | Each image dimension maps to correct new array dimension | <ul><li>Image dimensions map to incorrect values</li><li>Image dimension map doesn't change</li></ul>
-|~~Unsqueeze~~|~~Unsqueeze adds a new dimension ~~| ~~Unsqueezed image has 1 more dimension~~ | <ul><li>~~Unsqueezed image has the same number of dimensions~~/li></ul>|
-|~~Unsqueeze~~|~~New dimension is properly assigned to image~~ | ~~image_shape records the presence of the previously missing dimension with size 1~~ | <ul><li>~~image_shape does not record the presence of a new dimension with size 1~~</li><li>~~Value of 1 is assigned to the wrong dimension~~</li></ul>|
-|~~Unsqueeze~~|~~New dimension is properly mapped ~~|~~ image_mapping correctly maps to previously existing dimensions~~ | <ul><li>~~image_shape does correctly map to previously existing dimensions~~</ul>|
-|~~Unsqueeze~~|~~New dimension is properly mapped ~~| ~~image_mapping correctly maps to newly added dimensions~~ | <ul><li>~~image_shape does correctly map to newly added existing dimensions~~</ul>|
+|Type constraints|	Use unexpected data type (not ImageInt, ImageFloat or ImageBinary)|	Type Error	| Type converted to correct type<br>Incorrectly type data used anyway</li></ul>|
+|Shape constraints	|Insert input array with more or less than min/max dimensions defined in Shape.py |Value Error	|	Wrong shape array accepted|
+|Shape constraints	|Input shape data not in Shape class|Type Error	|	Wrong class ignored|
+|get_image_shape() | Get image shape of various shape pixel arrays | Gives correct shape | Gives incorrect shape |
 
 ## Stage 6.2 – Backend Image Operation Classes
 ### Parameters
