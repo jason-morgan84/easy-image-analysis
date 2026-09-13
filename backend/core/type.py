@@ -27,19 +27,17 @@ class BaseType:
         return self._value
 
     @value.setter
-    def value(self,val):
+    def value(self, val):
         # if val is already a member of a DataType class but is not the current data type class, call self.to(self.data_type) function for implicit conversion
         value_dtype = getattr(val, "data_type", None)
         if isinstance(value_dtype,DataType) and value_dtype != self.data_type:
-            print("implicit", val, val.value,self.data_type)
-            val = val.to(self.data_type)
+            val = val.to(self.data_type).value
         else:
             # defines different validation methods is data type is an array (is_array = True) or not (is_array = False)
             if self.is_array:
                 val = self.validate_array(val)
             else:
                 val = self.validate_scalar(val)
-        print(f"Value is {val}")
         self._value = val
 
     def validate_array(self, val):
@@ -112,9 +110,9 @@ class ImageFloat(BaseType):
     allowed_sub_types = (np.number)
 
     def to(self, dtype):
-        if dtype == DataType.ImageInt:
+        if dtype == DataType.ImageInt or dtype == ImageInt:
             return ImageInt(np.uint8(np.round(self.value * 255)))
-        elif dtype == DataType.ImageBinary:
+        elif dtype == DataType.ImageBinary or dtype == ImageBinary:
             return ImageBinary(np.uint8(np.round(self.value)))
         elif dtype == ImageFloat and dtype == self.data_type:
             return ImageFloat(self.value)
@@ -134,7 +132,6 @@ class ImageBinary(BaseType):
         if dtype == DataType.ImageFloat or dtype == ImageFloat:
             return ImageFloat(self.value)
         elif dtype == DataType.ImageInt or dtype == ImageInt:
-            print(f"Turning {self.value} to ImageInt gives {ImageInt(self.value).value}")
             return ImageInt(self.value)
         elif dtype == ImageBinary and dtype == self.data_type:
             return ImageBinary(self.value)
@@ -148,7 +145,7 @@ class ValueInt(BaseType):
     allowed_sub_types = (int, np.integer)
 
     def to(self, dtype):
-        if dtype == DataType.ValueFloat:
+        if dtype == DataType.ValueFloat or dtype == ValueFloat:
             return ValueFloat(self.value)
         else:
             raise TypeError(f"ValueInt cannot be converted to type {dtype}")
@@ -160,8 +157,8 @@ class ValueFloat(BaseType):
     allowed_sub_types = (numbers.Number, np.number)
 
     def to(self, dtype):
-        if dtype == DataType.ValueInt:
-            return ValueInt(round(self.value))
+        if dtype == DataType.ValueInt or dtype == ValueInt:
+            return ValueInt(np.round(self.value))
         else:
             raise TypeError(f"ValueFloat cannot be converted to type {dtype}")
 
@@ -173,7 +170,7 @@ class ArrayInt(BaseType):
     is_array = True
 
     def to(self, dtype):
-        if dtype == DataType.ArrayFloat:
+        if dtype == DataType.ArrayFloat or dtype == ArrayFloat:
             return ArrayFloat(self.value)
         else:
             raise TypeError(f"ArrayInt cannot be converted to type {dtype}")
@@ -186,8 +183,8 @@ class ArrayFloat(BaseType):
     is_array = True
 
     def to(self, dtype):
-        if dtype == DataType.ArrayInt:
-            return ArrayInt(round(self.value))
+        if dtype == DataType.ArrayInt or dtype == ArrayInt:
+            return ArrayInt(np.uint8(np.round(self.value)))
         else:
             raise TypeError(f"ArrayFloat cannot be converted to type {dtype}")
 

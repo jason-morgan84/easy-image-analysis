@@ -100,43 +100,107 @@ def test_all_datatype_classes_have_required_attributes(enum_member):
     assert enum_member.allowed_sub_types is not None, f"'{enum_member.__name__}.allowed_subdtypes' is not defined"
     assert isinstance(enum_member.is_array, bool), f"'{enum_member.__name__}.is_array' is not boolean"
 
-# test explict type conversions within ImageTypes gives expected output type
-@pytest.mark.parametrize("DataType, Input, OutputType", [
-    (ImageInt, [5, 10, 20], ImageFloat.data_type),      
-    (ImageInt, [0, 1, 1], ImageBinary.data_type),       
-    (ImageFloat, [0.2, 0.5], ImageInt.data_type),     
-    (ImageFloat, [1.0, 0.0], ImageBinary.data_type),      
-    (ImageBinary, [1, 0], ImageFloat.data_type),    
-    (ImageBinary, [0, 1], ImageInt.data_type),    
+# test image conversions within image_types
+@pytest.mark.parametrize("DataType, Input, OutputType, Output", [
+    (ImageInt, [51, 10, 20], ImageFloat, 0.2),      
+    (ImageInt, [0, 1, 1], ImageBinary, 0),       
+    (ImageFloat, [0.4, 0.5], ImageInt, 102),     
+    (ImageFloat, [1.0, 0.0], ImageBinary, 1),      
+    (ImageBinary, [1, 0], ImageFloat, 1.0),    
+    (ImageBinary, [0, 1], ImageInt, 0),  
 ])
-def test_image_explicit_conversions(DataType, Input, OutputType):
-    assert DataType(Input).to(OutputType).data_type == OutputType, f"{DataType(Input).to(OutputType).value}"
-
+def test_image_conversions(DataType, Input, OutputType, Output):
+# test explict type conversions within ImageTypes gives expected output type
+    assert DataType(Input).to(OutputType).data_type == OutputType.data_type, f"{DataType(Input).to(OutputType).value}"
 # test implicit type conversions within ImageTypes gives expected output type
+    assert OutputType(DataType(Input)).data_type == OutputType.data_type
+# test explict type conversions gives expected output value
+    assert (DataType(Input).to(OutputType).value[0] == Output)
+# test implicit type conversions gives expected output value
+    assert OutputType(DataType(Input)).value[0] == Output
+
+# test for drift within ImageTypes
 @pytest.mark.parametrize("DataType, Input, OutputType", [
-    (ImageInt, [5, 10, 20], ImageFloat),      
-    (ImageInt, [0, 1, 1], ImageBinary),       
-    (ImageFloat, [0.2, 0.5], ImageInt),     
-    (ImageFloat, [1.0, 0.0], ImageBinary),      
-    (ImageBinary, [1, 0], ImageFloat),    
+    (ImageInt, [1, 2], ImageFloat),      
+    (ImageFloat, [0.1, 1.0], ImageInt),       
+    (ImageFloat, [0.1, 0.9], ImageBinary),     
+    (ImageBinary, [1, 0], ImageFloat),      
+    (ImageInt, [1, 0], ImageBinary),    
     (ImageBinary, [0, 1], ImageInt),    
 ])
-def test_image_implicit_conversions(DataType, Input, OutputType):
-    assert OutputType(DataType(Input)).data_type == OutputType.data_type
+def test_for_value_drift_image_types(DataType, Input, OutputType):
+    a = DataType(Input)
+    for i in range (5):
+        b = a.to(OutputType).to(DataType)
 
-# test explict and implicit type conversions gives expected output value
+    for i in range (15):
+        c = a.to(OutputType).to(DataType)
+
+    assert(b.value[0]== c.value[0])
+    assert(b.value[1]== c.value[1])
+
+# test conversions within value_types
 @pytest.mark.parametrize("DataType, Input, OutputType, Output", [
-    (ImageInt, [51, 10, 20], ImageFloat.data_type, 0.2),      
-    (ImageInt, [0, 1, 1], ImageBinary.data_type, 0),       
-    (ImageFloat, [0.4, 0.5], ImageInt.data_type, 102),     
-    (ImageFloat, [1.0, 0.0], ImageBinary.data_type, 1),      
-    (ImageBinary, [1, 0], ImageFloat.data_type, 1.0),    
-    (ImageBinary, [0, 1], ImageInt, 0),    
+    (ValueInt, 5, ValueFloat, 5.0),      
+    (ValueFloat, 0.6, ValueInt, 1),       
 ])
-def test_image_values_conversions(DataType, Input, OutputType, Output):
-    print(f"{DataType, Input, OutputType, Output}")
+def test_value_conversions(DataType, Input, OutputType, Output):
+# test explict type conversions within value_types gives expected output type
+    assert DataType(Input).to(OutputType).data_type == OutputType.data_type, f"{DataType(Input).to(OutputType).value}"
+# test implicit type conversions within value_types gives expected output type
+    assert OutputType(DataType(Input)).data_type == OutputType.data_type
+# test explict type conversions gives expected output value
+    assert (DataType(Input).to(OutputType).value == Output)
+# test implicit type conversions gives expected output value
+    assert OutputType(DataType(Input)).value == Output
+
+# test for drift within value_types
+@pytest.mark.parametrize("DataType, Input, OutputType", [
+    (ValueFloat, 5.6, ValueInt),        
+])
+def test_for_value_drift_value_types(DataType, Input, OutputType):
+    a = DataType(Input)
+    for i in range (5):
+        b = a.to(OutputType).to(DataType)
+
+    for i in range (15):
+        c = a.to(OutputType).to(DataType)
+
+    assert(b.value== c.value)
+    assert(b.value== c.value)
+
+# test conversions within array_types
+@pytest.mark.parametrize("DataType, Input, OutputType, Output", [
+    (ArrayInt, [5, 2], ArrayFloat, 5.0),      
+    (ArrayFloat, [0.6, 17.1], ArrayInt, 1),       
+])
+def test_array_conversions(DataType, Input, OutputType, Output):
+# test explict type conversions within array_types gives expected output type
+    assert DataType(Input).to(OutputType).data_type == OutputType.data_type, f"{DataType(Input).to(OutputType).value}"
+# test implicit type conversions within array_types gives expected output type
+    assert OutputType(DataType(Input)).data_type == OutputType.data_type
+# test explict type conversions gives expected output value
     assert (DataType(Input).to(OutputType).value[0] == Output)
+# test implicit type conversions gives expected output value
     assert OutputType(DataType(Input)).value[0] == Output
+
+# test for drift within array_types
+@pytest.mark.parametrize("DataType, Input, OutputType", [
+    (ArrayFloat, [5.6, 8.1], ArrayInt),        
+])
+def test_for_value_drift_array_types(DataType, Input, OutputType):
+    a = DataType(Input)
+    for i in range (5):
+        b = a.to(OutputType).to(DataType)
+
+    for i in range (15):
+        c = a.to(OutputType).to(DataType)
+
+    assert(b.value[0] == c.value[0])
+    assert(b.value[0] == c.value[0])
+
+
+
 
 # test sample data generation
 def test_sample_data():
