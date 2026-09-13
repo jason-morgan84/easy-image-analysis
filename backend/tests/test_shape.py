@@ -44,4 +44,25 @@ def test_shape_iteration():
 
     assert(values == [2,-1,1,4]); print(values)
 
+def test_get_values():
+    test_shape = Shape(c = 2, x = 4, y = 1, z = -1)
+
+    assert test_shape[0] == 2
+    assert test_shape["c"] == 2
+
+    assert test_shape[1] == -1
+    assert test_shape["z"] == -1
+
+def test_set_values():
+    test_shape = Shape(c = 2, x = 4, y = 1, z = -1)
+
+    test_shape[0] = 5
+    assert test_shape[0] == 5
+    assert test_shape["c"] == 5
+
+    test_shape["z"] = 16
+
+    assert test_shape[1] == 16
+    assert test_shape["z"] == 16
+
 
