@@ -30,7 +30,8 @@
 |09/09/26|0.8.7|Parameter Class: Updated unit testing|
 |10/09/26|0.9.0|Started major re-write of description of classes, class heirarchy and type checking|
 |11/09/26|0.9.1|Re-wrote description of DataType classes to explain base class/child class structure|
-|13/09/26|0.9.2|Re-wrote description of Image classes and Image unit testing|
+|13/09/26|0.9.2|Re-wrote description of Image class and Image unit testing|
+|13/09/26|0.9.3|Re-wrote description of Parameter class and Parameter unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -236,21 +237,19 @@ Therefore, the image data can be described with two instance variables:
 2.	image_map: Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
 
 ### 3.2.4 Parameters Class
-The parameter class holds information for ImageOperations defining the required inputs, from the user and from the workflow.
 
-The aim is to allow data to be passed to and from an ImageOperation in the relevant standard numpy formats, and, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
+Similar to the Image class, the Parameter class does not exist independently of a Node/Port. 
+
+It contains non-image inputs/outputs for ImageOperations, including non-image values passed from other nodes via the WorkFlow and values passed from the UI based on user input.
+
+Parameter also includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
 
 * Name – the name of the parameter
-* dtype – the data type of the parameter
-* value – its value
-* shape - its shape, where relevant
+* value – its value (initialised as correct data_type/shape (if required) by Port on instantiation therefore also defines required data type)
 * ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc)
 * ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
 
-Type checking is carried out on dtype, to ensure its a member of DataType, and shape, to ensure its of Shape class.
-
-Because the Parameter class deals with inputs and outputs to ImageOperations, which work with standard numpy data types, type checking for "value" is to ensure it is of type DataType.dtype.numpy.
-
+Type checking is carried out on dtype, to ensure its a member of DataType.value_types or DataType.array_types.
 
 ### 3.2.5 ImageOperation Class/File
 A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
@@ -446,10 +445,7 @@ On creation of a new connection, it will check for structure, constraint or type
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
-|Type constraints|	Input a value that is not of type DataType.dtype.numpy|	Type Error	| <ul><li>Incorrectly typed data accepted</li></ul>|
-|Type constraints|	Input a value that is of type DataType.dtype|	Type Error	| <ul><li>Incorrectly typed data accepted</li></ul>|
-|Value constraints|	Input data with an image_type without a shape|	Value Error	| <ul><li>Data accepted</li></ul>|
-|Type constraints|	Input a shape that is not of class Shape|	Type Error	| <ul><li>Incorrectly shape accepted</li></ul>|
+
 
 
 ### ImageOperation
