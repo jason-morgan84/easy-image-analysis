@@ -31,6 +31,7 @@ class BaseType:
         # if val is already a member of a DataType class but is not the current data type class, call self.to(self.data_type) function for implicit conversion
         value_dtype = getattr(val, "data_type", None)
         if isinstance(value_dtype,DataType) and value_dtype != self.data_type:
+            print("implicit", val, val.value,self.data_type)
             val = val.to(self.data_type)
         else:
             # defines different validation methods is data type is an array (is_array = True) or not (is_array = False)
@@ -38,7 +39,7 @@ class BaseType:
                 val = self.validate_array(val)
             else:
                 val = self.validate_scalar(val)
-
+        print(f"Value is {val}")
         self._value = val
 
     def validate_array(self, val):
@@ -92,10 +93,12 @@ class ImageInt(BaseType):
     allowed_sub_types = (np.integer)
 
     def to(self, dtype):
-        if dtype == DataType.ImageFloat:
+        if dtype == DataType.ImageFloat or dtype == ImageFloat:
             return ImageFloat(self.value/255)
-        elif dtype == DataType.ImageBinary:
+        elif dtype == DataType.ImageBinary or dtype == ImageBinary:
             return ImageBinary(self.value)
+        elif dtype == ImageInt and dtype == self.data_type:
+            return ImageInt(self.value)
         else:
             raise TypeError(f"ImageInt cannot be converted to type {dtype}")
 
@@ -112,7 +115,9 @@ class ImageFloat(BaseType):
         if dtype == DataType.ImageInt:
             return ImageInt(np.uint8(np.round(self.value * 255)))
         elif dtype == DataType.ImageBinary:
-            return ImageBinary(self.value)
+            return ImageBinary(np.uint8(np.round(self.value)))
+        elif dtype == ImageFloat and dtype == self.data_type:
+            return ImageFloat(self.value)
         else:
             raise TypeError(f"ImageFloat cannot be converted to type {dtype}")
 
@@ -126,10 +131,13 @@ class ImageBinary(BaseType):
     allowed_sub_types = (np.integer)
 
     def to(self, dtype):
-        if dtype == DataType.ImageFloat:
+        if dtype == DataType.ImageFloat or dtype == ImageFloat:
             return ImageFloat(self.value)
-        elif dtype == DataType.ImageInt:
+        elif dtype == DataType.ImageInt or dtype == ImageInt:
+            print(f"Turning {self.value} to ImageInt gives {ImageInt(self.value).value}")
             return ImageInt(self.value)
+        elif dtype == ImageBinary and dtype == self.data_type:
+            return ImageBinary(self.value)
         else:
             raise TypeError(f"ImageBinary cannot be converted to type {dtype}")
         

@@ -100,6 +100,43 @@ def test_all_datatype_classes_have_required_attributes(enum_member):
     assert enum_member.allowed_sub_types is not None, f"'{enum_member.__name__}.allowed_subdtypes' is not defined"
     assert isinstance(enum_member.is_array, bool), f"'{enum_member.__name__}.is_array' is not boolean"
 
+# test explict type conversions within ImageTypes gives expected output type
+@pytest.mark.parametrize("DataType, Input, OutputType", [
+    (ImageInt, [5, 10, 20], ImageFloat.data_type),      
+    (ImageInt, [0, 1, 1], ImageBinary.data_type),       
+    (ImageFloat, [0.2, 0.5], ImageInt.data_type),     
+    (ImageFloat, [1.0, 0.0], ImageBinary.data_type),      
+    (ImageBinary, [1, 0], ImageFloat.data_type),    
+    (ImageBinary, [0, 1], ImageInt.data_type),    
+])
+def test_image_explicit_conversions(DataType, Input, OutputType):
+    assert DataType(Input).to(OutputType).data_type == OutputType, f"{DataType(Input).to(OutputType).value}"
+
+# test implicit type conversions within ImageTypes gives expected output type
+@pytest.mark.parametrize("DataType, Input, OutputType", [
+    (ImageInt, [5, 10, 20], ImageFloat),      
+    (ImageInt, [0, 1, 1], ImageBinary),       
+    (ImageFloat, [0.2, 0.5], ImageInt),     
+    (ImageFloat, [1.0, 0.0], ImageBinary),      
+    (ImageBinary, [1, 0], ImageFloat),    
+    (ImageBinary, [0, 1], ImageInt),    
+])
+def test_image_implicit_conversions(DataType, Input, OutputType):
+    assert OutputType(DataType(Input)).data_type == OutputType.data_type
+
+# test explict and implicit type conversions gives expected output value
+@pytest.mark.parametrize("DataType, Input, OutputType, Output", [
+    (ImageInt, [51, 10, 20], ImageFloat.data_type, 0.2),      
+    (ImageInt, [0, 1, 1], ImageBinary.data_type, 0),       
+    (ImageFloat, [0.4, 0.5], ImageInt.data_type, 102),     
+    (ImageFloat, [1.0, 0.0], ImageBinary.data_type, 1),      
+    (ImageBinary, [1, 0], ImageFloat.data_type, 1.0),    
+    (ImageBinary, [0, 1], ImageInt, 0),    
+])
+def test_image_values_conversions(DataType, Input, OutputType, Output):
+    print(f"{DataType, Input, OutputType, Output}")
+    assert (DataType(Input).to(OutputType).value[0] == Output)
+    assert OutputType(DataType(Input)).value[0] == Output
 
 # test sample data generation
 def test_sample_data():
