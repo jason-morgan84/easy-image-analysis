@@ -1,14 +1,25 @@
-import numpy as np
 from core.constants import DataType
 from core.shape import Shape
-from core.parameter import Parameter
-from core.image import Image
+import numpy as np
+"""Note for types: For input type checking, ImageOperation will be a part of a Node. Data will flow into the Node through a Port, which will transmit the data
+to the ImageOperation class. 
+
+Ports will carry out type conversions of any inputted data from custom DataTypes used to manage types in data transmission to standard numpy data types
+used in actual image analysis.
+
+This means that while input["input_name"].dtype will be of a DataType class, the actual input data will be off DataType.numpy type, and should be checked against
+that data type"""
+
+"""Note for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
+
+This means that input["input_name"].shape does not give array dimensions, but desired array dimensions - a specific value if a strict size is needed for that
+dimension, or -1 if the analysis function is indifferent to size in that dimension."""
 
 class ImageOperation:
-    def __init__(self, name, category, excecute, version, docs, alerts, input_image = {}, input_parameter={}, output_image = {}, output_parameter = {}, ):
+    def __init__(self, name, category, compiled_code, version, docs, alerts, input_image = {}, input_parameter={}, output_image = {}, output_parameter = {}, ):
         self.name = name
         self.category = category
-        self.excecute = excecute
+        self.compiled_code = compiled_code
         self.version = version
         self.docs = docs
         self.alerts = alerts 
@@ -24,19 +35,7 @@ class ImageOperation:
 
 
 
-    """Note for types: For input type checking, ImageOperation will be a part of a Node. Data will flow into the Node through a Port, which will transmit the data
-    to the ImageOperation class. 
 
-    Ports will carry out type conversions of any inputted data from custom DataTypes used to manage types in data transmission to standard numpy data types
-    used in actual image analysis.
-    
-    This means that while input["input_name"].dtype will be of a DataType class, the actual input data will be off DataType.numpy type, and should be checked against
-    that data type"""
-
-    """Note for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
-    
-    This means that input["input_name"].shape does not give array dimensions, but desired array dimensions - a specific value if a strict size is needed for that
-    dimension, or -1 if the analysis function is indifferent to size in that dimension."""
 
     # uses check_image function to check input_image and output_image dictionaries
     @property
@@ -158,5 +157,57 @@ class ImageOperation:
        
         return data
 
+    def run_code(self):
 
+        # set all output values to None
+        for item in self.output_image.values():
+            item["pixel_array"] = None
+
+        for item in self.output_parameter.values():
+            item["value"] = None
+
+        # save current input values:
+        current_input_image = self.input_image.copy()
+        current_input_parameter = self.input_parameter.copy()
+
+        # run compiled code on given inputs
+        try:
+            exec(self.compiled_code, {"input_image": self.input_image,
+                                      "input_parameter":self.input_parameter,
+                                      "output_image": self.output_image,
+                                      "output_parameter":self.output_parameter})
+        except Exception as e:
+            raise RuntimeError(f"Error executing operation '{self.name}': {e}")
+
+        # check output generated
+        output_generated = False
+
+        for item in self.output_image.values():
+            if item["pixel_array"] is not None:
+                output_generated = True
+
+        for item in self.output_parameter.values():
+            if item["value"] is not None:
+                output_generated = True
+
+        if output_generated == False:
+            raise RuntimeError(f"Operation {self.name} did not generate an output.")
+
+
+        # check inputs have not changed
+        input_changed = False
+        for key, item in self.input_image.items():
+            if item["pixel_array"] != None:
+                if not np.array_equal(item["pixel_array"],current_input_image[key]["pixel_array"]):
+                    input_changed = True
+        for key, item in self.input_parameter.items():
+            if item["value"] != None:
+                if item["value"] != current_input_parameter[key]["value"]:
+                    input_changed = True
+
+        if input_changed:
+            raise RuntimeError(f"Operation {self.name} altered input values.")
+                                      
+
+        
   
