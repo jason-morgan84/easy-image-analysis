@@ -32,7 +32,8 @@
 |11/09/26|0.9.1|Re-wrote description of DataType classes to explain base class/child class structure|
 |13/09/26|0.9.2|Re-wrote description of Image class and Image unit testing|
 |13/09/26|0.9.3|Re-wrote description of Parameter class and Parameter unit testing|
-|13/09/26|0.9.4|Re-wrote description of ImageOperation class and unit testing|
+|14/09/26|0.9.4|Re-wrote description of ImageOperation class and unit testing|
+|14/09/26|0.9.5|Documented run_code function in ImageOperation|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -276,7 +277,9 @@ A key aim of this project is expandability, to allow the inclusion of new image 
 * docs – documentation to explain function, effects, parameters etc
 * alerts – any warnings to user (e.g, “Background subtraction with a large radius is a very slow process”)
 * version – version of software code ImageOperation was written for. This is to future proof code, so changes to base code that affect ImageOperations don’t mean all existing ImageOperations need to be rewritten. 
-* execute – function with code to execute
+* compiled_code – function with compiled code to execute - gathered from input .py files by ImageOperationDirectory
+
+It will also contain the function, run_code, which runs the compiled code and confirms that output variables have been generated and input variables have not been changed.
 
 ### 3.2.6 ImageOperationDirectory Class
 This class acts as a holder for a list of all ImageOperation classes, along with the code required to import them.
