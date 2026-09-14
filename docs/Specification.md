@@ -32,6 +32,7 @@
 |11/09/26|0.9.1|Re-wrote description of DataType classes to explain base class/child class structure|
 |13/09/26|0.9.2|Re-wrote description of Image class and Image unit testing|
 |13/09/26|0.9.3|Re-wrote description of Parameter class and Parameter unit testing|
+|13/09/26|0.9.4|Re-wrote description of ImageOperation class and unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -254,10 +255,24 @@ Type checking is carried out on dtype, to ensure its a member of DataType.value_
 ### 3.2.5 ImageOperation Class/File
 A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
 * name: name of ImageOperation
-* category: logical category (“Threshold”, “Filter” etc)
-* inputs: dictionary defining inputs in the form {name: Str; dtype: DataType; shape: Shape}
-* outputs: dictionary defining outputs in the form {name: Str; dtype: DataType; shape: Shape}
-* parameters – dictionary of Parameter classes for input variables from frontend
+* category: logical category (“Threshold”, “Filter” etc) - defined by folder location of file
+* input_image: input images as dictionary of dictionaries:
+```
+{ "name": identifier for input image
+    {   dtype: member of DataType.image_types,
+        pixel_array: value of type DataType.dtype.numpy(),
+        shape: Shape class defining constraints on input image shape,
+        map: Shape class defining mapping from value array to image dimension}}
+```
+* input_parameter: other inputs as dictionary of dictionaries 
+```
+{ "name": identifier for input parameter  
+    {   dtype: member of DataType.value_types or array_types
+        value: value of type DataType.dtype.numpy()
+        shape: shape of array if required as tuple, else None }}
+```
+* output_image: Output images as dictionary, as input_image
+* output_parameter: other outputs as dictionary, as input_parameter
 * docs – documentation to explain function, effects, parameters etc
 * alerts – any warnings to user (e.g, “Background subtraction with a large radius is a very slow process”)
 * version – version of software code ImageOperation was written for. This is to future proof code, so changes to base code that affect ImageOperations don’t mean all existing ImageOperations need to be rewritten. 
@@ -451,23 +466,16 @@ On creation of a new connection, it will check for structure, constraint or type
 ### ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Input Type|Supply input arguement in incorrect format (not as a dictionary)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
-|Input Type|Supply input arguement in incorrect format - dictionary, but not with value as Parameter class| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
-
-|Input Values|Supply input["Name"].Parameter.dtype where dtype not a member of DataType| Value Error | <ul><li>Incorrect dtype accepted</li></ul>|
-|Input Values|Supply input["Name"].Parameter.shape where dtype not of Shape class| Type Error | <ul><li>Incorrect dtype accepted</li></ul>|
-|Input Values|Supply input["Name"].Parameter.value where value not of input["Name"].Parameter.dtype.numpy type| Type Error | <ul><li>Incorrect dtype accepted</li></ul>|
-
-|Input Value Shape|Supply input with image_type DataType where input["Name"].Parameter.value does not match defined shape| Value Error | <ul><li>Incorrect shape accepted</li></ul>|
-|Input Shape Type|Supply shape where shape not a tuple or list| Type Error | <ul><li>Incorrect shape format accepted</li></ul>|
-|Input Shape Type|Supply shape where shape not a tuple or list of integers| Type Error | <ul><li>Incorrect shape format accepted</li></ul>|
-|Input Shape Value|Supply shape where shape doesn't include sufficient dimensions (defined by Shape.min_image_dimensions and Shape.max_image_dimensions) | Value Error | <ul><li>Incorrect shape accepted</li></ul>|
-|Output Type|Supply output arguement in incorrect format (not as a dictionary)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
-|Output Type|Supply output arguement in incorrect format (not as a dictionary of Parameter class)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
-|Output Values|Supply output where dtype not a member of DataType| Value Error | <ul><li>Incorrect dtype accepted</li></ul>|
-|Output Value Type|Supply input where input data type doesn't match dtype arguement| Type Error | <ul><li>Incorrect data type accepted</li></ul>|
-|Output Values|Supply output where output value does not match defined shape| Value Error | <ul><li>Incorrect shape accepted</li></ul>|
-|Output|Code provided does not supply output|Value Error|<ul><li>No error given</li></ul>|
+|check_image|Supply input_image/output_image not as a dictionary| Type Error | Incorrect data type ignored|
+|check_image|Supply input_image["dtype"] as not member of DataTypes.image_types| Type Error | Incorrect data type accepted|
+|check_image|Have input_image["pixel_array"] type not match dtype| Type Error | Incorrect data type accepted|
+|check_image|Supply input_image["shape"] not as Shape class| Type Error | Incorrect data type accepted|
+|check_image|Supply pixel_array where shape does not match constrains in shape| Value Error | Incorrect pixel array accepted|
+|check_parameter|Supply input_parameter/input_parameter not as a dictionary| Type Error | Incorrect data type ignored|
+|check_parameter|Supply input_parameter["dtype"] as not member of DataTypes.value_types or DataTypes.array_types| Type Error | Incorrect data type accepted|
+|check_parameter|Have input_image["value"] type not match dtype| Type Error | Incorrect data type accepted|
+|check_parameter|Supply input_image["shape"] not as a list or tuple| Type Error | Incorrect data type accepted|
+|check_parameter|Supply array value where shape does not match defined shape| Value Error | Incorrect value accepted|
 |Execute|Code provided creates an error|Error|<ul><li>No error passed on</li></ul>|
 
 * ImageOperationDirectory
