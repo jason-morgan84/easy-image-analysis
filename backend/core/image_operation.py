@@ -44,7 +44,7 @@ class ImageOperation:
 
     @input_image.setter
     def input_image(self, input):
-        input = self.check_image(self, input, "Input")
+        input = self.check_image(input, "Input")
         self._input = input
 
     @property
@@ -53,7 +53,7 @@ class ImageOperation:
 
     @output_image.setter
     def output_image(self, output):
-        output = self.check_image(self, output, "Output")
+        output = self.check_image(output, "Output")
         self._output = output
 
     @property
@@ -62,7 +62,7 @@ class ImageOperation:
 
     @input_parameter.setter
     def input_parameter(self, input):
-        input = self.check_parameter(self, input, "Input")
+        input = self.check_parameter(input, "Input")
         self._input_parameter = input
 
     @property
@@ -71,13 +71,13 @@ class ImageOperation:
 
     @output_parameter.setter
     def output_parameter(self, output):
-        output = self.check_parameter(self, output, "Output")
+        output = self.check_parameter(output, "Output")
         self._output_parameter = output
 
 
     def check_image(self, data, descriptor):
         # check that data is a dictionary
-        if not isinstance(data,dict):
+        if not isinstance(data, dict):
             raise TypeError(f"{descriptor} should be passed as a dictionary, not {type(data)}")
         for key, item in data.items():
             dtype = item["dtype"]
