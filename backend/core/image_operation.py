@@ -5,24 +5,31 @@ from core.parameter import Parameter
 from core.image import Image
 
 class ImageOperation:
-    def __init__(self, name, category, excecute, version, docs, alerts, inputs = {}, outputs = {}, parameters = {}, ):
+    def __init__(self, name, category, excecute, version, docs, alerts, input_image = {}, input_parameter={}, output_image = {}, output_parameter = {}, ):
         self.name = name
         self.category = category
         self.excecute = excecute
         self.version = version
         self.docs = docs
         self.alerts = alerts 
-        self.inputs = inputs # inputs as dictionary {"Name": Parameter class}
-        self.outputs = outputs # outputs as dictionary {"Name": Parameter class}
-        self.parameters = parameters
+        self.input_image = input_image # input images as dictionary of dictionaries   { "name":  {  dtype: member of DataType.image_types,
+                                                                            #                       pixel_array: value of type DataType.dtype.numpy(),
+                                                                            #                       shape: Shape class defining constraints on input image shape,
+                                                                            #                       map: Shape class defining mapping from value array to image dimension}}
+        self.input_parameter = input_parameter # other inputs as dictionary of dictionaries {   "name":  {  dtype: member of DataType.value_types or array_types
+                                                                            #                               value: value of type DataType.dtype.numpy()
+                                                                            #                               shape: shape of array if required as tuple, else None}}
+        self.output_image = output_image # Output images as dictionary, as input_image
+        self.output_parameter = output_parameter # other outputs as dictionary, as input_parameter
+
 
         #TODO Change parameters name
 
 
-    """Note for types: For input type checking, ImageOperation will be a part of a WorkFlow Node. Data will flow into the Node through a Port, which will transmit the data
+    """Note for types: For input type checking, ImageOperation will be a part of a Node. Data will flow into the Node through a Port, which will transmit the data
     to the ImageOperation class. 
 
-    Ports will carry out type conversions of any inputting data from custom DataTypes used to manage types in data transmission to standard numpy data types
+    Ports will carry out type conversions of any inputted data from custom DataTypes used to manage types in data transmission to standard numpy data types
     used in actual image analysis.
     
     This means that while input["input_name"].dtype will be of a DataType class, the actual input data will be off DataType.numpy type, and should be checked against
@@ -32,73 +39,119 @@ class ImageOperation:
     
     This means that input["input_name"].shape does not give array dimensions, but desired array dimensions - a specific value if a strict size is needed for that
     dimension, or -1 if the analysis function is indifferent to size in that dimension."""
-    @property
-    def inputs(self):
-        return self._inputs
 
-    @inputs.setter
-    def inputs(self,inp):
-        # check input is a dictionary
-        if not isinstance(inp,dict):
-            raise TypeError(f"Inputs should be passed as a dictionary of Parameter class, not {type(item)}")
-        # loop through each item in dictionary
-        for key, item in inp.items():
+    # uses check_image function to check input_image and output_image dictionaries
+    @property
+    def input_image(self):
+        return self._input_image
+
+    @input_image.setter
+    def input_image(self, input):
+        input = self.check_image(self, input, "Input")
+        self._input = input
+
+    @property
+    def output_image(self):
+        return self._output_image
+
+    @output_image.setter
+    def output_image(self, output):
+        output = self.check_image(self, output, "Output")
+        self._output = output
+
+    @property
+    def input_parameter(self):
+        return self._input_parameter
+
+    @input_parameter.setter
+    def input_parameter(self, input):
+        input = self.check_parameter(self, input, "Input")
+        self._input_parameter = input
+
+    @property
+    def output_parameter(self):
+        return self._output_parameter
+
+    @output_parameter.setter
+    def output_parameter(self, output):
+        output = self.check_parameter(self, output, "Output")
+        self._output_parameter = output
+
+
+    def check_image(self, data, descriptor):
+        # check that data is a dictionary
+        if not isinstance(data,dict):
+            raise TypeError(f"{descriptor} should be passed as a dictionary, not {type(data)}")
+        for key, item in data.items():
+            dtype = item["dtype"]
+            pixel_array = item["pixel_array"]
+            shape = item["shape"]
+            map = item["map"]
+
+            # check that dtype is a member of DataType.image_types (although the pixel_array isn't of a custom class, this is still used to define the expected
+            # numpy data type of pixel_array)
+            if dtype not in DataType.image_types:
+                raise TypeError(f"For {descriptor} {key}, expected dtype to be member of DataTypes.image_types, got {dtype}")
+
+            # check that pixel_array is of the expected numpy data type given dtype
+            if not isinstance(pixel_array, dtype.numpy):
+                raise TypeError(f"For {descriptor} {key}, given dtype of {dtype}, expected pixel_array of type {dtype.numpy}, got {type(pixel_array)}")
+
+            # check that shape is of type Shape
+            if not isinstance(shape, Shape):
+                raise TypeError(f"For {descriptor} {key}, expected shape to be of class Shape, got {type(shape)}")
+
+            # check that map is of type Shape
+            if not isinstance(map, Shape):
+                raise TypeError(f"For {descriptor} {key},expected map to be of class Shape, got {type(map)}")
+
+            # check that image matches constrains given by shape
+            # NOTE for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined."""  
+            pixel_array_shape = pixel_array.value.shape
+
+            # loops through dimensions in order c, z, y, x
+            for index, dimension in enumerate(shape):
+                
+                current_dimension_identifier = Shape.dimensions[index]
+
+                # if the dimension is -1, the input doesn't care about that dimension
+                if dimension != -1:
+                
+                    # gets pixel_array dimension of current image dimension
+                    array_dim = map[current_dimension_identifier]
+
+                    # checks dimensions sizes match
+                    if pixel_array_shape[array_dim] != dimension:
+                        raise ValueError(f"For {descriptor} {key}, pixel_array dimension {current_dimension_identifier}, expected {dimension} but got {array_dim}")
+        return data
+
+    def check_parameter(self, data, descriptor):
+        # check that data is a dictionary
+        if not isinstance(data,dict):
+            raise TypeError(f"{descriptor} should be passed as a dictionary, not {type(data)}")
+        for key, item in data.items():
             dtype = item["dtype"]
             value = item["value"]
             shape = item["shape"]
-            
-            # First check dictionary value is of Parameter class
-            if not isinstance(item, Parameter):
-                raise TypeError(f"For input {key}, inputs should be passed using the Parameter class, not {type(item)}")
-             
 
-            # Following tests depend on whether the parameter is an image or not
-            # if its an image, need to check image shape matches shape arguement
-            # if its an image, need to check image type matches type arguement
-            # it its not an image, don't care about shape
-            # if its not an image, still need to check value type matches type arguement
-            
-            if dtype in DataType.image_types:
-                # if its a member of image_types, then the the actual value should be Image class
-                if not isinstance(value,Image):
-                    raise TypeError(f"For input {key}, image inputs should be of Image class, not {type(value)}")
+            # check that dtype is a member of DataTypes.value_types or DataTypes.array_types 
+            if dtype not in DataType.value_types and dtype not in DataType.array_types:
+                raise TypeError(f"For {descriptor} {key}, expected dtype to be member of DataTypes.value_types or DataTypes.array_types, got {dtype}")
 
-                # next, check data type of image.array and image.dtype arguement match input.dtype
-                if not isinstance(value.array, dtype):
-                    raise ValueError(f"For input {key}, image inputs type {type(value.array)} does not match dtype arguement {dtype}")
-                if value.array_dtype != dtype:
-                    raise ValueError(f"For input {key}, image.dtype {value.array_dtype} does not match dtype arguement {dtype}")
+            # check that pixel_array is of the expected numpy data type given dtype
+            if not isinstance(value, dtype.numpy):
+                raise TypeError(f"For {descriptor} {key}, given dtype of {dtype}, expected value of type {dtype.numpy}, got {type(value)}")
 
-                # next, check shape is a tuple/list, has size between Shape.min_image_dimensions and Shape.max_image_dimensions and is filled with integers
-                if not isinstance(shape,tuple) and not isinstance(shape,list):
-                    raise TypeError(f"For input {key}, Shape should be a tuple or list, not {type(shape)}")
+            # check whether value is an array data type. 
+            if value in DataType.array_types:
+                # if it is, checks that shape is a tuple or a list
+                if not isinstance(shape, (tuple,list)):
+                    raise TypeError(f"For {descriptor} {key}, expected shape to be a tuple or list, got {type(shape)}")
+                if tuple(value.value.shape) != tuple(shape):
+                    raise ValueError(f"For {descriptor} {key}, shape of value {value.value.shape} does not match expected shape {tuple(shape)}")
 
-                if len(shape) > Shape.max_image_dimensions or len(shape) < Shape.min_image_dimensions:
-                    raise ValueError(f"For input {key}, Shape should be in the range {Shape.min_image_dimensions}-{Shape.max_image_dimensions} (defined in Shape.py), not {len(shape)}")
+       
+        return data
 
-                if not isinstance(shape[0], int) and not isinstance(shape[0],np.integer):
-                    raise TypeError(f"Shape should be integers, not {type(shape[0])}")
 
-            elif dtype in DataType.value_types:
-                # for non-image values, just need to check that the dtype arguement matches the actual type of the value
-                if not isinstance(value,dtype):
-                    raise TypeError(f"For input {key}, value type {type(value)} does not match dtype {dtype}")
-
-            # if the data passed in is not from DataType, raise a type error
-            else:
-                raise TypeError(f"For input {key}, dtype should be a member of DataType classes, not {dtype}")
-
-            #TODO repeat setter for outputs (pretty much identical) and parameters. Parameters cannot pass in images, so simpler process
-    @property
-    def outputs(self):
-        return self._outputs
-
-    @outputs.setter
-    def outputs(self,out):
-        for key, item in out.items():
-            if not isinstance(item, Parameter):
-                raise TypeError(f"For output {key}, output should be passed using the Parameter class, not {type(item)}")
-            if item["value"] not in DataType.image_types and item["value"] not in DataType.value_types:
-                raise TypeError(f"For output {key}, values should be passed using DataType classes, not {type(item["value"])}")
-            if type(item["value"]) != item["dtype"]:
-                raise TypeError(f"For output {key}, value data type ({type(item["value"])}) does not match defined data type {item["dtype"]}")
+  
