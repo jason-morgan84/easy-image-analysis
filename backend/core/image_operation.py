@@ -18,49 +18,56 @@ that data type"""
 This means that input["input_name"].shape does not give array dimensions, but desired array dimensions - a specific value if a strict size is needed for that
 dimension, or -1 if the analysis function is indifferent to size in that dimension."""
 
-# simple dataclass to hold image inputs and outputs
-@dataclass
+# simple class to hold image inputs and outputs
 class ImageParcel:
-    dtype: DataType
-    shape: Optional[Shape] = None
-    mapping: Optional[Shape] = None
-    pixel_array: Any = None
-    type_name: str = "ImageParcel"
+    def __init__(self, dtype, pixel_array = None, shape = None, mapping = None):
+        self.dtype = dtype
+        self.shape = shape
+        self.mapping = mapping
+        self.pixel_array = pixel_array
 
-    def __post_init__(self):
+    type_name = "ImageParcel"
+
+    @property
+    def dtype(self):
+        return self._dtype
+    @dtype.setter
+    def dtype(self, typ):
         # check that dtype is a member of DataType.image_types (although the pixel_array isn't of a custom class, this is still used to define the expected
         # numpy data type of pixel_array)
-        if self.dtype not in DataType.image_types():
-            raise TypeError(f"{self.dtype} is not a valid Image DataType.")
+        if typ not in DataType.image_types():
+            raise TypeError(f"{typ} is not a valid Image DataType.")
+        self._dtype = typ
 
     # check that shape is of type Shape
     @property 
-    def shape(self):
+    def shape(self) -> Optional[Shape]:
         return self._shape
     @shape.setter
-    def shape(self, shp):
+    def shape(self, shp: Optional[Shape]):
         if not isinstance(shp, Shape) and shp is not None:
             raise TypeError(f"Expected shape to be of class Shape, got {type(shp)}")
         self._shape = shp
 
     # check that mapping is of type Shape
     @property
-    def mapping(self):
+    def mapping(self) -> Optional[Shape]:
         return self._mapping
-    def mapping(self, map):
+    @mapping.setter
+    def mapping(self, map: Optional[Shape]):
         if not isinstance(map, Shape) and map is not None:
             raise TypeError(f"Expected map to be of class Shape, got {type(map)}")
         self._mapping = map
 
 
     @property
-    def pixel_array(self):
+    def pixel_array(self) -> Optional[np.ndarray]:
         return self._pixel_array
 
     @pixel_array.setter
-    def pixel_array(self, array):
+    def pixel_array(self, array: Optional[np.ndarray]):
          # on instantiation, pixel_array values for inputs and outputs will be None - only check values once data is present
-        if array is not None:
+        if array is not None and self.dtype in DataType.image_types():
             if not isinstance(array, np.ndarray):
                 raise TypeError(f"Expected pixel array as numpy array, got {type(array)}")
             # check that pixel_array is of the expected numpy data type given dtype
@@ -68,17 +75,25 @@ class ImageParcel:
                 raise TypeError(f"Expected pixel array data as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {array.dtype}")
         self._pixel_array = array
 
-# simple dataclass to hold parameter inputs and outputs
-@dataclass
+# simple class to hold parameter inputs and outputs
 class ParameterParcel:
-    dtype: DataType
-    value: Any = None
-    shape: Any = None
-    type_name: str = "ParameterParcel"
+    def __init__(self, dtype, value = None, shape = None, mapping = None):
+        self.dtype = dtype
+        self.value = value
+        self.shape = shape        
 
-    def __post_init__(self):
-        if self.dtype not in DataType.value_types and self.dtype not in DataType.array_types():
-            raise TypeError(f"{self.dtype} is not a valid Image DataType.")
+    type_name = "ParameterParcel"
+
+    @property
+    def dtype(self):
+        return self._dtype
+    @dtype.setter
+    def dtype(self, typ):
+        # check that dtype is a member of DataType.array_types/value_types (although the pixel_array isn't of a custom class, this is still used to define the expected
+        # numpy data type of pixel_array)
+        if typ not in DataType.array_types() and typ not in DataType.value_types():
+            raise TypeError(f"{typ} is not a valid array or value DataType.")
+        self._dtype = typ
 
     @property
     def value(self):
@@ -88,7 +103,7 @@ class ParameterParcel:
     def value(self, val):
         if val is not None:
             # if dtype is an array,
-            if self.dtype in DataType.array_types:
+            if self.dtype in DataType.array_types():
                 # check value is actual ndarray
                 if not isinstance(val, (np.ndarray, list, tuple)):
                     raise TypeError(f"Expected value as list, tuple or ndarray, got {type(val)}")
@@ -96,7 +111,7 @@ class ParameterParcel:
                 if val.dtype != self.dtype.numpy:
                     raise TypeError(f"Expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {val[0].dtype}")
             # else if dtype is a scalar type
-            elif self.dtype in DataType.value_types:
+            elif self.dtype in DataType.value_types():
                 # check val is of expected type
                 if type(val) != self.dtype.numpy:
                     raise TypeError(f"Expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {val.dtype}")

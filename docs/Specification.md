@@ -259,8 +259,8 @@ Type checking is carried out on dtype, to ensure its a member of DataType.value_
 A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
 * name: name of ImageOperation
 * category: logical category (“Threshold”, “Filter” etc) - defined by folder location of file
-* input_image: input images as dictionary of ImagePackage dataclass
-* input_parameter: other inputs as dictionary of ParameterPackage dataclass 
+* input_image: input images as dictionary of ImagePackage class
+* input_parameter: other inputs as dictionary of ParameterPackage class 
 * output_image: Output images as dictionary, as input_image
 * output_parameter: other outputs as dictionary, as input_parameter
 * docs – documentation to explain function, effects, parameters etc
@@ -273,15 +273,19 @@ It will also contain the function, run_code, which runs the compiled code and co
 Note that, on instantiation, the inputs and outputs will have defined data types but no actual data. The package dataclasses (defined below), will therefore have defined dtypes for each variable/image but no data. The packages have setters to check that, when data values are added, they are of the expected type. More detailed checking, such as whether an image has an associated shape discriptor and this matches the shape of the array, will be carried out on code execution. In ImageOperation, setters for the various inputs and outputs will only check for dictionaries made up of the relevant package dataclass.
 
 #### 3.2.6.1 ImagePackage
-Simple dataclass holding data for image inputs and outputs from ImageOperation. Contains:
+Simple class holding data for image inputs and outputs from ImageOperation. Contains:
 * dtype - set at instantiation based on ImageOperation code file.
+    - Type checks for member of DataType
 * shape - set at instatiation based on shape constrains defined in code file. **NOTE: this is not the shape of the array (which is defined by the array) - it is the <u>constraints</u> on the shape of the image.**
+    - Type checks for Shape class
 * pixel_array - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain ndarray of dtype.numpy.
+    - Type checks for Shape class
 * mapping - set to None at instantiation, given value of type Shape mapping image dimensions to pixel array dimensions.
 
 #### 3.2.6.2 ParamterPackage
-Simple dataclass holding data for non-image inputs and outputs from ImageOperation. Contains:
+Simple class holding data for non-image inputs and outputs from ImageOperation. Contains:
 * dtype - set at instantiation based on ImageOperation code file.
+    - Type checks for member of DataType
 * value - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain value of dtype.numpy.
 * shape - if dtype defines an array_type, contains a list/tuple defining shape of value.
 
