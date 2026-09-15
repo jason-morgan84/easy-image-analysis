@@ -1,6 +1,9 @@
 from core.constants import DataType
 from core.shape import Shape
 import numpy as np
+from dataclasses import dataclass, field
+from typing import Any, Optional
+
 """Note for types: For input type checking, ImageOperation will be a part of a Node. Data will flow into the Node through a Port, which will transmit the data
 to the ImageOperation class. 
 
@@ -15,6 +18,93 @@ that data type"""
 This means that input["input_name"].shape does not give array dimensions, but desired array dimensions - a specific value if a strict size is needed for that
 dimension, or -1 if the analysis function is indifferent to size in that dimension."""
 
+# simple dataclass to hold image inputs and outputs
+@dataclass
+class ImageParcel:
+    dtype: DataType
+    shape: Optional[Shape] = None
+    mapping: Optional[Shape] = None
+    pixel_array: Any = None
+    type_name: str = "ImageParcel"
+
+    def __post_init__(self):
+        # check that dtype is a member of DataType.image_types (although the pixel_array isn't of a custom class, this is still used to define the expected
+        # numpy data type of pixel_array)
+        if self.dtype not in DataType.image_types():
+            raise TypeError(f"{self.dtype} is not a valid Image DataType.")
+
+    # check that shape is of type Shape
+    @property 
+    def shape(self):
+        return self._shape
+    @shape.setter
+    def shape(self, shp):
+        if not isinstance(shp, Shape) and shp is not None:
+            raise TypeError(f"Expected shape to be of class Shape, got {type(shp)}")
+        self._shape = shp
+
+    # check that mapping is of type Shape
+    @property
+    def mapping(self):
+        return self._mapping
+    def mapping(self, map):
+        if not isinstance(map, Shape) and map is not None:
+            raise TypeError(f"Expected map to be of class Shape, got {type(map)}")
+        self._mapping = map
+
+
+    @property
+    def pixel_array(self):
+        return self._pixel_array
+
+    @pixel_array.setter
+    def pixel_array(self, array):
+         # on instantiation, pixel_array values for inputs and outputs will be None - only check values once data is present
+        if array is not None:
+            if not isinstance(array, np.ndarray):
+                raise TypeError(f"Expected pixel array as numpy array, got {type(array)}")
+            # check that pixel_array is of the expected numpy data type given dtype
+            if array.dtype != self.dtype.numpy:
+                raise TypeError(f"Expected pixel array data as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {array.dtype}")
+        self._pixel_array = array
+
+# simple dataclass to hold parameter inputs and outputs
+@dataclass
+class ParameterParcel:
+    dtype: DataType
+    value: Any = None
+    shape: Any = None
+    type_name: str = "ParameterParcel"
+
+    def __post_init__(self):
+        if self.dtype not in DataType.value_types and self.dtype not in DataType.array_types():
+            raise TypeError(f"{self.dtype} is not a valid Image DataType.")
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, val):
+        if val is not None:
+            # if dtype is an array,
+            if self.dtype in DataType.array_types:
+                # check value is actual ndarray
+                if not isinstance(val, (np.ndarray, list, tuple)):
+                    raise TypeError(f"Expected value as list, tuple or ndarray, got {type(val)}")
+                # and that values inside array of correct type
+                if val.dtype != self.dtype.numpy:
+                    raise TypeError(f"Expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {val[0].dtype}")
+            # else if dtype is a scalar type
+            elif self.dtype in DataType.value_types:
+                # check val is of expected type
+                if type(val) != self.dtype.numpy:
+                    raise TypeError(f"Expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {val.dtype}")
+            else:
+                raise TypeError(f"Expected dtype as member of DataType.array_types or DataType.value_types, got {self.dtype}")
+        self._value = val
+
+
 class ImageOperation:
     def __init__(self, name, category, compiled_code, version, docs, alerts, input_image = {}, input_parameter={}, output_image = {}, output_parameter = {}, ):
         self.name = name
@@ -23,46 +113,43 @@ class ImageOperation:
         self.version = version
         self.docs = docs
         self.alerts = alerts 
-        self.input_image = input_image # input images as dictionary of dictionaries   { "name":  {  dtype: member of DataType.image_types,
-                                                                            #                       pixel_array: value of type DataType.dtype.numpy(),
-                                                                            #                       shape: Shape class defining constraints on input image shape,
-                                                                            #                       map: Shape class defining mapping from value array to image dimension}}
-        self.input_parameter = input_parameter # other inputs as dictionary of dictionaries {   "name":  {  dtype: member of DataType.value_types or array_types
-                                                                            #                               value: value of type DataType.dtype.numpy()
-                                                                            #                               shape: shape of array if required as tuple, else None}}
+        self.input_image = input_image # input images as dictionary of ImageParcels   { "name":  ImageParcel}
+        self.input_parameter = input_parameter # other inputs as dictionary of ParameterParcels {   "name":  ParameterParcel}
         self.output_image = output_image # Output images as dictionary, as input_image
         self.output_parameter = output_parameter # other outputs as dictionary, as input_parameter
 
-
-
-
-
-    # uses check_image function to check input_image and output_image dictionaries
+    # check input_image and output_image are dictionaries of ImagePackages
     @property
     def input_image(self):
         return self._input_image
-
+    
     @input_image.setter
     def input_image(self, input):
-        input = self.check_image(input, "Input")
+        self.check_data(dictionary = input, 
+                       dtype = ImageParcel,
+                       identifier = "input_image")
         self._input = input
 
     @property
     def output_image(self):
         return self._output_image
-
     @output_image.setter
     def output_image(self, output):
-        output = self.check_image(output, "Output")
+        self.check_data(dictionary = output, 
+                       dtype = ImageParcel,
+                       identifier = "output_image")
         self._output = output
 
+    # check input parameter and output parameter are dictionaries of ParameterPackages
     @property
     def input_parameter(self):
         return self._input_parameter
 
     @input_parameter.setter
     def input_parameter(self, input):
-        input = self.check_parameter(input, "Input")
+        self.check_data(dictionary = input, 
+                       dtype = ParameterParcel,
+                       identifier = "input_parameter")
         self._input_parameter = input
 
     @property
@@ -71,93 +158,44 @@ class ImageOperation:
 
     @output_parameter.setter
     def output_parameter(self, output):
-        output = self.check_parameter(output, "Output")
+        self.check_data(dictionary = output, 
+                       dtype = ParameterParcel,
+                       identifier = "output_parameter")
         self._output_parameter = output
 
+    def check_data(self, dictionary, dtype, identifier):
+        if dictionary is not None:
+            if not isinstance(dictionary, dict):
+                raise TypeError(f"Expected {identifier} to be dictionary, not {type(dictionary)}")
+            for item in dictionary.items():
+                if item is not None and not isinstance(item, dtype):
+                    raise TypeError(f"Expected {identifier} to be dictionary of {dtype.type_name}, not {type(item)}")
+        
 
-    def check_image(self, data, descriptor):
-        # check that data is a dictionary
-        if not isinstance(data, dict):
-            raise TypeError(f"{descriptor} should be passed as a dictionary, not {type(data)}")
-        for key, item in data.items():
-            dtype = item["dtype"]
-            pixel_array = item["pixel_array"]
-            shape = item["shape"]
-            map = item["map"]
-
-            # check that dtype is a member of DataType.image_types (although the pixel_array isn't of a custom class, this is still used to define the expected
-            # numpy data type of pixel_array)
-            if dtype not in DataType.image_types:
-                raise TypeError(f"For {descriptor} {key}, expected dtype to be member of DataTypes.image_types, got {dtype}")
-
-
-
-            # check that shape is of type Shape
-            if not isinstance(shape, Shape):
-                raise TypeError(f"For {descriptor} {key}, expected shape to be of class Shape, got {type(shape)}")
-
-            # check that map is of type Shape
-            if not isinstance(map, Shape):
-                raise TypeError(f"For {descriptor} {key},expected map to be of class Shape, got {type(map)}")
-
-            # on instantiation, pixel_array values for inputs and outputs will be None - only check values once data is present
-            if pixel_array is not None:
-
-                # check that pixel_array is of the expected numpy data type given dtype
-                if not isinstance(pixel_array, dtype.numpy):
-                    raise TypeError(f"For {descriptor} {key}, given dtype of {dtype}, expected pixel_array of type {dtype.numpy}, got {type(pixel_array)}")
-
-                # check that image matches constrains given by shape
-                # NOTE for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined."""  
-                pixel_array_shape = pixel_array.value.shape
-
-
-                # loops through dimensions in order c, z, y, x
-                for index, dimension in enumerate(shape):
-                    
-                    current_dimension_identifier = Shape.dimensions[index]
-
-                    # if the dimension is -1, the input doesn't care about that dimension
-                    if dimension != -1:
-                    
-                        # gets pixel_array dimension of current image dimension
-                        array_dim = map[current_dimension_identifier]
-
-                        # checks dimensions sizes match
-                        if pixel_array_shape[array_dim] != dimension:
-                            raise ValueError(f"For {descriptor} {key}, pixel_array dimension {current_dimension_identifier}, expected {dimension} but got {array_dim}")
-        return data
-
-    def check_parameter(self, data, descriptor):
-        # check that data is a dictionary
-        if not isinstance(data,dict):
-            raise TypeError(f"{descriptor} should be passed as a dictionary, not {type(data)}")
-        for key, item in data.items():
-            dtype = item["dtype"]
-            value = item["value"]
-            shape = item["shape"]
-
-            # check that dtype is a member of DataTypes.value_types or DataTypes.array_types 
-            if dtype not in DataType.value_types and dtype not in DataType.array_types:
-                raise TypeError(f"For {descriptor} {key}, expected dtype to be member of DataTypes.value_types or DataTypes.array_types, got {dtype}")
-
-            if value is not None:
-                # check that value is of the expected numpy data type given dtype
-                if not isinstance(value, dtype.numpy):
-                    raise TypeError(f"For {descriptor} {key}, given dtype of {dtype}, expected value of type {dtype.numpy}, got {type(value)}")
-
-                # check whether value is an array data type. 
-                if value in DataType.array_types:
-                    # if it is, checks that shape is a tuple or a list
-                    if not isinstance(shape, (tuple,list)):
-                        raise TypeError(f"For {descriptor} {key}, expected shape to be a tuple or list, got {type(shape)}")
-                    if tuple(value.value.shape) != tuple(shape):
-                        raise ValueError(f"For {descriptor} {key}, shape of value {value.value.shape} does not match expected shape {tuple(shape)}")
-
-       
-        return data
 
     def run_code(self):
+
+        #TODO - Carry out key checks that all input data is present and correct - for each image,
+        #is the pixel array, shape and map there? does the shape and map fit the pixel array?
+        """                # check that image matches constrains given by shape
+        # NOTE for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
+        pixel_array_shape = pixel_array.value.shape
+
+
+        # loops through dimensions in order c, z, y, x
+        for index, dimension in enumerate(shape):
+            
+            current_dimension_identifier = Shape.dimensions[index]
+
+            # if the dimension is -1, the input doesn't care about that dimension
+            if dimension != -1:
+            
+                # gets pixel_array dimension of current image dimension
+                array_dim = map[current_dimension_identifier]
+
+                # checks dimensions sizes match
+                if pixel_array_shape[array_dim] != dimension:
+                    raise ValueError(f"For {descriptor} {key}, pixel_array dimension {current_dimension_identifier}, expected {dimension} but got {array_dim}")"""
 
         # set all output values to None
         for item in self.output_image.values():
