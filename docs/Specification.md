@@ -34,6 +34,7 @@
 |13/09/26|0.9.3|Re-wrote description of Parameter class and Parameter unit testing|
 |14/09/26|0.9.4|Re-wrote description of ImageOperation class and unit testing|
 |14/09/26|0.9.5|Documented run_code function in ImageOperation|
+|15/09/26|0.9.6|Described refactoring of dictionary in ImageOperation to dataclasses and updated unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -45,6 +46,7 @@ With that in mind, I’ve got three main aims to this software:
 2.	It needs to be intuitive, with a simple UI where the same actions will always lead to the same effects.
 3.	It needs to have a large, well-structured and well-documented list of functions. To aid this, it needs to be easily expandable.
 This will be done by allowing the user to use drag-and-drop nodes and connections to draw an image analysis workflow. A pair of input/output images will allow immediate comparison between the original image and the changes at each step.
+
 ## 2.1 Educational
 To be educational, it should not place unnecessary barriers to learning. This means things like conversions between data types and transposition of dimensions should be dealt with behind the scenes, EXCEPT where they are directly relevant to proper image analysis (for example, trying to do binary processes on non-binarised data).
 
@@ -257,21 +259,8 @@ Type checking is carried out on dtype, to ensure its a member of DataType.value_
 A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
 * name: name of ImageOperation
 * category: logical category (“Threshold”, “Filter” etc) - defined by folder location of file
-* input_image: input images as dictionary of dictionaries:
-```
-{ "name": identifier for input image
-    {   dtype: member of DataType.image_types,
-        pixel_array: value of type DataType.dtype.numpy(),
-        shape: Shape class defining constraints on input image shape,
-        map: Shape class defining mapping from value array to image dimension}}
-```
-* input_parameter: other inputs as dictionary of dictionaries 
-```
-{ "name": identifier for input parameter  
-    {   dtype: member of DataType.value_types or array_types
-        value: value of type DataType.dtype.numpy()
-        shape: shape of array if required as tuple, else None }}
-```
+* input_image: input images as dictionary of ImagePackage dataclass
+* input_parameter: other inputs as dictionary of ParameterPackage dataclass 
 * output_image: Output images as dictionary, as input_image
 * output_parameter: other outputs as dictionary, as input_parameter
 * docs – documentation to explain function, effects, parameters etc
@@ -280,6 +269,21 @@ A key aim of this project is expandability, to allow the inclusion of new image 
 * compiled_code – function with compiled code to execute - gathered from input .py files by ImageOperationDirectory
 
 It will also contain the function, run_code, which runs the compiled code and confirms that output variables have been generated and input variables have not been changed.
+
+Note that, on instantiation, the inputs and outputs will have defined data types but no actual data. The package dataclasses (defined below), will therefore have defined dtypes for each variable/image but no data. The packages have setters to check that, when data values are added, they are of the expected type. More detailed checking, such as whether an image has an associated shape discriptor and this matches the shape of the array, will be carried out on code execution. In ImageOperation, setters for the various inputs and outputs will only check for dictionaries made up of the relevant package dataclass.
+
+#### 3.2.6.1 ImagePackage
+Simple dataclass holding data for image inputs and outputs from ImageOperation. Contains:
+* dtype - set at instantiation based on ImageOperation code file.
+* shape - set at instatiation based on shape constrains defined in code file. **NOTE: this is not the shape of the array (which is defined by the array) - it is the <u>constraints</u> on the shape of the image.**
+* pixel_array - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain ndarray of dtype.numpy.
+* mapping - set to None at instantiation, given value of type Shape mapping image dimensions to pixel array dimensions.
+
+#### 3.2.6.2 ParamterPackage
+Simple dataclass holding data for non-image inputs and outputs from ImageOperation. Contains:
+* dtype - set at instantiation based on ImageOperation code file.
+* value - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain value of dtype.numpy.
+* shape - if dtype defines an array_type, contains a list/tuple defining shape of value.
 
 ### 3.2.6 ImageOperationDirectory Class
 This class acts as a holder for a list of all ImageOperation classes, along with the code required to import them.
@@ -469,17 +473,24 @@ On creation of a new connection, it will check for structure, constraint or type
 ### ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|check_image|Supply input_image/output_image not as a dictionary| Type Error | Incorrect data type ignored|
-|check_image|Supply input_image["dtype"] as not member of DataTypes.image_types| Type Error | Incorrect data type accepted|
-|check_image|Have input_image["pixel_array"] type not match dtype| Type Error | Incorrect data type accepted|
-|check_image|Supply input_image["shape"] not as Shape class| Type Error | Incorrect data type accepted|
-|check_image|Supply pixel_array where shape does not match constrains in shape| Value Error | Incorrect pixel array accepted|
-|check_parameter|Supply input_parameter/input_parameter not as a dictionary| Type Error | Incorrect data type ignored|
-|check_parameter|Supply input_parameter["dtype"] as not member of DataTypes.value_types or DataTypes.array_types| Type Error | Incorrect data type accepted|
-|check_parameter|Have input_image["value"] type not match dtype| Type Error | Incorrect data type accepted|
-|check_parameter|Supply input_image["shape"] not as a list or tuple| Type Error | Incorrect data type accepted|
-|check_parameter|Supply array value where shape does not match defined shape| Value Error | Incorrect value accepted|
-|Execute|Code provided creates an error|Error|<ul><li>No error passed on</li></ul>|
+|ImageParcel|Supply **dtype** as not member of DataTypes.image_types| Type Error | Incorrect data type accepted|
+|ImageParcel|Have **pixel_array** type not match dtype| Type Error | Incorrect data type accepted|
+|ImageParcel|Supply **shape** not as Shape class| Type Error | Incorrect data type accepted|
+|ImageParcel|Supply **mapping** not as Shape class| Type Error | Incorrect data type accepted|
+|check_data|Supply input_image/output_image/input_parameter/output_parameter not as a dictionary| Type Error | Incorrect data type ignored|
+|ParameterParcel|Supply **dtype** as not member of DataTypes.value_types or DataTypes.array_types| Type Error | Incorrect data type accepted|
+|ParameterParcel|If array is expected, have **value** not a list, tuple or ndarray| Type Error | Incorrect data type accepted|
+|ParameterParcel|Have **value** type not match dtype| Type Error | Incorrect data type accepted|
+|run_code|Supply input pixel_array without mapping or shape data| Value Error | Incorrect pixel array accepted|
+|run_code|Supply input pixel_array where shape does not match constraints in shape| Value Error | Incorrect pixel array accepted|
+|run_code|Supply parameter array where array does not match defined shape| Value Error | Incorrect value accepted|
+|run_code|Try to run with missing output definitions (shape for images or arrays, dtype for any output) | Value Error | runs code anyway|
+|run_code|Code provided creates an error|Error|No error passed on|
+|run_code|Code provided doesn't create an output|Runtime error|No error passed|
+|run_code|Code provided changes inputs|Runtime error|No error passed|
+|run_code|Code provided returns a pixel_array without mapping data| Value Error | Incorrect value accepted|
+|run_code|Code provided returns an array value without shape data| Value Error | Incorrect value accepted|
+
 
 * ImageOperationDirectory
 
