@@ -257,6 +257,7 @@ Type checking is carried out on dtype, to ensure its a member of DataType.value_
 
 ### 3.2.5 ImageOperation Class/File
 A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
+
 * name: name of ImageOperation
 * category: logical category (“Threshold”, “Filter” etc) - defined by folder location of file
 * input_image: input images as dictionary of ImagePackage class
@@ -268,9 +269,11 @@ A key aim of this project is expandability, to allow the inclusion of new image 
 * version – version of software code ImageOperation was written for. This is to future proof code, so changes to base code that affect ImageOperations don’t mean all existing ImageOperations need to be rewritten. 
 * compiled_code – function with compiled code to execute - gathered from input .py files by ImageOperationDirectory
 
-It will also contain the function, run_code, which runs the compiled code and confirms that output variables have been generated and input variables have not been changed.
-
 Note that, on instantiation, the inputs and outputs will have defined data types but no actual data. The package dataclasses (defined below), will therefore have defined dtypes for each variable/image but no data. The packages have setters to check that, when data values are added, they are of the expected type. More detailed checking, such as whether an image has an associated shape discriptor and this matches the shape of the array, will be carried out on code execution. In ImageOperation, setters for the various inputs and outputs will only check for dictionaries made up of the relevant package dataclass.
+
+The function, run_code, which runs the compiled code. It first checks that an image is present with the expected format and that any other required parameters are present and in the expected format. After code execution, it confirms that output variables have been generated (in the expected format) and input variables have not been changed.
+
+**NOTE: At this point, any ImageOperation requires (at least) one image as an input. This is a design decision to prevent creep and bloat, based on the idea that as soon as only non-image variables are accepted this software is moving into data analysis rather than image analysis. This is checkedby the run_code function in ImageOperation and will therefore also affect other classes interacting with ImageOperations (Nodes and WorkFlow).**
 
 #### 3.2.6.1 ImagePackage
 Simple class holding data for image inputs and outputs from ImageOperation. Contains:
@@ -485,14 +488,18 @@ On creation of a new connection, it will check for structure, constraint or type
 |ParameterParcel|Supply **dtype** as not member of DataTypes.value_types or DataTypes.array_types| Type Error | Incorrect data type accepted|
 |ParameterParcel|If array is expected, have **value** not a list, tuple or ndarray| Type Error | Incorrect data type accepted|
 |ParameterParcel|Have **value** type not match dtype| Type Error | Incorrect data type accepted|
-|run_code|Supply input pixel_array without mapping or shape data| Value Error | Incorrect pixel array accepted|
+|run_code|Try to execute run_code with no compiled_code or compiled code in wrong format (not types.codetype)| Type Error |Proceeds without error|
+|run_code|Supply input_image with mising pixel array | Value Error | Incorrect pixel array accepted|
+|run_code|Supply input pixel_array with missing mapping or shape data| Value Error | Incorrect pixel array accepted|
 |run_code|Supply input pixel_array where shape does not match constraints in shape| Value Error | Incorrect pixel array accepted|
+|run_code|Supply input_parameter with mising value | Value Error | Incorrect pixel array accepted|
 |run_code|Supply parameter array where array does not match defined shape| Value Error | Incorrect value accepted|
 |run_code|Try to run with missing output definitions (shape for images or arrays, dtype for any output) | Value Error | runs code anyway|
 |run_code|Code provided creates an error|Error|No error passed on|
 |run_code|Code provided doesn't create an output|Runtime error|No error passed|
 |run_code|Code provided changes inputs|Runtime error|No error passed|
 |run_code|Code provided returns a pixel_array without mapping data| Value Error | Incorrect value accepted|
+|run_code|Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data|Value Error|Incorrect value accepted|
 |run_code|Code provided returns an array value without shape data| Value Error | Incorrect value accepted|
 
 

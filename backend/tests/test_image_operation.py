@@ -67,3 +67,48 @@ def test_check_data():
                     output_image = None,
                     output_parameter = None)
     print(f"{exc_info.value}")
+
+"""Testing run_code"""
+test_code = "import numpy as np\nprint('code running')\n"+\
+    "output_image['output'].pixel_array = np.array([1,2,3],np.uint8)"
+    
+
+compiled_code = compile(test_code,"<string>","exec")
+
+# Try to execute run_code with no compiled_code or compiled code in wrong format (not types.codetype)
+def test_run_code_no_code():
+    test = ImageOperation(name = "Test",
+            category = "Testing",
+            compiled_code = None,
+            version = None,
+            docs = None,
+            alerts = None,
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_parameter = None,
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_parameter = None)
+    
+    with pytest.raises(TypeError) as exc_info:
+        test.run_code()
+
+    test.compiled_code = test_code
+
+    with pytest.raises(TypeError) as exc_info:
+        test.run_code()
+
+    test.compiled_code = compiled_code
+    test.run_code()
+    print(f"{exc_info.value}")
+
+# Supply input_image with mising pixel array 
+# Supply input pixel_array with missing mapping or shape data
+# Supply input pixel_array where shape does not match constraints in shape
+# Supply input_parameter with mising value
+# Supply parameter array where array does not match defined shape
+# Try to run with missing output definitions (shape for images or arrays, dtype for any output) 
+# Code provided creates an error
+# Code provided doesn't create an output
+# Code provided changes inputs
+# Code provided returns a pixel_array without mapping data
+# Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data
+# Code provided returns an array value without shape data
