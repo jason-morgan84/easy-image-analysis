@@ -489,6 +489,7 @@ On creation of a new connection, it will check for structure, constraint or type
 |ParameterParcel|If array is expected, have **value** not a list, tuple or ndarray| Type Error | Incorrect data type accepted|
 |ParameterParcel|Have **value** type not match dtype| Type Error | Incorrect data type accepted|
 |run_code|Try to execute run_code with no compiled_code or compiled code in wrong format (not types.codetype)| Type Error |Proceeds without error|
+|run_code|Don't supply a value for input_image | Value Error | Code tries to continue|
 |run_code|Supply input_image with mising pixel array | Value Error | Incorrect pixel array accepted|
 |run_code|Supply input pixel_array with missing mapping or shape data| Value Error | Incorrect pixel array accepted|
 |run_code|Supply input pixel_array where shape does not match constraints in shape| Value Error | Incorrect pixel array accepted|

@@ -120,9 +120,9 @@ class ParameterParcel:
 
 
 class ImageOperation:
-    def __init__(self, name, category, compiled_code, version, docs, alerts, input_image = {}, input_parameter={}, output_image = {}, output_parameter = {}, ):
-        self._input_image = {}
-        self._output_image = {}
+    def __init__(self, name, category, compiled_code, version, docs, alerts, input_image, input_parameter={}, output_image = {}, output_parameter = {}, ):
+        self._input_image = input_image
+        self._output_image = output_image
 
         self.name = name
         self.category = category
@@ -155,7 +155,7 @@ class ImageOperation:
         self.check_data(dictionary = output, 
                        dtype = ImageParcel,
                        identifier = "output_image")
-        self._output = output
+        self._output_image = output
 
     # check input parameter and output parameter are dictionaries of ParameterPackages
     @property
@@ -191,49 +191,71 @@ class ImageOperation:
 
 
     def run_code(self):
-
         # Check code in correct format
         if not isinstance(self.compiled_code, types.CodeType):
             raise TypeError(f"compiled_code expected to be {types.CodeType}, got {type(self.compiled_code)}")
 
 
         """ 
-        Do all input_image dictionary members have an associated pixel map?
-        Do all the pixel maps match the expected shape given shape/mapping values?
-        NOTE for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
+        Does input_image exist?
+            If not:
+                Value Error.
+            If so:
+                It's value has already been checked.
+                Do all input_image dictionary members have an associated pixel map?
+                Do all the pixel maps match the expected shape given shape/mapping values?
+                NOTE for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
         """
-        for key, image in self.input_image.items():
-            if image.pixel_array == None:
-                raise ValueError(f"No image pixel array given for input {key}")
+        if self.input_image is None:
+            raise ValueError(f"input_image expected, got None")
+        else:
+            for key, image in self.input_image.items():
+                if image.pixel_array is None:
+                    raise ValueError(f"No image pixel array given for input {key}")
+                
+                if image.mapping is None: # note - for mapping and shape, if they exist their type has already been checked
+                    raise ValueError(f"No image mapping data given for input {key}")
+                if image.shape is None: 
+                    raise ValueError(f"No image shape data given for input {key}")
 
-            pixel_array_shape = image.pixel_array.value.shape
-            # loops through dimensions in order c, z, y, x
-            for index, dimension in enumerate(image.shape):
-                current_dimension_identifier = Shape.dimensions[index]
-                # if the dimension is -1, the input doesn't care about that dimension
-                if dimension != -1:
-                    # gets pixel_array dimension of current image dimension
-                    array_dim = map[current_dimension_identifier]
-                    # checks dimensions sizes match
-                    if pixel_array_shape[array_dim] != dimension:
-                        raise ValueError(f"For input image {key}, pixel_array dimension {current_dimension_identifier}, expected {dimension} but got {array_dim}")
+                pixel_array_shape = image.pixel_array.shape
+                # loops through dimensions in order c, z, y, x
+                for index, dimension in enumerate(image.shape):
+                    current_dimension_identifier = Shape.dimensions[index]
+                    # if the dimension is -1, the input doesn't care about that dimension
+                    if dimension != -1:
+                        # gets pixel_array dimension of current image dimension
+                        array_dim = image.mapping[current_dimension_identifier]
+                        # checks dimensions sizes match
+                        if pixel_array_shape[array_dim] != dimension:
+                            raise ValueError(f"For input image {key}, pixel_array dimension {current_dimension_identifier}, expected {dimension} but got {array_dim}")
 
-        """# Do all the input_parameter dictionary members have an associated value?
-        # Where that input_parameter is an array_value, does its shape match the defined shape?"""
-        for key, parameter in self.input_image.items():
-            if parameter.value == None:
-                raise ValueError(f"No value given for parameter input {key}")
-            if parameter.dtype in DataType.array_types() and tuple(parameter.value.shape) != tuple(parameter.shape):
-                raise ValueError(f"For parameter input {key}, array shape {parameter.value.shape} does not match expected shape {parameter.shape}")
+        
+        """
+        Does input_parameter exist?
+            If not:
+                Not a problem, not required.
+            If so:
+                Do all the input_parameter dictionary members have an associated value?
+                Where that input_parameter is an array_value, does its shape match the defined shape?
+        """
+        if self.input_parameter is not None:
+            for key, parameter in self.input_image.items():
+                if parameter.value == None:
+                    raise ValueError(f"No value given for parameter input {key}")
+                if parameter.dtype in DataType.array_types() and tuple(parameter.value.shape) != tuple(parameter.shape):
+                    raise ValueError(f"For parameter input {key}, array shape {parameter.value.shape} does not match expected shape {parameter.shape}")
 
         # set all output values to None (to allow for checking outputs have been generated)
         if self.output_image:
             for item in self.output_image.values():
-                item["pixel_array"] = None
+                item.pixel_array = None
+        else:
+            raise ValueError("No output defined")
 
         if self.output_parameter:
             for item in self.output_parameter.values():
-                item["value"] = None
+                item.value = None
 
         # save current input values (to allow for checking that inputs have not been changed):
         current_input_image = self.input_image.copy()
@@ -252,28 +274,49 @@ class ImageOperation:
         output_generated = False
         if self.output_image:
             for item in self.output_image.values():
-                if item["pixel_array"] is not None:
+                if item.pixel_array is not None:
                     output_generated = True
 
         if self.output_parameter:
             for item in self.output_parameter.values():
-                if item["value"] is not None:
+                if item.value is not None:
                     output_generated = True
 
         if output_generated == False:
             raise RuntimeError(f"Operation {self.name} did not generate an output.{self.output_image}")
 
+        # check output pixel_arrays match shape and mapping
+        for key, image in self.output_image.items():
+            if image.pixel_array is None:
+                raise ValueError(f"No image pixel array given for output {key}")
+
+            pixel_array_shape = image.pixel_array.shape
+            # loops through dimensions in order c, z, y, x
+            for index, dimension in enumerate(image.shape):
+                current_dimension_identifier = Shape.dimensions[index]
+                # if the dimension is -1, the output doesn't care about that dimension
+                if dimension != -1:
+                    # gets pixel_array dimension of current image dimension
+                    array_dim = map[current_dimension_identifier]
+                    # checks dimensions sizes match
+                    if pixel_array_shape[array_dim] != dimension:
+                        raise ValueError(f"For output image {key}, pixel_array dimension {current_dimension_identifier}, expected {dimension} but got {array_dim}")
 
         # check inputs have not changed
         input_changed = False
         for key, item in self.input_image.items():
-            if item["pixel_array"] != None:
-                if not np.array_equal(item["pixel_array"],current_input_image[key]["pixel_array"]):
-                    input_changed = True
-        for key, item in self.input_parameter.items():
-            if item["value"] != None:
-                if item["value"] != current_input_parameter[key]["value"]:
-                    input_changed = True
+            if not np.array_equal(item.pixel_array,current_input_image[key].pixel_array):
+                input_changed = True
+
+        if self.input_parameter is None:
+            if self.input_parameter is not None:
+                input_changed = True
+        else:
+            for key, item in self.input_parameter.items():
+
+                if item.value != None:
+                    if item.value != current_input_parameter[key].value:
+                        input_changed = True
 
         if input_changed:
             raise RuntimeError(f"Operation {self.name} altered input values.")
