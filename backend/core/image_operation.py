@@ -72,7 +72,7 @@ class ImageParcel:
             # check that pixel_array is of the expected numpy data type given dtype
             if array.dtype != self.dtype.numpy:
                 raise TypeError(f"Expected pixel array data as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {array.dtype}")
-        self._pixel_array = array
+        self._pixel_array = None if array is None else array.copy()
 
 # simple class to hold parameter inputs and outputs
 class ParameterParcel:
@@ -107,16 +107,29 @@ class ParameterParcel:
                 if not isinstance(val, (np.ndarray, list, tuple)):
                     raise TypeError(f"Expected value as list, tuple or ndarray, got {type(val)}")
                 # and that values inside array of correct type
+                if isinstance(val,(tuple,list)):
+                    val = np.array(val)
                 if val.dtype != self.dtype.numpy:
-                    raise TypeError(f"Expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {val[0].dtype}")
+                    raise TypeError(f"Expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {val.dtype}")
             # else if dtype is a scalar type
             elif self.dtype in DataType.value_types():
                 # check val is of expected type
                 if type(val) != self.dtype.numpy:
-                    raise TypeError(f"Expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {val.dtype}")
+                    raise TypeError(f"Expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {type(val)}")
             else:
                 raise TypeError(f"Expected dtype as member of DataType.array_types or DataType.value_types, got {self.dtype}")
-        self._value = val
+        self._value = None if val is None else val.copy()
+
+    @property
+    def shape(self):
+        return self._shape
+    @shape.setter
+    def shape(self, shp):
+        if not isinstance(shp, (np.ndarray,list,tuple)) and shp is not None:
+            raise TypeError(f"Parameter array shape expected as tuple, list or np.ndarray, got {type(shp)}")
+
+        #if shape is a np array, set as copy of array, else convert to np array
+        self._shape = shp.copy if isinstance(shp, np.ndarray) else np.array(shp).copy()
 
 
 class ImageOperation:
@@ -240,10 +253,10 @@ class ImageOperation:
                 Where that input_parameter is an array_value, does its shape match the defined shape?
         """
         if self.input_parameter is not None:
-            for key, parameter in self.input_image.items():
-                if parameter.value == None:
+            for key, parameter in self.input_parameter.items():
+                if parameter.value is None:
                     raise ValueError(f"No value given for parameter input {key}")
-                if parameter.dtype in DataType.array_types() and tuple(parameter.value.shape) != tuple(parameter.shape):
+                if parameter.dtype in DataType.array_types() and np.not_equal(np.array(parameter.value.shape), parameter.shape):
                     raise ValueError(f"For parameter input {key}, array shape {parameter.value.shape} does not match expected shape {parameter.shape}")
 
         # set all output values to None (to allow for checking outputs have been generated)
