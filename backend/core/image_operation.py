@@ -2,6 +2,7 @@ from core.constants import DataType
 from core.shape import Shape
 import numpy as np
 import types
+import copy
 
 """Note for types: For input type checking, ImageOperation will be a part of a Node. Data will flow into the Node through a Port, which will transmit the data
 to the ImageOperation class. 
@@ -46,7 +47,7 @@ class ImageParcel:
     def shape(self, shp):
         if not isinstance(shp, Shape) and shp is not None:
             raise TypeError(f"Expected shape to be of class Shape, got {type(shp)}")
-        self._shape = shp
+        self._shape = shp.copy()
 
     # check that mapping is of type Shape
     @property
@@ -56,7 +57,7 @@ class ImageParcel:
     def mapping(self, map):
         if not isinstance(map, Shape) and map is not None:
             raise TypeError(f"Expected map to be of class Shape, got {type(map)}")
-        self._mapping = map
+        self._mapping = map.copy()
 
 
     @property
@@ -129,7 +130,7 @@ class ParameterParcel:
             raise TypeError(f"Parameter array shape expected as tuple, list or np.ndarray, got {type(shp)}")
 
         #if shape is a np array, set as copy of array, else convert to np array
-        self._shape = shp.copy if isinstance(shp, np.ndarray) else np.array(shp).copy()
+        self._shape = shp.copy() if isinstance(shp, np.ndarray) else np.array(shp).copy()
 
 
 class ImageOperation:
@@ -256,7 +257,7 @@ class ImageOperation:
             for key, parameter in self.input_parameter.items():
                 if parameter.value is None:
                     raise ValueError(f"No value given for parameter input {key}")
-                if parameter.dtype in DataType.array_types() and np.not_equal(np.array(parameter.value.shape), parameter.shape):
+                if parameter.dtype in DataType.array_types() and not np.array_equal(np.array(parameter.value.shape), parameter.shape):
                     raise ValueError(f"For parameter input {key}, array shape {parameter.value.shape} does not match expected shape {parameter.shape}")
 
         # set all output values to None (to allow for checking outputs have been generated)
@@ -264,15 +265,21 @@ class ImageOperation:
             for item in self.output_image.values():
                 item.pixel_array = None
         else:
-            raise ValueError("No output defined")
+            raise ValueError("no output defined")
 
         if self.output_parameter:
             for item in self.output_parameter.values():
                 item.value = None
 
+        # check that Shape is present for any output images (pixel array and mapping can be defined based on actual code)
+        if self.output_image is not None:
+            for key, image in self.output_image.items():
+                if image.shape is None:
+                    raise ValueError(f"expected image shape constraints for output_image {key} not present")
+
         # save current input values (to allow for checking that inputs have not been changed):
-        current_input_image = self.input_image.copy()
-        current_input_parameter = self.input_parameter.copy() if self.input_parameter else None
+        current_input_image = copy.deepcopy(self.input_image)
+        current_input_parameter = copy.deepcopy(self.input_parameter) if self.input_parameter else None
 
         # run compiled code on given inputs
         try:
@@ -281,7 +288,7 @@ class ImageOperation:
                                       "output_image": self.output_image,
                                       "output_parameter":self.output_parameter})
         except Exception as e:
-            raise RuntimeError(f"Error executing operation '{self.name}': {e}")
+            raise RuntimeError(f"error executing operation '{self.name}': {e}")
 
         # check output generated
         output_generated = False
@@ -296,13 +303,14 @@ class ImageOperation:
                     output_generated = True
 
         if output_generated == False:
-            raise RuntimeError(f"Operation {self.name} did not generate an output.{self.output_image}")
+            raise RuntimeError(f"operation did not generate an output ({self.name})")
 
         # check output pixel_arrays match shape and mapping
         for key, image in self.output_image.items():
             if image.pixel_array is None:
                 raise ValueError(f"No image pixel array given for output {key}")
-
+            if image.mapping is None:
+                raise ValueError(f"No image pixel map given for output {key}")
             pixel_array_shape = image.pixel_array.shape
             # loops through dimensions in order c, z, y, x
             for index, dimension in enumerate(image.shape):
@@ -310,14 +318,24 @@ class ImageOperation:
                 # if the dimension is -1, the output doesn't care about that dimension
                 if dimension != -1:
                     # gets pixel_array dimension of current image dimension
-                    array_dim = map[current_dimension_identifier]
+                    array_dim = image.mapping[current_dimension_identifier]
                     # checks dimensions sizes match
                     if pixel_array_shape[array_dim] != dimension:
-                        raise ValueError(f"For output image {key}, pixel_array dimension {current_dimension_identifier}, expected {dimension} but got {array_dim}")
+                        raise ValueError(f"incorrect shape: for output image '{key}', pixel_array dimension '{current_dimension_identifier}, expected {dimension} but got {image.pixel_array.shape[array_dim]}")
+
+        # check output parameter arrays have shape
+        for key, parameter in self.output_parameter.items():
+            if parameter.dtype in DataType.array_types():
+                if not np.array_equal(np.array(parameter.value.shape), parameter.shape):
+                    raise ValueError(f"incorrect shape: for output parameter '{key}', array shape {parameter.value.shape}, expected {parameter.shape}")
+
 
         # check inputs have not changed
         input_changed = False
+        print("here,")
         for key, item in self.input_image.items():
+            print(current_input_image[key].pixel_array)
+            print(item.pixel_array)
             if not np.array_equal(item.pixel_array,current_input_image[key].pixel_array):
                 input_changed = True
 
@@ -327,12 +345,14 @@ class ImageOperation:
         else:
             for key, item in self.input_parameter.items():
 
-                if item.value != None:
-                    if item.value != current_input_parameter[key].value:
+                if item.value is not None:
+                    if not isinstance(item.value,np.ndarray) and item.value != current_input_parameter[key].value:
+                        input_changed = True
+                    if isinstance(item.value,np.ndarray) and not np.array_equal(item.value,current_input_parameter[key].value):
                         input_changed = True
 
         if input_changed:
-            raise RuntimeError(f"Operation {self.name} altered input values.")
+            raise RuntimeError(f"operation altered input values ({self.name})")
                                       
 
         

@@ -43,7 +43,38 @@ def test_ParameterParcel(dtype, value, shape):
                     shape = shape)
     print(f"{exc_info.value}")
 
+#ImageParcel Imutability - Pass value as variable then change variable
+def test_ImageParcel_imutability():
+        array = np.array([1,2,3],np.uint8)
+        shape_test = Shape(-1,-1,-1,-1)
+        mapping_test = Shape(0,0,0,0)
+        test = ImageParcel(dtype = DataType.ImageInt, 
+                    pixel_array = array, 
+                    shape = shape_test, 
+                    mapping = mapping_test)
+        
+        shape_test.c = 4
+        mapping_test.z = 5
+        array[0] = 5
+        assert test.pixel_array[0] != 5
+        assert test.mapping.z != 5, print(f"mapping values: {mapping_test.c} {test.mapping.c}")
+        assert test.shape.c != 4, print(f"shape values: {shape_test.c} {test.shape.c}")
+        
+#ParameterParcel Imutability - Pass value as variable then change variable
+def test_ParameterParcel_imutability():
+        array = np.array([1,2,3],np.uint8)
+        shape_test = np.array([3],np.uint8)
+        test = ParameterParcel(dtype = DataType.ArrayInt, 
+                    value = array, 
+                    shape = shape_test)
+        
+        shape_test[0] = 4
+        array[0] = 5
+        print(f"value: {test.shape}")
+        assert test.value[0] != 5
+        assert test.shape[0] != 4, print(f"value: {shape_test}")
 
+# test check data function
 def test_check_data():
     with pytest.raises(TypeError)  as exc_info:
         ImageOperation(name = "Test",
@@ -147,7 +178,7 @@ def test_run_code_no_input_image_shape_or_mapping():
             output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
             output_parameter = None)
         
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ValueError, match = "No image shape") as exc_info:
         test.run_code() 
     print(f"{exc_info.value}")
     test.input_image["input"].shape = None
@@ -192,7 +223,7 @@ def test_run_code_input_parameter_missing_value():
 
     print(f"{exc_info.value}")
 # Supply parameter array where array does not match defined shape
-@pytest.mark.parametrize("test_shape", [None,(2,2)])
+@pytest.mark.parametrize("test_shape", [None,(2,1)])
     
 def test_run_code_input_parameter_wrong_shape(test_shape):
     test = ImageOperation(name = "Test",
@@ -205,15 +236,166 @@ def test_run_code_input_parameter_wrong_shape(test_shape):
             input_parameter = {"input_parameter":ParameterParcel(dtype = DataType.ArrayInt,value = np.array([[2,5],[2,5]],np.uint8),shape = test_shape)},
             output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
             output_parameter = None)
-        
-    with pytest.raises(ValueError) as exc_info:
+
+    with pytest.raises(ValueError, match= "For parameter input ") as exc_info:
         test.run_code() 
 
     print(f"{exc_info.value}")
 # Try to run with missing output definitions (shape for images or arrays, dtype for any output) 
+
+def test_run_code_output_image_missing_definitions():
+    test = ImageOperation(name = "Test",
+            category = "Testing",
+            compiled_code = compiled_code,
+            version = None,
+            docs = None,
+            alerts = None,
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_parameter = None,
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = None,mapping = None)},
+            output_parameter = None)
+
+    with pytest.raises(ValueError, match = 'expected image shape') as exc_info:
+        test.run_code() 
+
+    print(f"{exc_info.value}")
+
+test_code = "import numpy as np\nprint('code running')\n"+\
+    "a = [1,2]\n"+\
+    "print(a[5])"
+
+compiled_code = compile(test_code,"<string>","exec")
+
 # Code provided creates an error
+def test_run_code_broken_code():
+    test = ImageOperation(name = "Test",
+            category = "Testing",
+            compiled_code = compiled_code,
+            version = None,
+            docs = None,
+            alerts = None,
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_parameter = None,
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_parameter = None)
+
+    with pytest.raises(RuntimeError, match = 'error executing operation') as exc_info:
+        test.run_code() 
+
+    print(f"{exc_info.value}")
+
 # Code provided doesn't create an output
+def test_run_code_no_output():
+    test_code = "import numpy as np\nprint('code running')\n"+\
+    "print('no output')"
+    compiled_code = compile(test_code,"<string>","exec")
+    test = ImageOperation(name = "Test",
+            category = "Testing",
+            compiled_code = compiled_code,
+            version = None,
+            docs = None,
+            alerts = None,
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_parameter = None,
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_parameter = None)
+
+    with pytest.raises(RuntimeError, match = 'operation did not generate') as exc_info:
+        test.run_code() 
+
+    print(f"{exc_info.value}")
+
+    test_code = "import numpy as np\nprint('code running')\n"+\
+    "output_image['output'].pixel_array = np.array([1,2,3],np.uint8)"
 # Code provided changes inputs
+
+def test_run_code_alters_input():
+    test_code = "import numpy as np\nprint('code running')\n"+\
+    "input_image['input'].pixel_array = np.array([0,1,32],np.uint8)\n"+\
+    "output_image['output'].pixel_array = np.array([1,2,3],np.uint8)"
+    compiled_code = compile(test_code,"<string>","exec")
+    test = ImageOperation(name = "Test",
+            category = "Testing",
+            compiled_code = compiled_code,
+            version = None,
+            docs = None,
+            alerts = None,
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_parameter = None,
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_parameter = None)
+
+    with pytest.raises(RuntimeError, match = 'operation altered input') as exc_info:
+        test.run_code() 
+
+    print(f"{exc_info.value}")
 # Code provided returns a pixel_array without mapping data
+
+def test_run_code_image_no_map():
+    test_code = "import numpy as np\nprint('code running')\n"+\
+    "output_image['output'].pixel_array = np.array([1,2,3],np.uint8)\n"
+    compiled_code = compile(test_code,"<string>","exec")
+    test = ImageOperation(name = "Test",
+            category = "Testing",
+            compiled_code = compiled_code,
+            version = None,
+            docs = None,
+            alerts = None,
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_parameter = None,
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_parameter = None)
+
+    with pytest.raises(ValueError, match = 'No image pixel map ') as exc_info:
+        test.run_code() 
+
+    print(f"{exc_info.value}")
+
 # Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data
+def test_run_code_image_no_matching_shape():
+    test_code = "import numpy as np\nfrom core.shape import Shape\n"+\
+    "output_image['output'].pixel_array = np.array([1,2,3],np.uint8)\n"+\
+    "output_image['output'].mapping = Shape(0,0,0,0)\n"+\
+    "output_image['output'].shape = Shape(1,1,1,1)\n"
+    compiled_code = compile(test_code,"<string>","exec")
+    test = ImageOperation(name = "Test",
+            category = "Testing",
+            compiled_code = compiled_code,
+            version = None,
+            docs = None,
+            alerts = None,
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_parameter = None,
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_parameter = None)
+
+    with pytest.raises(ValueError, match = 'incorrect shape: for output image') as exc_info:
+        test.run_code() 
+
+    print(f"{exc_info.value}")
+
+
 # Code provided returns an array value without shape data
+def test_run_code_array_parameter_no_matching_shape():
+    test_code = "import numpy as np\nfrom core.shape import Shape\n"+\
+    "output_image['output'].pixel_array = np.array([1,2,3],np.uint8)\n"+\
+    "output_image['output'].mapping = Shape(0,0,0,0)\n"+\
+    "output_image['output'].shape = Shape(3,3,3,3)\n"+\
+    "output_parameter['output_parameter'].value = np.array([0,1],np.uint8)"
+
+    compiled_code = compile(test_code,"<string>","exec")
+    test = ImageOperation(name = "Test",
+            category = "Testing",
+            compiled_code = compiled_code,
+            version = None,
+            docs = None,
+            alerts = None,
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_parameter = None,
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_parameter = {"output_parameter":ParameterParcel(dtype = DataType.ArrayInt,value = None,shape=None)},)
+
+    with pytest.raises(ValueError, match = 'incorrect shape: for output parameter') as exc_info:
+        test.run_code() 
+
+    print(f"{exc_info.value}")
