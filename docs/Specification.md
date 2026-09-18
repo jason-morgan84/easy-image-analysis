@@ -217,7 +217,7 @@ And contains class variables to define limits on image Shape:
 
 * dimensions- the current dimensions and default order (c, z, y, x). This is in the form of a tuple defining the order, used in the __iter__ and __getitem__ dunders below.
 
-Shape has __iter__ dunder to return values in the order defined above and __getitem__ and __setitem__ dunders to return and set values. __getitem__ and __setitem__ accept and return values as either strings (c,z,y,x) or integer indices (0,1,2,3 - as defined by order in dimensions).
+Shape has __iter__ dunder to return values in the order defined above, __getitem__ and __setitem__ dunders to return and set values and __copy__ and copy() functions to allow copying. __getitem__ and __setitem__ accept and return values as either strings (c,z,y,x) or integer indices (0,1,2,3 - as defined by order in dimensions).
 
 Shape also has functions to convert between dimensions in string and integer formats.
 
@@ -289,9 +289,10 @@ Simple class holding data for image inputs and outputs from ImageOperation. Cont
 #### 3.2.6.2 ParamterPackage
 Simple class holding data for non-image inputs and outputs from ImageOperation. Contains:
 * dtype - set at instantiation based on ImageOperation code file.
-    - Type checks for member of DataType
+    - Type checks for member of DataType.
 * value - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain value of dtype.numpy.
-* shape - if dtype defines an array_type, contains a list/tuple defining shape of value.
+* shape - if dtype defines an array_type, contains a np.array defining shape of value.
+    - will accept a tuple, list or np.ndarray. Tuples and lists will be converted to np.ndarray.
 
 ### 3.2.6 ImageOperationDirectory Class
 This class acts as a holder for a list of all ImageOperation classes, along with the code required to import them.
@@ -367,11 +368,13 @@ On creation of a new connection, it will check for structure, constraint or type
 
 ## 3.3 Error Handling
 
-To allow reporting of errors to an external log (with the future potential to pass to a UI dialog) I am using a custom function, log(), in error_handling.py, that catches and reports errors, then returns the python Error type and associated message to where it was called.
+To allow reporting of errors to an external log (with the future potential to pass to a UI dialog) It uses a custom function, log(), in error_handling.py, that catches and reports errors, then returns the python Error type and associated message to where it was called.
+
+Exception chaining will be used to log errors in the Workflow layer, but not lower layer classes (see class heirarchy).
 
 For now, error messages are simply printed. This will be developed to saving to a log file and user prompts as development progresses.
 
- ## 4 Frontend and UI
+# 4 Frontend and UI
 
 ![UI diagram](/docs/UI.svg)
  
@@ -491,10 +494,12 @@ For now, error messages are simply printed. This will be developed to saving to 
 |ImageParcel|Have **pixel_array** type not match dtype| Type Error | Incorrect data type accepted|
 |ImageParcel|Supply **shape** not as Shape class| Type Error | Incorrect data type accepted|
 |ImageParcel|Supply **mapping** not as Shape class| Type Error | Incorrect data type accepted|
+|ImageParcel Imutability|Pass value as variable then change variable| ImageParcel value remains the same | ImageParcel value changes|
 |check_data|Supply input_image/output_image/input_parameter/output_parameter not as a dictionary| Type Error | Incorrect data type ignored|
 |ParameterParcel|Supply **dtype** as not member of DataTypes.value_types or DataTypes.array_types| Type Error | Incorrect data type accepted|
 |ParameterParcel|If array is expected, have **value** not a list, tuple or ndarray| Type Error | Incorrect data type accepted|
 |ParameterParcel|Have **value** type not match dtype| Type Error | Incorrect data type accepted|
+|ParameterParcel Imutability|Pass value as variable then change variable| ParameterParcel value remains the same |ParameterParcel value changes|
 |run_code|Try to execute run_code with no compiled_code or compiled code in wrong format (not types.codetype)| Type Error |Proceeds without error|
 |run_code|Don't supply a value for input_image | Value Error | Code tries to continue|
 |run_code|Supply input_image with mising pixel array | Value Error | Incorrect pixel array accepted|
