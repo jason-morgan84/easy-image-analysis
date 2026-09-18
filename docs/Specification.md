@@ -35,6 +35,7 @@
 |14/09/26|0.9.4|Re-wrote description of ImageOperation class and unit testing|
 |14/09/26|0.9.5|Documented run_code function in ImageOperation|
 |15/09/26|0.9.6|Described refactoring of dictionary in ImageOperation to dataclasses and updated unit testing|
+|18/09/26|0.10.0|Added description of error handling and logging code|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -363,6 +364,12 @@ It also contains the following functions:
 * Squeeze/unsqueeze - changes array shape, as Tranpose.
 
 On creation of a new connection, it will check for structure, constraint or type violations. Where these can be fixed through image type or shape changes, it will do so, otherwise it will prompt the user to adjust the WorkFlow. 
+
+## 3.3 Error Handling
+
+To allow reporting of errors to an external log (with the future potential to pass to a UI dialog) I am using a custom function, log(), in error_handling.py, that catches and reports errors, then returns the python Error type and associated message to where it was called.
+
+For now, error messages are simply printed. This will be developed to saving to a log file and user prompts as development progresses.
 
  ## 4 Frontend and UI
 
