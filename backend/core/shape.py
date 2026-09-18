@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 """Shape class exists to hold data related to the shape of transmitted images. """
 class Shape:
@@ -36,6 +37,12 @@ class Shape:
                setattr(self,key,value)
           else:
                raise TypeError("Key must be an integer index or a string identifier")
+
+     def __copy__(self):
+          return Shape(self.c,self.z,self.y,self.x)
+
+     def copy(self):
+        return copy.copy(self)
 
      # translates back and forward between dimension name and dimension index
      @classmethod
