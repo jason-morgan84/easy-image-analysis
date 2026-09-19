@@ -257,22 +257,46 @@ Parameter also includes the option to specify UI elements to fetch parameter val
 Type checking is carried out on dtype, to ensure its a member of DataType.value_types or DataType.array_types.
 
 ### 3.2.5 ImageOperation Class/File
-A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
+The ImageOperation class is responsible for carrying out functions that carry out analysis on images. A key aim of this project is expandability and to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class, containing all the information required to run the function and will be imported using imagelib. 
+
+The previous classes described have been primarily related to the flow of data through the WorkFlow graph and have defined custom class types to make sure this happens in a controlled manner. The ImageOperation sits slightly outside this class structure, as existing image analysis modules work in standard or numpy classes. To allow ImageOperations code to be designed and executed in a standard manner, inputs and outputs from ImageOperations are in standard Numpy data types (for conversion from custom DataTypes to Numpy, see Node and Port classes).
+
+The expected inputs and outputs will still be described in terms of DataType classes, as these classes also define their own Numpy equivalents.
+
+The ImageOperation class will contain the following variables:
 
 * name: name of ImageOperation
 * category: logical category (“Threshold”, “Filter” etc) - defined by folder location of file
 * input_image: input images as dictionary of ImagePackage class
 * input_parameter: other inputs as dictionary of ParameterPackage class 
-* output_image: Output images as dictionary, as input_image
-* output_parameter: other outputs as dictionary, as input_parameter
+* output_image: Output images as dictionary of ImagePackage class
+* output_parameter: other outputs as dictionary of ParameterPackage class 
 * docs – documentation to explain function, effects, parameters etc
 * alerts – any warnings to user (e.g, “Background subtraction with a large radius is a very slow process”)
 * version – version of software code ImageOperation was written for. This is to future proof code, so changes to base code that affect ImageOperations don’t mean all existing ImageOperations need to be rewritten. 
-* compiled_code – function with compiled code to execute - gathered from input .py files by ImageOperationDirectory
+* execute – function with compiled code to execute - gathered from input .py files by ImageOperationDirectory
 
-Note that, on instantiation, the inputs and outputs will have defined data types but no actual data. The package dataclasses (defined below), will therefore have defined dtypes for each variable/image but no data. The packages have setters to check that, when data values are added, they are of the expected type. More detailed checking, such as whether an image has an associated shape discriptor and this matches the shape of the array, will be carried out on code execution. In ImageOperation, setters for the various inputs and outputs will only check for dictionaries made up of the relevant package dataclass.
+Because this class takes input directly from external files there are a number of checks made on that data:
 
-The function, run_code, which runs the compiled code. It first checks that an image is present with the expected format and that any other required parameters are present and in the expected format. After code execution, it confirms that output variables have been generated (in the expected format) and input variables have not been changed.
+```mermaid
+graph LR
+Node2["Package class: Type checks arguements"]
+Node3["ImageOperation. check_dict: Checks Input/Outputs are dictionaries of Package classes"]
+Node4["ImageOperation. pre_execution: Checks inputs are complete, outputs are ready"]
+Node5["ImageOperation. post_execution: Checks output are complete"]
+
+
+Node2-->Node3
+Node3-->Node4
+Node4-->Node5
+```
+Firstly, data on expected inputs and outputs are entered into a PackageClass, either ImagePackage for images or ParameterPackage for other input/output values. This requires a defined data type for that variable from the DataType enum. Where other parameters (the value itself, any shape parameters to define it) it will also check their type, but these aren't required until a later stage. Note that, on instantiation, the inputs and outputs will have defined data types but no actual data.
+
+Next, ImageOperation, the setters for InputImage, InputParameter, OutputImage and OutputParameter run check_dict() which checks that each arguement is a dictionary of the relevant package class.
+
+The bulk of the checks are carried out when run_code is called to execute the code, which calls the pre_execution function. This checks that all inputs are present and correct (eg, input image pixel array matches defined shape) and that the required output arguements are present to describe the outputs (dtype and shape).
+
+Finally, following code execution checks are carried out to ensure that the output is complete and correct.
 
 **NOTE: At this point, any ImageOperation requires (at least) one image as an input. This is a design decision to prevent creep and bloat, based on the idea that as soon as only non-image variables are accepted this software is moving into data analysis rather than image analysis. This is checkedby the run_code function in ImageOperation and will therefore also affect other classes interacting with ImageOperations (Nodes and WorkFlow).**
 
@@ -295,11 +319,13 @@ Simple class holding data for non-image inputs and outputs from ImageOperation. 
     - will accept a tuple, list or np.ndarray. Tuples and lists will be converted to np.ndarray.
 
 ### 3.2.6 ImageOperationDirectory Class
-This class acts as a holder for a list of all ImageOperation classes, along with the code required to import them.
+This class holds for a list of all ImageOperation classes, along with the code required to import them.
 
-Importing ImageOperation classes will also require testing under the same testing protocol described for ImageOperation in the testing section. This will be carried out using pytest parametization. 
+Once imported, ImageOperation classes will require testing under the same testing protocol described for ImageOperation in the testing section. This will be carried out using pytest parametization. 
 
 ImageOperations will only be imported if they were made using a compatible version.
+
+Imported function will be checked to ensure only permitted libraries are imported.
 
 ### 3.2.7 Node Class
 The ImageOperation class defines the image analysis function to be carried out on the image. The Node class is responsible for positioning an ImageOperation in the WorkFlow – this means there can be multiple nodes containing the same ImageOperation. While the ImageOperation class is responsible purely for image analysis, the Node class is responsible for interacting with other elements of the WorkFlow. As such, it has the following instance variables:
