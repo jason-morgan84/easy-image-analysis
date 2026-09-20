@@ -1,8 +1,8 @@
 from core.constants import DataType
 from core.shape import Shape
 import numpy as np
-import types
 import copy
+import inspect
 
 """Note for types: For input type checking, ImageOperation will be a part of a Node. Data will flow into the Node through a Port, which will transmit the data
 to the ImageOperation class. 
@@ -47,7 +47,7 @@ class ImageParcel:
     def shape(self, shp):
         if not isinstance(shp, Shape) and shp is not None:
             raise TypeError(f"Expected shape to be of class Shape, got {type(shp)}")
-        self._shape = shp.copy()
+        self._shape = shp.copy() if shp is not None else None
 
     # check that mapping is of type Shape
     @property
@@ -57,7 +57,7 @@ class ImageParcel:
     def mapping(self, map):
         if not isinstance(map, Shape) and map is not None:
             raise TypeError(f"Expected map to be of class Shape, got {type(map)}")
-        self._mapping = map.copy()
+        self._mapping = None if map is None else map.copy()
 
 
     @property
@@ -134,13 +134,11 @@ class ParameterParcel:
 
 
 class ImageOperation:
-    def __init__(self, name, category, compiled_code, version, docs, alerts, input_image, input_parameter={}, output_image = {}, output_parameter = {}, ):
+    def __init__(self, name, category, version, docs, alerts, input_image, input_parameter={}, output_image = {}, output_parameter = {}, ):
         self._input_image = input_image
         self._output_image = output_image
-
         self.name = name
         self.category = category
-        self.compiled_code = compiled_code
         self.version = version
         self.docs = docs
         self.alerts = alerts 
@@ -202,14 +200,17 @@ class ImageOperation:
                 if item is not None and not isinstance(item, dtype):
                     raise TypeError(f"Expected {identifier} to be dictionary of {dtype.type_name}, not {type(item)}")
         
-
+    def execute(self):
+        pass
 
     def run_code(self):
-        # Check code in correct format
-        if not isinstance(self.compiled_code, types.CodeType):
-            raise TypeError(f"compiled_code expected to be {types.CodeType}, got {type(self.compiled_code)}")
 
-
+        # check code exists:
+        function = getattr(self, "execute")
+        code_by_line = inspect.getsource(function).split("\n")
+        print(f"Code:{code_by_line[1].rstrip().lstrip()}")
+        if code_by_line[1].rstrip().lstrip() == "pass":
+            raise RuntimeError(f"no code exists for ImageOperation {self.name}")
         """ 
         Does input_image exist?
             If not:
@@ -283,10 +284,7 @@ class ImageOperation:
 
         # run compiled code on given inputs
         try:
-            exec(self.compiled_code, {"input_image": self.input_image,
-                                      "input_parameter":self.input_parameter,
-                                      "output_image": self.output_image,
-                                      "output_parameter":self.output_parameter})
+            self.execute()
         except Exception as e:
             raise RuntimeError(f"error executing operation '{self.name}': {e}")
 

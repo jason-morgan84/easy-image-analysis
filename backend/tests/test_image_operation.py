@@ -112,7 +112,6 @@ compiled_code = compile(test_code,"<string>","exec")
 def test_run_code_no_input_image():
     test = ImageOperation(name = "Test",
             category = "Testing",
-            compiled_code = compiled_code,
             version = None,
             docs = None,
             alerts = None,
@@ -128,7 +127,6 @@ def test_run_code_no_input_image():
 def test_run_code_no_code():
     test = ImageOperation(name = "Test",
             category = "Testing",
-            compiled_code = None,
             version = None,
             docs = None,
             alerts = None,
@@ -137,23 +135,14 @@ def test_run_code_no_code():
             output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
             output_parameter = None)
     
-    with pytest.raises(TypeError) as exc_info:
-        test.run_code()
-    print(f"{exc_info.value}")
-    test.compiled_code = test_code
-
-    with pytest.raises(TypeError) as exc_info:
+    with pytest.raises(RuntimeError, match="no code exists") as exc_info:
         test.run_code()
 
-    test.compiled_code = compiled_code
-    test.run_code()
-    print(f"{exc_info.value}")
 
 # Supply input_image with mising pixel array
 def test_run_code_no_input_image_pixel_array():
     test = ImageOperation(name = "Test",
             category = "Testing",
-            compiled_code = compiled_code,
             version = None,
             docs = None,
             alerts = None,
@@ -169,7 +158,6 @@ def test_run_code_no_input_image_pixel_array():
 def test_run_code_no_input_image_shape_or_mapping():
     test = ImageOperation(name = "Test",
             category = "Testing",
-            compiled_code = compiled_code,
             version = None,
             docs = None,
             alerts = None,
@@ -179,7 +167,7 @@ def test_run_code_no_input_image_shape_or_mapping():
             output_parameter = None)
         
     with pytest.raises(ValueError, match = "No image shape") as exc_info:
-        test.run_code() 
+        test._run_code() 
     print(f"{exc_info.value}")
     test.input_image["input"].shape = None
     test.input_image["input"].mapping = Shape(0,0,0,0)
