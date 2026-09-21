@@ -1,447 +1,253 @@
 import pytest
 import numpy as np
-from core.type import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat
+from core.constants import DataType
+from core.type import ImageInt, ArrayFloat, ImageFloat, ImageBinary, ValueInt, ValueFloat, ArrayInt
+from core.type import sample_data
 
-def test_data_type_ImageInt():
+
+@pytest.mark.parametrize("DataType, invalid_input", [
+    (ImageInt, 5.18),
+    (ImageFloat, "not_a_number"),
+    (ValueInt, 3.14),
+    (ValueFloat, "not_a_number"),
+    (ImageBinary, -2515.21),
+])
+def test_base_type_error_handling(DataType, invalid_input):
+    with pytest.raises(TypeError):
+        DataType(invalid_input)
+
+# tests is_array: sends arrays to types expecting scalars and vice versa
+@pytest.mark.parametrize("DataType, invalid_input", [
+    (ImageInt, 2), # not an array
+    (ArrayFloat, 1), # not an array
+    (ValueInt, [1,2]), # unexpected list
+    (ValueFloat, np.array([1,2,3])), #unexpected np.array
+])
+def test_is_array_validation(DataType, invalid_input):
+    with pytest.raises(TypeError):
+        DataType(invalid_input)
+
+# tests array shape - is it maintained through conversion
+def test_array_shape_maintenance():
     mock_image = np.arange(120).reshape(2,3,4,5)
-    mock_image_high = np.array([1251,2,3,4,5,6,7,8,9,10,11,12]).reshape(2,2,3)
-    mock_image_low = np.array([-1,2,3,4,5,6,7,8,9,10,11,12]).reshape(2,2,3)
-    mock_image_float = np.array([1.5,2,3,4,5,6,7,8,9,10,11,12]).reshape(2,2,3)
-    mock_image_string = np.array(["1.5",2,3,4,5,6,7,8,9,10,11,12]).reshape(2,2,3)
-    mock_image_list = [[0,0,0],[1,1,1],[2,2,2],[3,3,3]]
-    mock_image_np = np.array([0,1,2])
+    assert ImageInt(mock_image).value.shape == (2,3,4,5)
+    assert ImageFloat(mock_image/1000).value.shape == (2,3,4,5)
 
-    # test with out of bounds low value
+# test type bounds
+@pytest.mark.parametrize("DataType, invalid_input", [
+    (ImageInt, [-1, 10, 20]),       # Below min_val (0)
+    (ImageInt, [0, 5, 260]),        # Above max_val (255)
+    (ImageFloat, [-0.1, 0.5]),      # Below min_val (0.0)
+    (ImageFloat, [0.5, 1.2]),       # Above max_val (1.0)
+    (ImageBinary, [1, 2]),       # Above max_val (1.0)
+])
+def test_min_max_bounds(DataType, invalid_input):
     with pytest.raises(ValueError):
-        ImageInt(mock_image_low)
+        DataType(invalid_input)
 
-    # test with out of bounds high value
-    with pytest.raises(ValueError):
-        ImageInt(mock_image_high)
+#to_numpy: Convert value using to_numpy function
+def test_to_numpy():
+    test_array = ImageInt([1,2,3,4])
+    assert isinstance(test_array.to_numpy()[0],test_array.numpy)
 
-    # test with wrong type float
-    with pytest.raises(TypeError):
-        ImageInt(mock_image_float)
+    test_array = ImageFloat([1,0.2,0.3,0.4])
+    assert isinstance(test_array.to_numpy()[0],test_array.numpy)
 
-    # test with wrong type string
-    with pytest.raises(TypeError):
-        ImageInt(mock_image_string)
+    test_value = ValueFloat(1.2)
+    assert isinstance(test_value.to_numpy(),test_array.numpy)
 
-    # test conversion of 4d list
-    mock_image_ImageInt_list = ImageInt(mock_image_list)
-    assert mock_image_ImageInt_list.shape == (4,3)
+#Immutability: Modify original input list after instantiation of array data type
+def test_immutablity_array_list():
+    test_list = [2,3,4]
+    test_type = ImageInt(test_list)
+    test_list[0] = 5
 
-    # test conversion of 4d numpy array
-    mock_image_ImageInt = ImageInt(mock_image)
-    assert mock_image_ImageInt.shape == mock_image.shape
+    assert (test_list[0]!= test_type.value[0])
 
-    # test conversion to np uint8
-    assert isinstance(mock_image_ImageInt.to_uint8(),np.ndarray)
-    assert mock_image_ImageInt.to_uint8().dtype == np.uint8
-    assert mock_image_ImageInt.to_uint8().all() == mock_image.all()
+#Immutability: Modify original input np.array after instantiation of array data type
+def test_immutablity_array_np():
+    test_list = np.array([2,3,4])
+    test_type = ImageInt(test_list)
+    test_list[0] = 5
 
-    #test immutability of list inputs
-    mock_image_np_ImageInt = ImageInt(mock_image_np)
-    mock_image_np[0] = 12
-    assert (mock_image_np_ImageInt.value[0] != mock_image_np[0])
+    assert (test_list[0]!= test_type.value[0])
 
-    # test immutability of np.array inputst
-    mock_image_list[0][0] = 12
-    assert (mock_image_ImageInt_list.to_uint8()[0][0] != np.uint8(mock_image_list[0][0]))
-
-def test_data_type_ImageFloat():
-    mock_image = (np.float64(np.arange(120))/125).reshape(2,3,4,5)
-    mock_image_high = np.array([0,0.5,1,0.8,0.9,0,1,0.7,0.8,0.1,0.8,2]).reshape(2,2,3)
-    mock_image_low = np.array([0,0.5,1,0.8,0.9,0,1,0.7,0.8,0.1,0.8,-0.5]).reshape(2,2,3)
-    mock_image_string = np.array([0,0.5,1,0.8,0.9,0,1,0.7,0.8,0.1,0.8,"0.5"]).reshape(2,2,3)
-
-    #test with out of bounds low value
-    with pytest.raises(ValueError):
-        ImageFloat(mock_image_low)
-
-    #test with out of bounds high value
-    with pytest.raises(ValueError):
-        ImageFloat(mock_image_high)
-
-    #test with wrong type string
-    with pytest.raises(TypeError):
-        ImageFloat(mock_image_string)
-
-    #test conversion of 4d numpy array
-    mock_image_ImageFloat = ImageFloat(mock_image)
-    assert mock_image_ImageFloat.shape == (2,3,4,5)
-
-    #test conversion to np uint8
-    assert isinstance(mock_image_ImageFloat.to_float64(),np.ndarray)
-    assert mock_image_ImageFloat.to_float64().dtype == np.float64
-    assert mock_image_ImageFloat.to_float64().all() == mock_image.all()
-
-    #test immutability of np inputs
-    mock_image[0][0][0][1] = 1
-    assert (mock_image_ImageFloat.value[0][0][0][1] != mock_image[0][0][0][1])
-
-    #test immutability of lists
-    mock_list_image = [0.1,0.2,0.3]
-    mock_list_image_FloatImage = ImageFloat(mock_list_image)
-    mock_list_image[0] = 1
-    assert (mock_list_image_FloatImage.value[0] != mock_list_image[0])
-
-def test_data_type_ImageBinary():
-    mock_image = np.random.randint(2, size=120).reshape(2,3,4,5)
-    mock_image_small = np.array([[0,0],[1,1]])
-    mock_image_high = np.array([0,1,0,1,0,1,0,1,0,1,0,2]).reshape(2,2,3)
-    mock_image_low = np.array([0,1,0,1,0,1,0,1,0,1,0,-1]).reshape(2,2,3)
-    mock_image_middle = np.array([0,1,0,1,0,1,0,1,0,1,0,0.6]).reshape(2,2,3)
-    mock_image_string = np.array([0,1,0,1,0,1,0,1,0,1,0,"1"]).reshape(2,2,3)
-    mock_image_float = np.array([0,1,0,1,0,1,0,1,0,1,0,1.0]).reshape(2,2,3)
-
-    #test with out of bounds low value
-    with pytest.raises(ValueError):
-        ImageBinary(mock_image_low)
-
-    #test with out of bounds high value
-    with pytest.raises(ValueError):
-        ImageBinary(mock_image_high)
-
-    with pytest.raises(ValueError):
-        ImageBinary(mock_image_middle)
-
-    #test with wrong type string
-    with pytest.raises(TypeError):
-        ImageBinary(mock_image_string)
-
-    #test conversion containing float 1
-    mock_image_ImageBinary = ImageBinary(mock_image_float)
-    assert mock_image_ImageBinary.shape == (2,2,3)
-
-    #test conversion of 4d numpy array
-    mock_image_ImageBinary = ImageBinary(mock_image)
-    assert mock_image_ImageBinary.shape == (2,3,4,5)
-
-    #test conversion to np uint8
-    assert isinstance(mock_image_ImageBinary.to_uint8(),np.ndarray)
-    assert mock_image_ImageBinary.to_uint8().dtype == np.uint8
-    assert mock_image_ImageBinary.to_uint8().all() == mock_image.all()
-
-    #test conversion to np bool
-    assert isinstance(mock_image_ImageBinary.to_boolean(),np.ndarray)
-    assert mock_image_ImageBinary.to_boolean().dtype == np.bool
-    assert mock_image_ImageBinary.to_boolean().all() == mock_image.all()
-
-    #test immutability of np inputs
-    mock_image_ImageBinary = ImageBinary(mock_image_small)
-    mock_image_small[0][0] = 1
-    assert (mock_image_ImageBinary.to_uint8() != mock_image_small).any()
-
-    #test immutability of list inputs
-    mock_list_image = [0,1,0]
-    mock_list_image_ImageBinary = ImageBinary(mock_list_image)
-    mock_list_image[0] = 1
-    assert (mock_list_image_ImageBinary.value[0] != mock_list_image[0])
-
-def test_data_type_ValueInt():
-    mock_value = 2
-    mock_value_np = np.uint8(2)
-    mock_value_float = 2.0
-    mock_value_string = "2"
-
-    mock_value_np_ValueInt = ValueInt(mock_value_np)
-
-    #test with wrong type float
-    with pytest.raises(TypeError):
-        ValueInt(mock_value_float)
-
-    #test with wrong type string
-    with pytest.raises(TypeError):
-        ValueInt(mock_value_string)
-
-    #check correct type
-    mock_value_ValueInt = ValueInt(mock_value)
-    assert isinstance(mock_value_ValueInt,ValueInt)
-
-    #test conversion to np uint8
-    assert isinstance(mock_value_ValueInt.to_uint8(),np.uint8)
-    assert mock_value_ValueInt.to_uint8() == mock_value
-
-    #test immutability
-    mock_value_ValueInt = ValueInt(mock_value)
-    mock_value = 3
-    assert(mock_value_ValueInt != mock_value)
-
-    mock_value_ValueInt = ValueInt(mock_value_np)
-    mock_value_np = 3
-    assert(mock_value_ValueInt != mock_value_np)
-
-def test_data_type_ValueFloat():
-    mock_value = 2
-    mock_value_float = 2.0
-    mock_value_string = "2"
-    mock_value_float_np = np.float64(2.1)
-
-    #test with wrong type float
-    with pytest.raises(TypeError):
-        ValueFloat(mock_value_string)
-
-    #check correct type
-    mock_value_ValueFloat = ValueFloat(mock_value)
-    assert isinstance(mock_value_ValueFloat,ValueFloat)
-
-    mock_value_ValueFloat = ValueFloat(mock_value_float)
-    assert isinstance(mock_value_ValueFloat,ValueFloat)
-
-    #test conversion to np float64
-    assert isinstance(mock_value_ValueFloat.to_float64(),np.float64)
-    assert mock_value_ValueFloat.to_float64() == mock_value_float
-
-    #test immutability
-    mock_value_ValueFloat = ValueFloat(mock_value_float)
-    mock_value_float = 3.0
-    assert(mock_value_ValueFloat != mock_value_float)
-
-    mock_value_ValueFloat = ValueFloat(mock_value_float_np)
-    mock_value_float = 5.1
-    assert(mock_value_ValueFloat != mock_value_float_np)
-
-def test_image_conversions_ImageInt():
-
-    mock_int_image = ImageInt(np.arange(120).reshape(2,3,4,5))
-    #mock_int_image[0][0][0][0] = 5
-    mock_float_image = (np.arange(120)/125).reshape(2,3,4,5)
-    mock_binary_image = ImageInt(np.random.randint(2, size=120).reshape(2,3,4,5))
-    #test single conversions - function and shape
+#Immutability: Modify original input value after instantiation of scalar data type
+def test_immutablity_scalar():
+    test = 5
+    test_type = ValueInt(test)
+    test = 7
     
-    #test single conversion int to float, correct shape
-    mock_int_image_convert = mock_int_image.to_ImageFloat()
-    assert(mock_int_image_convert.shape == mock_int_image.shape)
+    assert (test != test_type.value)
 
-    #test single conversion int to binary, correct shape
-    mock_binary_image_convert = mock_binary_image.to_ImageBinary()
-    assert(mock_binary_image_convert.shape == mock_binary_image.shape)
-
-    #test single conversion int to float, correct value
-    specific_int_image = ImageInt([0,51,102,153,204,255])
-    specific_float_image = ImageFloat([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-    np.testing.assert_array_almost_equal(specific_int_image.to_ImageFloat().value, specific_float_image.value)
-
-    #test single conversion int to binary, correct value
-    specific_int_image = ImageInt([0,0,0,0,1,1,1,1])
-    specific_binary_image = ImageBinary([0, 0, 0, 0, 1, 1, 1, 1])
-    np.testing.assert_array_almost_equal(specific_int_image.to_ImageBinary().value, specific_binary_image.value)
-
-    """#test single conversion float to int, correct shape
-    mock_int_image_convert = mock_int_image_convert.to_ImageInt()
-    assert(mock_int_image_convert.shape == mock_int_image.shape)"""
-
-    #test that repeated int to float conversions don't lead to drift in values
-    for i in range(3):
-       mock_int_image_3_convert = mock_int_image.to_ImageFloat().to_ImageInt()
-
-    for i in range(7):
-        mock_int_image_7_convert = mock_int_image.to_ImageFloat().to_ImageInt()
-
-    np.testing.assert_array_equal(mock_int_image_3_convert.shape,mock_int_image_7_convert.shape)
-
-
-def test_image_conversions_ImageFloat():
-
-    mock_int_image = ImageInt(np.arange(120).reshape(2,3,4,5))
-    mock_float_image = ImageFloat((np.arange(120)/125).reshape(2,3,4,5))
-    mock_binary_image = ImageFloat(np.float64(np.random.randint(2, size=120)).reshape(2,3,4,5))
-    #test single conversions - function and shape
+#Immutability: Modify original numpy type value after instantiation of scalar data type
+def test_immutablity_scalar_np():
+    test = np.uint8(5)
+    test_type = ValueInt(test)
+    test = 7
     
-    #test single conversion float to int, correct shape
-    mock_int_image_convert = mock_float_image.to_ImageInt()
-    assert(mock_int_image_convert.shape == mock_int_image.shape)
+    assert (test != test_type.value)
 
-    #test single conversion float to binary, correct shape
-    mock_binary_image_convert = mock_binary_image.to_ImageBinary()
-    assert(mock_binary_image_convert.shape == mock_binary_image.shape)
+# goes through each member of DataType, checks that the required class variables have been 
+# properly set
+@pytest.mark.parametrize("enum_member", list(DataType))
+def test_all_datatype_classes_have_required_attributes(enum_member):
 
-    #test single conversion float to int, correct value
-    specific_int_image = ImageInt([0,51,102,153,204,255])
-    specific_float_image = ImageFloat([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
-    np.testing.assert_array_almost_equal(specific_float_image.to_ImageInt().value, specific_int_image.value)
-
-    #test single conversion float to binary, correct value
-    specific_float_image = ImageFloat([0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0])
-    specific_binary_image = ImageBinary([0, 0, 0, 0, 1, 1, 1, 1])
-    np.testing.assert_array_almost_equal(specific_float_image.to_ImageBinary().value, specific_binary_image.value)
-
-def test_binary_conversions_ImageFloat():
-
-    mock_binary_image = ImageBinary(np.random.randint(2, size=120).reshape(2,3,4,5))
-    #test single conversions - function and shape
     
-    #test single conversion binary to int, correct shape
-    mock_binary_image_convert = mock_binary_image.to_ImageInt()
-    assert(mock_binary_image_convert.shape == mock_binary_image.shape)
+    assert enum_member.data_type is not None, f"'{enum_member.__name__}.data_type' is not defined"
+    assert enum_member.data_type == enum_member, f"'{enum_member.__name__}.data_type' ({enum_member.data_type}) does not match Enum member {enum_member}"
+    assert enum_member.numpy is not None, f"'{enum_member.__name__}.numpy' is not defined"
+    assert enum_member.allowed_sub_types is not None, f"'{enum_member.__name__}.allowed_subdtypes' is not defined"
+    assert isinstance(enum_member.is_array, bool), f"'{enum_member.__name__}.is_array' is not boolean"
 
-    #test single conversion binary to float, correct shape
-    mock_binary_image_convert = mock_binary_image.to_ImageFloat()
-    assert(mock_binary_image_convert.shape == mock_binary_image.shape)
+# test image conversions within image_types
+@pytest.mark.parametrize("DataType, Input, OutputType, Output", [
+    (ImageInt, [51, 10, 20], ImageFloat, 0.2),      
+    (ImageInt, [0, 1, 1], ImageBinary, 0),       
+    (ImageFloat, [0.4, 0.5], ImageInt, 102),     
+    (ImageFloat, [1.0, 0.0], ImageBinary, 1),      
+    (ImageBinary, [1, 0], ImageFloat, 1.0),    
+    (ImageBinary, [0, 1], ImageInt, 0),  
+])
+def test_image_conversions(DataType, Input, OutputType, Output):
+# test explict type conversions within ImageTypes gives expected output type
+    assert DataType(Input).to(OutputType).data_type == OutputType.data_type, f"{DataType(Input).to(OutputType).value}"
+# test implicit type conversions within ImageTypes gives expected output type
+    assert OutputType(DataType(Input)).data_type == OutputType.data_type
+# test explict type conversions gives expected output value
+    assert (DataType(Input).to(OutputType).value[0] == Output)
+# test implicit type conversions gives expected output value
+    assert OutputType(DataType(Input)).value[0] == Output
 
-    #test single conversion binary to int, correct value
-    specific_binary_image = ImageBinary([0, 0, 0, 1, 1, 1])
-    specific_int_image = ImageInt([0, 0, 0, 1, 1, 1])
-    np.testing.assert_array_equal(specific_binary_image.to_ImageInt().value, specific_int_image.value)
+# test for drift within ImageTypes
+@pytest.mark.parametrize("DataType, Input, OutputType", [
+    (ImageInt, [1, 2], ImageFloat),      
+    (ImageFloat, [0.1, 1.0], ImageInt),       
+    (ImageFloat, [0.1, 0.9], ImageBinary),     
+    (ImageBinary, [1, 0], ImageFloat),      
+    (ImageInt, [1, 0], ImageBinary),    
+    (ImageBinary, [0, 1], ImageInt),    
+])
+def test_for_value_drift_image_types(DataType, Input, OutputType):
+    a = DataType(Input)
+    for i in range (5):
+        b = a.to(OutputType).to(DataType)
 
-    #test single conversion binary to float, correct value
-    specific_binary_image = ImageBinary([0, 0, 0, 1, 1, 1])
-    specific_float_image = ImageBinary([0.0, 0.0, 0.0, 1.0, 1.0, 1.0])
-    np.testing.assert_array_almost_equal(specific_binary_image.to_ImageFloat().value, specific_float_image.value)
+    for i in range (15):
+        c = a.to(OutputType).to(DataType)
 
-    #test that repeated binary to float conversions don't lead to drift in values
-    for i in range(3):
-       mock_binary_image_3_convert = mock_binary_image.to_ImageFloat().to_ImageBinary()
+    assert(b.value[0]== c.value[0])
+    assert(b.value[1]== c.value[1])
 
-    for i in range(7):
-        mock_binary_image_7_convert = mock_binary_image.to_ImageFloat().to_ImageBinary()
+# test conversions within value_types
+@pytest.mark.parametrize("DataType, Input, OutputType, Output", [
+    (ValueInt, 5, ValueFloat, 5.0),      
+    (ValueFloat, 0.6, ValueInt, 1),       
+])
+def test_value_conversions(DataType, Input, OutputType, Output):
+# test explict type conversions within value_types gives expected output type
+    assert DataType(Input).to(OutputType).data_type == OutputType.data_type, f"{DataType(Input).to(OutputType).value}"
+# test implicit type conversions within value_types gives expected output type
+    assert OutputType(DataType(Input)).data_type == OutputType.data_type
+# test explict type conversions gives expected output value
+    assert (DataType(Input).to(OutputType).value == Output)
+# test implicit type conversions gives expected output value
+    assert OutputType(DataType(Input)).value == Output
 
-    np.testing.assert_array_equal(mock_binary_image_3_convert.shape,mock_binary_image_7_convert.shape)
+# test for drift within value_types
+@pytest.mark.parametrize("DataType, Input, OutputType", [
+    (ValueFloat, 5.6, ValueInt),        
+])
+def test_for_value_drift_value_types(DataType, Input, OutputType):
+    a = DataType(Input)
+    for i in range (5):
+        b = a.to(OutputType).to(DataType)
 
-def test_value_conversions():
-    # test single conversions - function and shape
-    test_int = 2
-    test_float = 3.0
+    for i in range (15):
+        c = a.to(OutputType).to(DataType)
 
-    assert((ValueFloat(test_float).to_ValueInt().value) == 3)
+    assert(b.value== c.value)
+    assert(b.value== c.value)
 
-    assert((ValueInt(test_int).to_ValueFloat().value) == 2.0)
+# test conversions within array_types
+@pytest.mark.parametrize("DataType, Input, OutputType, Output", [
+    (ArrayInt, [5, 2], ArrayFloat, 5.0),      
+    (ArrayFloat, [0.6, 17.1], ArrayInt, 1),       
+])
+def test_array_conversions(DataType, Input, OutputType, Output):
+# test explict type conversions within array_types gives expected output type
+    assert DataType(Input).to(OutputType).data_type == OutputType.data_type, f"{DataType(Input).to(OutputType).value}"
+# test implicit type conversions within array_types gives expected output type
+    assert OutputType(DataType(Input)).data_type == OutputType.data_type
+# test explict type conversions gives expected output value
+    assert (DataType(Input).to(OutputType).value[0] == Output)
+# test implicit type conversions gives expected output value
+    assert OutputType(DataType(Input)).value[0] == Output
 
-    # test repeated conversions between int and float - any drift?
+# test for drift within array_types
+@pytest.mark.parametrize("DataType, Input, OutputType", [
+    (ArrayFloat, [5.6, 8.1], ArrayInt),        
+])
+def test_for_value_drift_array_types(DataType, Input, OutputType):
+    a = DataType(Input)
+    for i in range (5):
+        b = a.to(OutputType).to(DataType)
 
-    for i in range(3):
-       test_int_image_3_convert = ValueInt(test_int).to_ValueFloat().to_ValueInt()
+    for i in range (15):
+        c = a.to(OutputType).to(DataType)
 
-    for i in range(7):
-        test_int_image_7_convert = ValueInt(test_int).to_ValueFloat().to_ValueInt()
+    assert(b.value[0] == c.value[0])
+    assert(b.value[0] == c.value[0])
 
-    assert(test_int_image_3_convert.value == test_int_image_7_convert.value)
 
-#test implicit conversion ImageFloat or ImageBianary to ImageInt
-def test_implicit_conversion_to_int():
-    mock_float_image = ImageFloat((np.arange(120)/125).reshape(2,3,4,5))
-    mock_binary_image = ImageBinary(np.random.randint(2, size=120).reshape(2,3,4,5))
 
-    #test single conversion int to float, correct shape
-    mock_int_image_convert = ImageInt(mock_float_image)
-    assert(mock_int_image_convert.shape == mock_float_image.shape)
 
-    #test single conversion int to binary, correct shape
-    mock_int_image_convert = ImageInt(mock_binary_image)
-    assert(mock_int_image_convert.shape == mock_binary_image.shape)
-
-def test_implicit_conversion_to_float():
-    mock_int_image = ImageInt((np.arange(120)).reshape(2,3,4,5))
-    mock_binary_image = ImageBinary(np.random.randint(2, size=120).reshape(2,3,4,5))
-
-    #test single conversion int to float, correct shape
-    mock_int_image_convert = ImageFloat(mock_int_image)
-    assert(mock_int_image_convert.shape == mock_int_image.shape)
-
-    #test single conversion int to binary, correct shape
-    mock_int_image_convert = ImageFloat(mock_binary_image)
-    assert(mock_int_image_convert.shape == mock_binary_image.shape)
-
-def test_implicit_conversion_to_binary():
-    mock_int_image = ImageInt([[0,0,0],[1,1,1]])
-    mock_float_image = ImageFloat([[0,0,0],[1,1,1]])
-
-    #test single conversion int to float, correct shape
-    mock_int_image_convert = ImageBinary(mock_int_image)
-    assert(mock_int_image_convert.shape == mock_int_image.shape)
-
-    #test single conversion int to binary, correct shape
-    mock_int_image_convert = ImageBinary(mock_float_image)
-    assert(mock_int_image_convert.shape == mock_float_image.shape)
-
-# test implicit conversions to Value_int
-def test_implicit_conversion_value_int():
-    float_value = 2.4
-
-    test = ValueFloat(float_value)
-    test_implicit_int = ValueInt(test)
-
-# test implicit conversions to Value_float
-def test_implicit_conversion_value_float():
-    int_value = 2
-
-    test = ValueInt(int_value)
-    test_implicit_float = ValueFloat(test)
-
-# test test_sample for ImageInt
-def test_test_sample_for_ImageInt():
+# test sample data generation
+def test_sample_data():
     with pytest.raises(TypeError):
-        ImageInt.test_sample(2)
+        a = sample_data (int, (2,3))
 
+# shape checks: Input value dtype where is_array = true but no shape passed
     with pytest.raises(TypeError):
-        ImageInt.test_sample("2")
+        a = sample_data(ImageInt)
+        b = sample_data(ImageFloat)
 
+# shape checks: Shape passed, but not as np.array, tuple or list
     with pytest.raises(TypeError):
-        ImageInt.test_sample((1.0,2.0))
+        a = sample_data(ImageInt,shape = 25)
+        b = sample_data(ImageInt,shape = {25,24,1})
 
-    # check corret shape
-    assert(ImageInt.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
-    assert(ImageInt.test_sample((2,3,4,5), zero = True).value.shape == (2,3,4,5))
-
-    # check zero = true gives an array of 0s
-    assert(ImageInt.test_sample((2,3,4,5),zero = True).value.max() == 0)
-    assert(ImageInt.test_sample((2,3,4,5),zero = True).value.min() == 0)
-
-    # check array is of correct type
-    assert(isinstance(ImageInt.test_sample((2,3,4,5), zero = True),ImageInt))
-
-# test test_sample for ImageFloat
-def test_test_sample_for_ImageFloat():
+# shape checks: Shape passed, but not as array of integers
     with pytest.raises(TypeError):
-        ImageFloat.test_sample(2)
+        a = sample_data(ImageInt,shape = [1.0,2.4])
+        b = sample_data(ImageInt,shape = ("2","4","5"))
 
-    with pytest.raises(TypeError):
-        ImageFloat.test_sample("2")
+# shape checks: Shape as np.array, list, tuple
+    a = sample_data(ImageInt,[2,4,5])
+    b = sample_data(ImageFloat,(2,4,5))
 
-    with pytest.raises(TypeError):
-        ImageFloat.test_sample((1.0,2.0))
+# type checks: Input value of DataType type, output of expected type
+    assert (sample_data(ImageInt,[2,3])).data_type == DataType.ImageInt
+    assert (sample_data(DataType.ImageFloat,[2,3])).data_type == DataType.ImageFloat
+    assert (sample_data(DataType.ValueFloat)).data_type == DataType.ValueFloat
+    assert (sample_data(DataType.ArrayInt, (5,4))).data_type == DataType.ArrayInt
 
-    # check corret shape
-    assert(ImageFloat.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
-    assert(ImageFloat.test_sample((2,3,4,5),zero = True).value.shape == (2,3,4,5))
+#shape checks: For array dtype, does output have expected shape with randomized values
+    assert (sample_data(ImageInt,[5,4])).value.shape == (5,4)
+    assert (sample_data(ImageFloat,[1,2,3])).value.shape == (1,2,3)
+    assert (sample_data(ArrayInt,[1,2,3,4])).value.shape == (1,2,3,4)
 
-    # check zero = true gives an array of 0s
-    assert(ImageFloat.test_sample((2,3,4,5),zero = True).value.max()== 0)
-    assert(ImageFloat.test_sample((2,3,4,5),zero = True).value.min() == 0)
+#shape checks: For array dtype, does output have expected shape with 0 values
+    assert (sample_data(ImageInt,[5,4],zero = True)).value.shape == (5,4)
+    assert (sample_data(ImageFloat,[1,2,3],zero = True)).value.shape == (1,2,3)
+    assert (sample_data(ArrayInt,[1,2,3,4],zero = True)).value.shape == (1,2,3,4)
+    #def sample_data(dtype, shape = None, zero = False):
 
-    # check array is of correct type
-    assert(isinstance(ImageFloat.test_sample((2,3,4,5), zero = True),ImageFloat))
-
-# test test_sample for ImageBinary
-def test_test_sample_for_ImageBinary():
-    with pytest.raises(TypeError):
-        ImageBinary.test_sample(2)
-
-    with pytest.raises(TypeError):
-        ImageBinary.test_sample("2")
-
-    with pytest.raises(TypeError):
-        ImageBinary.test_sample((1.0,2.0))
-
-    # check corret shape
-    assert(ImageBinary.test_sample((2,3,4,5)).value.shape == (2,3,4,5))
-    assert(ImageBinary.test_sample((2,3,4,5),zero = True).value.shape == (2,3,4,5))
-
-    # check zero = true gives an array of 0s
-    assert(ImageBinary.test_sample((2,3,4,5),zero = True).value.max()== 0)
-    assert(ImageBinary.test_sample((2,3,4,5),zero = True).value.min() == 0)
-
-    # check array is of correct type
-    assert(isinstance(ImageBinary.test_sample((2,3,4,5), zero = True),ImageBinary))
-
-# test test_sample for ValueInt
-def test_test_sample_for_ValueInt():
-
-    assert(isinstance(ValueInt.test_sample(),ValueInt))
+# value constraint check: For dtype with min, max values, do random values conform to min and max
+    a = (sample_data(ImageInt,[200,300,400],zero = True))
+    assert a.value.max() <= a.data_type.max_value
+    assert a.value.min() >= a.data_type.min_value
 
 
-# test test_sample for ValueInt
-def test_test_sample_for_ValueFloat():
 
-    assert(isinstance(ValueFloat.test_sample(),ValueFloat))
+

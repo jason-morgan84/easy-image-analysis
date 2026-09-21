@@ -3,301 +3,219 @@ import numbers
 from core.constants import DataType
 
 
+class BaseType:
+    """ Create new DataTypes based on this framework.
+    Each new DataType must have data_type, numpy and allowed_sub_types set.
+    min_value, max_value and is_array can be set based on requirements.
+    
+    For conversions between classes, override the default 'to' function in the new class.
+    Attempts to convert between classes where type conversions have not been explicitly coded will result in an error message."""
 
-class ImageInt:
+    data_type = None            # reference to this data type in DataType enum in constant.py
+    numpy = None                # default numpy equivalent data_type   
+    description = None          # text description of class and what its for
+    allowed_sub_types = None    # tuple of allowed data types eg (np.integers, int)
+    min_value = None            # minimum allowed value, if defined
+    max_value = None            # maximum allowed value, if defined
+    is_array = False            # type classes must define either an 1d or multi-dimensional data type.
+
+    def __init__(self, value):
+        self.value = value
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, val):
+        # if val is already a member of a DataType class but is not the current data type class, call self.to(self.data_type) function for implicit conversion
+        value_dtype = getattr(val, "data_type", None)
+        if isinstance(value_dtype,DataType) and value_dtype != self.data_type:
+            val = val.to(self.data_type).value
+        else:
+            # defines different validation methods is data type is an array (is_array = True) or not (is_array = False)
+            if self.is_array:
+                val = self.validate_array(val)
+            else:
+                val = self.validate_scalar(val)
+        self._value = val
+
+    def validate_array(self, val):
+        # if input value is not a np array, list or tuple then give error
+        if not isinstance(val, (np.ndarray, list, tuple)):
+            raise TypeError (f"Expected list or np.array, got {type(val)}")
+        # if a collection but not np.array, convert to np.array, else copy the np.array
+        # this is required for immutability
+        val = np.array(val) if isinstance(val, (list,tuple)) else val.copy()
+
+        # if array members are not one of the allowed data subtypes, give type error
+        if not np.issubdtype(val.dtype, self.allowed_sub_types):
+            raise TypeError (f"Expected {self.allowed_sub_types}, got {val.dtype}")
+
+        # if min and max values are defined, check value is within the boundaries else give error
+        # these are explicit boundaries and not constraints - an error is given if unacceptable data is passed in, data is not changed to be within boundaries
+        if ((self.min_value != None and val.min() < self.min_value) or 
+            (self.max_value != None and val.max() > self.max_value)):
+                raise ValueError(f"Value out of bounds (must be {self.min_value}-{self.max_value})")
+
+        return val.copy()
+            
+
+    def validate_scalar(self, val):
+        # check value is a an allowed sub type
+        if not isinstance(val, self.allowed_sub_types):
+            raise TypeError (f"Expected {self.allowed_sub_types}, got {type(val)}")
+
+        # check value is within range, if appropriate
+        if self.min_value != None and self.max_value!=None:
+            if val > self.max_value or val < self.min_value:
+                raise ValueError(f"Value out of bounds (must be {self.min_value}-{self.max_value})")
+        return val
+
+    def to_numpy(self):
+        if self.is_array:
+            return np.array(self.value, self.numpy)
+        else:
+            return self.numpy(self.value)
+
+    def to(self, dtype):
+        raise NotImplementedError(f"Type conversions not yet implemented for data type {self.data_type}")
+
+class ImageInt(BaseType):
     data_type = DataType.ImageInt
-    numpy = np.uint8
     description = "Data type to hold multi-dimensional arrays for images as integers in the range 0 - 255 inclusive"
+    numpy = np.uint8
+    is_array = True
+    min_value = 0
+    max_value = 255
+    allowed_sub_types = (np.integer)
 
-    def __init__(self, value):
-        self.value = value
-
-    def __getitem__(self, index):
-        return self.value[index]
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, val):
-
-        # checks whether val is a member of any of another type defined as an image_types in constants.py
-        value_dtype = getattr(val, "data_type", None)
-        if value_dtype in DataType.image_types() and value_dtype != ImageInt:
-            # if it is, call relevant function converting to int
-            val = val.to_ImageInt()
+    def to(self, dtype):
+        if dtype == DataType.ImageFloat or dtype == ImageFloat:
+            return ImageFloat(self.value/255)
+        elif dtype == DataType.ImageBinary or dtype == ImageBinary:
+            return ImageBinary(self.value)
+        elif dtype == ImageInt and dtype == self.data_type:
+            return ImageInt(self.value)
         else:
-            # if not an np.array or list, give type error
-            if not isinstance(val, np.ndarray):
-                if not isinstance(val, list):
-                    raise TypeError (f"Expected list or np.array, got {type(val)}")
+            raise TypeError(f"ImageInt cannot be converted to type {dtype}")
 
-                # if its a list, convert to np.array
-                val = np.array(val)
-            else:
-                # if it is a np array, create a copy; for lists, conversion to np.array is sufficient for immutability but np.arrays need to be copied
-                val = val.copy()
-            
-            # if elements aren't integers or np.integers, type error
-            if not np.issubdtype(val.dtype, np.integer):
-                raise TypeError (f"Expected integer, got {val.dtype}")
-
-            # if it contains elements > 255 or < 0, value error
-            if val.max() > 255 or val.min() < 0:
-                raise ValueError(f"Value out of bounds (must be 0-255)")
-        
-        self._value = val
-
-    # returns a test variable of size "shape" of random integers between 0 and 255
-    def test_sample(shape, zero = False):
-        if not isinstance(shape, list) and not isinstance(shape, tuple):
-            raise TypeError(f"Expected shape as list or tuple, got  {type(shape)}")
-        elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
-            raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
-        elif zero == True:
-            return ImageInt(np.uint8(np.zeros(shape)))
-        else:
-            return ImageInt(np.random.randint(low=0, high=255, size=shape))
-
-    @property
-    def shape(self):
-        return self.value.shape
-
-    def to_ImageFloat(self):
-        return ImageFloat(self.value/255)
-
-    def to_ImageBinary(self):
-        return ImageBinary(self.value)
-
-    def to_numpy(self):
-        return np.array(self.value, self.numpy)
-
-    def to_uint8(self):
-        return np.array(self.value,np.uint8)
-
-class ImageFloat:
+class ImageFloat(BaseType):
     data_type = DataType.ImageFloat
-    numpy = np.float64
     description = "Data type to hold multi-dimensional arrays for images as floats in the range 0 - 1 inclusive"
-
-    def __init__(self, value):
-        self.value = value
-
-    def __getitem__(self, index):
-        return self.value[index]
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, val):
-        # checks whether input val is a member of any of the Image data types defined as image_types in constants.py
-        value_dtype = getattr(val, "data_type", None)
-        if value_dtype in DataType.image_types() and value_dtype != ImageFloat:
-            # if it is, call relevant function converting to int
-            val = val.to_ImageFloat()
-        else:
-            # if not an np.array or list, give type error
-            if not isinstance(val, np.ndarray):
-                if not isinstance(val, list):
-                    raise TypeError (f"Expected list or np.array, got {type(val)}")
-                # if its a list, convert to np.array
-                val = np.array(val)
-            else:
-                # if it is a np array; for lists, conversion to np.array is sufficient for immutability but np.arrays need to be copied
-                val = val.copy()
-            # if elements aren't integers or np.integers, type error
-            if not np.issubdtype(val.dtype, np.number):
-                raise TypeError (f"Expected number, got {val.dtype}")
-            
-            # if it contains elements > 1 or < 0, value error
-            if val.max() > 1 or val.min() < 0:
-                raise ValueError(f"Value out of bounds (must be 0-1)")
-        
-        self._value = val
-
-    # returns a test variable of size "shape" of random integers between 0 and 1
-    def test_sample(shape, zero = False):
-        if not isinstance(shape, list) and not isinstance(shape, tuple):
-            raise TypeError(f"Expected shape as list or tuple, got  {type(shape)}")
-        elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
-            raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
-        elif zero == True:
-            return ImageFloat(np.zeros(shape))
-        else:
-            return ImageFloat(np.random.random(size=shape))
-
-    @property
-    def shape(self):
-        return self.value.shape
-
-    def to_ImageInt(self):
-        return ImageInt(np.uint8(np.round(self.value * 255)))
-
-    def to_ImageBinary(self):
-        return ImageBinary(self.value)
-
-    def to_numpy(self):
-        return np.array(self.value,self.numpy)
-
-    def to_float64(self):
-        return np.array(self.value,np.float64)
-
-class ImageBinary:
-
-    data_type = DataType.ImageBinary
-    numpy = np.uint8
-    description = "Data type to hold multi-dimensional arrays for images as either 1 or 0"
-
-    def __init__(self, value):
-        self.value = value
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, val):
-
-        # checks whether input val is a member of any of the Image data types defined as image_types in constants.py
-        value_dtype = getattr(val, "data_type", None)
-        if value_dtype in DataType.image_types() and value_dtype != ImageBinary:
-            # if it is, call relevant function converting to int
-            val = val.to_ImageBinary()
-        else:
-            # if not an np.array or list, give type error
-            if not isinstance(val, np.ndarray):
-                if not isinstance(val, list):
-                    raise TypeError (f"Expected list or np.array, got {type(val)}")
-                
-                # if its a list, convert to np.array
-                val = np.array(val)
-            else:
-                # if it is a np array; for lists, conversion to np.array is sufficient for immutability but np.arrays need to be copied
-                val = val.copy()
-
-            # if elements aren't integers or np.integers, type error
-            if not np.issubdtype(val.dtype, np.number):
-                raise TypeError (f"Expected number, got {val.dtype}")
-            
-            # if it contains elements > 255 or < 0, value error
-            if np.any(~np.isin(val, [0, 1])):
-                raise ValueError(f"Value out of bounds (must be 0 or 1)")
-        
-        self._value = val
-
-    # returns a test variable of size "shape" of random integers either 0 or 1
-    def test_sample(shape, zero = False):
-        if not isinstance(shape, list) and not isinstance(shape, tuple):
-            raise TypeError(f"Expected shape as list or tuple, got  {type(shape)}")
-        elif not isinstance(shape[0],int) and not isinstance(shape[0],np.integer):
-            raise TypeError(f"Expected shape as as integers, got  {type(shape[0])}")
-        elif zero == True:
-            return ImageBinary(np.uint8(np.zeros(shape)))
-        else:
-            return ImageBinary(np.random.randint(low=0, high=1, size=shape))
-
-    @property
-    def shape(self):
-        return self.value.shape
-
-    def to_ImageFloat(self):
-        return ImageFloat(self.value)
-
-    def to_ImageInt(self):
-        return ImageInt(self.value)
-
-    def to_numpy(self):
-        return np.array(self.value,self.numpy)
-
-    def to_uint8(self):
-        return np.array(self.value,np.uint8)
-
-    def to_boolean(self):
-        return np.array(self.value,np.bool)
-
-class ValueInt:
-
-    data_type = DataType.ValueInt
-    numpy = np.uint8
-    description = "Data type to hold single variables as integers"
-
-    def __init__(self, value):
-        self.value = value
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self,val):
-        value_dtype = getattr(val, "data_type", None)
-        if value_dtype in DataType.value_types() and value_dtype != ValueInt:
-            # if it is, call relevant function converting to int
-            val = val.to_ValueInt()
-        else:
-
-            if not isinstance(val,int) and not isinstance(val,np.integer):
-                raise TypeError (f"Expected integer, got {type(val)}")
-            self._value = val
-
-
-    # returns a test variable
-    def test_sample(zero = False):
-        if zero:
-            return ValueInt(0)
-        else:
-            return ValueInt(np.random.randint(low = 0, high = 255))
-
-    def to_ValueFloat(self):
-        return ValueFloat(self.value)
-
-    def to_numpy(self):
-        return self.numpy(self.value)
-
-    def to_uint8(self):
-        return np.uint8(self.value)
-
-class ValueFloat:
-
-    data_type = DataType.ValueFloat
     numpy = np.float64
+    is_array = True
+    min_value = 0.0
+    max_value = 1.0
+    allowed_sub_types = (np.number)
+
+    def to(self, dtype):
+        if dtype == DataType.ImageInt or dtype == ImageInt:
+            return ImageInt(np.uint8(np.round(self.value * 255)))
+        elif dtype == DataType.ImageBinary or dtype == ImageBinary:
+            return ImageBinary(np.uint8(np.round(self.value)))
+        elif dtype == ImageFloat and dtype == self.data_type:
+            return ImageFloat(self.value)
+        else:
+            raise TypeError(f"ImageFloat cannot be converted to type {dtype}")
+
+class ImageBinary(BaseType):
+    data_type = DataType.ImageBinary
+    description = "Data type to hold multi-dimensional arrays for images as either 1 or 0"
+    numpy = np.uint8
+    is_array = True
+    min_value = 0
+    max_value = 1
+    allowed_sub_types = (np.integer)
+
+    def to(self, dtype):
+        if dtype == DataType.ImageFloat or dtype == ImageFloat:
+            return ImageFloat(self.value)
+        elif dtype == DataType.ImageInt or dtype == ImageInt:
+            return ImageInt(self.value)
+        elif dtype == ImageBinary and dtype == self.data_type:
+            return ImageBinary(self.value)
+        else:
+            raise TypeError(f"ImageBinary cannot be converted to type {dtype}")
+        
+class ValueInt(BaseType):
+    data_type = DataType.ValueInt
+    description = "Data type to hold single variables as integers"
+    numpy = np.uint8
+    allowed_sub_types = (int, np.integer)
+
+    def to(self, dtype):
+        if dtype == DataType.ValueFloat or dtype == ValueFloat:
+            return ValueFloat(self.value)
+        else:
+            raise TypeError(f"ValueInt cannot be converted to type {dtype}")
+
+class ValueFloat(BaseType):
+    data_type = DataType.ValueFloat
     description = "Data type to hold single variables as floats"
+    numpy = np.float64
+    allowed_sub_types = (numbers.Number, np.number)
 
-    def __init__(self, value):
-        self.value = value
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self,val):
-        value_dtype = getattr(val, "data_type", None)
-        if value_dtype in DataType.value_types() and value_dtype != ValueFloat:
-            # if it is, call relevant function converting to int
-            val = val.to_ValueFloat()
+    def to(self, dtype):
+        if dtype == DataType.ValueInt or dtype == ValueInt:
+            return ValueInt(np.round(self.value))
         else:
-            if not isinstance(val,(np.number,numbers.Number)):
-                raise TypeError ("Value must be a number.")
-            self._value = np.float64(val)
+            raise TypeError(f"ValueFloat cannot be converted to type {dtype}")
 
-    # returns a test variable
-    def test_sample(zero = False):
+class ArrayInt(BaseType):
+    data_type = DataType.ArrayInt
+    description = "Data type to hold variables lists as ints"
+    numpy = np.uint8
+    allowed_sub_types = (np.integer)
+    is_array = True
+
+    def to(self, dtype):
+        if dtype == DataType.ArrayFloat or dtype == ArrayFloat:
+            return ArrayFloat(self.value)
+        else:
+            raise TypeError(f"ArrayInt cannot be converted to type {dtype}")
+
+class ArrayFloat(BaseType):
+    data_type = DataType.ArrayFloat
+    description = "Data type to hold variables lists as floats"
+    numpy = np.float64
+    allowed_sub_types = (np.number)
+    is_array = True
+
+    def to(self, dtype):
+        if dtype == DataType.ArrayInt or dtype == ArrayInt:
+            return ArrayInt(np.uint8(np.round(self.value)))
+        else:
+            raise TypeError(f"ArrayFloat cannot be converted to type {dtype}")
+
+def sample_data(dtype, shape = None, zero = False):
+    value_dtype = getattr(dtype, "data_type", None)
+    if value_dtype == None or value_dtype not in DataType.types():
+        raise TypeError (f"Expected Image data type (see constants.py) got {dtype}")
+    # used for generating sample data sets of given type
+
+        
+    if dtype.is_array:
+        if shape == None:
+            raise TypeError (f"Array data type ({dtype}) supplied without shape")
+        if type(shape) not in [list,tuple]:
+            raise TypeError (f"Expected shape as list or tuple, got {type(shape)}")
+        if not isinstance(shape[0],(int,np.integer)):
+            raise TypeError (f"Shape should be array of integers, not {type(shape[0])}")
         if zero:
-            return ValueFloat(0)
+            return dtype(dtype.numpy(np.zeros(shape)))
         else:
-            return ValueFloat(np.random.random())
-
-    def to_ValueInt(self):
-        return ValueInt(round(self.value))
-
-    def _to_numpy(self):
-        return self.numpy(self.value)
-
-    def to_float64(self):
-        return np.float64(self.value)
-
-     
+            max = 255 if dtype.max_value == None else dtype.max_value
+            min = 0 if dtype.min_value == None else dtype.min_value
+            range = max - min
+            random_array = np.random.random(size = shape) # gives random array between 0 and 1 of desired shape
+            random_array = (random_array * range) + min # gets array between min and max values
+            return dtype(dtype.numpy(random_array)) # returns array in correct format
+    else:
+        if zero:
+            return dtype(dtype.numpy(0))
+        else:
+            max = 255 if dtype.max_value == None else dtype.max_value
+            min = 0 if dtype.min_value == None else dtype.min_value
+            range = max - min
+            return dtype(dtype.numpy(np.random.random() * range + min))

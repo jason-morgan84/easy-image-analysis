@@ -28,11 +28,14 @@
 |09/09/26|0.8.5|Parameter class: added shape arguement and updated unit testing|
 |09/09/26|0.8.6|Type class: clarified description of use cases of Type classes|
 |09/09/26|0.8.7|Parameter Class: Updated unit testing|
-<<<<<<< HEAD
 |10/09/26|0.9.0|Started major re-write of description of classes, class heirarchy and type checking|
-=======
-|09/09/26|0.8.8|Type class: Added description of future potential bug|
->>>>>>> 13e65bee47d96f64ffb3b6e01ecf46b4d1af547d
+|11/09/26|0.9.1|Re-wrote description of DataType classes to explain base class/child class structure|
+|13/09/26|0.9.2|Re-wrote description of Image class and Image unit testing|
+|13/09/26|0.9.3|Re-wrote description of Parameter class and Parameter unit testing|
+|14/09/26|0.9.4|Re-wrote description of ImageOperation class and unit testing|
+|14/09/26|0.9.5|Documented run_code function in ImageOperation|
+|15/09/26|0.9.6|Described refactoring of dictionary in ImageOperation to dataclasses and updated unit testing|
+|18/09/26|0.10.0|Added description of error handling and logging code|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -44,6 +47,7 @@ With that in mind, I’ve got three main aims to this software:
 2.	It needs to be intuitive, with a simple UI where the same actions will always lead to the same effects.
 3.	It needs to have a large, well-structured and well-documented list of functions. To aid this, it needs to be easily expandable.
 This will be done by allowing the user to use drag-and-drop nodes and connections to draw an image analysis workflow. A pair of input/output images will allow immediate comparison between the original image and the changes at each step.
+
 ## 2.1 Educational
 To be educational, it should not place unnecessary barriers to learning. This means things like conversions between data types and transposition of dimensions should be dealt with behind the scenes, EXCEPT where they are directly relevant to proper image analysis (for example, trying to do binary processes on non-binarised data).
 
@@ -112,19 +116,19 @@ graph TD
     classDef exec fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000000;
 
     subgraph Foundational_Layer ["1. Foundational Data & Type Layer"]
-        Shape["<b>Shape</b><br>• Checks for ints<br>• Contains image min/max dimensions<br>• Checks size within min/max"]:::found
+        Shape["<b>Shape</b><br>• Checks for ints<br>• Contains image min/max dimensions"]:::found
         ImageType["<b>ImageType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
         ValueType["<b>ValueType</b><br>• Checks for int/float<br>• Checks for 0 dimensionality"]:::found
         ArrayType["<b>ArrayType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
     end
 
     subgraph Composition_Layer ["2. Structural Composition Layer"]
-        Image["<b>Image</b><br>• Check array_dtype is an ImageType<br>• Check shape is a Shape<br>• Check array matches array_dtype<br>• Check array dimensions match shape*"]:::comp
+        Image["<b>Image</b><br>• Check array_dtype is an ImageType<br>"]:::comp
         Parameter["<b>Parameter</b><br>• Check dtype is a ValueType or ArrayType<br>• Check value matches dtype"]:::comp
     end
     subgraph Composition_layer ["Node"]
         subgraph Interface_Layer ["3. WorkFlow Interface Layer"]
-            Port["<b>Port (Gatekeeper & Translator)</b><br>• Always associated with a node/operation<br>• Accepts Image or Parameter<br>• Outputs raw NumPy array or scalar<br>• Validates array_dtype & shape compatibility"]:::iface
+            Port["<b>Port (Gatekeeper & Translator)</b><br>• Always associated with a node/operation<br>• Accepts Image or Parameter<br>• Outputs raw NumPy array or scalar<br>• Validates array_dtype & shape match ImageOperation requirements"]:::iface
         end
 
         subgraph Execution_Layer ["4. Execution Layer"]
@@ -144,50 +148,58 @@ graph TD
     Port --> ImageOperation
 ```
 
-
-
-
-
-
 ### 3.2.1 DataType Classes
 
-The aim of the data classes is to allow data to be transferred through the workflow in a reliable and predictable way.
+The aim of the DataType classes is to allow data to be transferred through the WorkFlow in a reliable and predictable way.
 
-Data can **only** be passed through the workflow as a DataType class - equivalent types such as np.uint8 or np.float64 **will** result in type errors.
+Data can **only** be passed through the WorkFlow as a DataType class - equivalent types such as np.uint8 or np.float64 **will** result in type errors.
 
-This may seem overly strict, but its a deliberate design choice to have control and consistency in how data moves through the WorkFlow.
+This is a deliberate design choice to maintain control and consistency in how data moves through the WorkFlow.
 
-The only exception to this is in the ImageOperation class, where the actual image analysis takes place. Input and output data to ImageOperations will be in **defined** numpy equivalents to DataType classes and this conversion will take place in the relevant Port for each input and output. This means image analysis can be carried out using standard types and functions, and there is no requirement for data manipulation using the DataType classes. 
+A distinction should be made between data transferred through the WorkFlow and data used for image manipulation in members of the ImageOperation class. Input and output data to ImageOperations will be in **defined** numpy equivalents to DataType classes. The conversion from DataType classes to their numpy equivalent will take place in the Port for each input and output. This means image analysis can be carried out using standard types and functions, and there is no requirement for data manipulation using the DataType classes. 
+
+While image manipulation is carried out using standard Numpy types, DataTypes are still used to define the format of expected inputs to and output from ImageOperations.
 
 The interaction between DataTypes, Ports and ImageOperations will be described in more detail in the Port and ImageOperation class descriptions.
 
-When developing image analysis functions, this should make the permissible input and output formats clear, it should allow automatic conversion between compatible formats and give clear feedback to users where formats aren't compatible. 
+DataTypes are all based on a defined base class, BaseType. This defines the characteristics of a custom data type with the following variables. The first three variables are required - the class types will not function without them and will fail unit testing. The remaining four variables are optional:
 
-There will be three data types for image data and two for non-image data:
+* data_type - this provides a reference to this DataType in the DataType enum in constant.py
+* numpy - the defines the equivalent numpy data type (eg np.uint8, np.bool, np.float64)
+* allowed_sub_types - a tuple of allowed data types (eg np.integers, bool, numbers.Number)
 
-ImageInt - 0 ≤ int ≤ 255
-ImageFloat - 0 ≤ float ≤ 1
-ImageBinary - 0 or 1
-ValueInt - int
-ValueFloat - float
+* description - text description of class and what its for
+* min_value - if the value must be with a range, this defines a minimum value (default is None)
+* max_value - maximum allowed value, if defined (default is None)
+* is_array - type classes must define as either a 1d or multi-dimensional data type (default is False)
+
+By default, seven custom data types are defined. Three are used to define images, two to define 1D variables and two to define non-image arrays:
+
+* ImageInt - For images stored as integers in the range 0 ≤ int ≤ 255
+* ImageFloat - For images stored as floats in the range 0 ≤ float ≤ 1
+* ImageBinary - For binarised images. Stored as integer 0 or 1, will accept boolean values.
+
+* ValueInt - For 1D integer variables
+* ValueFloat - For 1D float variables
+
+* ArrayInt - for multi dimensional integer variables
+* ArrayFloat - for multi dimensional float variables
+
+Note again that these data types are for transferring data through the WorkFlow, for example an image threshold value may be transmitted from one node to the next as a ValueInt. They are not expected to be used in any code unrelated to data transfer.
+
+For new DataTypes, conversion between types will result in a NotImplementedError. To fix this, implement a custom to(self, dtype) function in your custom class defining the possible conversions.
+
+By default, each ImageType can be converted to each other. Likewise ValueTypes and ArrayTypes can be converted to other members of the same type.
+
+Where the 'to' function has been implemented, conversions can be explicit (eg, by using ImageInt.to(DataType.ImageFloat)) or implicit (eg, by calling ImageFloat(x) where x is an ImageInt).
 
 Each Image type has __init__, value property and value.getter functions along with conversion functions for the other two image types and the relevant standard numpy type. For numpy conversion, this will be available as an explicit function (to_uint8 or to_float64) or as a generic function (to_numpy).
 
 The comparable numpy data type is stored in the numpy class variable. This is used in the to_numpy function and for type checking once the DataType class has been converted to a standard numpy class for image analysis in a Port.
 
-The value types will have similar functions for converting between themselves.
+~~Each DataType includes a test_sample() function, which creates a variable of that type for testing and providing default values. This can be generated as random numbers (for testing) or 0s (for instantiating default input and output variables for ImageOperations, if zero = True - by default, zero = False).~~
 
-Conversions can be explicit (eg, by using ImageInt.to_ImageFloat) or implicit (eg, by calling ImageFloat(x) where x is an ImageInt).
-
-To allow implicit conversions, each class should have conversion functions for all members of it's sub group (defined below).
-
-Each DataType includes a test_sample() function, which creates a variable of that type for testing and providing default values. This can be generated as random numbers (for testing) or 0s (for instantiating default input and output variables for ImageOperations, if zero = True - by default, zero = False).
-
-All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type.
-
-
-#### Potential bug
-Type is used in a number of instances as a proxy for whether a variable is 1d or multi-dimensional. This could lead to widespread problems if an array/list is required for a non-image variable.
+All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type. For each type, the data_type class variable **must** point to the relevant name in the Enum (stored in constants.py).
 
 ### 3.2.2 Shape class
 
@@ -196,6 +208,7 @@ This exists to hold data related to the shape of transmitted images. It will hol
 * z (depth)
 * y (height)
 * x (width) 
+
 And contains class variables to define limits on image Shape:
 
 * max_image_dimensions - the max number of dimensions an image should have (4).
@@ -204,7 +217,7 @@ And contains class variables to define limits on image Shape:
 
 * dimensions- the current dimensions and default order (c, z, y, x). This is in the form of a tuple defining the order, used in the __iter__ and __getitem__ dunders below.
 
-Shape has __iter__ dunder to return values in the order defined above and __getitem__ and __setitem__ dunders to return and set values. __getitem__ and __setitem__ accept and return values as either strings (c,z,y,x) or integer indices (0,1,2,3 - as defined by order in dimensions).
+Shape has __iter__ dunder to return values in the order defined above, __getitem__ and __setitem__ dunders to return and set values and __copy__ and copy() functions to allow copying. __getitem__ and __setitem__ accept and return values as either strings (c,z,y,x) or integer indices (0,1,2,3 - as defined by order in dimensions).
 
 Shape also has functions to convert between dimensions in string and integer formats.
 
@@ -219,56 +232,100 @@ Shape will be used to hold shape related information in a number of classes and 
 
 ### 3.2.3 Image Class
 
-This holds the image data as a 4D array. If the image does not require all four dimensions, for example a flat, greyscale image, the unneeded dimensions should still be present with size 1.
+This holds the image data as a multi-dimensional array, with max and min dimensions defined in the Shape class.
 
-As for the data type class, it exists purely to transmit images between nodes with a clearly defined shape and data type. It contains four instance variables:
+The Image class exists purely to hold images for input to and output from ImageOperations within Nodes. Members of the Image class are instantiated on the creation of the Node and ImageOperation initially as arrays of 0s of the defined size and type. This means that, for each Image, the shape and data type of the pixel array is pre-defined and invariate. Any changes to the Image class which do not match the requirments of the attached Port will result in an error.
 
-1.	Image pixel data, in a multi-dimensional array of defined size and type.
-2.	Image data type, as a member of DataType.
-3.	Image shape, using Shape class.
-4.	Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
+Therefore, the image data can be described with two instance variables:
 
-It also contains the following functions:
-* ~~Convert between DataTypes~~ No longer required after implementation of implicit Type conversions.
-* transpose(Shape) - takes a parameter of type Shape defining which array dimension each image dimension should be moved to.
-    - expect a list/tuple with four, non-duplicate string elements which are members of Shape.dimension_order eg, (x,y,z,c)
-* ~~Unsqueeze images where output from an ImageOperation is in less than 4 dimensions~~ Unsqueeze can be carried out on collection of image from an ImageOperation using no.unsqueeze prior to converting to custom ImageType.
+1.	pixel_array: Contains Image pixel data, in a multi-dimensional array of defined size and type.
+2.	image_map: Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
 
 ### 3.2.4 Parameters Class
-The parameter class holds information for ImageOperations defining the required inputs, from the user and from the workflow.
 
-The aim is to allow data to be passed to and from an ImageOperation in the relevant standard numpy formats, and, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
+Similar to the Image class, the Parameter class does not exist independently of a Node/Port. 
+
+It contains non-image inputs/outputs for ImageOperations, including non-image values passed from other nodes via the WorkFlow and values passed from the UI based on user input.
+
+Parameter also includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
 
 * Name – the name of the parameter
-* dtype – the data type of the parameter
-* value – its value
-* shape - its shape, where relevant
+* value – its value (initialised as correct data_type/shape (if required) by Port on instantiation therefore also defines required data type)
 * ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc)
 * ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
 
-Type checking is carried out on dtype, to ensure its a member of DataType, and shape, to ensure its of Shape class.
-
-Because the Parameter class deals with inputs and outputs to ImageOperations, which work with standard numpy data types, type checking for "value" is to ensure it is of type DataType.dtype.numpy.
-
+Type checking is carried out on dtype, to ensure its a member of DataType.value_types or DataType.array_types.
 
 ### 3.2.5 ImageOperation Class/File
-A key aim of this project is expandability, to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class which will contain all the information required to run the function and will be imported using imagelib. The ImageOperation class will contain:
+The ImageOperation class is responsible for carrying out functions that carry out analysis on images. A key aim of this project is expandability and to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class, containing all the information required to run the function and will be imported using imagelib. 
+
+The previous classes described have been primarily related to the flow of data through the WorkFlow graph and have defined custom class types to make sure this happens in a controlled manner. The ImageOperation sits slightly outside this class structure, as existing image analysis modules work in standard or numpy classes. To allow ImageOperations code to be designed and executed in a standard manner, inputs and outputs from ImageOperations are in standard Numpy data types (for conversion from custom DataTypes to Numpy, see Node and Port classes).
+
+The expected inputs and outputs will still be described in terms of DataType classes, as these classes also define their own Numpy equivalents.
+
+The ImageOperation class will contain the following variables:
+
 * name: name of ImageOperation
-* category: logical category (“Threshold”, “Filter” etc)
-* inputs: dictionary defining inputs in the form {name: Str; dtype: DataType; shape: Shape}
-* outputs: dictionary defining outputs in the form {name: Str; dtype: DataType; shape: Shape}
-* parameters – dictionary of Parameter classes for input variables from frontend
+* category: logical category (“Threshold”, “Filter” etc) - defined by folder location of file
+* input_image: input images as dictionary of ImagePackage class
+* input_parameter: other inputs as dictionary of ParameterPackage class 
+* output_image: Output images as dictionary of ImagePackage class
+* output_parameter: other outputs as dictionary of ParameterPackage class 
 * docs – documentation to explain function, effects, parameters etc
 * alerts – any warnings to user (e.g, “Background subtraction with a large radius is a very slow process”)
 * version – version of software code ImageOperation was written for. This is to future proof code, so changes to base code that affect ImageOperations don’t mean all existing ImageOperations need to be rewritten. 
-* execute – function with code to execute
+* execute – function with compiled code to execute - gathered from input .py files by ImageOperationDirectory
+
+Because this class takes input directly from external files there are a number of checks made on that data:
+
+```mermaid
+graph LR
+Node2["Package class: Type checks arguements"]
+Node3["ImageOperation. check_dict: Checks Input/Outputs are dictionaries of Package classes"]
+Node4["ImageOperation. pre_execution: Checks inputs are complete, outputs are ready"]
+Node5["ImageOperation. post_execution: Checks output are complete"]
+
+
+Node2-->Node3
+Node3-->Node4
+Node4-->Node5
+```
+Firstly, data on expected inputs and outputs are entered into a PackageClass, either ImagePackage for images or ParameterPackage for other input/output values. This requires a defined data type for that variable from the DataType enum. Where other parameters (the value itself, any shape parameters to define it) it will also check their type, but these aren't required until a later stage. Note that, on instantiation, the inputs and outputs will have defined data types but no actual data.
+
+Next, ImageOperation, the setters for InputImage, InputParameter, OutputImage and OutputParameter run check_dict() which checks that each arguement is a dictionary of the relevant package class.
+
+The bulk of the checks are carried out when run_code is called to execute the code, which calls the pre_execution function. This checks that all inputs are present and correct (eg, input image pixel array matches defined shape) and that the required output arguements are present to describe the outputs (dtype and shape).
+
+Finally, following code execution checks are carried out to ensure that the output is complete and correct.
+
+**NOTE: At this point, any ImageOperation requires (at least) one image as an input. This is a design decision to prevent creep and bloat, based on the idea that as soon as only non-image variables are accepted this software is moving into data analysis rather than image analysis. This is checkedby the run_code function in ImageOperation and will therefore also affect other classes interacting with ImageOperations (Nodes and WorkFlow).**
+
+#### 3.2.6.1 ImagePackage
+Simple class holding data for image inputs and outputs from ImageOperation. Contains:
+* dtype - set at instantiation based on ImageOperation code file.
+    - Type checks for member of DataType
+* shape - set at instatiation based on shape constrains defined in code file. **NOTE: this is not the shape of the array (which is defined by the array) - it is the <u>constraints</u> on the shape of the image.**
+    - Type checks for Shape class
+* pixel_array - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain ndarray of dtype.numpy.
+    - Type checks for Shape class
+* mapping - set to None at instantiation, given value of type Shape mapping image dimensions to pixel array dimensions.
+
+#### 3.2.6.2 ParamterPackage
+Simple class holding data for non-image inputs and outputs from ImageOperation. Contains:
+* dtype - set at instantiation based on ImageOperation code file.
+    - Type checks for member of DataType.
+* value - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain value of dtype.numpy.
+* shape - if dtype defines an array_type, contains a np.array defining shape of value.
+    - will accept a tuple, list or np.ndarray. Tuples and lists will be converted to np.ndarray.
 
 ### 3.2.6 ImageOperationDirectory Class
-This class acts as a holder for a list of all ImageOperation classes, along with the code required to import them.
+This class holds for a list of all ImageOperation classes, along with the code required to import them.
 
-Importing ImageOperation classes will also require testing under the same testing protocol described for ImageOperation in the testing section. This will be carried out using pytest parametization. 
+Once imported, ImageOperation classes will require testing under the same testing protocol described for ImageOperation in the testing section. This will be carried out using pytest parametization. 
 
 ImageOperations will only be imported if they were made using a compatible version.
+
+Imported function will be checked to ensure only permitted libraries are imported.
 
 ### 3.2.7 Node Class
 The ImageOperation class defines the image analysis function to be carried out on the image. The Node class is responsible for positioning an ImageOperation in the WorkFlow – this means there can be multiple nodes containing the same ImageOperation. While the ImageOperation class is responsible purely for image analysis, the Node class is responsible for interacting with other elements of the WorkFlow. As such, it has the following instance variables:
@@ -330,10 +387,20 @@ It also contains the following functions:
 * port_create
 * port_edit
 * port_remove
+* Transpose - tranposes pixel_arrays passing through the graph, given requirements of input and output Ports. Previously part of Image class./
+* Squeeze/unsqueeze - changes array shape, as Tranpose.
 
 On creation of a new connection, it will check for structure, constraint or type violations. Where these can be fixed through image type or shape changes, it will do so, otherwise it will prompt the user to adjust the WorkFlow. 
 
- ## 4 Frontend and UI
+## 3.3 Error Handling
+
+To allow reporting of errors to an external log (with the future potential to pass to a UI dialog) It uses a custom function, log(), in error_handling.py, that catches and reports errors, then returns the python Error type and associated message to where it was called.
+
+Exception chaining will be used to log errors in the Workflow layer, but not lower layer classes (see class heirarchy).
+
+For now, error messages are simply printed. This will be developed to saving to a log file and user prompts as development progresses.
+
+# 4 Frontend and UI
 
 ![UI diagram](/docs/UI.svg)
  
@@ -380,95 +447,100 @@ On creation of a new connection, it will check for structure, constraint or type
 # 6 Testing - Backend
 ## 6.1 – Backend Image Classes
 ### 6.1.1 DataType
-**All DataTypes**
+**BaseType**
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Type constraints|	Insert wrong type|	Type Error	| <ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
-|Value constraints |Insert out of bounds value |	Value Error |	<ul><li>Out-of-bounds value added to type</li><li>Value coerced to bounds</li></ul>
-|Immutability   |   Define DataType *x* based on standard python variable *y*, then change *y* |	Values in DataType do not change |<ul><li> Values in DataType change </li></ul>|
-|Immutability  |   Define DataType *x* based on np variable *y*, then change *y* |	Values in DataType do not change |<ul><li> Values in DataType change </li></ul>|
-|Explicit Type Conversions | Member of DataType *x* converted to DataType *y* | Correctly converted with expected value | <ul><li>Not converted to expected DataType</li><li>Not converted to expected value</li></ul>|
-|Explicit Type conversions | Convert to standard NumPy type | Array/values type matches that expected | <ul><li>Array/value data type does not match that expected</li></ul>|
-|Explicit Type conversions|	Convert between int and float types then back again repeatedly	| Array values are consistent over time	|	<ul><li>Array values drift over time</ul></li>|
-|Explicit Type conversions|	Test to_numpy() works in the same way as to_uint8 or to_float64 functions	| They give the expected value	|	<ul><li>They give unexpected values</li><li>They give errors</li></ul>|
-|Implicit Type Conversions| Test implicit type conversions | Implicit type conversions correctly convert type |<ul><li>Implicity type conversions don't work</li><li>Implicity type conversions don't maintain shape</li><li>Implicit type conversions don't maintain values</li></ul>
-|Sample Values|test_sample values give appropriate values| test_sample gives values appropriate for data type | <ul><li>Test sample returns inappropriate values</li><li>Test sample causes type error</li></ul>
+|allowed_subtypes | Use test value of type where type not listed in allowed_subtypes | Type Error | No type error |
+|is_array validation | Enter [1, 2] to data type expecting scalar values | Type Error | Data accepted |
+|is_array validation | Enter 2 to data type expecting list values | Type Error | Data accepted |
+|Array shape | Enter multi-dimensional array to type expecting multi-dimensional array | Array maintains shape | Array shape changed |
+|Min/Max bounds | Enter value above max_value | Value Error | Value accepted |
+|Min/Max bounds | Enter value below min_value | Value Error | Value accepted |
+|to_numpy| Convert value using to_numpy function | Expected value of correct type | Incorrect value<br>Incorrect type |
+|Immutability | Modify original input list after instantiation of array data type | Value doesn't change | Value does change |
+|Immutability | Modify original input np.array after instantiation of array data type | Value doesn't change | Value does change |
+|Immutability | Modify original input value after instantiation of scalar data type | Value doesn't change | Value does change |
+|Immutability | Modify original numpy type value after instantiation of scalar data type | Value doesn't change | Value does change |
 
-**Image DataTypes**
+**Every child class** 
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Matrix input| Input 4D numpy array|Array shape maintained|<ul><li>Array shape changes</li></ul>
-|Explicit Type conversions| Test each conversion on array|Array elements change type correctly| <ul><li>Array elements do not change to correct type</li></ul>|
-|Explicit Type conversions| Test each conversion on 4D numpy array|Array shape maintained|<ul><li>Array shape changes</ul></li>|
-|Sample Values|Pass inappropriate shape variabel (not list, tuple and integer)| Returns type error | <ul>Does not return type error</ul>
+|Required class variables | Test that DataType.numpy, DataType.allowed_sub_types and DataType.data_type are not None | Test pass| Test fail |
 
+**Every conversion of every child class**
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                |  
+| Output type | Output type matches dtype arguement following explicit conversion using (.to(dtype))| Test pass| Test fail |
+| Output type | Output type matches dtype arguement following implicit conversion (dtype(value))| Test pass| Test fail |
+| Output value | Output value matches dtype arguement following explicit conversion ((.to(dtype))| Test pass| Test fail |
+| Output value | Output value matches dtype arguement following implicit conversion (dtype(value))| Test pass| Test fail |
+| Value drift | Carry out repeated conversions between data types| No drift in values| Drift in values |
 
+**sample_data**
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                |  
+|dtype checks | Input value of non DataType type    |Type error |Value accepted| 
+|shape checks | Input value dtype where is_array = true but no shape passed   |Type error |Value accepted| 
+|shape checks | Shape passed, but not as np.array, tuple or list   |Type error |Value accepted| 
+|shape checks | Shape passed, but not as array of integers   |Type error |Value accepted| 
+|type checks| Input value of DataType type | Output of expected type | Output of different type|
+|shape checks | For array dtype, does output have expected shape with randomized values | Shape matches shape arguement | shape doesn't match shape arguement|
+|shape checks | For array dtype, does output have expected shape with 0 values | Shape matches shape arguement | shape doesn't match shape arguement|
+|value constraint check | For array dtype with min, max values, do random values conform to min and max | values conform | values out of range/value error from underlying type |
 
 ### 6.1.2 Shape
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Type constraints	|Insert wrong type	|Type Error	| <ul><li>Type converted to correct type</li><li>Wrong type ignored</li></ul>|
-|Immutability|Input values based on variable then change variable |Values in DataType do not change|<ul><li>Values change</ul></li>
-|Itterability|Test iteration|Iteration returns correct values|<ul><li>Iteration returns incorrect values</ul></li>
+|Type constraints	|Insert wrong type	|Type Error	| Type converted to correct type<br>Wrong type ignored|
+|Immutability|Input values based on variable then change variable |Values in DataType do not change|Values change|
+|Itterability|Test iteration|Iteration returns correct values|Iteration returns incorrect values|
+|get_item|Test getting items using either index or dimension string| returns correct values|Returns incorrect values|
+|set_item|Test setting items using either index or dimension string| Sets correct values|Sets incorrect values|
 
 ### 6.1.3 Image
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Type constraints|	Use unexpected data type (not ImageInt, ImageFloat or ImageBinary)|	Type Error	| <ul><li>Type converted to correct type</li><li>Incorrectly type data used anyway</li></ul>|
-|Type constraints	|Insert acceptable type where array type does not match DataType	|Type Error	|<ul><li>Wrong type ignored</li></ul>|
-|Shape constraints	|Insert input array with more or less than 4 dimensions |Value Error	|	<ul><li>Wrong shape array accepted</li></ul>
-|Shape constraints	|Input pixel data with different number of dimensions to image_shape|Value Error	|	<ul><li>Wrong shape ignored</li></ul>
-|Shape constraints	|Input incorrect mapping (ie, shape data says z_dim = 5, but mapping associates z with an array dimension of size 3)  |	Shape Error	|<ul><li>Wrong shape ignore</li></ul>|
-|Type conversions|Pixel data array shape| Same shape after type conversion | <ul><li>Different shape after type conversion</li></ul>|
-|Type conversions|Pixel data array value | Expected values after type conversion | <ul><li>Wrong values after type conversion</li></ul>|
-|Type conversions|Converts to correct type | Expected type after type conversion | <ul><li>Wrong type after type conversion</li></ul>|
-|Shape conversions|Test input with incorrect type - not string | Type error | <ul><li>Incorrect type ignored</li></ul>|
-|Shape conversions|Test input with incorrect type - not list or tuple | Type error | <ul><li>Incorrect type ignored</li></ul>|
-|Shape conversions|Test input with incorrect type - not 4 elements in list or tuple| Value error | <ul><li>Incorrect list size ignored</li></ul>|
-|Shape conversions|Test input with incorrect type - duplicate elements| Value error | <ul><li>Duplicate elements ignored</li></ul>|
-|Shape conversions|Test input with incorrect type - elements that aren't valid image dimension identifiers| Value error | <ul><li>Incorrect identifiers ignored</li></ul>|
-|Shape conversions|Converts to correct shape | Expected shape after shape conversion | <ul><li>Wrong shape after shape conversion</li></ul>|
-|Shape conversions|Maintains values after conversion | Expected values after type conversion  | <ul><li>Wrong values after shape conversion</ul></li>|
-|Shape conversions|Maintains type after conversion|Expected type after type conversion | <ul><li>Wrong type after shape conversion</li></ul>|
-|Shape conversions|Image shape variable updated to new shape | Image shape variable matches new shape | <ul><li>Image shape variable changes to incorrect values</li><li>Image shape variable doesn't change</li></ul>
-|Shape conversions|Dimension mapping updated to new shape | Each image dimension maps to correct new array dimension | <ul><li>Image dimensions map to incorrect values</li><li>Image dimension map doesn't change</li></ul>
-|~~Unsqueeze~~|~~Unsqueeze adds a new dimension ~~| ~~Unsqueezed image has 1 more dimension~~ | <ul><li>~~Unsqueezed image has the same number of dimensions~~/li></ul>|
-|~~Unsqueeze~~|~~New dimension is properly assigned to image~~ | ~~image_shape records the presence of the previously missing dimension with size 1~~ | <ul><li>~~image_shape does not record the presence of a new dimension with size 1~~</li><li>~~Value of 1 is assigned to the wrong dimension~~</li></ul>|
-|~~Unsqueeze~~|~~New dimension is properly mapped ~~|~~ image_mapping correctly maps to previously existing dimensions~~ | <ul><li>~~image_shape does correctly map to previously existing dimensions~~</ul>|
-|~~Unsqueeze~~|~~New dimension is properly mapped ~~| ~~image_mapping correctly maps to newly added dimensions~~ | <ul><li>~~image_shape does correctly map to newly added existing dimensions~~</ul>|
+|Type constraints|	Use unexpected data type (not ImageInt, ImageFloat or ImageBinary)|	Type Error	| Type converted to correct type<br>Incorrectly type data used anyway</li></ul>|
+|Shape constraints	|Insert input array with more or less than min/max dimensions defined in Shape.py |Value Error	|	Wrong shape array accepted|
+|Shape constraints	|Input shape data not in Shape class|Type Error	|	Wrong class ignored|
+|get_image_shape() | Get image shape of various shape pixel arrays | Gives correct shape | Gives incorrect shape |
 
 ## Stage 6.2 – Backend Image Operation Classes
 ### Parameters
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
-|Type constraints|	Input a value that is not of type DataType.dtype.numpy|	Type Error	| <ul><li>Incorrectly typed data accepted</li></ul>|
-|Type constraints|	Input a value that is of type DataType.dtype|	Type Error	| <ul><li>Incorrectly typed data accepted</li></ul>|
-|Value constraints|	Input data with an image_type without a shape|	Value Error	| <ul><li>Data accepted</li></ul>|
-|Type constraints|	Input a shape that is not of class Shape|	Type Error	| <ul><li>Incorrectly shape accepted</li></ul>|
+
 
 
 ### ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Input Type|Supply input arguement in incorrect format (not as a dictionary)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
-|Input Type|Supply input arguement in incorrect format - dictionary, but not with value as Parameter class| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
+|ImageParcel|Supply **dtype** as not member of DataTypes.image_types| Type Error | Incorrect data type accepted|
+|ImageParcel|Have **pixel_array** type not match dtype| Type Error | Incorrect data type accepted|
+|ImageParcel|Supply **shape** not as Shape class| Type Error | Incorrect data type accepted|
+|ImageParcel|Supply **mapping** not as Shape class| Type Error | Incorrect data type accepted|
+|ImageParcel Imutability|Pass value as variable then change variable| ImageParcel value remains the same | ImageParcel value changes|
+|check_data|Supply input_image/output_image/input_parameter/output_parameter not as a dictionary| Type Error | Incorrect data type ignored|
+|ParameterParcel|Supply **dtype** as not member of DataTypes.value_types or DataTypes.array_types| Type Error | Incorrect data type accepted|
+|ParameterParcel|If array is expected, have **value** not a list, tuple or ndarray| Type Error | Incorrect data type accepted|
+|ParameterParcel|Have **value** type not match dtype| Type Error | Incorrect data type accepted|
+|ParameterParcel Imutability|Pass value as variable then change variable| ParameterParcel value remains the same |ParameterParcel value changes|
+|run_code|Try to execute run_code with no compiled_code or compiled code in wrong format (not types.codetype)| Type Error |Proceeds without error|
+|run_code|Don't supply a value for input_image | Value Error | Code tries to continue|
+|run_code|Supply input_image with mising pixel array | Value Error | Incorrect pixel array accepted|
+|run_code|Supply input pixel_array with missing mapping or shape data| Value Error | Incorrect pixel array accepted|
+|run_code|Supply input pixel_array where shape does not match constraints in shape| Value Error | Incorrect pixel array accepted|
+|run_code|Supply input_parameter with mising value | Value Error | Incorrect pixel array accepted|
+|run_code|Supply parameter array where array does not match defined shape| Value Error | Incorrect value accepted|
+|run_code|Try to run with missing output definitions (shape for images or arrays, dtype for any output) | Value Error | runs code anyway|
+|run_code|Code provided creates an error|Error|No error passed on|
+|run_code|Code provided doesn't create an output|Runtime error|No error passed|
+|run_code|Code provided changes inputs|Runtime error|No error passed|
+|run_code|Code provided returns a pixel_array without mapping data| Value Error | Incorrect value accepted|
+|run_code|Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data|Value Error|Incorrect value accepted|
+|run_code|Code provided returns an array value without shape data| Value Error | Incorrect value accepted|
 
-|Input Values|Supply input["Name"].Parameter.dtype where dtype not a member of DataType| Value Error | <ul><li>Incorrect dtype accepted</li></ul>|
-|Input Values|Supply input["Name"].Parameter.shape where dtype not of Shape class| Type Error | <ul><li>Incorrect dtype accepted</li></ul>|
-|Input Values|Supply input["Name"].Parameter.value where value not of input["Name"].Parameter.dtype.numpy type| Type Error | <ul><li>Incorrect dtype accepted</li></ul>|
-
-|Input Value Shape|Supply input with image_type DataType where input["Name"].Parameter.value does not match defined shape| Value Error | <ul><li>Incorrect shape accepted</li></ul>|
-|Input Shape Type|Supply shape where shape not a tuple or list| Type Error | <ul><li>Incorrect shape format accepted</li></ul>|
-|Input Shape Type|Supply shape where shape not a tuple or list of integers| Type Error | <ul><li>Incorrect shape format accepted</li></ul>|
-|Input Shape Value|Supply shape where shape doesn't include sufficient dimensions (defined by Shape.min_image_dimensions and Shape.max_image_dimensions) | Value Error | <ul><li>Incorrect shape accepted</li></ul>|
-|Output Type|Supply output arguement in incorrect format (not as a dictionary)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
-|Output Type|Supply output arguement in incorrect format (not as a dictionary of Parameter class)| Type Error | <ul><li>Incorrect data type ignored</li></ul>|
-|Output Values|Supply output where dtype not a member of DataType| Value Error | <ul><li>Incorrect dtype accepted</li></ul>|
-|Output Value Type|Supply input where input data type doesn't match dtype arguement| Type Error | <ul><li>Incorrect data type accepted</li></ul>|
-|Output Values|Supply output where output value does not match defined shape| Value Error | <ul><li>Incorrect shape accepted</li></ul>|
-|Output|Code provided does not supply output|Value Error|<ul><li>No error given</li></ul>|
-|Execute|Code provided creates an error|Error|<ul><li>No error passed on</li></ul>|
 
 * ImageOperationDirectory
 
