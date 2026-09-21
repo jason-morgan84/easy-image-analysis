@@ -2,15 +2,15 @@ from core.image_operation import ImageOperation, ImageParcel
 from core.shape import Shape
 from core.constants import DataType
 
-version = "0.1"
+version = "0.1.0"
 
-class SameImage(ImageOperation):
+class InvalidCode(ImageOperation):
     def __init__(self):
         super().__init__(
-            name = "Same Image",
+            name = "Invalid Code",
             category = "Testing",
             version = "0.1",
-            docs = "Returns an identical image to that inserted",
+            docs = "Contains broken code (accessing improper list index)",
             alerts = None,
             input_image = { "input":  ImageParcel(pixel_array = None,
                                                   dtype = DataType.ImageInt,
