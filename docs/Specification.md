@@ -36,6 +36,8 @@
 |14/09/26|0.9.5|Documented run_code function in ImageOperation|
 |15/09/26|0.9.6|Described refactoring of dictionary in ImageOperation to dataclasses and updated unit testing|
 |18/09/26|0.10.0|Added description of error handling and logging code|
+|19/09/26|0.11.0|Added detail to description of ImageOperation and flow chart|
+
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -541,9 +543,15 @@ For now, error messages are simply printed. This will be developed to saving to 
 |run_code|Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data|Value Error|Incorrect value accepted|
 |run_code|Code provided returns an array value without shape data| Value Error | Incorrect value accepted|
 
-
-* ImageOperationDirectory
-
+### ImageOperationDirectory
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                |  
+|ImportList|Imports expected number of ImageOperations| Expected number imported | Wrong number imported|
+|ImportList|Import an ImageOperation that should not be expected| ImageOperation rejected and reported | ImageOperation accepted|
+|ImportList|Import ImageOperation with correct category| Correct category saved to ImageOperation | Incorrect category|
+|ImportList|Test ImageOperation with no/incorrect version number|  ImageOperation rejected and reported | ImageOperation accepted|
+|ImportConstraints|ImageOperation with unacceptable import|  ImageOperation rejected and reported | ImageOperation accepted|
+|ImportTesting|ImageOperation which fails output tests|ImageOperation rejected and reported | ImageOperation accepted|
 
 
 
