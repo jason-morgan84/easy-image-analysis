@@ -158,7 +158,7 @@ class ValueFloat(BaseType):
 
     def to(self, dtype):
         if dtype == DataType.ValueInt or dtype == ValueInt:
-            return ValueInt(np.round(self.value))
+            return ValueInt(ValueInt.numpy(np.round(self.value)))
         else:
             raise TypeError(f"ValueFloat cannot be converted to type {dtype}")
 
