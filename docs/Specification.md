@@ -37,6 +37,7 @@
 |15/09/26|0.9.6|Described refactoring of dictionary in ImageOperation to dataclasses and updated unit testing|
 |18/09/26|0.10.0|Added description of error handling and logging code|
 |19/09/26|0.11.0|Added detail to description of ImageOperation and flow chart|
+|19/09/26|0.12.0|Added description of versioning and Changelog.md|
 
 
 # 2. Premise and Aims
@@ -547,15 +548,22 @@ For now, error messages are simply printed. This will be developed to saving to 
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |ImportList|Imports expected number of ImageOperations| Expected number imported | Wrong number imported|
-|ImportList|Import an ImageOperation that should not be expected| ImageOperation rejected and reported | ImageOperation accepted|
+|ImportList|Import an ImageOperation that should not be accepted (ie, missing arguements, no code)| ImageOperation rejected and reported | ImageOperation accepted|
 |ImportList|Import ImageOperation with correct category| Correct category saved to ImageOperation | Incorrect category|
 |ImportList|Test ImageOperation with no/incorrect version number|  ImageOperation rejected and reported | ImageOperation accepted|
 |ImportConstraints|ImageOperation with unacceptable import|  ImageOperation rejected and reported | ImageOperation accepted|
 |ImportTesting|ImageOperation which fails output tests|ImageOperation rejected and reported | ImageOperation accepted|
 
+# Versioning
+
+Versioning and changelogs are implemented using the "keep a changelog" 1.1 format (https://keepachangelog.com/en/1.1.0/).
+
+This is unit tested for __version__ existing in __init__.py in the core directory, and that the version number complies with semantic major.minor.patch versioning.
+
+For now, version checks within the code are limited to the ImageOperationDirectory class, which checks the version number in imported modules to use import code that corresponds to the ImageOperation class structure at that defined version.
 
 
-## 7 Other Notes
+## 8 Other Notes
 * Changes to image shape should always be explicit, never incidental. For example, z-projection will reduce z dimension to 1 because that’s what z projection does, but thresholding a 5 slice z-stack will output 5 thresholds, not just 1.
 * Function code does not deal with type changes, checking of types, displaying images, UI input. The role of each function is purely to take its defined input, process it according to the supplied parameters, and produce an output in defined shape. As part of this role, it should include error handling to minimise/deal with possible errors (with the assumption that the input is of the required format). 
 * To allow for simple additions of new functions without affecting the base code, each function will be in a separate module. Along with the code itself, this module should include other data required to integrate into the software (definitions of parameters required, input and output data types, input and output image shape) and documentation (what the function does, how it affects the image shape, how changes to parameters affect output, any other points of interest). 
