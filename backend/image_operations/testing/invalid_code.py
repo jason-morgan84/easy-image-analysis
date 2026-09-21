@@ -3,13 +3,13 @@ from core.shape import Shape
 from core.constants import DataType
 
 version = "0.1"
+
 class SameImage(ImageOperation):
-    
     def __init__(self):
         super().__init__(
             name = "Same Image",
-            category = "",
-            version = "0.2",
+            category = "Testing",
+            version = "0.1",
             docs = "Returns an identical image to that inserted",
             alerts = None,
             input_image = { "input":  ImageParcel(pixel_array = None,
@@ -25,6 +25,5 @@ class SameImage(ImageOperation):
             )
     def execute(self):
         input_image_array = self.input_image["input"].pixel_array
-        self.output_image["output"].pixel_array = input_image_array.copy()
-        self.output_image["output"].mapping = Shape(0,1,2,3)
+        print(input_image_array[len(input_image_array) + 1])
 

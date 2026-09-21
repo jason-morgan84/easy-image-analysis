@@ -1,0 +1,2 @@
+category = "Testing"
+test = True
