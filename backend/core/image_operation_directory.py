@@ -9,12 +9,13 @@ class ImageOperationDirectory():
 
     
 
-    def __init__(self, image_operation_list = {}, testing = False):
+    def __init__(self, image_operation_list = {}, logger = None, testing = False):
         self.image_operation_list = image_operation_list
         self.testing = testing
         self.version_mapping = {"0": lambda attr: self.import_0(attr)}
         self.succesful_imports = 0
         self.failed_imports = 0
+        self.logger = logger if logger else []
 
     def __getitem__(self, item):
         return self.image_operation_list[item]
@@ -57,7 +58,7 @@ class ImageOperationDirectory():
                                 try: 
                                     major, _, _ = version.split(".")
                                 except Exception as e:
-                                    log(ValueError,f"incorrect version format in {name}: {e}","ImageOperationDirectory","import_list")
+                                    self.logger.append(log(ValueError,f"incorrect version format in {name}: {e}","ImageOperationDirectory","import_list"))
                                     self.failed_imports += 1
                                     major = None
                                     #raise ValueError(f"incorrect version format in {name}: {e}")

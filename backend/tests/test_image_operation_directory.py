@@ -19,11 +19,16 @@ def test_category_inputs():
     assert directory["same_image"].category == "Testing"
 
 # Import an ImageOperation that should not be accepted (ie, missing arguements)
+# test ImageOperations imported:
+# missing_arguements.py: missing_arguements
+# invalid_arguement.py: invalid_arguement
 def test_broken_inputs():
     directory = ImageOperationDirectory(testing = True)
     directory.import_list()
 
-    assert directory.failed_imports == 1
+    assert "missing_arguements" not in directory.image_operation_list.keys()
+    assert "invalid_arguement" not in directory.image_operation_list.keys()
+
 #Test ImageOperation with no/incorrect version number
 def test_no_version_number():
     pass
