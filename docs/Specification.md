@@ -38,6 +38,7 @@
 |18/09/26|0.10.0|Added description of error handling and logging code|
 |19/09/26|0.11.0|Added detail to description of ImageOperation and flow chart|
 |19/09/26|0.12.0|Added description of versioning and Changelog.md|
+|22/09/26|0.13.0|Added description of LogItem in error_handling.py|
 
 
 # 2. Premise and Aims
@@ -397,9 +398,19 @@ On creation of a new connection, it will check for structure, constraint or type
 
 ## 3.3 Error Handling
 
-To allow reporting of errors to an external log (with the future potential to pass to a UI dialog) It uses a custom function, log(), in error_handling.py, that catches and reports errors, then returns the python Error type and associated message to where it was called.
+error handling.py holds functions and classes that allow reporting of errors to an external log (with the future potential to pass to a UI dialog).
 
-Exception chaining will be used to log errors in the Workflow layer, but not lower layer classes (see class heirarchy).
+It contains the LogItem class, which holds data for adding to the log. It includes:
+- time
+- error: the BaseException class defining the error type
+- message: the associtaed error message
+- class_name: the class that logged the error
+- function_name: the function that logged the error
+- import_name: the imported ImageOperation file which caused the error. Defaults to None.
+
+It also contains a custom function, log() that reports errors and returns the associated LogItem describing the error.
+
+Exception chaining will be used to log errors in the WorkFlow layer and ImageOperationDirectory, but not lower layer classes (see class heirarchy).
 
 For now, error messages are simply printed. This will be developed to saving to a log file and user prompts as development progresses.
 
