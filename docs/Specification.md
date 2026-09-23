@@ -39,6 +39,7 @@
 |19/09/26|0.11.0|Added detail to description of ImageOperation and flow chart|
 |19/09/26|0.12.0|Added description of versioning and Changelog.md|
 |22/09/26|0.13.0|Added description of LogItem in error_handling.py|
+|23/09/26|0.14.0|Updated specification and unit testing for ImageOperationDirectory class|
 
 
 # 2. Premise and Aims
@@ -325,11 +326,23 @@ Simple class holding data for non-image inputs and outputs from ImageOperation. 
 ### 3.2.6 ImageOperationDirectory Class
 This class holds for a list of all ImageOperation classes, along with the code required to import them.
 
-Once imported, ImageOperation classes will require testing under the same testing protocol described for ImageOperation in the testing section. This will be carried out using pytest parametization. 
+ImageOperations are imported from a directory defined in the ImageOperationDirectory class, currently .\backend\image_operations. 
+Modules in child folders of image_operations are imported, but not at greater depth. Child folders define the category of contained ImageOperations. The category name should be saved in __init__.py as category = "string".
 
-ImageOperations will only be imported if they were made using a compatible version.
+ImageOperationsDirectory can be passed two arguements. Log provides a list of LogItem class from error_handling.py and makes up a log of error messages. If this is not passed, a new list will be created. Test (default = false) is a flag for testing ImageOperationsDirectory. If test == true, only files within image_operations/testing folder will be imported. If testing == false, files within image_operations/testing folder will not be imported.
 
-Imported function will be checked to ensure only permitted libraries are imported.
+The proper format for ImageOperation files is described in the ImageOperations Files section.
+
+Files are first checked for any imports that are not permitted by the allowed_imports variable, currently stored in the ImageOperationDirectory class.
+
+Files are then checked for their version, in the format "version = x.y.z". This defines the API version for which they are designed and is used to ensure the correct import function is used to keep backward compatibility.
+
+Where a version is found, ImageOperations are imported into the ImageOperation class.
+
+They are then tested using the core.type.sample_data function, which provides sample input data in the required format defined by the ImageOperation.
+Note that, for now, inputs are provided as variables or arrays of 0s, to avoid situations where a random value may be outside a required range. However, a potential future point of failure is if 0 is not a valid value for a particular input. In future, this could be avoided by implemented min and max values to the sample_data function.
+
+If testing is sucessful, files are added to a dictionary of ImageOperations with a key of the filename without py (**TODO: address potential failure with identical filenames**). The category and version number will be added to each ImageOperations based on file and folder parameters. 
 
 ### 3.2.7 Node Class
 The ImageOperation class defines the image analysis function to be carried out on the image. The Node class is responsible for positioning an ImageOperation in the WorkFlow – this means there can be multiple nodes containing the same ImageOperation. While the ImageOperation class is responsible purely for image analysis, the Node class is responsible for interacting with other elements of the WorkFlow. As such, it has the following instance variables:
@@ -563,7 +576,12 @@ For now, error messages are simply printed. This will be developed to saving to 
 |ImportList|Import ImageOperation with correct category| Correct category saved to ImageOperation | Incorrect category|
 |ImportList|Test ImageOperation with no/incorrect version number|  ImageOperation rejected and reported | ImageOperation accepted|
 |ImportConstraints|ImageOperation with unacceptable import|  ImageOperation rejected and reported | ImageOperation accepted|
-|ImportTesting|ImageOperation which fails output tests|ImageOperation rejected and reported | ImageOperation accepted|
+|ImportTesting|Test loading an ImageOperation with no input_image| ImageOperation rejected and reported | ImageOperation accepted|
+|ImportTesting|ImageOperation with non-functioning code|ImageOperation rejected and reported | ImageOperation accepted|
+|ImportTesting|ImageOperation which doesn't produce an output|ImageOperation rejected and reported | ImageOperation accepted|
+|ImportTesting|ImageOperation which produces an output in the wrong format (not Package class)|ImageOperation rejected and reported | ImageOperation accepted|
+|ImportTesting|ImageOperation which produces an output with incorrect arguements|ImageOperation rejected and reported | ImageOperation accepted|
+
 
 # Versioning
 
