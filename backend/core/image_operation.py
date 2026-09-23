@@ -134,7 +134,7 @@ class ParameterParcel:
 
 
 class ImageOperation:
-    def __init__(self, name, category, version, docs, alerts, input_image, input_parameter={}, output_image = {}, output_parameter = {}, ):
+    def __init__(self, name, category, version, docs, alerts, input_image={}, input_parameter={}, output_image = {}, output_parameter = {}, ):
         self._input_image = input_image
         self._output_image = output_image
         self.name = name
@@ -142,10 +142,10 @@ class ImageOperation:
         self.version = version
         self.docs = docs
         self.alerts = alerts 
-        self.input_image = input_image # input images as dictionary of ImageParcels   { "name":  ImageParcel}
-        self.input_parameter = input_parameter # other inputs as dictionary of ParameterParcels {   "name":  ParameterParcel}
-        self.output_image = output_image # Output images as dictionary, as input_image
-        self.output_parameter = output_parameter # other outputs as dictionary, as input_parameter
+        self.input_image = input_image if input_image else {} # input images as dictionary of ImageParcels   { "name":  ImageParcel}
+        self.input_parameter = input_parameter if input_parameter else {}# other inputs as dictionary of ParameterParcels {   "name":  ParameterParcel}
+        self.output_image = output_image if output_image else {}# Output images as dictionary, as input_image
+        self.output_parameter = output_parameter if output_parameter else {}# other outputs as dictionary, as input_parameter
 
     # check input_image and output_image are dictionaries of ImagePackages
     @property
@@ -193,12 +193,12 @@ class ImageOperation:
         self._output_parameter = output if output else {}
 
     def check_data(self, dictionary, dtype, identifier):
-        if dictionary is not None:
-            if not isinstance(dictionary, dict):
-                raise TypeError(f"Expected {identifier} to be dictionary, not {type(dictionary)}")
-            for key, item in dictionary.items():
-                if item is not None and not isinstance(item, dtype):
-                    raise TypeError(f"Expected {identifier} to be dictionary of {dtype.type_name}, not {type(item)}")
+        if not isinstance(dictionary, dict):
+            raise TypeError(f"Expected {identifier} to be dictionary, not {type(dictionary)}")
+        
+        for key, item in dictionary.items():
+            if not isinstance(item, dtype):
+                   raise TypeError(f"Expected {identifier} to be dictionary of {dtype.type_name}, not {type(item)}")
 
     def execute(self):
         pass

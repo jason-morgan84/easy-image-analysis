@@ -261,7 +261,7 @@ Parameter also includes the option to specify UI elements to fetch parameter val
 
 Type checking is carried out on dtype, to ensure its a member of DataType.value_types or DataType.array_types.
 
-### 3.2.5 ImageOperation Class/File
+### 3.2.5 ImageOperation Class
 The ImageOperation class is responsible for carrying out functions that carry out analysis on images. A key aim of this project is expandability and to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class, containing all the information required to run the function and will be imported using imagelib. 
 
 The previous classes described have been primarily related to the flow of data through the WorkFlow graph and have defined custom class types to make sure this happens in a controlled manner. The ImageOperation sits slightly outside this class structure, as existing image analysis modules work in standard or numpy classes. To allow ImageOperations code to be designed and executed in a standard manner, inputs and outputs from ImageOperations are in standard Numpy data types (for conversion from custom DataTypes to Numpy, see Node and Port classes).
@@ -272,10 +272,11 @@ The ImageOperation class will contain the following variables:
 
 * name: name of ImageOperation
 * category: logical category (“Threshold”, “Filter” etc) - defined by folder location of file
-* input_image: input images as dictionary of ImagePackage class
-* input_parameter: other inputs as dictionary of ParameterPackage class 
-* output_image: Output images as dictionary of ImagePackage class
-* output_parameter: other outputs as dictionary of ParameterPackage class 
+* input and output dictionaries (note: each of these variables will be instantiated as a dictionary, either of a Package class or empty if None is passed):
+    - input_image: input images as dictionary of ImagePackage class
+    - input_parameter: other inputs as dictionary of ParameterPackage class         
+    - output_image: Output images as dictionary of ImagePackage class
+    - output_parameter: other outputs as dictionary of ParameterPackage class 
 * docs – documentation to explain function, effects, parameters etc
 * alerts – any warnings to user (e.g, “Background subtraction with a large radius is a very slow process”)
 * version – version of software code ImageOperation was written for. This is to future proof code, so changes to base code that affect ImageOperations don’t mean all existing ImageOperations need to be rewritten. 
