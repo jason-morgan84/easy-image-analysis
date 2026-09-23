@@ -11,7 +11,8 @@ class LogItem():
 
     def __str__(self):
         message = f"{self.time}: {self.error} in {self.class_name}.{self.function_name}" + \
-            (f" (importing {self.import_name})" if self.import_name else "")
+            (f" (importing {self.import_name})" if self.import_name else "") + \
+            self.message
         return message
 
 def log(error, message, class_name, function_name, import_name = None):
