@@ -7,7 +7,7 @@ class MissingArguements(ImageOperation):
     
     def __init__(self):
         super().__init__(
-            name = "MissingArguements",
+            name = "Missing Arguements",
             category = "",
             version = "0.2",
             docs = "Missing an arguement (input_image['input'].dtype)",

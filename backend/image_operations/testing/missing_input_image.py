@@ -4,17 +4,15 @@ from core.constants import DataType
 
 version = "0.1.0"
 
-class InvalidArguement(ImageOperation):
+class MissingInputImage(ImageOperation):
     def __init__(self):
         super().__init__(
-            name = "Invalid Arguement",
+            name = "Missing Input Image",
             category = "Testing",
-            docs = "Contains an invalid arguement in input_image (dtype = int))",
+            version = "0.1",
+            docs = "Contains no input_image",
             alerts = None,
-            input_image = { "input":  ImageParcel(pixel_array = None,
-                                                  dtype = int,
-                                                  shape = Shape(-1,-1,-1,-1),
-                                                  mapping = Shape(0,1,2,3))},
+            input_image = None,
             input_parameter = None,
             output_image = { "output": ImageParcel(pixel_array = None,
                                                    dtype = DataType.ImageInt,
@@ -26,4 +24,3 @@ class InvalidArguement(ImageOperation):
         input_image_array = self.input_image["input"].pixel_array
         self.output_image["output"].pixel_array = input_image_array.copy()
         self.output_image["output"].mapping = Shape(0,1,2,3)
-
