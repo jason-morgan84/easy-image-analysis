@@ -322,7 +322,7 @@ def test_run_code_no_output():
 
     setattr(test, 'execute', types.MethodType(test_function, test))
 
-    with pytest.raises(RuntimeError, match = 'operation did not generate') as exc_info:
+    with pytest.raises(ValueError, match = 'No image pixel array given for output') as exc_info:
         test.run_code() 
 
     print(f"{exc_info.value}")

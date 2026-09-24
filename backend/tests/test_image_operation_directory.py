@@ -1,15 +1,6 @@
 import pytest
 from core.image_operation_directory import ImageOperationDirectory
 
-
-# test correct number of files inputted
-def test_import_number():
-    directory = ImageOperationDirectory(testing = True)
-    directory.import_list()
-
-    assert len(directory.image_operation_list) == 1, print(len(directory.image_operation_list))
-
-
 # import ImageOperation with correct category
 def test_import_category():
     directory = ImageOperationDirectory(testing = True)

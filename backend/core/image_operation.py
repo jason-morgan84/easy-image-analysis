@@ -239,11 +239,9 @@ class ImageOperation:
         except Exception as e:
             raise RuntimeError(f"error executing operation '{self.name}': {e}")
 
-        # check output generated
-        output_generated = any(image.pixel_array is not None for image in self.output_image.values()) or \
-                            any(parameter.value is not None for parameter in self.output_parameter.values())
 
-        if not output_generated:
+        # check output generated
+        if not self.output_image and not self.output_parameter:
             raise RuntimeError(f"operation did not generate an output ({self.name})")
 
         # check output pixel_arrays match shape and mapping
@@ -286,6 +284,8 @@ class ImageOperation:
                 NOTE for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
         """
         for key, image in check_images.items():
+            if not isinstance(image, ImageParcel):
+                raise TypeError(f"Expected {descriptor} to be dictionary of ImageParcel, not {type(image)}")
             if image.pixel_array is None:
                 raise ValueError(f"No image pixel array given for {descriptor} {key}")
             if image.mapping is None: # note - for mapping and shape, if they exist their type has already been checked
@@ -316,6 +316,8 @@ class ImageOperation:
         """
 
         for key, parameter in check_parameters.items():
+            if not isinstance(parameter, ParameterParcel):
+                raise TypeError(f"Expected {descriptor} to be dictionary of ParameterParcel, not {type(parameter)}")
             if parameter.value is None:
                 raise ValueError(f"No value given for parameter {descriptor} {key}")
             if parameter.dtype in DataType.array_types() and not np.array_equal(np.array(parameter.value.shape), parameter.shape):
