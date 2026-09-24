@@ -40,6 +40,7 @@
 |19/09/26|0.12.0|Added description of versioning and Changelog.md|
 |22/09/26|0.13.0|Added description of LogItem in error_handling.py|
 |23/09/26|0.14.0|Updated specification and unit testing for ImageOperationDirectory class|
+|24/09/26|0.14.1|Updated unit testing for ImageOperationDirectory class|
 
 
 # 2. Premise and Aims
@@ -572,16 +573,22 @@ For now, error messages are simply printed. This will be developed to saving to 
 ### ImageOperationDirectory
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|ImportList|Imports expected number of ImageOperations| Expected number imported | Wrong number imported|
-|ImportList|Import an ImageOperation that should not be accepted (ie, missing arguements, no code)| ImageOperation rejected and reported | ImageOperation accepted|
 |ImportList|Import ImageOperation with correct category| Correct category saved to ImageOperation | Incorrect category|
 |ImportList|Test ImageOperation with no/incorrect version number|  ImageOperation rejected and reported | ImageOperation accepted|
+|ImportList|Import an ImageOperation that should not be accepted because of missing arguements| ImageOperation rejected and logged | ImageOperation accepted|
+|ImportList|Import an ImageOperation that should not be accepted because of invalid arguements| ImageOperation rejected and logged | ImageOperation accepted|
+|ImportTesting|Test loading an ImageOperation with no input_image| ImageOperation rejected and logged | ImageOperation accepted|
+|ImportTesting|Test loading an ImageOperation with non-functioning code (code returns error)|ImageOperation rejected and logged | ImageOperation accepted|
+|ImportTesting|Test load an ImageOperation which produces an image output in the wrong format(not ImagePackage)|ImageOperation rejected and logged | ImageOperation accepted|
+|ImportTesting|ImageOperation which produces a parameter output in the wrong format (not ParamaterPackage) |ImageOperation rejected and logged | ImageOperation accepted|
+|ImportTesting|Test load an ImageOperation which produces an image output in the correct format with a missing pixel array|ImageOperation rejected and logged | ImageOperation accepted|
+|ImportTesting|Test load an ImageOperation which produces an image output in the correct format with missing mapping data|ImageOperation rejected and logged | ImageOperation accepted|
+|ImportTesting|Test load an ImageOperation which produces an image output in the correct format with incompatible shape and mapping data| ImageOperation accepted|
+|ImportTesting|Test load an ImageOperation which produces a parameter output in the correct format with a missing value|ImageOperation rejected and logged | ImageOperation accepted|
+|ImportTesting|ImageOperation which only produces an image output|ImageOperation accepted | ImageOperation rejected|
+|ImportTesting|ImageOperation which only produces a parameter output|ImageOperation accepted | ImageOperation rejected|
+|ImportTesting|ImageOperation which produces a parameter and image output|ImageOperation accepted | ImageOperation rejected|
 |ImportConstraints|ImageOperation with unacceptable import|  ImageOperation rejected and reported | ImageOperation accepted|
-|ImportTesting|Test loading an ImageOperation with no input_image| ImageOperation rejected and reported | ImageOperation accepted|
-|ImportTesting|ImageOperation with non-functioning code|ImageOperation rejected and reported | ImageOperation accepted|
-|ImportTesting|ImageOperation which doesn't produce an output|ImageOperation rejected and reported | ImageOperation accepted|
-|ImportTesting|ImageOperation which produces an output in the wrong format (not Package class)|ImageOperation rejected and reported | ImageOperation accepted|
-|ImportTesting|ImageOperation which produces an output with incorrect arguements|ImageOperation rejected and reported | ImageOperation accepted|
 
 
 # Versioning

@@ -24,6 +24,8 @@ class ImageOperationDirectory():
         return self.image_operation_list[item]
 
     def import_list(self):
+        """imports all ImageOperation files from defined folder to image_operation_list.
+        For each import, checks that only permitted libraries are imported and provides test input to look for output errors from ImageOperation class"""
         # get list of files to import
         path = os.path.join(self.backend_path, self.package_folder)
         folders = [name for name in os.listdir(path) if os.path.isdir(os.path.join(path,name)) and name[0]!="_"]
@@ -74,8 +76,7 @@ class ImageOperationDirectory():
                                     self.failed_imports += 1
                                     continue
                                 """Here we need to check for allowed imports"""
-                                """Here we need to test before importing"""
-                                # test_function with appropriate sample data for correct code function and outputs
+
                                 try:
                                     self.test_function(imported_function)
                                 except Exception as e:
@@ -89,28 +90,17 @@ class ImageOperationDirectory():
                                 self.succesful_imports += 1
 
 
-                                #if import_function:
-
-
-
-
-        # import each file as an instance of ImageOperation 
-        #   check for imports for security
-        #   test imported files
-
-        """global variables that need to go somewhere:
-                - image_operations path
-                - acceptable imports"""
         self.image_operation_list = operations_dict
     
     def import_0(self, attribute):
-
+        """imports functions where major version is 0"""
         imported_function = attribute()
         
         return imported_function
 
     def test_function(self, function):
-
+        """tests functions by providing sample inputs (given requested input dtype, shape etc). Actual outputs checked in ImageOperation.run_code and any
+        errors will be chained here, then to input_list function where they're logged."""
         # default values for each image dimension if function is indifferent to shape in that dimension
         default_c = 3
         default_z = 4
