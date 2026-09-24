@@ -73,14 +73,13 @@ class ImageOperationDirectory():
                                     self.logger.append(log(ImportError,f"cannot import module {attribute.__name__}: {e}","ImageOperationDirectory","import_list",name))
                                     self.failed_imports += 1
                                     continue
-
                                 """Here we need to check for allowed imports"""
                                 """Here we need to test before importing"""
                                 # test_function with appropriate sample data for correct code function and outputs
                                 try:
                                     self.test_function(imported_function)
                                 except Exception as e:
-                                    self.logger.append(log(ImportError,f"module {attribute.__name__} failed inport tests: {e}","ImageOperationDirectory","import_list", name))
+                                    self.logger.append(log(ImportError,f"module {attribute.__name__} failed import tests: {e}","ImageOperationDirectory","import_list", name))
                                     self.failed_imports += 1
                                     continue
 
@@ -131,9 +130,9 @@ class ImageOperationDirectory():
             item_shape[function.input_image[item].mapping.x] = default_x if function.input_image[item].shape.x == -1 else function.input_image[item].shape.x
 
             # uses type.sample_data to set pixel_array as an array of the correct shape and dtype of 0s
-            function.input_image[item].pixel_array = sample_data(dtype = item_dtype,
+            function.input_image[item].pixel_array = item_dtype.to_numpy(sample_data(dtype = item_dtype,
                                                                  shape = item_shape,
-                                                                 zero = True)
+                                                                 zero = True))
 
         # similar process for each input_parameter
         for item in function.input_parameter.keys():
