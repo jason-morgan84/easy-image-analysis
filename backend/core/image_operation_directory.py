@@ -4,26 +4,30 @@ import pkgutil
 import os
 from core.error_handling import log
 from core.type import sample_data
+import ast
+import inspect
 
 class ImageOperationDirectory():
     """Key constants for importing ImageOperations"""
     package_folder = "image_operations" # name of base folder for ImageOperations packages
     backend_path = ".\\backend\\" # defines path of backend
-    #permitted_imports = set("numpy", "pillow") # defines permitted imports in ImageOperations
+    permitted_imports = {"core",
+                         "math", 
+                         "numpy", 
+                         "pillow"} # defines permitted imports in ImageOperations
  
 
     def __init__(self, logger = None, testing = False):
         self.image_operation_list = {}
         self.testing = testing
         self.version_mapping = {"0": lambda attr: self.import_0(attr)}
-        self.succesful_imports = 0
-        self.failed_imports = 0
         self.logger = logger if logger else []
+        self.disallowed_modules = set()
 
     def __getitem__(self, item):
         return self.image_operation_list[item]
 
-    def import_list(self):
+    def import_operations_dict(self):
         """imports all ImageOperation files from defined folder to image_operation_list.
         For each import, checks that only permitted libraries are imported and provides test input to look for output errors from ImageOperation class"""
         # get list of files to import
@@ -48,46 +52,56 @@ class ImageOperationDirectory():
                     if not ispkg:
                         # imports individual file
                         sub_module = importlib.import_module(".".join((self.package_folder, folder, name)))
+                        """Before running the code, check for only allowed imports"""
+                        try:
+                            imported_modules = self.check_imports(inspect.getsource(sub_module))
+                        except Exception as e:
+                            self.logger.append(log(ImportError, f"unable to check for permitted module imports in {name}: {e}","ImageOperationDirectory","import_operations_dict", name))
+                            continue
+
+                        self.disallowed_modules = imported_modules - self.permitted_imports
+                        if self.disallowed_modules:
+                            self.logger.append(log(ImportError, f"non-permitted imports found in module {name}: {self.disallowed_modules}","ImageOperationDirectory","import_operations_dict", name))
+                            continue
+
+                        """Next, check version is acceptable"""
                         try:
                             version = getattr(sub_module, "version")
                         except Exception as e:
-                            self.logger.append(log(ImportError,f"version number expected for module {name}: {e}","ImageOperationDirectory","import_list",name))
+                            self.logger.append(log(ImportError,f"version number expected for module {name}: {e}","ImageOperationDirectory","import_operations_dict",name))
                             continue
+
+                        try: 
+                            major, _, _ = version.split(".")
+                        except Exception as e:
+                            self.logger.append(log(ImportError,f"incorrect version format in {name}: {e}","ImageOperationDirectory","import_operations_dict",name))
+                            continue
+
+                        """ Once imports and version are checked, get actual ImageOperation class"""
                         # iterates through each attribute in module
                         for attribute_name in dir(sub_module):
                             attribute = getattr(sub_module, attribute_name)
                             # if its a class that is a subclass of ImageOperation, but not ImageOperation itself (which should never be in that folder anyway)
                             if isinstance(attribute, type) and issubclass(attribute,ImageOperation) and attribute is not ImageOperation:
-                                """First, check version is acceptable"""
-                                # use version_mapping dictionary to pass attribute to correct import function
-                                try: 
-                                    major, _, _ = version.split(".")
-                                except Exception as e:
-                                    self.logger.append(log(ImportError,f"incorrect version format in {name}: {e}","ImageOperationDirectory","import_list",name))
-                                    self.failed_imports += 1
-                                    continue
-
-                                # use major version number and version_mapping dictionary to import new dictionary item 
-                                # with key "name" and value based on return from relevant import function
+                                """ Use major version number and version_mapping dictionary to import new dictionary item 
+                                # with key "name" and value based on return from relevant import function"""
                                 try:
                                     imported_function = self.version_mapping[major](attribute)
                                 except Exception as e:
-                                    self.logger.append(log(ImportError,f"cannot import module {attribute.__name__}: {e}","ImageOperationDirectory","import_list",name))
-                                    self.failed_imports += 1
-                                    continue
-                                """Here we need to check for allowed imports"""
-
+                                    self.logger.append(log(ImportError,f"cannot import module {name}: {e}","ImageOperationDirectory","import_operations_dict",name))
+                                    continue                                                              
+                                
+                                """test code to ensure it runs and gives expected output given sample input"""
                                 try:
                                     self.test_function(imported_function)
                                 except Exception as e:
-                                    self.logger.append(log(ImportError,f"module {attribute.__name__} failed import tests: {e}","ImageOperationDirectory","import_list", name))
-                                    self.failed_imports += 1
+                                    self.logger.append(log(ImportError,f"module {name} failed import tests: {e}","ImageOperationDirectory","import_operations_dict", name))
                                     continue
 
+                                """if code passes these tests, add to dictionary of operations"""
                                 operations_dict[name] = imported_function
                                 operations_dict[name].category = current_category
                                 operations_dict[name].version = version
-                                self.succesful_imports += 1
 
 
         self.image_operation_list = operations_dict
@@ -95,8 +109,32 @@ class ImageOperationDirectory():
     def import_0(self, attribute):
         """imports functions where major version is 0"""
         imported_function = attribute()
-        
+    
         return imported_function
+
+    def check_imports(self, function):
+        """gets a list of all modules imported into 'function' and 
+        checks them against permitted module names"""
+
+        imported_modules = set() # set to hold names of any imported modules
+        ast_code = ast.parse(function) # parses imported code into ast nodes
+
+        # Iterates through each ast node in ast_code.
+        # Looks for nodes of the Import class and nodes of the ImportFrom class.
+        # Where it finds them, adds the relevant module name to modules set
+        for node in ast.walk(ast_code): 
+            if isinstance (node, ast.Import):
+                print(node.names)
+                for alias in node.names:
+                    imported_modules.add(alias.name.split('.')[0])
+            elif isinstance (node, ast.ImportFrom):
+                if node.module:
+                    imported_modules.add(node.module.split('.')[0])
+        # non-permited imports are any modules left after subtracting 
+        # permitted imports from imported modules
+        return imported_modules
+
+
 
     def test_function(self, function):
         """tests functions by providing sample inputs (given requested input dtype, shape etc). Actual outputs checked in ImageOperation.run_code and any
