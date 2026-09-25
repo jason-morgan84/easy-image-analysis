@@ -22,8 +22,12 @@ class Parameter:
 
     @value.setter
     def value(self, val):
-
-        if not val in DataType.value_types and not val in DataType.array_types:
+        try:
+            val_dtype = getattr(val,"data_type")
+        except:
+            raise TypeError(f"Expected type member of DataType, got{type(val)}")
+        
+        if not val_dtype in DataType.value_types() and not val_dtype in DataType.array_types():
             raise TypeError (f"Expected type member of DataType.value_types or DataType.array_types, got{type(val)}")
            
         self._value = val
