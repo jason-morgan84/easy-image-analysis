@@ -42,6 +42,7 @@
 |23/09/26|0.14.0|Updated specification and unit testing for ImageOperationDirectory class|
 |24/09/26|0.14.1|Updated unit testing for ImageOperationDirectory class|
 |25/09/26|0.14.2|Updated unit testing for ImageOperationDirectory class import testing|
+|25/09/26|0.15.0|Updated description of Port class and Port class unit testing|
 
 
 # 2. Premise and Aims
@@ -77,7 +78,7 @@ This means new functions, with the correct formatting and using the correct clas
 
 Crucially, adding in a new function should not require messing with the UI or base code.
 
-# 3. System Architecture & Class Structure
+# 3. System Backend Architecture & Class Structure
 
 ![System Class Structure](/docs/Structure.svg)
 
@@ -99,17 +100,15 @@ Each node is associated with a given ImageOperation and the parameters of that o
 
 They can then draw connections between the nodes. A single node has a defined number of inputs (defined by the ImageOperation) but can output to as many other nodes as required. On drawing the connection, the WorkFlow class checks that the connection can provide an image/value in the proper data type and shape. If so, the ImageOperation is carried out allowing immediate feedback in one of the two image views. If not, and the connection cannot carry out simple shape or type conversions, the user is warned of the problem. Where possible, this warning will provide hints towards available ImageOperations that could be used to fix the problems with the data (for example, carry out a Z-projection to flatten the image). 
 
-## 3.2 Classes
+## 3.2 Class Hierarchy
 
-### Class Hierachy
+The classes are designed as a heirarchy. The base is a foundation layer which define custom data types and provide constraints on values (for example, an integer 8bit image should not contain values above 255 or below 0). These carry out deep checks of all data to make sure it fits that class type, after which higher layers can safely assume data passed to them is of an appropriate format.
 
-The classes are designed as a heirarchy. The base is a foundational layer which define custom data types and provide constraints on values (for example, an integer 8bit image should not contain values above 255 or below 0). These carry out deep checks of all data to make sure it fits that class type, after which higher layers can safely assume data passed to them is of an appropriate format.
-
-The next layer is the composition layer, the Image and Parameter class, which are made up of combinations of the foundational classes to safely define and constrain their values as they are passed through the WorkFlow graph.
+The next layer is the composition layer, the Image and Parameter class, which are made up of combinations of the foundation classes to safely define and constrain their values as they are passed through the WorkFlow graph.
 
 The next two layers are both present in Nodes. The WorkFlow interface layer contains the Port class, which sits inside a Node and provides a buffer and translation between the WorkFlow graph and actual image analysis code. The Port layer takes an input from a member of the Composition layer, carries out a final check to ensure it matches the requiered data type, then outpus the data in a standard numpy format (defined by the original foundation data class).
 
-The final layer is the execution layer, which also stands slightly outside the other layers. This layer is purely involved in execution of image analysis code. As such, it doesn't receive or send data using data types from the other layers, but works in standard numpy data types. However, it does define the expectations for inputs and outputs in terms of foundational layer data classes, to safely manage communication with the DataFlow graph, via ports.
+The final layer is the execution layer, which also stands slightly outside the other layers. This layer is purely involved in execution of image analysis code. As such, it doesn't receive or send data using data types from the other layers, but works in standard numpy data types. However, it does define the expectations for inputs and outputs in terms of foundation layer data classes, to safely manage communication with the DataFlow graph, via ports.
 
 This heirachy does not explicitly define the roles of the Connection, Node and WorkFlow classes in defining the WorkFlow graph. This is described in more detail in the WorkFlow section.
 
@@ -122,7 +121,7 @@ graph TD
     classDef exec fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000000;
     classDef exec fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000000;
 
-    subgraph Foundational_Layer ["1. Foundational Data & Type Layer"]
+    subgraph Foundation_Layer ["1. Foundation Data & Type Layer"]
         Shape["<b>Shape</b><br>• Checks for ints<br>• Contains image min/max dimensions"]:::found
         ImageType["<b>ImageType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
         ValueType["<b>ValueType</b><br>• Checks for int/float<br>• Checks for 0 dimensionality"]:::found
@@ -155,7 +154,9 @@ graph TD
     Port --> ImageOperation
 ```
 
-### 3.2.1 DataType Classes
+## 3.3 Foundation Classes
+
+### 3.3.1 DataType classes
 
 The aim of the DataType classes is to allow data to be transferred through the WorkFlow in a reliable and predictable way.
 
@@ -208,7 +209,7 @@ The comparable numpy data type is stored in the numpy class variable. This is us
 
 All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type. For each type, the data_type class variable **must** point to the relevant name in the Enum (stored in constants.py).
 
-### 3.2.2 Shape class
+### 3.3.2 Shape class
 
 This exists to hold data related to the shape of transmitted images. It will hold integer values for:
 * c (channels)
@@ -237,7 +238,8 @@ Shape will be used to hold shape related information in a number of classes and 
 * Node and Port classes – this will mirror the usage in ImageOperation classes
 * Connection class – this may be required to reshape the image from the shape given by the input port to the shape given by the output port.
 
-### 3.2.3 Image Class
+## 3.3 Composition classes
+### 3.3.1 Image Class
 
 This holds the image data as a multi-dimensional array, with max and min dimensions defined in the Shape class.
 
@@ -248,7 +250,7 @@ Therefore, the image data can be described with two instance variables:
 1.	pixel_array: Contains Image pixel data, in a multi-dimensional array of defined size and type.
 2.	image_map: Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
 
-### 3.2.4 Parameters Class
+### 3.3.2 Parameters Class
 
 Similar to the Image class, the Parameter class does not exist independently of a Node/Port. 
 
@@ -263,7 +265,8 @@ Parameter also includes the option to specify UI elements to fetch parameter val
 
 Type checking is carried out on dtype, to ensure its a member of DataType.value_types or DataType.array_types.
 
-### 3.2.5 ImageOperation Class
+## 3.4 Execution Classes
+### 3.4.1 ImageOperation Class
 The ImageOperation class is responsible for carrying out functions that carry out analysis on images. A key aim of this project is expandability and to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class, containing all the information required to run the function and will be imported using imagelib. 
 
 The previous classes described have been primarily related to the flow of data through the WorkFlow graph and have defined custom class types to make sure this happens in a controlled manner. The ImageOperation sits slightly outside this class structure, as existing image analysis modules work in standard or numpy classes. To allow ImageOperations code to be designed and executed in a standard manner, inputs and outputs from ImageOperations are in standard Numpy data types (for conversion from custom DataTypes to Numpy, see Node and Port classes).
@@ -308,7 +311,7 @@ Finally, following code execution checks are carried out to ensure that the outp
 
 **NOTE: At this point, any ImageOperation requires (at least) one image as an input. This is a design decision to prevent creep and bloat, based on the idea that as soon as only non-image variables are accepted this software is moving into data analysis rather than image analysis. This is checkedby the run_code function in ImageOperation and will therefore also affect other classes interacting with ImageOperations (Nodes and WorkFlow).**
 
-#### 3.2.6.1 ImagePackage
+### 3.4.2 ImagePackage
 Simple class holding data for image inputs and outputs from ImageOperation. Contains:
 * dtype - set at instantiation based on ImageOperation code file.
     - Type checks for member of DataType
@@ -318,7 +321,7 @@ Simple class holding data for image inputs and outputs from ImageOperation. Cont
     - Type checks for Shape class
 * mapping - set to None at instantiation, given value of type Shape mapping image dimensions to pixel array dimensions.
 
-#### 3.2.6.2 ParamterPackage
+### 3.4.3 ParameterPackage
 Simple class holding data for non-image inputs and outputs from ImageOperation. Contains:
 * dtype - set at instantiation based on ImageOperation code file.
     - Type checks for member of DataType.
@@ -326,7 +329,7 @@ Simple class holding data for non-image inputs and outputs from ImageOperation. 
 * shape - if dtype defines an array_type, contains a np.array defining shape of value.
     - will accept a tuple, list or np.ndarray. Tuples and lists will be converted to np.ndarray.
 
-### 3.2.6 ImageOperationDirectory Class
+### 3.4.4 ImageOperationDirectory Class
 This class holds for a list of all ImageOperation classes, along with the code required to import them.
 
 ImageOperations are imported from a directory defined in the ImageOperationDirectory class, currently .\backend\image_operations. 
@@ -347,7 +350,26 @@ Note that, for now, inputs are provided as variables or arrays of 0s, to avoid s
 
 If testing is sucessful, files are added to a dictionary of ImageOperations with a key of the filename without py (**TODO: address potential failure with identical filenames**). The category and version number will be added to each ImageOperations based on file and folder parameters. 
 
-### 3.2.7 Node Class
+## 3.5 Interface Classes
+
+### 3.5.1 Port Class
+
+The port class acts as a buffer between a Node and an ImageOperation. It has two main roles: 
+ * to convert between data types used for transmitting data through the WorkFlow and those used for image analysis.
+ * to make sure that future changes can be made to the overall WorkFlow without impacting on the data sent to ImageOperations 
+
+Two lists of ports are created with each node, and ports do not exist independently of nodes. Each port has the instance variables:
+* node_id – unique identifier for connected node
+* connection_id – unique identifier for connected connections
+* is_node_input – flag for whether port is an input or output. Inputs only allow one connection, outputs allow multiple
+* image_operation_ID - connected image operation input/output
+* input - the inputted data
+* output - the outputted data
+
+It has a single main function for data conversion:
+* convert()
+
+### 3.5.2 Node Class
 The ImageOperation class defines the image analysis function to be carried out on the image. The Node class is responsible for positioning an ImageOperation in the WorkFlow – this means there can be multiple nodes containing the same ImageOperation. While the ImageOperation class is responsible purely for image analysis, the Node class is responsible for interacting with other elements of the WorkFlow. As such, it has the following instance variables:
 * image_operation – the image analysis function to be run, as an ImageOperation class
 * output – Image or value holding output data from the ImageOperation
@@ -357,26 +379,25 @@ The ImageOperation class defines the image analysis function to be carried out o
 * input_ports – a list of members of the port class defining the required inputs to the node.
 * output_ports – a list of members of the port class defining the presented output(s) from the node.
 
-### 3.2.8 Port Class
+Node instantiation:
+1: Create Node and node ID
+2: Add ImageOperation to Node
+3: Add Ports to Node based on input and output requirements of ImageOperation
 
-The port class acts as a buffer between a node and an ImageOperation. It has two main roles: to make sure that, in the future, changes can be made to the overall WorkFlow without impacting on the data sent to ImageOperations and to convert between data types used for transmitting data through the WorkFlow and those used for image analysis. Two lists of ports are created with each node, and ports do not exist independently of nodes. Each port has the following:
+Node running:
+1: run ImageOperation code with inputs from input Ports
+2: send ImageOperation output to output Ports
 
-* node_id – unique identifier for connected node
-* connection_id – unique identifier for connected connections
-* is_input – flag for whether port is an input or output. Inputs only allow one connection, outputs allow multiple
-* to_workflow – converts data types from those used in ImageOperations to those used in WorkFlow
-* from_workflow – converts data types from those used in WorkFlow to those used in ImageOperations, including Unsqueeze where necessary.
-* type – WorkFlow associated data type
-* shape – WorkFlow associated image shape
 
-### 3.2.9 Connection Class
+
+### 3.5.3 Connection Class
 
 Connections form the links between nodes and ports through which data travels through the WorkFlow. They have a defined direction, with an input and an output, and are created by the user. On their initiation, type and shape checking are carried out by the WorkFlow (explained in more detail below). If they find a simple type or shape conversion can be made, they will do so, and if not, they will prompt the user to make changes to the WorkFlow. They will be discarded if both ends of the connection are not appropriately typed/shaped. Connections only contain two instance variables:
 
 * input_port_id
 * output_port_id
 
-### 3.2.10 WorkFlow Class
+## 3.6 WorkFlow Class
 
 ![Workflow Graph Map](/docs/Workflow%20Graph%20Map.svg)
 
@@ -412,7 +433,7 @@ It also contains the following functions:
 
 On creation of a new connection, it will check for structure, constraint or type violations. Where these can be fixed through image type or shape changes, it will do so, otherwise it will prompt the user to adjust the WorkFlow. 
 
-## 3.3 Error Handling
+## 3.7 Error Handling
 
 error handling.py holds functions and classes that allow reporting of errors to an external log (with the future potential to pass to a UI dialog).
 
@@ -430,7 +451,7 @@ Exception chaining will be used to log errors in the WorkFlow layer and ImageOpe
 
 For now, error messages are simply printed. This will be developed to saving to a log file and user prompts as development progresses.
 
-# 4 Frontend and UI
+# 4 System Frontend and UI
 
 ![UI diagram](/docs/UI.svg)
  
@@ -454,15 +475,15 @@ For now, error messages are simply printed. This will be developed to saving to 
 * Plan main UI elements.
 * Set up project and directory structure for development and testing.
 ## Stage 1 - Backend
-### Stage 1.1 – Backend Image Classes
-* Plan unit testing for DataType, Shape and Image classes.
-* Implement DataType, Shape and Image classes.
-* Test DataType, Shape and Image classes.
-### Stage 1.2 – Backend Image Operation Classes
-* Plan unit testing for Parameters, ImageOperation and ImageOperationDirectory classes.
-* Implement Parameters, ImageOperation and ImageOperationDirectory classes.
-* Test Parameters, ImageOperation and ImageOperationDirectory classes.
-### Stage 1.3 – Backend Workflow Sub-classes
+### Stage 1.1 – Backend Foundation and Composition Classes
+* Plan unit testing for DataType, Shape, Image and Parameter classes.
+* Implement DataType, Shape and Image and Parameter classes.
+* Test DataType, Shape and Image and Parameter classes.
+### Stage 1.2 – Backend Execution Classes
+* Plan unit testing for ImageOperation and ImageOperationDirectory classes.
+* Implement ImageOperation and ImageOperationDirectory classes.
+* Test ImageOperation and ImageOperationDirectory classes.
+### Stage 1.3 – Backend Interface Classes
 * Plan unit testing for Port, Node and Connection classes.
 * Implement Port, Node and Connection classes.
 * Test Port, Node and Connection classes.
@@ -474,8 +495,8 @@ For now, error messages are simply printed. This will be developed to saving to 
 ### Stage 2.1 – Frontend Planning
 * Detailed plans for frontend from initial overview.
 * Plan implementation of frontend.
-# 6 Testing - Backend
-## 6.1 – Backend Image Classes
+# 6 Testing
+## 6.1 – Backend Foundation Classes
 ### 6.1.1 DataType
 **BaseType**
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
@@ -527,7 +548,9 @@ For now, error messages are simply printed. This will be developed to saving to 
 |get_item|Test getting items using either index or dimension string| returns correct values|Returns incorrect values|
 |set_item|Test setting items using either index or dimension string| Sets correct values|Sets incorrect values|
 
-### 6.1.3 Image
+## 6.2 – Backend Composition Classes
+
+### 6.2.1 Image
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Use unexpected data type (not ImageInt, ImageFloat or ImageBinary)|	Type Error	| Type converted to correct type<br>Incorrectly type data used anyway</li></ul>|
@@ -535,15 +558,14 @@ For now, error messages are simply printed. This will be developed to saving to 
 |Shape constraints	|Input shape data not in Shape class|Type Error	|	Wrong class ignored|
 |get_image_shape() | Get image shape of various shape pixel arrays | Gives correct shape | Gives incorrect shape |
 
-## Stage 6.2 – Backend Image Operation Classes
-### Parameters
+### 6.2.2 Parameters
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
 
+## Stage 6.3 – Backend Excecution Classes
 
-
-### ImageOperation
+### 6.3.1 ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |ImageParcel|Supply **dtype** as not member of DataTypes.image_types| Type Error | Incorrect data type accepted|
@@ -571,7 +593,7 @@ For now, error messages are simply printed. This will be developed to saving to 
 |run_code|Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data|Value Error|Incorrect value accepted|
 |run_code|Code provided returns an array value without shape data| Value Error | Incorrect value accepted|
 
-### ImageOperationDirectory
+### 6.3.2 ImageOperationDirectory
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |ImportList|Import ImageOperation with correct category| Correct category saved to ImageOperation | Incorrect category|
@@ -591,6 +613,16 @@ For now, error messages are simply printed. This will be developed to saving to 
 |ImportTesting|ImageOperation which produces a parameter and image output|ImageOperation accepted | ImageOperation rejected|
 |ImportConstraints|Import an ImageOperation with unacceptable import|  ImageOperation rejected and reported | ImageOperation accepted|
 |ImportConstraints|Import an ImageOperation with acceptable import|  ImageOperation imported | ImageOperation accepted|
+
+## 6.4 Backend Interface Classes
+### 6.4.1 Port Class
+
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                |  
+|Convert|Provide numpy data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
+|Convert|Provide DataType data to Node flagged as !node_input| Type error: expects numpy| Accepts Data|
+|Convert|Provide DataType data to Node flagged as node_input| Correctly converts to numpy data type | Fails to correctly convert data|
+|Convert|Provide numpy data to Node flagged as !node_input| Correctly converts to relevant DataType | Fails to correctly convert data|
 
 
 # Versioning
