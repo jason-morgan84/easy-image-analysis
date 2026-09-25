@@ -43,7 +43,7 @@
 |24/09/26|0.14.1|Updated unit testing for ImageOperationDirectory class|
 |25/09/26|0.14.2|Updated unit testing for ImageOperationDirectory class import testing|
 |25/09/26|0.15.0|Updated description of Port class and Port class unit testing|
-
+|25/09/26|0.15.1|Updated Port class unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -369,6 +369,12 @@ Two lists of ports are created with each node, and ports do not exist independen
 It has a single main function for data conversion:
 * convert()
 
+This function **only** converts the data types, it doesn't carry out any checks. 
+
+For an input, these checks are carried out by the DataFlow class on creating a connection and by the ImageOperation class on receiving the data.
+
+For an output, these checks are carried out by the ImageOperation class on creating an output and the DataFlow class on creating a connection.
+
 ### 3.5.2 Node Class
 The ImageOperation class defines the image analysis function to be carried out on the image. The Node class is responsible for positioning an ImageOperation in the WorkFlow – this means there can be multiple nodes containing the same ImageOperation. While the ImageOperation class is responsible purely for image analysis, the Node class is responsible for interacting with other elements of the WorkFlow. As such, it has the following instance variables:
 * image_operation – the image analysis function to be run, as an ImageOperation class
@@ -618,11 +624,17 @@ For now, error messages are simply printed. This will be developed to saving to 
 ### 6.4.1 Port Class
 
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
-|:--        |:--    |:--                |:--                |  
-|Convert|Provide numpy data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide DataType data to Node flagged as !node_input| Type error: expects numpy| Accepts Data|
-|Convert|Provide DataType data to Node flagged as node_input| Correctly converts to numpy data type | Fails to correctly convert data|
-|Convert|Provide numpy data to Node flagged as !node_input| Correctly converts to relevant DataType | Fails to correctly convert data|
+|:--        |:--    |:--                |:--                | 
+|is_node_input setter|Provide missign input flag|Type Error, expected type bool|No error| 
+|Convert|Provide incorrect image data (ImageParcel - numpy) data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
+|Convert|Provide incorrect incorrect parameter data (ParameterParcel - numpy) data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
+|Convert|Provide incorrect image data (Image of DataType) to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
+|Convert|Provide incorrect paramter data (Parameter of DataType) to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
+|Convert|Provide correct (ImageParcel - numpy) image data to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
+|Convert|Provide correct (ImageParameter - numpy) parameter data to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
+|Convert|Provide correct (Image - DataType) image data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
+|Convert|Provide correct (Parameter - DataType) parameter data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
+
 
 
 # Versioning
