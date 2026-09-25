@@ -9,9 +9,7 @@ from core.shape import Shape
 
 # Input data type not a member of DataType.value_type
 @pytest.mark.parametrize("value, message", [
-    # Supply dtype as not member of DataTypes.image_types
     (5, "Expected type member of DataType"),
-    # Have pixel_array type not match dtype
     ("5", "Expected type member of DataType"),
     (DataType.ImageInt([1,2,3],), "Expected type member of DataType.value_types")])
 
