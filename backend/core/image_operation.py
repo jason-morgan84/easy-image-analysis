@@ -77,7 +77,7 @@ class ImageParcel:
 
 # simple class to hold parameter inputs and outputs
 class ParameterParcel:
-    def __init__(self, dtype, value = None, shape = None, mapping = None):
+    def __init__(self, dtype, value = None, shape = None):
         self.dtype = dtype
         self.value = value
         self.shape = shape        
