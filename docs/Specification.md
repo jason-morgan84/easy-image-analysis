@@ -41,6 +41,7 @@
 |22/09/26|0.13.0|Added description of LogItem in error_handling.py|
 |23/09/26|0.14.0|Updated specification and unit testing for ImageOperationDirectory class|
 |24/09/26|0.14.1|Updated unit testing for ImageOperationDirectory class|
+|25/09/26|0.14.2|Updated unit testing for ImageOperationDirectory class import testing|
 
 
 # 2. Premise and Aims
@@ -588,7 +589,8 @@ For now, error messages are simply printed. This will be developed to saving to 
 |ImportTesting|ImageOperation which only produces an image output|ImageOperation accepted | ImageOperation rejected|
 |ImportTesting|ImageOperation which only produces a parameter output|ImageOperation accepted | ImageOperation rejected|
 |ImportTesting|ImageOperation which produces a parameter and image output|ImageOperation accepted | ImageOperation rejected|
-|ImportConstraints|ImageOperation with unacceptable import|  ImageOperation rejected and reported | ImageOperation accepted|
+|ImportConstraints|Import an ImageOperation with unacceptable import|  ImageOperation rejected and reported | ImageOperation accepted|
+|ImportConstraints|Import an ImageOperation with acceptable import|  ImageOperation imported | ImageOperation accepted|
 
 
 # Versioning
