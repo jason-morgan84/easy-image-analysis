@@ -19,3 +19,10 @@ def log(error, message, class_name, function_name, import_name = None):
     new_log_item = LogItem(time.time(),error,message,class_name,function_name,import_name)
     print(new_log_item)
     return new_log_item
+
+class ConnectionError(Exception):
+    """Exception raised when errors are found in WorkFlow connectivity"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
