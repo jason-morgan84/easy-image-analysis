@@ -93,6 +93,8 @@
 |25/09/26|0.14.2|Updated unit testing for ImageOperationDirectory class import testing|
 |25/09/26|0.15.0|Updated description of Port class and Port class unit testing|
 |25/09/26|0.15.1|Updated Port class unit testing|
+|26/09/26|0.15.2|Updated Connection class description and added class unit testing|
+|27/09/26|0.15.3|Added description of ConnectionError exception to Error Handling section|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -401,21 +403,42 @@ If testing is sucessful, files are added to a dictionary of ImageOperations with
 
 ## 3.5 Interface Classes
 
-### 3.5.1 Port Class
+### 3.5.1 Connection Class
+
+Connections form the links between nodes and ports through which data travels through the WorkFlow. They have a defined direction, with an input and an output, and are created by the user. Before the instantiation of a connection, the WorkFlow class will check that input and output expect compatible type and shape (explained in more detail in WorkFlow class). Connections contain three instance variables:
+
+* input_port - a reference to the preceeding Port
+* output_port - a reference to the next Port
+* input_data - a reference to the output of the preceeding port
+* output_data - either a reference to the input or a conversion of the input
+* connection_id - unique identifier of the connection
+
+### 3.5.2 Port Class
 
 The port class acts as a buffer between a Node and an ImageOperation. It has two main roles: 
  * to convert between data types used for transmitting data through the WorkFlow and those used for image analysis.
  * to make sure that future changes can be made to the overall WorkFlow without impacting on the data sent to ImageOperations 
 
 Two lists of ports are created with each node, and ports do not exist independently of nodes. Each port has the instance variables:
+* is_input – flag for whether port is an input or output. Inputs only allow one connection, outputs allow multiple
 * node_id – unique identifier for connected node
-* connection_id – unique identifier for connected connections
-* is_node_input – flag for whether port is an input or output. Inputs only allow one connection, outputs allow multiple
-* image_operation_ID - connected image operation input/output
-* input - the inputted data
-* output - the outputted data
+* port_id - id for port within the node (the name of the connected ImageOperation input/output)
+* input_connection – identifier for input Connection/ImageOperation
+* output_connection – identifier for output Connection/ImageOperation
+* input_data - reference to/cached input data
+* output_data - cached output data
 
-It has a single main function for data conversion:
+There are key differences between input ports (is_input = True) and output ports (is_input = False).
+Output ports:
+    - cache their input (as an Package class)
+    - convert their input to a DataType
+    - cache their output.
+Input ports:
+    - input is a reference to where their data can be found (an output of an output node, via a Connection). 
+    - convert their input to a Package class containing a standard numpy data type.
+    - cache their output.
+
+Port has a single main function for data conversion:
 * convert()
 
 This function **only** converts the data types, it doesn't carry out any checks. 
@@ -424,15 +447,16 @@ For an input, these checks are carried out by the DataFlow class on creating a c
 
 For an output, these checks are carried out by the ImageOperation class on creating an output and the DataFlow class on creating a connection.
 
-### 3.5.2 Node Class
+### 3.5.3 Node Class
 The ImageOperation class defines the image analysis function to be carried out on the image. The Node class is responsible for positioning an ImageOperation in the WorkFlow – this means there can be multiple nodes containing the same ImageOperation. While the ImageOperation class is responsible purely for image analysis, the Node class is responsible for interacting with other elements of the WorkFlow. As such, it has the following instance variables:
-* image_operation – the image analysis function to be run, as an ImageOperation class
-* output – Image or value holding output data from the ImageOperation
+
+* node_id - unique identifier for this Node, created by WorkFlow on Node instantiation.
+* image_operation – reference to the image analysis function to be run, as an ImageOperation class
 * Various flags:
     - is_ready – whether the correct inputs have been connected allowing the ImageOperation to be run.
     - needs_update – whether this node needs to be (re)run, either because it hasn’t been run yet or because an upstream node has been changed.
-* input_ports – a list of members of the port class defining the required inputs to the node.
-* output_ports – a list of members of the port class defining the presented output(s) from the node.
+* input_ports – a dictionary of members of the port class defining the required inputs to the node.
+* output_ports – a dictionary of members of the port class defining the presented output(s) from the node.
 
 Node instantiation:
 1: Create Node and node ID
@@ -441,21 +465,10 @@ Node instantiation:
 
 Node running:
 1: run ImageOperation code with inputs from input Ports
-2: send ImageOperation output to output Ports
-
-
-
-### 3.5.3 Connection Class
-
-Connections form the links between nodes and ports through which data travels through the WorkFlow. They have a defined direction, with an input and an output, and are created by the user. On their initiation, type and shape checking are carried out by the WorkFlow (explained in more detail below). If they find a simple type or shape conversion can be made, they will do so, and if not, they will prompt the user to make changes to the WorkFlow. They will be discarded if both ends of the connection are not appropriately typed/shaped. Connections only contain two instance variables:
-
-* input_port_id
-* output_port_id
+2: copy ImageOperation output to output Ports
+3: reset ImageOperation
 
 ## 3.6 WorkFlow Class
-
-
-
 
 The WorkFlow class does the bulk of the work in initiating, defining and checking the graph through which image data flows.
 
@@ -498,7 +511,7 @@ On creation of a new connection, it will check for structure, constraint or type
 
 error handling.py holds functions and classes that allow reporting of errors to an external log (with the future potential to pass to a UI dialog).
 
-It contains the LogItem class, which holds data for adding to the log. It includes:
+It contains the LogItem class, which holds data for adding to the log. LogItem logs:
 - time
 - error: the BaseException class defining the error type
 - message: the associtaed error message
@@ -511,6 +524,9 @@ It also contains a custom function, log() that reports errors and returns the as
 Exception chaining will be used to log errors in the WorkFlow layer and ImageOperationDirectory, but not lower layer classes (see class heirarchy).
 
 For now, error messages are simply printed. This will be developed to saving to a log file and user prompts as development progresses.
+
+error_handling.py also includes custom exceptions:
+* ConnectionError - for errors in WorkFlow connectivity (eg, Connection with a loose end).
 
 # 4 System Frontend and UI
 
@@ -676,6 +692,8 @@ For now, error messages are simply printed. This will be developed to saving to 
 |ImportConstraints|Import an ImageOperation with acceptable import|  ImageOperation imported | ImageOperation accepted|
 
 ## 6.4 Backend Interface Classes
+
+
 ### 6.4.1 Port Class
 
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
@@ -690,6 +708,11 @@ For now, error messages are simply printed. This will be developed to saving to 
 |Convert|Provide correct (Image - DataType) image data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
 |Convert|Provide correct (Parameter - DataType) parameter data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
 
+### 6.4.2 Connection Class
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                | 
+| input     |Input not Port class|Type error|Input accepted|
+| output     |Output not Port class|Type error|Output accepted|
 
 
 # Versioning
