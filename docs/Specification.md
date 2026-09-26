@@ -454,10 +454,14 @@ Connections form the links between nodes and ports through which data travels th
 
 ## 3.6 WorkFlow Class
 
-![Workflow Graph Map](/docs/Workflow%20Graph%20Map.svg)
+
+
 
 The WorkFlow class does the bulk of the work in initiating, defining and checking the graph through which image data flows.
+
 It contains lists of all existing nodes, connections and ports, contains functions to safely add, edit and remove new nodes, ports and connections.
+
+![System Class Structure](/docs/data_flow_diagram.svg)
 
 On creation of new nodes, it interacts with the frontend to get node parameters.
 
@@ -487,6 +491,8 @@ It also contains the following functions:
 * Squeeze/unsqueeze - changes array shape, as Tranpose.
 
 On creation of a new connection, it will check for structure, constraint or type violations. Where these can be fixed through image type or shape changes, it will do so, otherwise it will prompt the user to adjust the WorkFlow. 
+
+<img src="./workflow_error_checking.svg" width="100%" height = "100%" alt="Node Graph Set-Up checks" />
 
 ## 3.7 Error Handling
 
