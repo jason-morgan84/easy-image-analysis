@@ -3,37 +3,40 @@ from core.image import Image
 from core.parameter import Parameter
 from core.image_operation import ImageParcel, ParameterParcel
 from core.constants import DataType
+from core.image_operation import ImageOperation
 
 """Connection is an extremely simple class that exists only to point an output Port from one Node to the input Port of the next.
 It has an input (expected Node class), an output (expected Node class) and an ID (defined by the WorkFlow class on the Connection's instantiation)"""
 
 class Connection:
-    def __init__(self, input, output, connection_id):
+    def __init__(self, connection_id, input_port, output_port, input_data, output_data):
         self.connection_id = connection_id
-        self.input = input
-        self.output = output
+        self.input_port = input_port
+        self.output_port = output_port
+        self.input_data = input_data
+        self.output_data = output_data
 
     @property
-    def input(self):
-        return self._input
+    def input_port(self):
+        return self._input_port
 
-    @input.setter
-    def input(self, value):
-        if not isinstance(value, Port):
-            raise ConnectionError(f"port class expected as input to connection {self.connection_id}, not {type(value)}")
+    @input_port.setter
+    def input_port(self, port):
+        if not isinstance(port, Port):
+            raise ConnectionError(f"port class expected as input_port to connection {self.connection_id}, not {type(port)}")
 
-        self._input = value
+        self._input = port
 
     @property
-    def output(self):
-        return self._output
+    def output_port(self):
+        return self._output_port
 
-    @output.setter
-    def output(self, value):
-        if not isinstance(value, Port):
-            raise ConnectionError(f"port class expected as output to connection {self.connection_id}, not {type(value)}")
+    @output_port.setter
+    def output_port(self, port):
+        if not isinstance(port, Port):
+            raise ConnectionError(f"port class expected as output_port to connection {self.connection_id}, not {type(port)}")
 
-        self._output = value
+        self._output_port = port
 
 
 
@@ -51,12 +54,14 @@ Input ports:
     - cache their output.
 """
 class Port:
-    def __init__(self, is_input, port_id, node_id):
-        self.is_node_input = is_input
-        self.port_id = port_id
-        self.node_id = node_id
-        self._input = None
-        self._output = None
+    def __init__(self, is_input, port_id, node_id, input_connection = None, output_connection = None, input_data = None, output_data = None):
+        self.is_input = is_input        # flags as an input (True) or output (False) 
+        self.port_id = port_id          # own ID value, set during instatiation
+        self.node_id = node_id          # Nodes identifier, set during instantiation
+        self.input_connection = input_connection
+        self.output_connection = output_connection
+        self.input_data = input_data
+        self.output_data = output_data
 
     @property
     def is_input(self):
@@ -70,41 +75,59 @@ class Port:
         self._is_input = flag
 
     @property
-    def input(self):
-        return self._input
+    def input_connection(self):
+        return self._input_connection
 
-    @input.setter
-    def input(self, value):
-        """check the inputs. if is_input, input should be a connection. if !is_input, input should be a Parcel class."""
-        if self.is_input:
-            if not isinstance(value, Connection):
-                raise TypeError(f"for an input port, expected input as connection class, not {type(value)}")
+    @input_connection.setter
+    def input_connection(self, value):
+        if value:
+            """check the input_connection. if is_input, input_connection should be a connection. if !is_input, input should be an ImageOperation class."""
+            if self.is_input:
+                if not isinstance(value, Connection):
+                    raise TypeError(f"for an input port, expected input_connection as connection class, not {type(value)}; port: {self.port_id}")
 
-        else:
-            if not isinstance(value, ImageParcel) and not isinstance(value, ParameterParcel):
-                raise TypeError(f"expected input as Parcel class for output Port {self.port_id} not {type(value)}")
+            else:
+                if not isinstance(value, ImageOperation):
+                    raise TypeError(f"for an output port, expected input_connection as ImageOpeartion class not {type(value)}; port: {self.port_id}")
 
-        self._input = value
+        self._input_connection = value
+
+    @property
+    def output_connection(self):
+        return self._output_connection
+
+    @output_connection.setter
+    def output_connection(self, value):
+        if value:
+            """check the output_connection. if is_input, output_connection should be a ImageOperation. if !is_input, input should be a Connection class."""
+            if self.is_input:
+                if not isinstance(value, ImageOperation):
+                    raise TypeError(f"for an input port, expected output_connection as ImageOperation class, not {type(value)}; port: {self.port_id}")
+
+            else:
+                if not isinstance(value, Connection):
+                    raise TypeError(f"for an output port, expected output_connection as Connection class not {type(value)}; port: {self.port_id}")
+
+        self._output_connection = value
 
 
 
     @property
-    def output(self):
+    def output_data(self):
         """Converts input data on demand."""
-        if self._input is None:
+        if self.input_data is None:
             return None
-
         return self.convert()
 
-    @output.setter
-    def output(self, value):
-        self._output = value
+    @output_data.setter
+    def output_data(self, value):
+        self._output_data = value
 
     def convert(self):
         """Function to convert input data to correct output data type"""
         """First, checks if this Port is connected to a node input or output"""
         if self.is_input is True:
-            data_to_convert = self.input.input
+            data_to_convert = self.input_data
             """if its an input, self.input will be Image or Parameter class"""
             # if its Image class, give output as ImageParcel
             if isinstance(data_to_convert, Image):
@@ -126,7 +149,7 @@ class Port:
             else:
                 raise TypeError(f"Expected input of Image or Parameter class, got {type(data_to_convert)}")
         elif self.is_input is False:
-            data_to_convert = self.input
+            data_to_convert = self.input_data
             """if its an output, self.input will be ImageParcel or ParamaterPackage class"""
             # if its ImageParcel class, give output as Image
             if isinstance(data_to_convert,ImageParcel):
@@ -140,7 +163,7 @@ class Port:
             elif isinstance(data_to_convert,ParameterParcel):
                 parameter_dtype = data_to_convert.dtype
                 parameter_value = parameter_dtype(data_to_convert.value)
-                parameter_name = self.image_operation_ID
+                parameter_name = self.node_id
                 output = Parameter(value = parameter_value,
                                         name = parameter_name)
             else:
