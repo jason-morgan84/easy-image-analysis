@@ -26,3 +26,10 @@ class ConnectionError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
+
+class ActivationError(Exception):
+    """Exception raised when nodes are unable to activate"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
