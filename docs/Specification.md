@@ -556,7 +556,35 @@ error_handling.py also includes custom exceptions:
 * ConnectionError - for errors in WorkFlow connectivity (eg, Connection with a loose end)
 * ActivationError - for errors in Node activation
 
-# 4 System Frontend and UI
+# 4 ImageOperation files
+
+Describe format of these files.
+
+Reference to sample files.
+
+Reference to testing.
+
+Develop and reference plug-in test harness.
+
+Plugins to make:
+
+* Z-projection
+* Select channel(s)
+* Get threshold value
+* Apply threshold value
+* Gaussian blur
+* Median blur
+* Top hat filter
+* Binary operations (erode, dilate, open, close, fill holes)
+* Logical operations (and, or, etc)
+* Measurements
+* Compare intensities
+* Edge detection
+* Segmentation
+* Watershedding
+
+
+# 5 System Frontend and UI
 
 ![UI diagram](/docs/UI.svg)
  
@@ -572,7 +600,7 @@ error_handling.py also includes custom exceptions:
 10.	Channel options view toggle (allows selection of LUTs, what channels are visible etc)
 
 *both views can be toggled to view the outputs of other nodes by clicking the node (for the output view) or shift-clicking the node (for the input view). Zoom using mouse wheel, double right clicking/left clicking. Pan by dragging and/or scroll bars. 
-# 5 Development Plan
+# 6 Development Plan
 ## Stage 0 - Planning
 * Plan overall design.
 * Plan class structure.
@@ -600,9 +628,9 @@ error_handling.py also includes custom exceptions:
 ### Stage 2.1 – Frontend Planning
 * Detailed plans for frontend from initial overview.
 * Plan implementation of frontend.
-# 6 Testing
-## 6.1 – Backend Foundation Classes
-### 6.1.1 DataType
+# 7 Testing
+## 7.1 – Backend Foundation Classes
+### 7.1.1 DataType
 **BaseType**
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
@@ -644,7 +672,7 @@ error_handling.py also includes custom exceptions:
 |shape checks | For array dtype, does output have expected shape with 0 values | Shape matches shape arguement | shape doesn't match shape arguement|
 |value constraint check | For array dtype with min, max values, do random values conform to min and max | values conform | values out of range/value error from underlying type |
 
-### 6.1.2 Shape
+### 7.1.2 Shape
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints	|Insert wrong type	|Type Error	| Type converted to correct type<br>Wrong type ignored|
@@ -653,9 +681,9 @@ error_handling.py also includes custom exceptions:
 |get_item|Test getting items using either index or dimension string| returns correct values|Returns incorrect values|
 |set_item|Test setting items using either index or dimension string| Sets correct values|Sets incorrect values|
 
-## 6.2 – Backend Composition Classes
+## 7.2 – Backend Composition Classes
 
-### 6.2.1 Image
+### 7.2.1 Image
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Use unexpected data type (not ImageInt, ImageFloat or ImageBinary)|	Type Error	| Type converted to correct type<br>Incorrectly type data used anyway</li></ul>|
@@ -663,14 +691,14 @@ error_handling.py also includes custom exceptions:
 |Shape constraints	|Input shape data not in Shape class|Type Error	|	Wrong class ignored|
 |get_image_shape() | Get image shape of various shape pixel arrays | Gives correct shape | Gives incorrect shape |
 
-### 6.2.2 Parameters
+### 7.2.2 Parameters
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
 
-## Stage 6.3 – Backend Excecution Classes
+## Stage 7.3 – Backend Excecution Classes
 
-### 6.3.1 ImageOperation
+### 7.3.1 ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |ImageParcel|Supply **dtype** as not member of DataTypes.image_types| Type Error | Incorrect data type accepted|
@@ -698,7 +726,7 @@ error_handling.py also includes custom exceptions:
 |run_code|Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data|Value Error|Incorrect value accepted|
 |run_code|Code provided returns an array value without shape data| Value Error | Incorrect value accepted|
 
-### 6.3.2 ImageOperationDirectory
+### 7.3.2 ImageOperationDirectory
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |ImportList|Import ImageOperation with correct category| Correct category saved to ImageOperation | Incorrect category|
@@ -719,10 +747,9 @@ error_handling.py also includes custom exceptions:
 |ImportConstraints|Import an ImageOperation with unacceptable import|  ImageOperation rejected and reported | ImageOperation accepted|
 |ImportConstraints|Import an ImageOperation with acceptable import|  ImageOperation imported | ImageOperation accepted|
 
-## 6.4 Backend Interface Classes
+## 7.4 Backend Interface Classes
 
-
-### 6.4.1 Port Class
+### 7.4.1 Port Class
 
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
@@ -736,13 +763,13 @@ error_handling.py also includes custom exceptions:
 |Convert|Provide correct (Image - DataType) image data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
 |Convert|Provide correct (Parameter - DataType) parameter data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
 
-### 6.4.2 Connection Class
+### 7.4.2 Connection Class
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
 | input     |Input not Port class|Type error|Input accepted|
 | output     |Output not Port class|Type error|Output accepted|
 
-### 6.4.2 Node Class
+### 7.4.2 Node Class
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
 | image_operation setter     |Provide image_operation thats not ImageOperation class|Type error|Input accepted|
@@ -761,7 +788,7 @@ error_handling.py also includes custom exceptions:
 | port activation <br> pre-tests | Activate node where an ImageOperation output_parameter does not contain value | ActivationError | node activates|
 
 
-# Versioning
+# 8 Versioning
 
 Versioning and changelogs are implemented using the "keep a changelog" 1.1 format (https://keepachangelog.com/en/1.1.0/).
 
@@ -769,8 +796,7 @@ This is unit tested for __version__ existing in __init__.py in the core director
 
 For now, version checks within the code are limited to the ImageOperationDirectory class, which checks the version number in imported modules to use import code that corresponds to the ImageOperation class structure at that defined version.
 
-
-## 8 Other Notes
+## 9 Other Notes
 * Changes to image shape should always be explicit, never incidental. For example, z-projection will reduce z dimension to 1 because that’s what z projection does, but thresholding a 5 slice z-stack will output 5 thresholds, not just 1.
 * Function code does not deal with type changes, checking of types, displaying images, UI input. The role of each function is purely to take its defined input, process it according to the supplied parameters, and produce an output in defined shape. As part of this role, it should include error handling to minimise/deal with possible errors (with the assumption that the input is of the required format). 
 * To allow for simple additions of new functions without affecting the base code, each function will be in a separate module. Along with the code itself, this module should include other data required to integrate into the software (definitions of parameters required, input and output data types, input and output image shape) and documentation (what the function does, how it affects the image shape, how changes to parameters affect output, any other points of interest). 
@@ -784,34 +810,5 @@ For now, version checks within the code are limited to the ImageOperationDirecto
 * One of the challenges of image analysis I would like to simplify here is making sure an input image to a function is in the right format. Transposition of shape (eg, 3*1024*1024 image to 1024*1024*3 image) and data type (int to float) will be handled automatically. The user will be responsible for making sure a function that requires a 1*1024*1024 image doesn’t get sent a 3*5*1024*1024 image. For this to be intuitive, each function must have a clearly defined and invariable effect on image shape (eg, z-projection will reduce Z to 1. Isolating a channel will reduce channels to 1 or conversely, z-projection won’t affect channels so channels in = channels out). This allows the user to clearly see what effect each function has on the shape of the image, and also allows the software to give pointers (ie, if the user is trying to squeeze a 3 * 1024 * 1024 image into a function that requires a 1 * 1024 * 1024 image, or an integer image into a function that requires a binarized input, highlight potential functions that can be used to fit the image to the required shape).
 * Implement a “pause updates” button – if the node graph gets big, make it possible to update multiple nodes then update all the images, rather than doing it repeatedly.
 
-### 7.1 Class design notes
-* Dimension class:
-o	In images, need to know which dimension of the np.array holds C or Z.
-o	Therefore image_shape class has c_dim, z_dim, y_dim, x_dim
-o	Image class itself needs to be able to iterate through c, iterate through z, iterate through y and iterate through x.
-o	The images returned form these iterations need their own image_shape class (i.e, an image iterated through z slices will have an image_shape class with z = -1 - so can then iterate through channels and so on.
-o	The output from a function will be an image, this will have its own image_shape class so that role of a function is dealt with here.
-o	The constraints on a node will also use this class. Node inputs can be "I need 1 channel, I don't care about x, I don't care about Y, I don't care about z" - this can fit into image_shape class as C = 1, y = x = z = -1.
-o	This will also fit for outputs, given currently anticipated effects that a function will have. Either output dimensions are the same or they are reduced to 1. So outputs could be "-1" for no change or "1" for changed to 1, "2" to changed to 2. There’s a slight possibility of needing to use strings for other operations “-3” or “/6” etc, at which point this class may need rethinking.
-* Workflow class:
-o	Plans for defining graph topology of the workflow are to match the way they would be added in the UI. First, a node (e.g., node 2) would be dragged into the workflow; this would add the node to the workflow class as a workflow element, but with no input or output connections specified. Next, the user would connect the node to the preceding node (node 1). At this point a function would be called within the workflow class to check what type conversions might be needed (in pseudo code, node2 input = int(node1 float output)) or whether there were larger problems with the input to node 2 that might need the user to add in intervening nodes to further process the data. If the function is satisfied that the connection between node 1 and node 2 is functional, the relevant inputs and outputs are added to the two node elements.
-o	Key thing is that these checks need to be made when adding the connection as the image processing will update once the software is satisfied that the connection is valid. As such, there’s a few checks to make.
 
-
-
-### 7.2 Node design notes
-* Z-projection
-* Select channel(s)
-* Get threshold value
-* Apply threshold value
-* Gaussian blur
-* Median blur
-* Top hat filter
-* Binary operations (erode, dilate, open, close, fill holes)
-* Logical operations (and, or, etc)
-* Measurements
-* Compare intensities
-* Edge detection
-* Segmentation
-* Watershedding
 
