@@ -671,6 +671,7 @@ Plugins to make:
 |shape checks | For array dtype, does output have expected shape with randomized values | Shape matches shape arguement | shape doesn't match shape arguement|
 |shape checks | For array dtype, does output have expected shape with 0 values | Shape matches shape arguement | shape doesn't match shape arguement|
 |value constraint check | For array dtype with min, max values, do random values conform to min and max | values conform | values out of range/value error from underlying type |
+|output type checks| Check that output types match expecations for numpy = True and numpy = False | Correct outout types | incorrect output types |
 
 ### 7.1.2 Shape
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
@@ -781,11 +782,11 @@ Plugins to make:
 | port activation <br> pre-tests | Activate node where an input port_id name does not correctly reference a ImageOperation input_parameter dictionary key | ActivationError | node activates|
 | port activation <br> pre-tests | Activate node where an image input port does not contain pixel_array or mapping | ActivationError | node activates|
 | port activation <br> pre-tests | Activate node where a parameter input port does not contain value | ActivationError | node activates|
-| port activation <br> pre-tests | Activate node where an output port_id is in an incorrect format (not type.name) | ActivationError | node activates|
-| port activation <br> pre-tests | Activate node where an output port_id name does not correctly reference a ImageOperation output_image dictionary key | ActivationError | node activates|
-| port activation <br> pre-tests | Activate node where an output port_id name does not correctly reference a ImageOperation output_parameter dictionary key | ActivationError | node activates|
-| port activation <br> pre-tests | Activate node where an ImageOperation output_image does not contain pixel_array or mapping | ActivationError | node activates|
-| port activation <br> pre-tests | Activate node where an ImageOperation output_parameter does not contain value | ActivationError | node activates|
+| port activation <br> post-tests | Activate node where an output port_id is in an incorrect format (not type.name) | ActivationError | node activates|
+| port activation <br> post-tests | Activate node where an output port_id name does not correctly reference a ImageOperation output_image dictionary key | ActivationError | node activates|
+| port activation <br> post-tests | Activate node where an output port_id name does not correctly reference a ImageOperation output_parameter dictionary key | ActivationError | node activates|
+| port activation <br> post-tests | Activate node where an ImageOperation output_image does not contain pixel_array or mapping | ActivationError | node activates|
+| port activation <br> post-tests | Activate node where an ImageOperation output_parameter does not contain value | ActivationError | node activates|
 
 
 # 8 Versioning

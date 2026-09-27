@@ -16,25 +16,25 @@ def test_incorrect_input_flag():
              node_id = None)
 
 
-# Provide incorrect image data (Image of DataType) to Node flagged as !node_input	
-# Provide incorrect paramter data (Parameter of DataType) to Node flagged as !node_input
+# Provide incorrect image data (Image of DataType) to Port flagged as !node_input	
+# Provide incorrect paramter data (Parameter of DataType) to Port flagged as !node_input
 @pytest.mark.parametrize("is_input, value, message", [
     (False, Image(pixel_array = sample_data(DataType.ImageInt,(1,2,3,4)),
                   image_map = Shape(0,0,0,0)),
-                    "for an output port, expected input_connection as ImageOpeartion class"),
+                    "for an output port, expected input_connection as ImageOperation class"),
     (False, Parameter(name = "Test",
                       value = DataType.ValueInt(2)),
-                    "for an output port, expected input_connection as ImageOpeartion class")
+                    "for an output port, expected input_connection as ImageOperation class")
     ])
 
 def test_output_port_incorrect_data_type(is_input, value, message):
     with pytest.raises(TypeError,match = message):
         test_port = Port(is_input, node_id = "no_node", port_id = "test_port")
         test_port._input_data = value
-        print(test_port.output())
+        print(test_port.output_data)
 
-# Provide incorrect image data (ImageParcel - numpy) data to Node flagged as node_input	
-# Provide incorrect parameter data (ParameterParcel - numpy) to Node flagged as node_input
+# Provide incorrect image data (ImageParcel - numpy) data to Port flagged as node_input	
+# Provide incorrect parameter data (ParameterParcel - numpy) to Port flagged as node_input
 def test_input_port_incorrect_data_type():
     preceeding_port = Port(is_input = False,
                            port_id = "preceeding port",

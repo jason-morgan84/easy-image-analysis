@@ -211,15 +211,15 @@ class Node:
                                               node_id = self.node_id)
 
     def initialise_output_ports(self):
-        for key in self.image_operation.input_image.keys():
+        for key in self.image_operation.output_image.keys():
             port_id = "image." + str(key)
-            self.input_ports[port_id] = Port(is_input = True,
+            self.output_ports[port_id] = Port(is_input = False,
                                               port_id = port_id,
                                               node_id = self.node_id)
             
-        for key in self.image_operation.input_parameter.keys():
+        for key in self.image_operation.output_parameter.keys():
             port_id = "parameter." + str(key)
-            self.input_ports[port_id] = Port(is_input = True,
+            self.output_ports[port_id] = Port(is_input = False,
                                               port_id = port_id,
                                               node_id = self.node_id)
 

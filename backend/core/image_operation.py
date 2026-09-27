@@ -46,7 +46,7 @@ class ImageParcel:
     @shape.setter
     def shape(self, shp):
         if not isinstance(shp, Shape) and shp is not None:
-            raise TypeError(f"Expected shape to be of class Shape, got {type(shp)}")
+            raise TypeError(f"for ImageParcel class, expected shape to be of class Shape, got {type(shp)}")
         self._shape = shp.copy() if shp is not None else None
 
     # check that mapping is of type Shape
@@ -56,7 +56,7 @@ class ImageParcel:
     @mapping.setter
     def mapping(self, map):
         if not isinstance(map, Shape) and map is not None:
-            raise TypeError(f"Expected map to be of class Shape, got {type(map)}")
+            raise TypeError(f"for ImageParcel class, expected map to be of class Shape, got {type(map)}")
         self._mapping = None if map is None else map.copy()
 
 
@@ -69,10 +69,10 @@ class ImageParcel:
          # on instantiation, pixel_array values for inputs and outputs will be None - only check values once data is present
         if array is not None and self.dtype in DataType.image_types():
             if not isinstance(array, np.ndarray):
-                raise TypeError(f"Expected pixel array as numpy array, got {type(array)}")
+                raise TypeError(f"for ImageParcel class, expected pixel array as numpy array, got {type(array)}")
             # check that pixel_array is of the expected numpy data type given dtype
             if array.dtype != self.dtype.numpy:
-                raise TypeError(f"Expected pixel array data as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {array.dtype}")
+                raise TypeError(f"for ImageParcel class, expected pixel array data as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {array.dtype}")
         self._pixel_array = None if array is None else array.copy()
 
 # simple class to hold parameter inputs and outputs
@@ -106,19 +106,19 @@ class ParameterParcel:
             if self.dtype in DataType.array_types():
                 # check value is actual ndarray
                 if not isinstance(val, (np.ndarray, list, tuple)):
-                    raise TypeError(f"Expected value as list, tuple or ndarray, got {type(val)}")
+                    raise TypeError(f"for ParameterParcel class, expected value as list, tuple or ndarray, got {type(val)}")
                 # and that values inside array of correct type
                 if isinstance(val,(tuple,list)):
                     val = np.array(val)
                 if val.dtype != self.dtype.numpy:
-                    raise TypeError(f"Expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {val.dtype}")
+                    raise TypeError(f"for ParameterParcel class, expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {val.dtype}")
             # else if dtype is a scalar type
             elif self.dtype in DataType.value_types():
                 # check val is of expected type
                 if type(val) != self.dtype.numpy:
-                    raise TypeError(f"Expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {type(val)}")
+                    raise TypeError(f"for ParameterParcel class, expected value as {self.dtype.numpy} (defined by {self.dtype}.numpy), got {type(val)}")
             else:
-                raise TypeError(f"Expected dtype as member of DataType.array_types or DataType.value_types, got {self.dtype}")
+                raise TypeError(f"for ParameterParcel class, expected dtype as member of DataType.array_types or DataType.value_types, got {self.dtype}")
         self._value = None if val is None else val.copy()
 
     @property
