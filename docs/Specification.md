@@ -95,6 +95,8 @@
 |25/09/26|0.15.1|Updated Port class unit testing|
 |26/09/26|0.15.2|Updated Connection class description and added class unit testing|
 |27/09/26|0.15.3|Added description of ConnectionError exception to Error Handling section|
+|28/09/26|0.15.4|Added description of ActivationError exception to Error Handling section|
+|28/09/26|0.15.4|Updated description of Node class and added class unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -448,7 +450,7 @@ For an input, these checks are carried out by the DataFlow class on creating a c
 For an output, these checks are carried out by the ImageOperation class on creating an output and the DataFlow class on creating a connection.
 
 ### 3.5.3 Node Class
-The ImageOperation class defines the image analysis function to be carried out on the image. The Node class is responsible for positioning an ImageOperation in the WorkFlow – this means there can be multiple nodes containing the same ImageOperation. While the ImageOperation class is responsible purely for image analysis, the Node class is responsible for interacting with other elements of the WorkFlow. As such, it has the following instance variables:
+The Node class is a hanger for an ImageOperation and its associated inputs/outputs. It is responsible for positioning an ImageOperation in the WorkFlow. There can be multiple nodes containing the same ImageOperation. On instantiation, the Node creates Ports to provide inputs and outputs to the associated ImageOperation. Data travels through these Ports to the ImageOperation; the Node class itself does not handle any data. It contains the following instance variables:
 
 * node_id - unique identifier for this Node, created by WorkFlow on Node instantiation.
 * image_operation – reference to the image analysis function to be run, as an ImageOperation class
@@ -458,15 +460,36 @@ The ImageOperation class defines the image analysis function to be carried out o
 * input_ports – a dictionary of members of the port class defining the required inputs to the node.
 * output_ports – a dictionary of members of the port class defining the presented output(s) from the node.
 
-Node instantiation:
-1: Create Node and node ID
-2: Add ImageOperation to Node
-3: Add Ports to Node based on input and output requirements of ImageOperation
+On Node instantiation, the following occurs:
+<ol>
+<li>Create Node and node ID</li>
+<li>Add ImageOperation to Node</li>
+<li>Add Ports to Node based on input and output requirements of ImageOperation</li>
+    <ul><li>Each port is added to either the input_ports dictionary or output_ports dictionary</li>
+    <li>If the Port is for an ImageOperation input_image with name "name", its key will be "image.name"</li>
+    <li>If the Port is for an ImageOperation input_parameter with name "name", its key will be "parameter.name"</li>
+    <li>For each Port, its Port.port_id will be the same as its dictionary key</li></ul>
+</ol>
+When a Node is activated, there are three steps:
+<ol>
+<li> Reset ImageOperation inputs and outputs</li>
+  <ul><li>This is important because Nodes contain references to ImageOperations, and an ImageOperation can be shared between multiple Nodes</li></ul>
+<li> Give ImageOperation inputs references to outputs from relevant Ports</li>
+  <ul><li>References rather than cache to avoid data duplication where not necessary</li></ul>
+<li> Run ImageOperation </li>
+<li> Cache ImageOperation output to inputs of relevant output Ports</li>
+  <ul><li>Cache rather than references because ImageOperations are shared and its outputs are about to be reset</li></ul>
+<li> Reset ImageOperation inputs and outputs</li>
 
-Node running:
-1: run ImageOperation code with inputs from input Ports
-2: copy ImageOperation output to output Ports
-3: reset ImageOperation
+Things to test before activation:
+* is the node is_ready flag true?
+* is the port_id in the correct format ("type.name")
+* does the input key referenced by port_name exist in ImageOperation inputs?
+* does the input port contain data (pixel_array and mapping for images, value for parameters)?
+
+Things to test after activation:
+* does the output key referenced by port_name exist in ImageOperation outputs?
+* does ImageOperation output contain data (pixel_array and mapping for images, value for parameters)?
 
 ## 3.6 WorkFlow Class
 
@@ -507,6 +530,10 @@ On creation of a new connection, it will check for structure, constraint or type
 
 <img src="./workflow_error_checking.svg" width="100%" height = "100%" alt="Node Graph Set-Up checks" />
 
+### 3.6.1 Workflow Implementation
+
+- Add permitted conversions and conversions with warnings to Types
+
 ## 3.7 Error Handling
 
 error handling.py holds functions and classes that allow reporting of errors to an external log (with the future potential to pass to a UI dialog).
@@ -526,7 +553,8 @@ Exception chaining will be used to log errors in the WorkFlow layer and ImageOpe
 For now, error messages are simply printed. This will be developed to saving to a log file and user prompts as development progresses.
 
 error_handling.py also includes custom exceptions:
-* ConnectionError - for errors in WorkFlow connectivity (eg, Connection with a loose end).
+* ConnectionError - for errors in WorkFlow connectivity (eg, Connection with a loose end)
+* ActivationError - for errors in Node activation
 
 # 4 System Frontend and UI
 
@@ -713,6 +741,24 @@ error_handling.py also includes custom exceptions:
 |:--        |:--    |:--                |:--                | 
 | input     |Input not Port class|Type error|Input accepted|
 | output     |Output not Port class|Type error|Output accepted|
+
+### 6.4.2 Node Class
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                | 
+| image_operation setter     |Provide image_operation thats not ImageOperation class|Type error|Input accepted|
+| port initiation     |Associate Node with ImageOperations with varying numbers of input_images and input_parameters|Total input ports equals sum of length of ImageOperation input_image and input_parameter directories<br>Input ports have expected IDs|Incorrect number of input ports<br>Incorrect port names|
+| port initiation     |Associate Node with ImageOperations with varying numbers of output_images and output_parameters|Total output ports equals sum of length of ImageOperation output_image and output_parameter directories<br>Output ports have expected IDs|Incorrect number of output ports<br>Incorrect port names|
+| port activation <br> pre-tests | Activate node where is_ready is false | ActivationError | node activates|
+| port activation <br> pre-tests | Activate node where an input port_id is in an incorrect format (not type.name) | ActivationError | node activates|
+| port activation <br> pre-tests | Activate node where an input port_id name does not correctly reference a ImageOperation input_image dictionary key | ActivationError | node activates|
+| port activation <br> pre-tests | Activate node where an input port_id name does not correctly reference a ImageOperation input_parameter dictionary key | ActivationError | node activates|
+| port activation <br> pre-tests | Activate node where an image input port does not contain pixel_array or mapping | ActivationError | node activates|
+| port activation <br> pre-tests | Activate node where a parameter input port does not contain value | ActivationError | node activates|
+| port activation <br> pre-tests | Activate node where an output port_id is in an incorrect format (not type.name) | ActivationError | node activates|
+| port activation <br> pre-tests | Activate node where an output port_id name does not correctly reference a ImageOperation output_image dictionary key | ActivationError | node activates|
+| port activation <br> pre-tests | Activate node where an output port_id name does not correctly reference a ImageOperation output_parameter dictionary key | ActivationError | node activates|
+| port activation <br> pre-tests | Activate node where an ImageOperation output_image does not contain pixel_array or mapping | ActivationError | node activates|
+| port activation <br> pre-tests | Activate node where an ImageOperation output_parameter does not contain value | ActivationError | node activates|
 
 
 # Versioning
