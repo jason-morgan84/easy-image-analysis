@@ -206,28 +206,28 @@ class ImageOperation:
     
     def run_code(self):
 
+
+
+        """carry out pre-execution tests"""
         # check code exists:
         self.check_code()
 
-        # carry out pre-execution tests
+        # check input_image exists and is in the correct format
         if len(self.input_image) != 0:
             self.check_image(self.input_image,"input")
         else:
             raise ValueError(f"input_image expected, got none")
 
+        # check input parameter format, if they exist
         self.check_parameter(self.input_parameter, "input")
 
         # For output images, check that Shape is present (pixel array and mapping can be defined based on actual code) 
-        # and set values to None (to allow that outputs have been created)
         for key, image in self.output_image.items():
             if image.shape is None:
                 raise ValueError(f"expected image shape constraints for output_image {key} not present")
-            image.pixel_array = None
-                    
-        # set output parameter values to None
-        if self.output_parameter:
-            for item in self.output_parameter.values():
-                item.value = None
+
+        """reset output values"""
+        self.reset_output()
 
         # save current input values (to allow for checking that inputs have not been changed):
         current_input_image = copy.deepcopy(self.input_image)
@@ -239,7 +239,7 @@ class ImageOperation:
         except Exception as e:
             raise RuntimeError(f"error executing operation '{self.name}': {e}")
 
-
+        """carry out post-execution tests"""
         # check output generated
         if not self.output_image and not self.output_parameter:
             raise RuntimeError(f"operation did not generate an output ({self.name})")
@@ -265,6 +265,24 @@ class ImageOperation:
 
         if input_changed:
             raise RuntimeError(f"operation altered input values ({self.name})")
+
+    def reset_input(self):
+        # set output iamge values to None
+        for image in self.input_image.values():
+            image.pixel_array = None
+            image.mapping = None
+        # set output parameter values to None
+        for item in self.input_parameter.values():
+            item.value = None
+
+    def reset_output(self):
+        # set output iamge values to None
+        for image in self.output_image.values():
+            image.pixel_array = None
+            image.mapping = None
+        # set output parameter values to None
+        for item in self.output_parameter.values():
+            item.value = None
         
     def check_code(self):
         function = getattr(self, "execute")
