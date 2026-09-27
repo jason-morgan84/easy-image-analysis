@@ -283,6 +283,27 @@ def test_run_code_output_image_missing_definitions():
 
     print(f"{exc_info.value}")
 
+def test_run_code_output_no_image():
+    test = ImageOperation(name = "Test",
+            category = "Testing",
+            version = None,
+            docs = None,
+            alerts = None,
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_parameter = None,
+            output_image = None,
+            output_parameter = {"output":ParameterParcel(dtype = DataType.ValueInt,value=None,shape = None)})
+
+    def test_function(self):
+        self.output_parameter['output'].value = np.uint8(5)
+
+    setattr(test, 'execute', types.MethodType(test_function, test))
+
+    test.run_code() 
+
+    #print(f"{exc_info.value}")
+
+
 # Code provided creates an error
 def test_run_code_broken_code():
     test = ImageOperation(name = "Test",

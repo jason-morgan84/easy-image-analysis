@@ -1,14 +1,13 @@
-from core.error_handling import ConnectionError
+from core.error_handling import ConnectionError, ActivationError
 from core.image import Image
 from core.parameter import Parameter
 from core.image_operation import ImageParcel, ParameterParcel
 from core.constants import DataType
 from core.image_operation import ImageOperation
 
-"""Connection is an extremely simple class that exists only to point an output Port from one Node to the input Port of the next.
-It has an input (expected Node class), an output (expected Node class) and an ID (defined by the WorkFlow class on the Connection's instantiation)"""
-
 class Connection:
+    """Connection is an extremely simple class that exists only to point an output Port from one Node to the input Port of the next.
+    It has an input (expected Node class), an output (expected Node class) and an ID (defined by the WorkFlow class on the Connection's instantiation)"""
     def __init__(self, connection_id, input_port, output_port, input_data, output_data):
         self.connection_id = connection_id
         self.input_port = input_port
@@ -38,22 +37,20 @@ class Connection:
 
         self._output_port = port
 
-
-
-"""A port converts data to/from DataTypes used in data transport through the graph and equivalent numpy types used in ImageOperations.
-They are instantiated by Nodes, with respect to the inputs and outputs required by the Node's ImageOperation.
-
-There are key differences between input ports (is_input = True) and output ports (is_input = False).
-Output ports:
-    - cache their input (as an Package class)
-    - convert their input to a DataType
-    - cache their output.
-Input ports:
-    - input is a reference to where their data can be found (an output of an output node, via a Connection). 
-    - convert their input to a Package class containing a standard numpy data type.
-    - cache their output.
-"""
 class Port:
+    """A port converts data to/from DataTypes used in data transport through the graph and equivalent numpy types used in ImageOperations.
+    They are instantiated by Nodes, with respect to the inputs and outputs required by the Node's ImageOperation.
+
+    There are key differences between input ports (is_input = True) and output ports (is_input = False).
+    Output ports:
+        - cache their input (as an Package class)
+        - convert their input to a DataType
+        - cache their output.
+    Input ports:
+        - input is a reference to where their data can be found (an output of an output node, via a Connection). 
+        - convert their input to a Package class containing a standard numpy data type.
+        - cache their output.
+    """
     def __init__(self, is_input, port_id, node_id, input_connection = None, output_connection = None, input_data = None, output_data = None):
         self.is_input = is_input        # flags as an input (True) or output (False) 
         self.port_id = port_id          # own ID value, set during instatiation
@@ -109,8 +106,6 @@ class Port:
                     raise TypeError(f"for an output port, expected output_connection as Connection class not {type(value)}; port: {self.port_id}")
 
         self._output_connection = value
-
-
 
     @property
     def output_data(self):
@@ -171,3 +166,159 @@ class Port:
         else:
             raise ValueError(f"expected True of False for is_input flag, got {self.is_node_input}")
         return output
+
+class Node:
+    """
+    The Node class is a hanger for an ImageOperation and its associated inputs/outputs.
+    It is responsible for positioning an ImageOperation in the WorkFlow. 
+    There can be multiple nodes containing the same ImageOperation. 
+    On instantiation, the Node creates Ports to provide inputs and outputs to the associated ImageOperation. 
+    Data travels through these Ports to the ImageOperation; the Node class itself does not handle any data.
+    """
+    def __init__(self, image_operation, node_id):
+        self.node_id = node_id
+        self.image_operation = image_operation
+        self.is_ready = False
+        self.needs_update = True
+
+        self.input_ports = {}
+        self.initialise_input_ports()
+
+        self.output_ports = {}
+        self.initialise_output_ports()
+
+    @property
+    def image_operation(self):
+        return self._image_operation
+
+    @image_operation.setter
+    def image_operation(self, operation):
+        if not isinstance (operation, ImageOperation):
+            raise TypeError(f"ImageOperation class expected for image_operation for {self.node_id}, got {type(operation)}")
+        self._image_operation = operation
+
+    def initialise_input_ports(self):
+        for key in self.image_operation.input_image.keys():
+            port_id = "image." + str(key)
+            self.input_ports[port_id] = Port(is_input = True,
+                                              port_id = port_id,
+                                              node_id = self.node_id)
+            
+        for key in self.image_operation.input_parameter.keys():
+            port_id = "parameter." + str(key)
+            self.input_ports[port_id] = Port(is_input = True,
+                                              port_id = port_id,
+                                              node_id = self.node_id)
+
+    def initialise_output_ports(self):
+        for key in self.image_operation.input_image.keys():
+            port_id = "image." + str(key)
+            self.input_ports[port_id] = Port(is_input = True,
+                                              port_id = port_id,
+                                              node_id = self.node_id)
+            
+        for key in self.image_operation.input_parameter.keys():
+            port_id = "parameter." + str(key)
+            self.input_ports[port_id] = Port(is_input = True,
+                                              port_id = port_id,
+                                              node_id = self.node_id)
+
+    def activate_node(self):
+        # only activate node if ready
+        if self.is_ready is False:
+            raise ActivationError(f"node activated when is_ready set to False: {self.node_id}")
+        else:
+            # Reset ImageOperation inputs and outputs
+            self.image_operation.reset_input()
+            self.image_operation.reset_output()
+
+            # Give ImageOperation inputs references to outputs from relevant Ports
+            self.reference_input_data()
+
+            # Run ImageOperation
+            self.image_operation.run_code()
+
+            # Cache ImageOperation output to inputs of relevant output Ports
+            self.image_operation.cache_output_data()
+
+            # Reset ImageOperation inputs and outputs
+            self.image_operation.reset_input()
+            self.image_operation.reset_output()
+  
+    def reference_input_data(self):
+        # go through each input port
+        for port_id, port in self.input_ports.items():
+            # port ids are made up of type.name. Split into type and name
+            try:
+                port_type, port_name = port_id.split(".")
+            except:
+                raise ValueError(f"invalid port_id for input port {port_id}, node {self.node_id}")
+
+            # if port is for an image
+            if port_type == "image":
+                # if port_name is not a valid reference to a key in the image_operation input_image dictionary, raise an error
+                if port_name not in self.image_operation.input_image.keys():
+                    raise ActivationError(f"node activated where input port name not present in ImageOperation input dictionary: port {port_id} in node {self.node_id}")
+                # if the input port contains pixel_array data, set the relevant image_operation input_image pixel_array to a reference to the port output
+                if port.output_data.pixel_array:
+                    self.image_operation.input_image[port_name].pixel_array = port.output_data.pixel_array
+                # else raise an error
+                else:
+                    raise ActivationError(f"node activated when input pixel_array not present: port {port_id} in node {self.node_id}")
+                # if the input port contains mapping data, set the relevant image_operation input_image mapping to a reference to the port output
+                if port.output_data.mapping:
+                    self.image_operation.input_image[port_name].mapping = port.output_data.mapping
+                else:
+                        # else raise an error
+                        raise ActivationError(f"node activated when input mapping not present: port {port_id} in node {self.node_id}")
+
+            # if port is for a parameter
+            elif port_type == "parameter":
+                # if port_name is not a valid reference to a key in the image_operation input_image dictionary, raise an error
+                if port_name not in self.image_operation.input_parameter.keys():
+                    raise ActivationError(f"node activated where port name not present in ImageOperation input dictionary: port {port_id} in node {self.node_id}")
+                # if the input port contains value data, set the relevant image_operation input_image value to a reference to the port output
+                if port.output_data.value:
+                    self.image_operation.input_parameter[port_name].value = port.output_data.value
+                else:
+                        # else raise an error
+                        raise ActivationError(f"node activated when input value not present: port {port_id} in node {self.node_id}")
+   
+    def cache_output_data(self):
+        # go through each output port
+        for port_id, port in self.output_ports.items():
+            # port ids are made up of type.name. Split into type and name
+            try:
+                port_type, port_name = port_id.split(".")
+            except:
+                raise ValueError(f"invalid port_id for output port {port_id}, node {self.node_id}")
+             # if port is for an image
+            if port_type == "image":
+                # if port_name is not a valid reference to a key in the image_operation output_image dictionary, raise an error
+                if port_name not in self.image_operation.output_image.keys():
+                    raise ActivationError(f"node activated where output port name not present in ImageOperation output dictionary: port {port_id} in node {self.node_id}")
+                # if the image_operation output dictionary contains pixel_array data, 
+                # set the relevant output_port pixel_array to a copy of the ImageOperation output
+                if self.image_operation.output_image[port_name].pixel_array:
+                    port.input_data.pixel_array = self.image_operation.output_image[port_name].pixel_array.copy()
+                # else raise an error
+                else:
+                    raise ActivationError(f"node activated but expected output pixel_array not created: port {port_id} in node {self.node_id}")
+                # if the image_operation output dictionary contains mapping data, 
+                # set the relevant output_port mapping to a copy of the ImageOperation output
+                if self.image_operation.output_image[port_name].mapping:
+                    port.input_data.mapping = self.image_operation.output_image[port_name].mapping.copy()
+                else:
+                    # else raise an error
+                    raise ActivationError(f"node activated but expected output mapping not created: port {port_id} in node {self.node_id}")
+            elif port_type == "parameter":
+                # if port_name is not a valid reference to a key in the image_operation output_image dictionary, raise an error
+                if port_name not in self.image_operation.output_parameter.keys():
+                    raise ActivationError(f"node activated where output port name not present in ImageOperation output dictionary: port {port_id} in node {self.node_id}")
+                # if the image_operation output dictionary contains value data, 
+                # set the relevant output_port pixel_array to a copy of the ImageOperation output
+                if self.image_operation.output_parameter[port_name].value:
+                    port.input_data.value = self.image_operation.output_parameter[port_name].value.copy()
+                # else raise an error
+                else:
+                    raise ActivationError(f"node activated but expected output value not created: port {port_id} in node {self.node_id}")
