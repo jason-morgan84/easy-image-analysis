@@ -207,6 +207,12 @@ def test_sample_data():
     with pytest.raises(TypeError):
         a = sample_data (int, (2,3))
 
+    test_numpy = sample_data(DataType.ImageInt,(1,2,3,4),False,True)
+    assert test_numpy.dtype == DataType.ImageInt.numpy
+
+    test_dataType = sample_data(DataType.ImageFloat,(2,4,6,7),False,False)
+    assert type(test_dataType) == DataType.ImageFloat.target_class
+
 # shape checks: Input value dtype where is_array = true but no shape passed
     with pytest.raises(TypeError):
         a = sample_data(ImageInt)

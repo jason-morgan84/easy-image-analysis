@@ -188,7 +188,7 @@ class ArrayFloat(BaseType):
         else:
             raise TypeError(f"ArrayFloat cannot be converted to type {dtype}")
 
-def sample_data(dtype, shape = None, zero = False):
+def sample_data(dtype, shape = None, zero = False, numpy = False):
     value_dtype = getattr(dtype, "data_type", None)
     if value_dtype == None or value_dtype not in DataType.types():
         raise TypeError (f"Expected Image data type (see constants.py) got {dtype}")
@@ -203,19 +203,22 @@ def sample_data(dtype, shape = None, zero = False):
         if not isinstance(shape[0],(int,np.integer)):
             raise TypeError (f"Shape should be array of integers, not {type(shape[0])}")
         if zero:
-            return dtype(dtype.numpy(np.zeros(shape)))
+            numpy_output = dtype.numpy(np.zeros(shape))
+            return numpy_output if numpy else dtype(numpy_output)
         else:
             max = 255 if dtype.max_value == None else dtype.max_value
             min = 0 if dtype.min_value == None else dtype.min_value
             range = max - min
             random_array = np.random.random(size = shape) # gives random array between 0 and 1 of desired shape
             random_array = (random_array * range) + min # gets array between min and max values
-            return dtype(dtype.numpy(random_array)) # returns array in correct format
+            numpy_output = dtype.numpy(random_array)
+            return numpy_output if numpy else dtype(numpy_output) # returns array in correct format
     else:
         if zero:
-            return dtype(dtype.numpy(0))
+            return dtype.numpy(0) if numpy else dtype(dtype.numpy(0))
         else:
             max = 255 if dtype.max_value == None else dtype.max_value
             min = 0 if dtype.min_value == None else dtype.min_value
             range = max - min
-            return dtype(dtype.numpy(np.random.random() * range + min))
+            numpy_output = dtype.numpy(np.random.random() * range + min)
+            return numpy_output if numpy else dtype(numpy_output) 
