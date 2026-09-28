@@ -160,7 +160,6 @@ def test_pre_test_missing_pixel_array_input_port_image():
     #    test_node1.activate_node()
 
 #Activate node where an image input port does not contain image_map
-#Activate node where an image input port does not contain pixel_array
 def test_pre_test_missing_image_map_input_port_image():
     test_node1 = Node(test_operation_1,"test 1")
     test_node1.is_ready = True
@@ -176,9 +175,34 @@ def test_pre_test_missing_image_map_input_port_image():
        # test_node1.activate_node()
 
 
-# Activate node where a parameter input port does not contain value | ActivationError | node activates|
+# Activate node where a parameter input port does not contain value
+def test_pre_test_missing_value_input_port_parameter():
+    test_node1 = Node(test_operation_1,"test 1")
+    test_node1.is_ready = True
+    test_node1.input_ports["image.image 1"].input_data = test_image
+    test_node1.input_ports["image.image 2"].input_data = test_image
+    test_node1.input_ports["parameter.parameter 1"].input_data = test_parameter
+
+    with pytest.raises(TypeError, match = "Expected type member of DataType"):
+        test_node1.input_ports["parameter.parameter 1"].input_data.value = None
+    """as with the previous test, this causes an error in the Parameter class when setting value to 0. Keeping the actual tests for the Node class below
+    in case something changes in the Image class down the line"""
+    #with pytest.raises(ActivationError, match = "node activated when input image_map not present"):
+       # test_node1.activate_node()
+
 """post tests"""
 # Activate node where an output port_id is in an incorrect format (not type.name) | ActivationError | node activates|
+def test_pre_test_incorrect_format_output_port_id():
+    test_node1 = Node(test_operation_1,"test 1")
+    test_node1.is_ready = True
+    test_node1.input_ports["image.image 1"].input_data = test_image
+    test_node1.input_ports["image.image 2"].input_data = test_image
+    test_node1.input_ports["parameter.parameter 1"].input_data = test_parameter
+    test_node1.output_ports["wrong name"] = test_node1.output_ports["image.output 1"]
+    del test_node1.output_ports["image.output 1"]
+    with pytest.raises(ValueError, match = "invalid port_id for input port"):
+        test_node1.activate_node()
+
 #Activate node where an output port_id name does not correctly reference a ImageOperation output_image dictionary key | ActivationError | node activates|
 # Activate node where an output port_id name does not correctly reference a ImageOperation output_parameter dictionary key | ActivationError | node activates|
 #Activate node where an ImageOperation output_image does not contain pixel_array or image_map | ActivationError | node activates|
