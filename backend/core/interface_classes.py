@@ -111,7 +111,7 @@ class Port:
     def output_data(self):
         """Converts input data on demand."""
         if self.input_data is None:
-            return None
+            raise ConnectionError(f"attempt to get port output where no input present: {self.port_id}")
         return self.convert()
 
     @output_data.setter
@@ -131,7 +131,7 @@ class Port:
                 image_map = data_to_convert.image_map
                 output = ImageParcel(dtype = image_dtype,
                                           pixel_array = image_pixel_array,
-                                          mapping = image_map)
+                                          image_map = image_map)
 
             # if input is Parameter class, give output as ParameterParcel
             elif isinstance(data_to_convert,Parameter):
@@ -150,7 +150,7 @@ class Port:
             if isinstance(data_to_convert,ImageParcel):
                 image_dtype = data_to_convert.dtype
                 image_pixel_array = image_dtype(data_to_convert.pixel_array)
-                image_map = data_to_convert.mapping
+                image_map = data_to_convert.image_map
                 output = Image(pixel_array = image_pixel_array,
                                     image_map = image_map)
 
@@ -260,23 +260,25 @@ class Node:
                 if port_name not in self.image_operation.input_image.keys():
                     raise ActivationError(f"node activated where input port name not present in ImageOperation input dictionary: port {port_id} in node {self.node_id}")
                 # if the input port contains pixel_array data, set the relevant image_operation input_image pixel_array to a reference to the port output
-                if port.output_data.pixel_array:
+                if port.output_data.pixel_array is not None:
                     self.image_operation.input_image[port_name].pixel_array = port.output_data.pixel_array
                 # else raise an error
                 else:
                     raise ActivationError(f"node activated when input pixel_array not present: port {port_id} in node {self.node_id}")
-                # if the input port contains mapping data, set the relevant image_operation input_image mapping to a reference to the port output
-                if port.output_data.mapping:
-                    self.image_operation.input_image[port_name].mapping = port.output_data.mapping
+                # if the input port contains image_map data, set the relevant image_operation input_image image_map to a reference to the port output
+                if port.output_data.image_map is not None:
+                    print(f"\n\n\n\ninput: {port.input_data.image_map}")
+                    print(f"\n\n\n\noutput: {port.output_data.image_map}")
+                    self.image_operation.input_image[port_name].image_map = port.output_data.image_map
                 else:
-                        # else raise an error
-                        raise ActivationError(f"node activated when input mapping not present: port {port_id} in node {self.node_id}")
+                    # else raise an error
+                    raise ActivationError(f"node activated when input image_map not present: port {port_id} in node {self.node_id}")
 
             # if port is for a parameter
             elif port_type == "parameter":
                 # if port_name is not a valid reference to a key in the image_operation input_image dictionary, raise an error
                 if port_name not in self.image_operation.input_parameter.keys():
-                    raise ActivationError(f"node activated where port name not present in ImageOperation input dictionary: port {port_id} in node {self.node_id}")
+                    raise ActivationError(f"node activated where input port name not present in ImageOperation input dictionary: port {port_id} in node {self.node_id}")
                 # if the input port contains value data, set the relevant image_operation input_image value to a reference to the port output
                 if port.output_data.value:
                     self.image_operation.input_parameter[port_name].value = port.output_data.value
@@ -304,13 +306,13 @@ class Node:
                 # else raise an error
                 else:
                     raise ActivationError(f"node activated but expected output pixel_array not created: port {port_id} in node {self.node_id}")
-                # if the image_operation output dictionary contains mapping data, 
-                # set the relevant output_port mapping to a copy of the ImageOperation output
-                if self.image_operation.output_image[port_name].mapping:
-                    port.input_data.mapping = self.image_operation.output_image[port_name].mapping.copy()
+                # if the image_operation output dictionary contains image_map data, 
+                # set the relevant output_port image_map to a copy of the ImageOperation output
+                if self.image_operation.output_image[port_name].image_map:
+                    port.input_data.image_map = self.image_operation.output_image[port_name].image_map.copy()
                 else:
                     # else raise an error
-                    raise ActivationError(f"node activated but expected output mapping not created: port {port_id} in node {self.node_id}")
+                    raise ActivationError(f"node activated but expected output image_map not created: port {port_id} in node {self.node_id}")
             elif port_type == "parameter":
                 # if port_name is not a valid reference to a key in the image_operation output_image dictionary, raise an error
                 if port_name not in self.image_operation.output_parameter.keys():
