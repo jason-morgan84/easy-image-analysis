@@ -20,7 +20,7 @@ class ImageOperationDirectory():
     def __init__(self, logger = None, testing = False):
         self.image_operation_list = {}
         self.testing = testing
-        self.version_mapping = {"0": lambda attr: self.import_0(attr)}
+        self.version_image_map = {"0": lambda attr: self.import_0(attr)}
         self.logger = logger if logger else []
         self.disallowed_modules = set()
 
@@ -83,10 +83,10 @@ class ImageOperationDirectory():
                             attribute = getattr(sub_module, attribute_name)
                             # if its a class that is a subclass of ImageOperation, but not ImageOperation itself (which should never be in that folder anyway)
                             if isinstance(attribute, type) and issubclass(attribute,ImageOperation) and attribute is not ImageOperation:
-                                """ Use major version number and version_mapping dictionary to import new dictionary item 
+                                """ Use major version number and version_image_map dictionary to import new dictionary item 
                                 # with key "name" and value based on return from relevant import function"""
                                 try:
-                                    imported_function = self.version_mapping[major](attribute)
+                                    imported_function = self.version_image_map[major](attribute)
                                 except Exception as e:
                                     self.logger.append(log(ImportError,f"cannot import module {name}: {e}","ImageOperationDirectory","import_operations_dict",name))
                                     continue                                                              
@@ -151,11 +151,11 @@ class ImageOperationDirectory():
             # gets dtype of input image
             item_dtype = function.input_image[item].dtype
 
-            # calculates dimensions of shape for pixel_array based on input_image shape and mapping arguements
-            item_shape[function.input_image[item].mapping.c] = default_c if function.input_image[item].shape.c == -1 else function.input_image[item].shape.c
-            item_shape[function.input_image[item].mapping.z] = default_z if function.input_image[item].shape.z == -1 else function.input_image[item].shape.z
-            item_shape[function.input_image[item].mapping.y] = default_y if function.input_image[item].shape.y == -1 else function.input_image[item].shape.y
-            item_shape[function.input_image[item].mapping.x] = default_x if function.input_image[item].shape.x == -1 else function.input_image[item].shape.x
+            # calculates dimensions of shape for pixel_array based on input_image shape and image_map arguements
+            item_shape[function.input_image[item].image_map.c] = default_c if function.input_image[item].shape.c == -1 else function.input_image[item].shape.c
+            item_shape[function.input_image[item].image_map.z] = default_z if function.input_image[item].shape.z == -1 else function.input_image[item].shape.z
+            item_shape[function.input_image[item].image_map.y] = default_y if function.input_image[item].shape.y == -1 else function.input_image[item].shape.y
+            item_shape[function.input_image[item].image_map.x] = default_x if function.input_image[item].shape.x == -1 else function.input_image[item].shape.x
 
             # uses type.sample_data to set pixel_array as an array of the correct shape and dtype of 0s
             function.input_image[item].pixel_array = item_dtype.to_numpy(sample_data(dtype = item_dtype,
