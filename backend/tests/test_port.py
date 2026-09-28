@@ -21,16 +21,16 @@ def test_incorrect_input_flag():
 @pytest.mark.parametrize("is_input, value, message", [
     (False, Image(pixel_array = sample_data(DataType.ImageInt,(1,2,3,4)),
                   image_map = Shape(0,0,0,0)),
-                    "for an output port, expected input_connection as ImageOperation class"),
+                    "Expected input of ImageParcel or ParameterParcel class"),
     (False, Parameter(name = "Test",
                       value = DataType.ValueInt(2)),
-                    "for an output port, expected input_connection as ImageOperation class")
+                    "Expected input of ImageParcel or ParameterParcel class")
     ])
 
 def test_output_port_incorrect_data_type(is_input, value, message):
     with pytest.raises(TypeError,match = message):
         test_port = Port(is_input, node_id = "no_node", port_id = "test_port")
-        test_port._input_data = value
+        test_port.input_data = value
         print(test_port.output_data)
 
 # Provide incorrect image data (ImageParcel - numpy) data to Port flagged as node_input	
@@ -42,7 +42,7 @@ def test_input_port_incorrect_data_type():
 
     preceeding_port.output = ImageParcel(dtype = DataType.ImageInt, 
                                          pixel_array = np.ndarray([1,2,3,4],np.uint8), 
-                                         mapping = Shape(0,0,0,0))
+                                         image_map = Shape(0,0,0,0))
     
     preceeding_connection = Connection(connection_id = "ID", 
                                        input_port = preceeding_port, 
@@ -71,7 +71,7 @@ def test_input_port_incorrect_data_type():
 @pytest.mark.parametrize("is_input, value", [
     (False, ImageParcel(dtype = DataType.ImageInt,
                        pixel_array = np.ndarray([1,2,3,4],np.uint8),
-                       mapping = Shape(0,0,0,0))),
+                       image_map = Shape(0,0,0,0))),
     (False, ParameterParcel(dtype = DataType.ValueInt,
                            value = np.uint8(2))),
     (True, Image(pixel_array = sample_data(DataType.ImageInt,(1,2,3,4)),

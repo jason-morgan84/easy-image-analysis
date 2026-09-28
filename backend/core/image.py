@@ -5,7 +5,7 @@ from core.shape import Shape
 class Image:
     def __init__(self, pixel_array, image_map):
         self.pixel_array = pixel_array                      # the multi-dimensional array that holds the pixel data
-        self.image_map = image_map                          # mapping of image dimensions (c,z,y,x) to Array dimensions (0,1,2,3 etc)
+        self.image_map = image_map                          # image_map of image dimensions (c,z,y,x) to Array dimensions (0,1,2,3 etc)
 
     @property
     def pixel_array(self):
@@ -74,12 +74,12 @@ class Image:
 
 
         #for n, item in enumerate(new_shape):
-        #    for dim in self.image_mapping:
+        #    for dim in self.image_image_map:
         #        if Shape.dimensions[dim] == item.lower():
         #            transpose.append(dim)
 
         # convert new dimension order in new_shape as strings to same order in transpose as integers
-        transpose = [self.image_mapping[item] for item in new_shape]
+        transpose = [self.image_image_map[item] for item in new_shape]
 
         # get new shape map - ie, get the position of c,z,y,x in new_shape
         shape_index_lookup = {item.lower(): idx for idx, item in enumerate(new_shape)}
@@ -92,7 +92,7 @@ class Image:
                      array_dtype = self.array_dtype,
                      image_shape = self.image_shape,
                      #image_shape = Shape(*transposed_array.shape),
-                     image_mapping = Shape(*new_map))"""
+                     image_image_map = Shape(*new_map))"""
 
 
 

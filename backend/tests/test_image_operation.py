@@ -6,22 +6,22 @@ from core.constants import DataType
 from core.image_operation import ImageOperation, ImageParcel, ParameterParcel
 import types
 
-@pytest.mark.parametrize("dtype, pixel_array, shape, mapping", [
+@pytest.mark.parametrize("dtype, pixel_array, shape, image_map", [
     # Supply dtype as not member of DataTypes.image_types
     (np.uint8, np.array([1,2,3],np.uint8), None, None),
     # Have pixel_array type not match dtype
     (DataType.ImageInt, np.array([0.1,0.2,0.3],np.float64), None, None),
     # Supply shape not as Shape class
     (DataType.ImageInt, np.array([1,2,3],np.uint8), [1,2], None),
-    # Supply mapping not as Shape class
+    # Supply image_map not as Shape class
     (DataType.ImageInt, np.array([1,2,3],np.uint8), None, [5,1])])
-def test_ImageParcel(dtype, pixel_array, shape, mapping):
+def test_ImageParcel(dtype, pixel_array, shape, image_map):
 
     with pytest.raises(TypeError) as exc_info:
         ImageParcel(dtype = dtype, 
                     pixel_array = pixel_array, 
                     shape = shape, 
-                    mapping = mapping)
+                    image_map = image_map)
     print(f"{exc_info.value}")
 
 @pytest.mark.parametrize("dtype, value, shape", [
@@ -47,17 +47,17 @@ def test_ParameterParcel(dtype, value, shape):
 def test_ImageParcel_imutability():
         array = np.array([1,2,3],np.uint8)
         shape_test = Shape(-1,-1,-1,-1)
-        mapping_test = Shape(0,0,0,0)
+        image_map_test = Shape(0,0,0,0)
         test = ImageParcel(dtype = DataType.ImageInt, 
                     pixel_array = array, 
                     shape = shape_test, 
-                    mapping = mapping_test)
+                    image_map = image_map_test)
         
         shape_test.c = 4
-        mapping_test.z = 5
+        image_map_test.z = 5
         array[0] = 5
         assert test.pixel_array[0] != 5
-        assert test.mapping.z != 5, print(f"mapping values: {mapping_test.c} {test.mapping.c}")
+        assert test.image_map.z != 5, print(f"image_map values: {image_map_test.c} {test.image_map.c}")
         assert test.shape.c != 4, print(f"shape values: {shape_test.c} {test.shape.c}")
         
 #ParameterParcel Imutability - Pass value as variable then change variable
@@ -110,12 +110,12 @@ def test_run_code_no_input_image():
             alerts = None,
             input_image = None,
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
 
     def test_function(self):
         self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].mapping = Shape(0,0,0,0)
+        self.output_image['output'].image_map = Shape(0,0,0,0)
         self.output_image['output'].shape = Shape(3,3,3,3)
 
     setattr(test, 'execute', types.MethodType(test_function, test))
@@ -130,9 +130,9 @@ def test_run_code_no_code():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
     
     with pytest.raises(RuntimeError, match="no code exists") as exc_info:
@@ -146,14 +146,14 @@ def test_run_code_input_image_no_pixel_array():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
 
     def test_function(self):
         self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].mapping = Shape(0,0,0,0)
+        self.output_image['output'].image_map = Shape(0,0,0,0)
         self.output_image['output'].shape = Shape(3,3,3,3)
 
     setattr(test, 'execute', types.MethodType(test_function, test))
@@ -162,26 +162,26 @@ def test_run_code_input_image_no_pixel_array():
         test.run_code() 
     print(f"{exc_info.value}")
 
-# Supply input pixel_array with missing mapping or shape data
-def test_run_code_input_image_no_shape_or_mapping():
+# Supply input pixel_array with missing image_map or shape data
+def test_run_code_input_image_no_shape_or_image_map():
     test = ImageOperation(name = "Test",
             category = "Testing",
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = None,mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = None,image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
         
     def test_function(self):
         self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].mapping = Shape(0,0,0,0)
+        self.output_image['output'].image_map = Shape(0,0,0,0)
         self.output_image['output'].shape = Shape(3,3,3,3)
 
     setattr(test, 'execute', types.MethodType(test_function, test))
     test.input_image["input"].shape = None
-    test.input_image["input"].mapping = Shape(0,0,0,0)
+    test.input_image["input"].image_map = Shape(0,0,0,0)
 
     with pytest.raises(ValueError) as exc_info:
         test.run_code() 
@@ -194,14 +194,14 @@ def test_run_code_input_image_array_not_matching_constraints():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
 
     def test_function(self):
         self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].mapping = Shape(0,0,0,0)
+        self.output_image['output'].image_map = Shape(0,0,0,0)
         self.output_image['output'].shape = Shape(3,3,3,3)
 
     setattr(test, 'execute', types.MethodType(test_function, test))
@@ -217,14 +217,14 @@ def test_run_code_input_parameter_missing_value():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = {"input_parameter":ParameterParcel(dtype = DataType.ValueInt,value = None)},
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
 
     def test_function(self):
         self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].mapping = Shape(0,0,0,0)
+        self.output_image['output'].image_map = Shape(0,0,0,0)
         self.output_image['output'].shape = Shape(3,3,3,3)
 
     setattr(test, 'execute', types.MethodType(test_function, test))
@@ -242,14 +242,14 @@ def test_run_code_input_parameter_wrong_shape(test_shape):
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = {"input_parameter":ParameterParcel(dtype = DataType.ArrayInt,value = np.array([[2,5],[2,5]],np.uint8),shape = test_shape)},
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
 
     def test_function(self):
         self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].mapping = Shape(0,0,0,0)
+        self.output_image['output'].image_map = Shape(0,0,0,0)
         self.output_image['output'].shape = Shape(-1,-1,-1,-1)
 
     setattr(test, 'execute', types.MethodType(test_function, test))
@@ -266,14 +266,14 @@ def test_run_code_output_image_missing_definitions():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = None,mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = None,image_map = None)},
             output_parameter = None)
 
     def test_function(self):
         self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].mapping = Shape(0,0,0,0)
+        self.output_image['output'].image_map = Shape(0,0,0,0)
         self.output_image['output'].shape = Shape(-1,-1,-1,-1)
 
     setattr(test, 'execute', types.MethodType(test_function, test))
@@ -289,7 +289,7 @@ def test_run_code_output_no_image():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
             output_image = None,
             output_parameter = {"output":ParameterParcel(dtype = DataType.ValueInt,value=None,shape = None)})
@@ -311,9 +311,9 @@ def test_run_code_broken_code():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
 
     def test_function(self):
@@ -333,9 +333,9 @@ def test_run_code_no_output():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
 
     def test_function(self):
@@ -356,15 +356,15 @@ def test_run_code_alters_input():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
 
     
     def test_function(self):
         self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].mapping = Shape(0,0,0,0)
+        self.output_image['output'].image_map = Shape(0,0,0,0)
         self.output_image['output'].shape = Shape(3,3,3,3)
         self.input_image['input'].pixel_array = np.array([1,2,7],np.uint8)
         
@@ -375,7 +375,7 @@ def test_run_code_alters_input():
         test.run_code() 
 
     print(f"{exc_info.value}")
-# Code provided returns a pixel_array without mapping data
+# Code provided returns a pixel_array without image_map data
 
 def test_run_code_output_image_no_map():
     test = ImageOperation(name = "Test",
@@ -383,9 +383,9 @@ def test_run_code_output_image_no_map():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
     
     def test_function(self):
@@ -395,26 +395,26 @@ def test_run_code_output_image_no_map():
 
     setattr(test, 'execute', types.MethodType(test_function, test))
 
-    with pytest.raises(ValueError, match = 'No image mapping data given for output output') as exc_info:
+    with pytest.raises(ValueError, match = 'No image image_map data given for output output') as exc_info:
         test.run_code() 
 
     print(f"{exc_info.value}")
 
-# Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data
+# Code provided returns a pixel_array with shape that doesn't match image_map and shape constraint data
 def test_run_code_output_image_no_matching_shape():
     test = ImageOperation(name = "Test",
             category = "Testing",
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = None)
 
     def test_function(self):
         self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].mapping = Shape(0,0,0,0)
+        self.output_image['output'].image_map = Shape(0,0,0,0)
         self.output_image['output'].shape = Shape(1,1,1,1)
         
 
@@ -433,14 +433,14 @@ def test_run_code_parameter_array_no_matching_shape():
             version = None,
             docs = None,
             alerts = None,
-            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),mapping = Shape(0,0,0,0))},
+            input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
             input_parameter = None,
-            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),mapping = None)},
+            output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
             output_parameter = {"output_parameter":ParameterParcel(dtype = DataType.ArrayInt,value = None,shape=None)},)
 
     def test_function(self):
         self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].mapping = Shape(0,0,0,0)
+        self.output_image['output'].image_map = Shape(0,0,0,0)
         self.output_image['output'].shape = Shape(3,3,3,3)
         self.output_parameter['output_parameter'].value = np.array([0,1],np.uint8)
         

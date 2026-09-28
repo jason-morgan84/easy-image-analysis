@@ -15,12 +15,12 @@ class CodeOutputWrongFormatImage(ImageOperation):
             input_image = { "input":  ImageParcel(pixel_array = None,
                                                   dtype = DataType.ImageInt,
                                                   shape = Shape(-1,-1,-1,-1),
-                                                  mapping = Shape(0,1,2,3))},
+                                                  image_map = Shape(0,1,2,3))},
             input_parameter = None,
             output_image = { "output": ImageParcel(pixel_array = None,
                                                    dtype = DataType.ImageInt,
                                                    shape = Shape(-1,-1,-1,-1),
-                                                   mapping = None)}, 
+                                                   image_map = None)}, 
             output_parameter = None
             )
     def execute(self):

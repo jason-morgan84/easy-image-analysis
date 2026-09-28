@@ -59,7 +59,7 @@ def test_inputs_incorrect_arguements(function_name, error_message):
 # code_output_wrong_format_image.py - code produces an image output in the wrong format (not Package class)
 # code_output_wrong_format_parameter.py - code produces a parameter output in the wrong format (not Package class)
 # code_outout_missing_arguement_image_pixel_array.py - code produces an image output with an missing arguement (pixel_array)
-# code_outout_missing_arguement_image_mapping.py - code produces an image output with an missing arguement (mapping)
+# code_outout_missing_arguement_image_image_map.py - code produces an image output with an missing arguement (image_map)
 # code_outout_missing_arguement_parameter_value.py - code produces a parameter output with a missing arguement (value)
 # code_outout_incorrect_arguements_image_shape.py - code produces an image output with incorrectly defined shape
 @pytest.mark.parametrize("function_name, error_message", [
@@ -69,7 +69,7 @@ def test_inputs_incorrect_arguements(function_name, error_message):
     ("code_output_wrong_format_image","Expected output to be dictionary of ImageParcel"),
     ("code_output_wrong_format_parameter","Expected output to be dictionary of ParameterParcel"),
     ("code_outout_missing_arguement_image_pixel_array","No image pixel array given for"),
-    ("code_output_missing_arguement_image_mapping","No image mapping data given for"),
+    ("code_output_missing_arguement_image_image_map","No image image_map data given for"),
     ("code_outout_missing_arguement_parameter_value","No value given for parameter output"),
     ("code_outout_incorrect_arguements_image_shape","For output image output, pixel_array dimension")])
 def test_incorrect_code(function_name, error_message):

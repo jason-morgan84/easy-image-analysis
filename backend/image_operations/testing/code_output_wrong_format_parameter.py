@@ -15,7 +15,7 @@ class CodeOutputWrongFormatParameter(ImageOperation):
             input_image = { "input":  ImageParcel(pixel_array = None,
                                                   dtype = DataType.ImageInt,
                                                   shape = Shape(-1,-1,-1,-1),
-                                                  mapping = Shape(0,1,2,3))},
+                                                  image_map = Shape(0,1,2,3))},
             input_parameter = None,
             output_image = None,
             output_parameter = {"output": ParameterParcel(value = None,

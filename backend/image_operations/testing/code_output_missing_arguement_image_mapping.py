@@ -3,27 +3,27 @@ from core.shape import Shape
 from core.constants import DataType
 
 version = "0.1.0"
-class CodeOutputMissingArguementImageMapping(ImageOperation):
+class CodeOutputMissingArguementImageimage_map(ImageOperation):
     
     def __init__(self):
         super().__init__(
-            name = "Code outout missing arguement image mapping",
+            name = "Code outout missing arguement image image_map",
             category = "",
             version = "0.2",
-            docs = "Returns an image output with missing mapping value",
+            docs = "Returns an image output with missing image_map value",
             alerts = None,
             input_image = { "input":  ImageParcel(pixel_array = None,
                                                   dtype = DataType.ImageInt,
                                                   shape = Shape(-1,-1,-1,-1),
-                                                  mapping = Shape(0,1,2,3))},
+                                                  image_map = Shape(0,1,2,3))},
             input_parameter = None,
             output_image = { "output": ImageParcel(pixel_array = None,
                                                    dtype = DataType.ImageInt,
                                                    shape = Shape(-1,-1,-1,-1),
-                                                   mapping = None)}, 
+                                                   image_map = None)}, 
             output_parameter = None
             )
     def execute(self):
         input_image_array = self.input_image["input"].pixel_array
         self.output_image["output"].pixel_array = input_image_array.copy()
-       # self.output_image["output"].mapping = Shape(0,1,2,3)
+       # self.output_image["output"].image_map = Shape(0,1,2,3)

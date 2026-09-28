@@ -20,10 +20,10 @@ dimension, or -1 if the analysis function is indifferent to size in that dimensi
 
 # simple class to hold image inputs and outputs
 class ImageParcel:
-    def __init__(self, dtype, pixel_array = None, shape = None, mapping = None):
+    def __init__(self, dtype, pixel_array = None, shape = None, image_map = None):
         self.dtype = dtype
         self.shape = shape
-        self.mapping = mapping
+        self.image_map = image_map
         self.pixel_array = pixel_array
 
     type_name = "ImageParcel"
@@ -49,15 +49,15 @@ class ImageParcel:
             raise TypeError(f"for ImageParcel class, expected shape to be of class Shape, got {type(shp)}")
         self._shape = shp.copy() if shp is not None else None
 
-    # check that mapping is of type Shape
+    # check that image_map is of type Shape
     @property
-    def mapping(self):
-        return self._mapping
-    @mapping.setter
-    def mapping(self, map):
+    def image_map(self):
+        return self._image_map
+    @image_map.setter
+    def image_map(self, map):
         if not isinstance(map, Shape) and map is not None:
             raise TypeError(f"for ImageParcel class, expected map to be of class Shape, got {type(map)}")
-        self._mapping = None if map is None else map.copy()
+        self._image_map = None if map is None else map.copy()
 
 
     @property
@@ -221,7 +221,7 @@ class ImageOperation:
         # check input parameter format, if they exist
         self.check_parameter(self.input_parameter, "input")
 
-        # For output images, check that Shape is present (pixel array and mapping can be defined based on actual code) 
+        # For output images, check that Shape is present (pixel array and image_map can be defined based on actual code) 
         for key, image in self.output_image.items():
             if image.shape is None:
                 raise ValueError(f"expected image shape constraints for output_image {key} not present")
@@ -244,7 +244,7 @@ class ImageOperation:
         if not self.output_image and not self.output_parameter:
             raise RuntimeError(f"operation did not generate an output ({self.name})")
 
-        # check output pixel_arrays match shape and mapping
+        # check output pixel_arrays match shape and image_map
         self.check_image(self.output_image,"output")
 
         # check output parameter arrays have shape
@@ -270,7 +270,7 @@ class ImageOperation:
         # set output iamge values to None
         for image in self.input_image.values():
             image.pixel_array = None
-            image.mapping = None
+            image.image_map = None
         # set output parameter values to None
         for item in self.input_parameter.values():
             item.value = None
@@ -279,7 +279,7 @@ class ImageOperation:
         # set output iamge values to None
         for image in self.output_image.values():
             image.pixel_array = None
-            image.mapping = None
+            image.image_map = None
         # set output parameter values to None
         for item in self.output_parameter.values():
             item.value = None
@@ -298,7 +298,7 @@ class ImageOperation:
             If so:
                 It's value has already been checked.
                 Do all image dictionary members have an associated pixel map?
-                Do all the pixel maps match the expected shape given shape/mapping values?
+                Do all the pixel maps match the expected shape given shape/image_map values?
                 NOTE for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
         """
         for key, image in check_images.items():
@@ -306,8 +306,8 @@ class ImageOperation:
                 raise TypeError(f"Expected {descriptor} to be dictionary of ImageParcel, not {type(image)}")
             if image.pixel_array is None:
                 raise ValueError(f"No image pixel array given for {descriptor} {key}")
-            if image.mapping is None: # note - for mapping and shape, if they exist their type has already been checked
-                raise ValueError(f"No image mapping data given for {descriptor} {key}")
+            if image.image_map is None: # note - for image_map and shape, if they exist their type has already been checked
+                raise ValueError(f"No image image_map data given for {descriptor} {key}")
             if image.shape is None: 
                 raise ValueError(f"No image shape data given for {descriptor} {key}")
 
@@ -318,7 +318,7 @@ class ImageOperation:
                 # if the dimension is -1, the image doesn't care about that dimension
                 if dimension != -1:
                     # gets pixel_array dimension of current image dimension
-                    array_dim = image.mapping[current_dimension_identifier]
+                    array_dim = image.image_map[current_dimension_identifier]
                     # checks dimensions sizes match
                     if pixel_array_shape[array_dim] != dimension:
                         raise ValueError(f"For {descriptor} image {key}, pixel_array dimension {current_dimension_identifier}, expected {dimension} but got {array_dim}")
