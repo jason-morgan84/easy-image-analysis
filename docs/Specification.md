@@ -98,6 +98,7 @@
 |28/09/26|0.15.4|Added description of ActivationError exception to Error Handling section|
 |28/09/26|0.15.4|Updated description of Node class and added class unit testing|
 
+
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -558,11 +559,10 @@ error_handling.py also includes custom exceptions:
 
 # 4 ImageOperation files
 
-Describe format of these files.
-
-Reference to sample files.
-
-Reference to testing.
+Describe format of these files:
+* some sort of API documentation to describe things that are not hard-coded but are best practice.
+* Reference to sample files.
+* Reference to testing.
 
 Develop and reference plug-in test harness.
 
@@ -620,7 +620,9 @@ Plugins to make:
 * Plan unit testing for Port, Node and Connection classes.
 * Implement Port, Node and Connection classes.
 * Test Port, Node and Connection classes.
-### Stage 1.4 – Backend Workflow Class
+### Stage 1.4 – Backend WorkFlow Class
+* Detailed planning for WorkFlow class.
+* Plan implementation for WorkFlow class.
 * Plan unit testing for Workflow class.
 * Implement Workflow class.
 * Test Workflow class.
