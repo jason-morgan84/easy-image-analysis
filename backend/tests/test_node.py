@@ -204,6 +204,16 @@ def test_pre_test_incorrect_format_output_port_id():
         test_node1.activate_node()
 
 #Activate node where an output port_id name does not correctly reference a ImageOperation output_image dictionary key | ActivationError | node activates|
+def test_pre_test_mismatched_output_port_image_id():
+    test_node1 = Node(test_operation_1,"test 1")
+    test_node1.is_ready = True
+    test_node1.input_ports["image.image 1"].input_data = test_image
+    test_node1.input_ports["image.image 2"].input_data = test_image
+    test_node1.input_ports["parameter.parameter 1"].input_data = test_parameter
+    test_node1.output_ports["image.no image"] = test_node1.output_ports["image.output 1"]
+    with pytest.raises(ActivationError, match = "node activated where input port name not present in ImageOperation input dictionary"):
+        test_node1.activate_node()
+
 # Activate node where an output port_id name does not correctly reference a ImageOperation output_parameter dictionary key | ActivationError | node activates|
 #Activate node where an ImageOperation output_image does not contain pixel_array or image_map | ActivationError | node activates|
 #Activate node where an ImageOperation output_parameter does not contain value | ActivationError | node activates|
