@@ -97,6 +97,7 @@
 |27/09/26|0.15.3|Added description of ConnectionError exception to Error Handling section|
 |28/09/26|0.15.4|Added description of ActivationError exception to Error Handling section|
 |28/09/26|0.15.4|Updated description of Node class and added class unit testing|
+|30/09/26|0.16.0|Added plans for implementation of WorkFlow class to WorkFlow class description|
 
 
 # 2. Premise and Aims
@@ -508,25 +509,17 @@ It defines the starting node in the graph, allowing it to generate upstream and 
 It contains instance variables:
 
 * nodes – dictionary of all extant nodes by unique ID
-* ports – dictionary of all extant ports by unique ID
 * connections – dictionary of all connections by unique ID
 * starting_node – ID of starting node
 
 It also contains the following functions:
-* get_downstream_nodes
-* get_previous_node
-* get_next_node
+* update_graph
 * node_create
-* node_edit
 * node_remove
 * connection_create
-* connection_edit
 * connection_remove
-* port_create
-* port_edit
-* port_remove
-* Transpose - tranposes pixel_arrays passing through the graph, given requirements of input and output Ports. Previously part of Image class./
-* Squeeze/unsqueeze - changes array shape, as Tranpose.
+* ~~Transpose - tranposes pixel_arrays passing through the graph, given requirements of input and output Ports. Previously part of Image class./~~
+* ~~Squeeze/unsqueeze - changes array shape, as Tranpose.~~
 
 On creation of a new connection, it will check for structure, constraint or type violations. Where these can be fixed through image type or shape changes, it will do so, otherwise it will prompt the user to adjust the WorkFlow. 
 
@@ -534,7 +527,77 @@ On creation of a new connection, it will check for structure, constraint or type
 
 ### 3.6.1 Workflow Implementation
 
+__Stage 0__
 - Add permitted conversions and conversions with warnings to Types
+- ~~update connection class and unit testing - it should check input port is a node_output port and output port is a node.input port~~ checked in add_connection function
+- re-add transposition to Image and unit test
+- update nomenclature for connections from input and output to source and target (if I'm talking about an input to a connection being the output of an output port, things get confusing)
+
+__Stage 1__
+* Create class.
+* Only arguement passed in is an ImageOperationDirectory
+* This needs a setter to ensure it is of Class ImageOperationDirectory
+* Two key dictionaries created in __init__
+  - nodes
+  - connections
+* One function called from __init__
+  - initialise_load_image - creates a load_image node as graph start point
+* Instance variable created in __init__
+  - update_on_change - if True, updates whole graph every time theres a change. If False, waits for update call
+  - start_node - nodes dictionary key of start node (a load image node)
+* Create add_node(ImageOperation, key) function
+  - this adds a key/value pair to nodes dictionary
+  - dictionary key is node.ImageOperation.UniqueID
+  - gets uniqueID and checks the key isn't already in dictionary
+  - value is Node(ImageOperation)
+* Create delete_node(key) function
+  - removes node with given key from nodes dictionary
+  - also removes associated connections
+* Create add_connection(key, input_node, input_port, output_node, output_port) function
+  - checks if a connection can be made
+    - follows workflow_error_checking flow char
+    - if connection is possible and compatible, create node
+    - if connection is possible but simple incompatibilities, create node with relevant conversions/transpositions
+    - if connection is not possible, raise error and log
+  - key is connection.unique_id
+  - value is Connection(key, input_node, output_ndoe, input_port, output_port)
+  - calls update_graph
+* Create delete_connection(key) function
+  - removes connection with given key from nodes dictionary
+  - calls update_graph
+  
+__Stage 2__
+* update_graph function
+  - traverse through graph (choose a traversal method)
+  - update node is_ready flags
+    - if all connected input nodes are ready, set ready is true
+  - where is_ready is true and needs_update flag is true, update node
+  - carry on traversing through graph till all nodes checked
+
+__Stage 3__
+* Once ImageOperation API is developed and key initial ImageOperations are implemented, add and test responses to incompatible connections suggesting an ImageOperation that might solve incompatibility.
+
+Unit testing list:
+* Passing non-ImageOperationDirectory to WorkFlow
+* call add_node with arguement that's not a valid ImageOperation - error should be chained up and logged
+* call add_node with a key thats not unique (if possible)
+* check add_node adds a node
+* call delete_node with an invalid key
+* check delete_node removes a node
+* check delete_node removes associated connections
+* call create_connection with invalid connections (invalid port_id, id of soemthign thats not a port, input to conenction also input to node etc) - check errors chained up and logged
+* call create_connection where a connection would fail structure checks (connecting input to input/output to output)
+* call create_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
+* call create_connection where a connection would fail structure checks(would result in loop)
+* call create_connection where a connection would fail constraint checks(invalid shape input image)
+* call create_connection where a connection would fail constraint checks(invalid type (eg 8 bit image to binarised input))
+* call create_connection where a connection would fail constraint checks(invalid shape (eg needs flattened image but has z != 1))
+* call create_connection where a connection would fail type checks(invalid type (eg 8 bit image to binarised input))
+* call create_connection where a connection fails type checks but can be converted (eg 8 bit int to float input)
+  - check conversion properly made
+* call delete_connection with an invalid key
+* check delete_connection removes a connection
+
 
 ## 3.7 Error Handling
 
