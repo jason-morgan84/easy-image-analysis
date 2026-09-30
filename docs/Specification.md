@@ -469,7 +469,8 @@ On Node instantiation, the following occurs:
     <ul><li>Each port is added to either the input_ports dictionary or output_ports dictionary</li>
     <li>If the Port is for an ImageOperation input_image with name "name", its key will be "image.name"</li>
     <li>If the Port is for an ImageOperation input_parameter with name "name", its key will be "parameter.name"</li>
-    <li>For each Port, its Port.port_id will be the same as its dictionary key</li></ul>
+    <li>For each Port, its Port.port_id will be the same as its dictionary key</li>
+    <li>At this point, Port's will be created with neither input/output port data nor an empty Image/Parameter/ImageParcel/ParameterParcel class structure for entering data later (as these classes can't be created empty)</ul>
 </ol>
 When a Node is activated, there are three steps:
 <ol>
@@ -787,9 +788,11 @@ Plugins to make:
 | port activation <br> post-tests | Activate node where an output port_id is in an incorrect format (not type.name) | ActivationError | node activates|
 | port activation <br> post-tests | Activate node where an output port_id name does not correctly reference a ImageOperation output_image dictionary key | ActivationError | node activates|
 | port activation <br> post-tests | Activate node where an output port_id name does not correctly reference a ImageOperation output_parameter dictionary key | ActivationError | node activates|
-| port activation <br> post-tests | Activate node where an ImageOperation output_image does not contain pixel_array or mapping | ActivationError | node activates|
-| port activation <br> post-tests | Activate node where an ImageOperation output_parameter does not contain value | ActivationError | node activates|
-
+| Data flow through | Create node with ImageOperation that passes through same image<br>Input image at relevant input Port input<br>Check output port output. |Output port output has exepcted dtype, shape, pixel_array and image_map | Output port has unexpected values| 
+| Data flow through | Create node with ImageOperation that passes through same parameter<br>Input parameter at relevant input Port input<br>Check output port output. |Output port output has exepcted dtype, shape and value | Output port has unexpected values| 
+| port activation <br> post-tests | ~~Activate node where an ImageOperation output_image does not contain pixel_array or mapping~~ | ActivationError | node activates|
+| port activation <br> post-tests | ~~Activate node where an ImageOperation output_parameter does not contain value ~~| ActivationError| node activates|
+* final two unit tests removed because this situation raises an error in ImageOperation which will result in it failing at the import stage
 
 # 8 Versioning
 

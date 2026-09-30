@@ -54,6 +54,7 @@ test_operation_1 = ImageOperation(name = "Test Operation 1",
 )
 def function1(self):
     self.output_image['output 1'].pixel_array = self.input_image['image 1'].pixel_array
+    self.output_image['output 1'].image_map = self.input_image['image 1'].image_map
 
 setattr(test_operation_1, 'execute', types.MethodType(function1, test_operation_1))
 
@@ -70,8 +71,9 @@ test_operation_2 = ImageOperation(name = "Test Operation 1",
 )
 def function2(self):
     self.output_image['output 1'].pixel_array = self.input_image['image 1'].pixel_array
-    self.output_parameter["out_param_1"].value = 0.5
-    self.output_parameter["out_param_1"].value = 3
+    self.output_image['output 1'].image_map = self.input_image['image 1'].image_map
+    self.output_parameter["out_param_1"].value = np.float64(0.5)
+    self.output_parameter["out_param_2"].value = np.uint8(3)
 setattr(test_operation_2, 'execute', types.MethodType(function2, test_operation_2))
 
 # Associate Node with ImageOperations with varying numbers of input_images and input_parameters
@@ -192,7 +194,7 @@ def test_pre_test_missing_value_input_port_parameter():
 
 """post tests"""
 # Activate node where an output port_id is in an incorrect format (not type.name) | ActivationError | node activates|
-def test_pre_test_incorrect_format_output_port_id():
+def test_post_test_incorrect_format_output_port_id():
     test_node1 = Node(test_operation_1,"test 1")
     test_node1.is_ready = True
     test_node1.input_ports["image.image 1"].input_data = test_image
@@ -200,20 +202,111 @@ def test_pre_test_incorrect_format_output_port_id():
     test_node1.input_ports["parameter.parameter 1"].input_data = test_parameter
     test_node1.output_ports["wrong name"] = test_node1.output_ports["image.output 1"]
     del test_node1.output_ports["image.output 1"]
-    with pytest.raises(ValueError, match = "invalid port_id for input port"):
+    with pytest.raises(ValueError, match = "invalid port_id for output port"):
         test_node1.activate_node()
 
-#Activate node where an output port_id name does not correctly reference a ImageOperation output_image dictionary key | ActivationError | node activates|
-def test_pre_test_mismatched_output_port_image_id():
+#Activate node where an output port_id name does not correctly reference a ImageOperation output_image dictionary key 
+def test_post_test_mismatched_output_port_image_id():
     test_node1 = Node(test_operation_1,"test 1")
     test_node1.is_ready = True
     test_node1.input_ports["image.image 1"].input_data = test_image
     test_node1.input_ports["image.image 2"].input_data = test_image
     test_node1.input_ports["parameter.parameter 1"].input_data = test_parameter
     test_node1.output_ports["image.no image"] = test_node1.output_ports["image.output 1"]
-    with pytest.raises(ActivationError, match = "node activated where input port name not present in ImageOperation input dictionary"):
+    with pytest.raises(ActivationError, match = "node activated where output image port name not present in ImageOperation output dictionary"):
         test_node1.activate_node()
 
-# Activate node where an output port_id name does not correctly reference a ImageOperation output_parameter dictionary key | ActivationError | node activates|
-#Activate node where an ImageOperation output_image does not contain pixel_array or image_map | ActivationError | node activates|
-#Activate node where an ImageOperation output_parameter does not contain value | ActivationError | node activates|
+# Activate node where an output port_id name does not correctly reference a ImageOperation output_parameter dictionary key 
+def test_post_test_mismatched_output_port_parameter_id():
+    test_node2 = Node(test_operation_2,"test 2")
+    test_node2.is_ready = True
+    test_node2.input_ports["image.image 1"].input_data = test_image
+    test_node2.input_ports["image.image 2"].input_data = test_image
+    test_node2.input_ports["image.image 3"].input_data = test_image
+    test_node2.input_ports["parameter.parameter 1"].input_data = test_parameter
+    test_node2.input_ports["parameter.parameter 2"].input_data = test_parameter
+    test_node2.output_ports["parameter.no parameter"] = test_node2.output_ports["parameter.out_param_1"]
+    with pytest.raises(ActivationError, match = "node activated where output parameter port name not present in ImageOperation output dictionary"):
+        test_node2.activate_node()
+
+"""These two unit tests has been removed, because ImageOperation itself will raise an error if this occurs"""
+# Activate node where an ImageOperation output_image does not contain pixel_array or image_map
+# Activate node where an ImageOperation output_parameter does not contain value | ActivationError | node activates|
+
+
+"""Data flow through tests"""
+# Create node with ImageOperation that passes through same image<br>Input image at relevant input Port input<br>Check output port output. 
+
+
+test_image_pass_through = ImageOperation(name = "test_image_pass_through",
+                                    category = "None",
+                                    version = None,
+                                    docs = None,
+                                    alerts = None,
+                                    input_image = {"image 1": test_image_parcel},
+                                    input_parameter = {},
+                                    output_image = {"output 1": ImageParcel(dtype = DataType.ImageInt, shape = Shape(-1,-1,-1,-1))}
+)
+def image_pass_through(self):
+    self.output_image['output 1'].pixel_array = self.input_image['image 1'].pixel_array
+    self.output_image['output 1'].image_map = self.input_image['image 1'].image_map
+
+setattr(test_image_pass_through, 'execute', types.MethodType(image_pass_through, test_image_pass_through))
+
+def test_data_flow_image_pass_through():
+    pass_through_node = Node(test_image_pass_through,"test_node")
+    pass_through_node.input_ports["image.image 1"].input_data = test_image
+    pass_through_node.is_ready = True
+    pass_through_node.activate_node()
+
+    # assert that expected output port exists
+    assert pass_through_node.output_ports["image.output 1"].output_data
+
+    # assert that output port output is an Image class
+    assert isinstance(pass_through_node.output_ports["image.output 1"].output_data, Image)
+
+    # assert that output port output pixel_array is the same data type as input
+    assert isinstance(pass_through_node.output_ports["image.output 1"].output_data.pixel_array, type(test_image.pixel_array))
+
+    # assert that output port output pixel_array is the same array shape as input
+    assert pass_through_node.output_ports["image.output 1"].output_data.pixel_array.value.shape == test_image.pixel_array.value.shape
+
+    # assert that output port output pixel_array is the same values as input
+    assert np.array_equal(pass_through_node.output_ports["image.output 1"].output_data.pixel_array.value, test_image.pixel_array.value)
+
+
+# Create node with ImageOperation that passes through same parameter<br>Input parameter at relevant input Port input<br>Check output port output. 
+
+test_parameter_pass_through = ImageOperation(name = "test_parameter_pass_through",
+                                    category = "None",
+                                    version = None,
+                                    docs = None,
+                                    alerts = None,
+                                    input_image = {"image 1": test_image_parcel},
+                                    input_parameter = {"parameter 1": test_parameter_parcel},
+                                    output_image = {},
+                                    output_parameter = {"out_param_1": ParameterParcel(dtype=DataType.ValueInt, value = None)}
+)
+def parameter_pass_through(self):
+    self.output_parameter['out_param_1'].value = self.input_parameter['parameter 1'].value
+
+setattr(test_parameter_pass_through, 'execute', types.MethodType(parameter_pass_through, test_parameter_pass_through))
+
+def test_data_flow_parameter_pass_through():
+    pass_through_node = Node(test_parameter_pass_through,"test_node")
+    pass_through_node.input_ports["image.image 1"].input_data = test_image
+    pass_through_node.input_ports["parameter.parameter 1"].input_data = test_parameter
+    pass_through_node.is_ready = True
+    pass_through_node.activate_node()
+
+    # assert that expected output port exists
+    assert pass_through_node.output_ports["parameter.out_param_1"].output_data
+
+    # assert that output port output is Parameter class
+    assert isinstance(pass_through_node.output_ports["parameter.out_param_1"].output_data, Parameter)
+
+    # assert that output port output value is the same data type as input
+    assert isinstance(pass_through_node.output_ports["parameter.out_param_1"].output_data.value, type(test_parameter.value))
+
+    # assert that output port output value is the same as input
+    assert pass_through_node.output_ports["parameter.out_param_1"].output_data.value.value == test_parameter.value.value
