@@ -100,6 +100,7 @@
 |30/09/26|0.16.0|Added plans for implementation of WorkFlow class to WorkFlow class description|
 |01/10/26|0.16.1|Added transpose function to description of Image class, added transpose unit testing|
 |01/10/26|0.16.2|Updated description of connection class from input/output to source/target|
+|01/10/26|0.16.3|Added description of permitted_conversions and warned_conersions to Type classes|
 
 
 # 2. Premise and Aims
@@ -237,6 +238,10 @@ DataTypes are all based on a defined base class, BaseType. This defines the char
 * min_value - if the value must be with a range, this defines a minimum value (default is None)
 * max_value - maximum allowed value, if defined (default is None)
 * is_array - type classes must define as either a 1d or multi-dimensional data type (default is False)
+
+* permitted_conversions - these are the other DataType classes this is permitted to be be automatically converted into by WorkFlow (eg, between 8bit int and 8bit float)
+* warned_conversions - these are the DataType classes this can be converted into by WorkFlow, with a prompt to the user (ie, binary image to 8 bit image - this is possible, but will likely unbinarise the image)
+
 
 By default, seven custom data types are defined. Three are used to define images, two to define 1D variables and two to define non-image arrays:
 
