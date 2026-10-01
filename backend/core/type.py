@@ -45,20 +45,20 @@ class BaseType:
     def validate_array(self, val):
         # if input value is not a np array, list or tuple then give error
         if not isinstance(val, (np.ndarray, list, tuple)):
-            raise TypeError (f"Expected list or np.array, got {type(val)}")
+            raise TypeError (f"expected list or np.array for {self.data_type}, got {type(val)}")
         # if a collection but not np.array, convert to np.array, else copy the np.array
         # this is required for immutability
         val = np.array(val) if isinstance(val, (list,tuple)) else val.copy()
 
         # if array members are not one of the allowed data subtypes, give type error
         if not np.issubdtype(val.dtype, self.allowed_sub_types):
-            raise TypeError (f"Expected {self.allowed_sub_types}, got {val.dtype}")
+            raise TypeError (f"expected {self.allowed_sub_types} for {self.data_type}, got {val.dtype}")
 
         # if min and max values are defined, check value is within the boundaries else give error
         # these are explicit boundaries and not constraints - an error is given if unacceptable data is passed in, data is not changed to be within boundaries
         if ((self.min_value != None and val.min() < self.min_value) or 
             (self.max_value != None and val.max() > self.max_value)):
-                raise ValueError(f"Value out of bounds (must be {self.min_value}-{self.max_value})")
+                raise ValueError(f"value out of bounds for {self.data_type} (must be {self.min_value}-{self.max_value})")
 
         return val.copy()
             
@@ -66,12 +66,12 @@ class BaseType:
     def validate_scalar(self, val):
         # check value is a an allowed sub type
         if not isinstance(val, self.allowed_sub_types):
-            raise TypeError (f"Expected {self.allowed_sub_types}, got {type(val)}")
+            raise TypeError (f"expected {self.allowed_sub_types} for {self.data_type}, got {type(val)}")
 
         # check value is within range, if appropriate
         if self.min_value != None and self.max_value!=None:
             if val > self.max_value or val < self.min_value:
-                raise ValueError(f"Value out of bounds (must be {self.min_value}-{self.max_value})")
+                raise ValueError(f"value out of bounds for {self.data_type} (must be {self.min_value}-{self.max_value})")
         return val
 
     def to_numpy(self):
@@ -81,7 +81,7 @@ class BaseType:
             return self.numpy(self.value)
 
     def to(self, dtype):
-        raise NotImplementedError(f"Type conversions not yet implemented for data type {self.data_type}")
+        raise NotImplementedError(f"type conversions not yet implemented for data type {self.data_type}")
 
 class ImageInt(BaseType):
     data_type = DataType.ImageInt
