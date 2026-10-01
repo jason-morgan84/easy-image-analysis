@@ -11,13 +11,15 @@ class BaseType:
     For conversions between classes, override the default 'to' function in the new class.
     Attempts to convert between classes where type conversions have not been explicitly coded will result in an error message."""
 
-    data_type = None            # reference to this data type in DataType enum in constant.py
-    numpy = None                # default numpy equivalent data_type   
-    description = None          # text description of class and what its for
-    allowed_sub_types = None    # tuple of allowed data types eg (np.integers, int)
-    min_value = None            # minimum allowed value, if defined
-    max_value = None            # maximum allowed value, if defined
-    is_array = False            # type classes must define either an 1d or multi-dimensional data type.
+    data_type = None                # reference to this data type in DataType enum in constant.py
+    numpy = None                    # default numpy equivalent data_type   
+    description = None              # text description of class and what its for
+    allowed_sub_types = None        # tuple of allowed data types eg (np.integers, int)
+    min_value = None                # minimum allowed value, if defined
+    max_value = None                # maximum allowed value, if defined
+    is_array = False                # type classes must define either an 1d or multi-dimensional data type.
+    permitted_conversions = None    # list of other DataType classes this can be converted to automatically
+    warned_conversion = None        # list of other DataType classes this can be converted to, with a prompt to user
 
     def __init__(self, value):
         self.value = value
@@ -89,6 +91,7 @@ class ImageInt(BaseType):
     min_value = 0
     max_value = 255
     allowed_sub_types = (np.integer)
+    permitted_conversions = [DataType.ImageFloat]
 
     def to(self, dtype):
         if dtype == DataType.ImageFloat or dtype == ImageFloat:
@@ -108,6 +111,7 @@ class ImageFloat(BaseType):
     min_value = 0.0
     max_value = 1.0
     allowed_sub_types = (np.number)
+    permitted_conversions = [DataType.ImageInt]
 
     def to(self, dtype):
         if dtype == DataType.ImageInt or dtype == ImageInt:
@@ -127,6 +131,7 @@ class ImageBinary(BaseType):
     min_value = 0
     max_value = 1
     allowed_sub_types = (np.integer)
+    warned_conversions = [DataType.ImageInt, DataType.ImageFloat]
 
     def to(self, dtype):
         if dtype == DataType.ImageFloat or dtype == ImageFloat:
