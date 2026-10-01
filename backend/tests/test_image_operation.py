@@ -6,6 +6,8 @@ from core.constants import DataType
 from core.image_operation import ImageOperation, ImageParcel, ParameterParcel
 import types
 
+
+"""Test ImageParcel Class"""
 @pytest.mark.parametrize("dtype, pixel_array, shape, image_map", [
     # Supply dtype as not member of DataTypes.image_types
     (np.uint8, np.array([1,2,3],np.uint8), None, None),
@@ -24,6 +26,8 @@ def test_ImageParcel(dtype, pixel_array, shape, image_map):
                     image_map = image_map)
     print(f"{exc_info.value}")
 
+"""Test ParameterParcel Class"""
+# test valid inputs
 @pytest.mark.parametrize("dtype, value, shape", [
     # Supply dtype as not member of DataTypes.image_types
     (np.uint8, np.uint8(5), None),
@@ -42,6 +46,20 @@ def test_ParameterParcel(dtype, value, shape):
                     value = value, 
                     shape = shape)
     print(f"{exc_info.value}")
+
+# test user_input flag as not boolean
+def test_ParameterParcel_user_input_flag_boolean():
+    with pytest.raises(TypeError, match = "user_input flag expected to be boolean, not "):
+        ParameterParcel(dtype = DataType.ValueInt, 
+                    value = DataType.ValueInt(2).to_numpy(), 
+                    user_input = 4)
+
+# test user_input true without user_interface element
+def test_ParameterParcel_user_input_no_ui_element():
+    with pytest.raises(ValueError, match = "defined UI element required where user_input flag is True"):
+        ParameterParcel(dtype = DataType.ValueInt, 
+                    value = DataType.ValueInt(2).to_numpy(), 
+                    user_input = True)
 
 #ImageParcel Imutability - Pass value as variable then change variable
 def test_ImageParcel_imutability():
