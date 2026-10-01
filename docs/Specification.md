@@ -101,7 +101,7 @@
 |01/10/26|0.16.1|Added transpose function to description of Image class, added transpose unit testing|
 |01/10/26|0.16.2|Updated description of connection class from input/output to source/target|
 |01/10/26|0.16.3|Added description of permitted_conversions and warned_conersions to Type classes|
-
+|01/10/26|0.16.4|Added description of load_image and save_image to ImageOperation files section|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -520,6 +520,7 @@ It contains instance variables:
 * nodes – dictionary of all extant nodes by unique ID
 * connections – dictionary of all connections by unique ID
 * starting_node – ID of starting node
+* max_id - current max integer ID for node/connections dictionary keys - considered uuid for this but in a centrally controlled graph like this, with only two data classes to be kept track of, integers are easily managed and result in a more human-readable dictionary for testing and error reporting purporses. 
 
 It also contains the following functions:
 * update_graph
@@ -551,7 +552,8 @@ __Stage 1__
   - connections
 * One function called from __init__
   - initialise_load_image - creates a load_image node as graph start point
-* Instance variable created in __init__
+* Instance variables created in __init__
+  - max_id - highest value used for a node or connection id - increments each time a new node/connection is created
   - update_on_change - if True, updates whole graph every time theres a change. If False, waits for update call
   - start_node - nodes dictionary key of start node (a load image node)
 * Create add_node(ImageOperation, key) function
@@ -631,6 +633,10 @@ error_handling.py also includes custom exceptions:
 * ActivationError - for errors in Node activation
 
 # 4 ImageOperation files
+
+## 4.2 Special cases - input and output
+
+Because ImageOperation files loaded through ImageOperationDirectory must have inputs and outputs and can't import the sys module, ImageOperations for load_image and save_image (which by definition either don't have an input image or output image respectively) are stored in input_output.py and are not loaded via an ImageOperationDirectory.
 
 Describe format of these files:
 * some sort of API documentation to describe things that are not hard-coded but are best practice.
