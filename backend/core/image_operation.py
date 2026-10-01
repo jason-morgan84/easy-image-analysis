@@ -77,10 +77,13 @@ class ImageParcel:
 
 # simple class to hold parameter inputs and outputs
 class ParameterParcel:
-    def __init__(self, dtype, value = None, shape = None):
+    def __init__(self, dtype, value = None, shape = None, user_input = False, ui_element = None, ui_element_options = None):
         self.dtype = dtype
         self.value = value
-        self.shape = shape        
+        self.shape = shape                              # array shape where dtype is an array_type
+        self.user_input = user_input                    # flag for user input - if True, expect parameter via UI not through graph input
+        self.ui_element = ui_element                    # definition of UI element required for user input, if relevant
+        self.ui_element_options = ui_element_options    # any options associated with that UI element (such as min/max values for sliders, list options for lists)        
 
     type_name = "ParameterParcel"
 
@@ -131,6 +134,27 @@ class ParameterParcel:
 
         #if shape is a np array, set as copy of array, else convert to np array
         self._shape = shp.copy() if isinstance(shp, np.ndarray) else np.array(shp).copy()
+
+    @property
+    def user_input(self):
+        return self._user_input
+    @user_input.setter
+    def user_input(self, flag):
+        # check that flag is boolean
+        if not isinstance(flag, bool):
+            raise TypeError(f"user_input flag expected to be boolean, not {type(flag)}")
+        self._user_input = flag
+
+    @property
+    def ui_element(self):
+        return self._ui_element
+    @ui_element.setter
+    def ui_element(self, element):
+        # check if user_input flag is set, check ui_element exists
+        if self.user_input:
+            if element == None:
+                raise ValueError(f"defined UI element required where user_input flag is True")
+        self._ui_element = element
 
 
 class ImageOperation:
