@@ -8,12 +8,10 @@ from core.image_operation import ImageOperation
 class Connection:
     """Connection is an extremely simple class that exists only to point an output Port from one Node to the input Port of the next.
     It has an input (expected Node class), an output (expected Node class) and an ID (defined by the WorkFlow class on the Connection's instantiation)"""
-    def __init__(self, connection_id, source_port, target_port, source_data, target_data):
+    def __init__(self, connection_id, source_port, target_port):
         self.connection_id = connection_id
         self.source_port = source_port
         self.target_port = target_port
-        self.source_data = source_data
-        self.target_data = target_data
 
     @property
     def source_port(self):

@@ -46,9 +46,7 @@ def test_input_port_incorrect_data_type():
     
     preceeding_connection = Connection(connection_id = "ID", 
                                        source_port = preceeding_port, 
-                                       target_port = preceeding_port,
-                                       source_data = preceeding_port.output,
-                                       target_data = preceeding_port.output)
+                                       target_port = preceeding_port)
     
     with pytest.raises(TypeError, match = "Expected input of Image or Parameter class"):
         test_port = Port(is_input = True, node_id = "no_node", port_id = "test_port", input_connection = preceeding_connection, output_connection = ImageOperation("Test","Test","0.1.0",None,None))
