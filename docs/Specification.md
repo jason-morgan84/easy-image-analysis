@@ -102,6 +102,7 @@
 |01/10/26|0.16.2|Updated description of connection class from input/output to source/target|
 |01/10/26|0.16.3|Added description of permitted_conversions and warned_conersions to Type classes|
 |01/10/26|0.16.4|Added description of load_image and save_image to ImageOperation files section|
+|01/10/26|0.16.5|Moved description of references to UI elements from Parameter to ParameterParcel class|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -316,16 +317,10 @@ It contains one function, __transpose__. This takes an input of Shape class and 
 
 ### 3.3.2 Parameters Class
 
-Similar to the Image class, the Parameter class does not exist independently of a Node/Port. 
-
-It contains non-image inputs/outputs for ImageOperations, including non-image values passed from other nodes via the WorkFlow and values passed from the UI based on user input.
-
-Parameter also includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
+Contains non-image inputs/outputs for transport through WorkFlow.
 
 * Name – the name of the parameter
 * value – its value (initialised as correct data_type/shape (if required) by Port on instantiation therefore also defines required data type)
-* ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc)
-* ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
 
 Type checking is carried out on dtype, to ensure its a member of DataType.value_types or DataType.array_types.
 
@@ -386,12 +381,17 @@ Simple class holding data for image inputs and outputs from ImageOperation. Cont
 * mapping - set to None at instantiation, given value of type Shape mapping image dimensions to pixel array dimensions.
 
 ### 3.4.3 ParameterPackage
-Simple class holding data for non-image inputs and outputs from ImageOperation. Contains:
+Simple class holding data for non-image inputs and outputs from ImageOperation. Includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
+
+Contains:
 * dtype - set at instantiation based on ImageOperation code file.
     - Type checks for member of DataType.
 * value - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain value of dtype.numpy.
 * shape - if dtype defines an array_type, contains a np.array defining shape of value.
     - will accept a tuple, list or np.ndarray. Tuples and lists will be converted to np.ndarray.
+* user_input - boolean flag to say if value is expected via WorkFlow (False) or via (UI).
+* ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc) - setter checks this is present if user_input is True
+* ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
 
 ### 3.4.4 ImageOperationDirectory Class
 This class holds for a list of all ImageOperation classes, along with the code required to import them.
@@ -542,6 +542,7 @@ __Stage 0__
 - ~~update connection class and unit testing - it should check input port is a node_output port and output port is a node.input port~~ checked in add_connection function
 - re-add transposition to Image and unit test
 - update nomenclature for connections from input and output to source and target (if I'm talking about an input to a connection being the output of an output port, things get confusing)
+- Update ParameterPackage with user_input flag
 
 __Stage 1__
 * Create class.
