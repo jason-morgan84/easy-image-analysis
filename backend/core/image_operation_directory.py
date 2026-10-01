@@ -100,6 +100,7 @@ class ImageOperationDirectory():
 
                                 """if code passes these tests, add to dictionary of operations"""
                                 operations_dict[name] = imported_function
+                                operations_dict[name].id = name
                                 operations_dict[name].category = current_category
                                 operations_dict[name].version = version
 

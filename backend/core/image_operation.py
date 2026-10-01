@@ -158,10 +158,11 @@ class ParameterParcel:
 
 
 class ImageOperation:
-    def __init__(self, name, category, version, docs, alerts, input_image={}, input_parameter={}, output_image = {}, output_parameter = {}, ):
+    def __init__(self, name, category, version, docs, alerts, id = None, input_image={}, input_parameter={}, output_image = {}, output_parameter = {}, ):
         self._input_image = input_image
         self._output_image = output_image
         self.name = name
+        self.id = id
         self.category = category
         self.version = version
         self.docs = docs

@@ -25,7 +25,7 @@ def test_incorrect_version_number(function_name, error_message):
     not_imported = [item.import_name for item in directory.logger]
 
     assert function_name not in directory.image_operation_list.keys()
-    assert function_name in not_imported, f"{directory.logger},{directory.failed_imports},{directory.logger[0]}"
+    assert function_name in not_imported, f"{directory.logger},{directory.logger[0]}"
     for item in directory.logger:
         if item.import_name == function_name:
             assert error_message in item.message, f"{item.message}"
