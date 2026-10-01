@@ -99,6 +99,7 @@
 |28/09/26|0.15.4|Updated description of Node class and added class unit testing|
 |30/09/26|0.16.0|Added plans for implementation of WorkFlow class to WorkFlow class description|
 |01/10/26|0.16.1|Added transpose function to description of Image class, added transpose unit testing|
+|01/10/26|0.16.2|Updated description of connection class from input/output to source/target|
 
 
 # 2. Premise and Aims
@@ -414,10 +415,10 @@ If testing is sucessful, files are added to a dictionary of ImageOperations with
 
 Connections form the links between nodes and ports through which data travels through the WorkFlow. They have a defined direction, with an input and an output, and are created by the user. Before the instantiation of a connection, the WorkFlow class will check that input and output expect compatible type and shape (explained in more detail in WorkFlow class). Connections contain three instance variables:
 
-* input_port - a reference to the preceeding Port
-* output_port - a reference to the next Port
-* input_data - a reference to the output of the preceeding port
-* output_data - either a reference to the input or a conversion of the input
+* source_port - a reference to the preceeding Port
+* target_port - a reference to the next Port
+* source_data - a reference to the output of the preceeding port
+* target_data - either a reference to the input or a conversion of the input
 * connection_id - unique identifier of the connection
 
 ### 3.5.2 Port Class
