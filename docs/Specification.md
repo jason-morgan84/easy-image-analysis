@@ -334,7 +334,8 @@ The expected inputs and outputs will still be described in terms of DataType cla
 
 The ImageOperation class will contain the following variables:
 
-* name: name of ImageOperation
+* name: name of ImageOperation (user facing)
+* id: id of ImageOperation for use in code (imported based on module name)
 * category: logical category (“Threshold”, “Filter” etc) - defined by folder location of file
 * input and output dictionaries (note: each of these variables will be instantiated as a dictionary, either of a Package class or empty if None is passed):
     - input_image: input images as dictionary of ImagePackage class
@@ -422,8 +423,6 @@ Connections form the links between nodes and ports through which data travels th
 
 * source_port - a reference to the preceeding Port
 * target_port - a reference to the next Port
-* source_data - a reference to the output of the preceeding port
-* target_data - either a reference to the input or a conversion of the input
 * connection_id - unique identifier of the connection
 
 ### 3.5.2 Port Class
@@ -531,7 +530,7 @@ It also contains the following functions:
 * ~~Transpose - tranposes pixel_arrays passing through the graph, given requirements of input and output Ports. Previously part of Image class./~~
 * ~~Squeeze/unsqueeze - changes array shape, as Tranpose.~~
 
-On creation of a new connection, it will check for structure, constraint or type violations. Where these can be fixed through image type or shape changes, it will do so, otherwise it will prompt the user to adjust the WorkFlow. 
+On creation of a new connection, it will check for structure, shape or type violations. Where these can be fixed through image type or shape changes, it will do so, otherwise it will prompt the user to adjust the WorkFlow. 
 
 <img src="./workflow_error_checking.svg" width="100%" height = "100%" alt="Node Graph Set-Up checks" />
 
@@ -601,9 +600,9 @@ Unit testing list:
 * call create_connection where a connection would fail structure checks (connecting input to input/output to output)
 * call create_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
 * call create_connection where a connection would fail structure checks(would result in loop)
-* call create_connection where a connection would fail constraint checks(invalid shape input image)
-* call create_connection where a connection would fail constraint checks(invalid type (eg 8 bit image to binarised input))
-* call create_connection where a connection would fail constraint checks(invalid shape (eg needs flattened image but has z != 1))
+* call create_connection where a connection would fail shape checks(invalid shape input image)
+* call create_connection where a connection would fail shape checks(invalid type (eg 8 bit image to binarised input))
+* call create_connection where a connection would fail shape checks(invalid shape (eg needs flattened image but has z != 1))
 * call create_connection where a connection would fail type checks(invalid type (eg 8 bit image to binarised input))
 * call create_connection where a connection fails type checks but can be converted (eg 8 bit int to float input)
   - check conversion properly made
