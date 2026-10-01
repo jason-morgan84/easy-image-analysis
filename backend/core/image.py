@@ -44,7 +44,36 @@ class Image:
                      y = self.pixel_array.value.shape[self.image_map.y],
                      x = self.pixel_array.value.shape[self.image_map.x])
 
+
     # tranpose to be moved to WorkFlow
+    def transpose(self, new_shape):
+        # expect a Shape class
+        if not isinstance(new_shape, Shape):
+            raise TypeError (f"expected Shape class, got {type(new_shape)}")
+
+        for item in new_shape:
+            if item < 0 or item > Shape.max_image_dimensions:
+                raise ValueError (f"passed shape dimensions out of range, must be 0-{Shape.max_image_dimensions}")
+
+
+        # receives Shape class member with new dimensions indices of each array (c,z,y,x)
+        # needs to create transpose list with values c,z,y,x in order of old_c,old_z,old_y,old_x
+        transpose = [self.image_map[item] for item in new_shape]
+
+        # receives input of new channel order, such as z,c,y,x
+        # to use numpy transpose, needs to go from string z to array map for that dimension and append to list transpose
+        # transpose used as input for np.transpose
+
+        # get new shape map - ie, get the position of c,z,y,x in new_shape
+        
+        transposed_array = np.transpose(self.pixel_array.to_numpy(),transpose)
+
+        current_dtype = getattr(self.pixel_array, "data_type")
+
+        self.pixel_array = current_dtype(transposed_array)
+        self.image_map = new_shape
+
+    # old transpose, expected tuple of channel names
     """def transpose(self, new_shape):
 
         # expect a list/tuple with four, non-duplicate string elements which are members of Shape.dimension_order
