@@ -3,7 +3,7 @@ import numpy as np
 from core.image import Image
 from core.shape import Shape
 from core.constants import DataType
-
+from core.type import sample_data
 #Insert wrong type
 
 def test_image_type_constraints():
@@ -66,3 +66,34 @@ def test_get_image():
             print(dimension)
             assert dimension == mock_image.value.shape[image_map[n]], f"{dimension}, {n}"
     
+# test image transpose
+def test_tranpose():
+    pixel_array = sample_data(DataType.ImageInt,(2,3,4,5))
+    image_map = Shape(0,1,2,3)
+
+    test_image = Image(pixel_array, image_map)
+
+    test_image.transpose(Shape(3,2,1,0))
+
+    assert test_image.pixel_array.value.shape == (5,4,3,2)
+
+# test image tranpose input not Shape class
+def test_tranpose_invalid_input_not_shape():
+    pixel_array = sample_data(DataType.ImageInt,(2,3,4,5))
+    image_map = Shape(0,1,2,3)
+
+    test_image = Image(pixel_array, image_map)
+
+    with pytest.raises(TypeError, match = "expected Shape class, got"):
+        test_image.transpose([3,2,1,0])
+
+# test image transpose invalid input Shape class
+def test_tranpose_invalid_input_shape():
+    pixel_array = sample_data(DataType.ImageInt,(2,3,4,5))
+    image_map = Shape(0,1,2,3)
+
+    test_image = Image(pixel_array, image_map)
+
+    with pytest.raises(ValueError, match = "passed shape dimensions out of range"):
+        test_image.transpose(Shape(5,2,1,0))
+

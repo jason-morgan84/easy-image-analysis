@@ -75,11 +75,12 @@ def test_ParameterParcel_imutability():
         assert test.shape[0] != 4, print(f"value: {shape_test}")
 
 # test check data function
-def test_check_data():
-    with pytest.raises(TypeError)  as exc_info:
+# pass input_image not as dictionary
+def test_check_data_input_image_not_dictionary():
+
+    with pytest.raises(TypeError, match = "Expected input_image to be dictionary" ):
         ImageOperation(name = "Test",
                     category = "Testing",
-                    compiled_code = None,
                     version = None,
                     docs = None,
                     alerts = None,
@@ -87,19 +88,19 @@ def test_check_data():
                     input_parameter = None,
                     output_image = None,
                     output_parameter = None)
-    print(f"{exc_info.value}")
-    with pytest.raises(TypeError)  as exc_info:
+
+# pass input_image as dictionary of wrong class
+def test_check_data_input_image_dictionary_wrong_class():
+    with pytest.raises(TypeError, match = "Expected input_image to be dictionary of"):
         ImageOperation(name = "Test",
                     category = "Testing",
-                    compiled_code = None,
                     version = None,
                     docs = None,
                     alerts = None,
-                    input_image = ParameterParcel(dtype = DataType.ValueInt),
+                    input_image = {"input": ParameterParcel(dtype = DataType.ValueInt)},
                     input_parameter = None,
                     output_image = None,
                     output_parameter = None)
-    print(f"{exc_info.value}")
 
 # Don't supply a value for input_image
 def test_run_code_no_input_image():
