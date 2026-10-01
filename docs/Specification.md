@@ -98,6 +98,7 @@
 |28/09/26|0.15.4|Added description of ActivationError exception to Error Handling section|
 |28/09/26|0.15.4|Updated description of Node class and added class unit testing|
 |30/09/26|0.16.0|Added plans for implementation of WorkFlow class to WorkFlow class description|
+|01/10/26|0.16.1|Added transpose function to description of Image class, added transpose unit testing|
 
 
 # 2. Premise and Aims
@@ -298,12 +299,14 @@ Shape will be used to hold shape related information in a number of classes and 
 
 This holds the image data as a multi-dimensional array, with max and min dimensions defined in the Shape class.
 
-The Image class exists purely to hold images for input to and output from ImageOperations within Nodes. Members of the Image class are instantiated on the creation of the Node and ImageOperation initially as arrays of 0s of the defined size and type. This means that, for each Image, the shape and data type of the pixel array is pre-defined and invariate. Any changes to the Image class which do not match the requirments of the attached Port will result in an error.
-
-Therefore, the image data can be described with two instance variables:
+The Image class exists to hold images for transit through the WorkFlow graph. Is is described with two instance variables:
 
 1.	pixel_array: Contains Image pixel data, in a multi-dimensional array of defined size and type.
 2.	image_map: Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
+
+Other required information, such as the pixel_array data type and pixel_array shape, are properties of thet pixel_array data and are not stored separately.
+
+It contains one function, __transpose__. This takes an input of Shape class and transposes the Image so that each image dimension is in the given array dimension.
 
 ### 3.3.2 Parameters Class
 
@@ -757,6 +760,9 @@ Plugins to make:
 |Shape constraints	|Insert input array with more or less than min/max dimensions defined in Shape.py |Value Error	|	Wrong shape array accepted|
 |Shape constraints	|Input shape data not in Shape class|Type Error	|	Wrong class ignored|
 |get_image_shape() | Get image shape of various shape pixel arrays | Gives correct shape | Gives incorrect shape |
+|transpose| new_shape arguement not in Shape class | Type error | No error given |
+|transpose| new_shape arguement has values out of range |Value error | No error given |
+|transpose|transpose test image | resulting image pixel_array has expected Shape | resulting image pixel array has incorrect shape |
 
 ### 7.2.2 Parameters
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
