@@ -45,10 +45,10 @@ def test_input_port_incorrect_data_type():
                                          image_map = Shape(0,0,0,0))
     
     preceeding_connection = Connection(connection_id = "ID", 
-                                       input_port = preceeding_port, 
-                                       output_port = preceeding_port,
-                                       input_data = preceeding_port.output,
-                                       output_data = preceeding_port.output)
+                                       source_port = preceeding_port, 
+                                       target_port = preceeding_port,
+                                       source_data = preceeding_port.output,
+                                       target_data = preceeding_port.output)
     
     with pytest.raises(TypeError, match = "Expected input of Image or Parameter class"):
         test_port = Port(is_input = True, node_id = "no_node", port_id = "test_port", input_connection = preceeding_connection, output_connection = ImageOperation("Test","Test","0.1.0",None,None))

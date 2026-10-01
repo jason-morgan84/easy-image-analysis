@@ -8,34 +8,34 @@ from core.image_operation import ImageOperation
 class Connection:
     """Connection is an extremely simple class that exists only to point an output Port from one Node to the input Port of the next.
     It has an input (expected Node class), an output (expected Node class) and an ID (defined by the WorkFlow class on the Connection's instantiation)"""
-    def __init__(self, connection_id, input_port, output_port, input_data, output_data):
+    def __init__(self, connection_id, source_port, target_port, source_data, target_data):
         self.connection_id = connection_id
-        self.input_port = input_port
-        self.output_port = output_port
-        self.input_data = input_data
-        self.output_data = output_data
+        self.source_port = source_port
+        self.target_port = target_port
+        self.source_data = source_data
+        self.target_data = target_data
 
     @property
-    def input_port(self):
-        return self._input_port
+    def source_port(self):
+        return self._source_port
 
-    @input_port.setter
-    def input_port(self, port):
+    @source_port.setter
+    def source_port(self, port):
         if not isinstance(port, Port):
-            raise ConnectionError(f"port class expected as input_port to connection {self.connection_id}, not {type(port)}")
+            raise ConnectionError(f"port class expected as source for connection {self.connection_id}, not {type(port)}")
 
-        self._input = port
+        self._source_port = port
 
     @property
-    def output_port(self):
-        return self._output_port
+    def target_port(self):
+        return self._target_port
 
-    @output_port.setter
-    def output_port(self, port):
+    @target_port.setter
+    def target_port(self, port):
         if not isinstance(port, Port):
-            raise ConnectionError(f"port class expected as output_port to connection {self.connection_id}, not {type(port)}")
+            raise ConnectionError(f"port class expected as target for connection {self.connection_id}, not {type(port)}")
 
-        self._output_port = port
+        self._target_port = port
 
 class Port:
     """A port converts data to/from DataTypes used in data transport through the graph and equivalent numpy types used in ImageOperations.
