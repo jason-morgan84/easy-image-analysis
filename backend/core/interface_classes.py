@@ -4,14 +4,17 @@ from core.parameter import Parameter
 from core.image_operation import ImageParcel, ParameterParcel
 from core.constants import DataType
 from core.image_operation import ImageOperation
+from core.shape import Shape
 
 class Connection:
     """Connection is an extremely simple class that exists only to point an output Port from one Node to the input Port of the next.
     It has an input (expected Node class), an output (expected Node class) and an ID (defined by the WorkFlow class on the Connection's instantiation)"""
-    def __init__(self, connection_id, source_port, target_port):
+    def __init__(self, connection_id, source_port, target_port, transpose = None, convert = None):
         self.connection_id = connection_id
         self.source_port = source_port
         self.target_port = target_port
+        self.transpose = transpose # Shape class member describing any transpositions required on input to produce output
+        self.convert = convert # Target DataType member for any conversions required on input to produce output
 
     @property
     def source_port(self):
@@ -34,6 +37,51 @@ class Connection:
             raise ConnectionError(f"port class expected as target for connection {self.connection_id}, not {type(port)}")
 
         self._target_port = port
+
+    @property
+    def transpose(self):
+        return self._transpose
+
+    @transpose.setter
+    def transpose(self,shape):
+        if shape and not isinstance(shape, Shape):
+            raise TypeError(f"shape class expected for transpose, not {type(shape)}")
+        self._transpose = shape
+
+    @property
+    def convert(self):
+        return self._convert
+
+    @convert.setter
+    def convert(self, convert_type):
+        
+        if convert_type and convert_type not in DataType.types():
+            raise TypeError(f"datatype class expected for transpose, not {type(convert_type)}")
+        self._convert = convert_type
+
+    @property
+    def output_data(self):
+        """Converts input data on demand."""
+
+        if self.source_port.output_data is None or \
+            (isinstance(self.source_port.output_data, Parameter) and self.source_port.output_data.value is None) or \
+                (isinstance(self.source_port.output_data, Image) and self.source_port.output_data.pixel_array is None):
+            raise ConnectionError(f"attempt to get output where source_port.output_data has no data present: {self.port_id}")
+        output = self.source_port.output_data
+
+        # if tranpose is not None and the source data is an image, transpose it
+        if self.transpose and isinstance(output, Image):
+            output = output.tranpose(self.transpose)
+
+        # if convert is not None, convert it
+        if self.convert:
+            output = output.convert(self.convert)
+        return output
+
+    @output_data.setter
+    def output_data(self, value):
+        self._output_data = value
+
 
 class Port:
     """A port converts data to/from DataTypes used in data transport through the graph and equivalent numpy types used in ImageOperations.

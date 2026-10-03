@@ -425,11 +425,18 @@ If testing is sucessful, files are added to a dictionary of ImageOperations with
 
 ### 3.5.1 Connection Class
 
-Connections form the links between nodes and ports through which data travels through the WorkFlow. They have a defined direction, with an input and an output, and are created by the user. Before the instantiation of a connection, the WorkFlow class will check that input and output expect compatible type and shape (explained in more detail in WorkFlow class). Connections contain three instance variables:
+Connections form the links between nodes and ports through which data travels through the WorkFlow. They have a defined direction, with an input and an output, and are created by the user. Before the instantiation of a connection, the WorkFlow class will check that input and output expect compatible type and shape (explained in more detail in WorkFlow class). Connections contain the following instance variables:
 
 * source_port - a reference to the preceeding Port
 * target_port - a reference to the next Port
 * connection_id - unique identifier of the connection
+* tranpose - default None, required for transposing an image from source_port to target_port
+* convert - default None, required for converting a DataType from source_port to target_port
+
+And the following property:
+* output_data: passes either the source_port.output_data or converted/tranposed/both source_port.output_data when requested.
+
+
 
 ### 3.5.2 Port Class
 
@@ -862,9 +869,18 @@ Plugins to make:
 ### 7.4.2 Connection Class
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
-| input     |Input not Port class|Type error|Input accepted|
-| output     |Output not Port class|Type error|Output accepted|
-
+| source_port     |source_port not Port class|Type error|source_port accepted|
+| target_port |target_port not Port class|Type error|target_port accepted|
+|transpose| transpose passed not as Shape class | Type error | transpose accepted|
+|convert| convert passed not as DataType class | Type error | convert accepted |
+| get_output | Use get_output when no data at source_port | ConnectionError| No error|
+| get_output | Use get_output when source_port contains image with no pixel_array| ConnectionError| No error|
+| get_output | Use get_output when source_port contains parameter with no value| ConnectionError| No error|
+| get_output | Test correct output given with no transpose or convert | Correct output given| Incorrect output|
+| get_output | Test correct output given with transpose but no convert | Correct output given| Incorrect output|
+| get_output | Test correct output given with convert but no transpose | Correct output given| Incorrect output|
+| get_output | Test correct output given with transpose and convert | Correct output given| Incorrect output|
+* note: both transpose and convert have previously been unit tested in Image and/or Parameter classes
 ### 7.4.2 Node Class
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
