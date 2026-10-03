@@ -56,25 +56,25 @@ class ImageOperationDirectory():
                         try:
                             imported_modules = self.check_imports(inspect.getsource(sub_module))
                         except Exception as e:
-                            self.logger.append(log(ImportError, f"unable to check for permitted module imports in {name}: {e}","ImageOperationDirectory","import_operations_dict", name))
+                            log(self.logger, ImportError, f"unable to check for permitted module imports in {name}: {e}","ImageOperationDirectory","import_operations_dict", name)
                             continue
 
                         self.disallowed_modules = imported_modules - self.permitted_imports
                         if self.disallowed_modules:
-                            self.logger.append(log(ImportError, f"non-permitted imports found in module {name}: {self.disallowed_modules}","ImageOperationDirectory","import_operations_dict", name))
+                            log(self.logger, ImportError, f"non-permitted imports found in module {name}: {self.disallowed_modules}","ImageOperationDirectory","import_operations_dict", name)
                             continue
 
                         """Next, check version is acceptable"""
                         try:
                             version = getattr(sub_module, "version")
                         except Exception as e:
-                            self.logger.append(log(ImportError,f"version number expected for module {name}: {e}","ImageOperationDirectory","import_operations_dict",name))
+                            log(self.logger,ImportError,f"version number expected for module {name}: {e}","ImageOperationDirectory","import_operations_dict",name)
                             continue
 
                         try: 
                             major, _, _ = version.split(".")
                         except Exception as e:
-                            self.logger.append(log(ImportError,f"incorrect version format in {name}: {e}","ImageOperationDirectory","import_operations_dict",name))
+                            log(self.logger,ImportError,f"incorrect version format in {name}: {e}","ImageOperationDirectory","import_operations_dict",name)
                             continue
 
                         """ Once imports and version are checked, get actual ImageOperation class"""
@@ -88,14 +88,14 @@ class ImageOperationDirectory():
                                 try:
                                     imported_function = self.version_image_map[major](attribute)
                                 except Exception as e:
-                                    self.logger.append(log(ImportError,f"cannot import module {name}: {e}","ImageOperationDirectory","import_operations_dict",name))
+                                    log(self.logger,ImportError,f"cannot import module {name}: {e}","ImageOperationDirectory","import_operations_dict",name)
                                     continue                                                              
                                 
                                 """test code to ensure it runs and gives expected output given sample input"""
                                 try:
                                     self.test_function(imported_function)
                                 except Exception as e:
-                                    self.logger.append(log(ImportError,f"module {name} failed import tests: {e}","ImageOperationDirectory","import_operations_dict", name))
+                                    log(self.logger,ImportError,f"module {name} failed import tests: {e}","ImageOperationDirectory","import_operations_dict", name)
                                     continue
 
                                 """if code passes these tests, add to dictionary of operations"""

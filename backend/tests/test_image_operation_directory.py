@@ -22,12 +22,12 @@ def test_import_category():
 def test_incorrect_version_number(function_name, error_message):
     directory = ImageOperationDirectory(testing = True)
     directory.import_operations_dict()
-    not_imported = [item.import_name for item in directory.logger]
+    not_imported = [item.identifier for item in directory.logger]
 
     assert function_name not in directory.image_operation_list.keys()
     assert function_name in not_imported, f"{directory.logger},{directory.logger[0]}"
     for item in directory.logger:
-        if item.import_name == function_name:
+        if item.identifier == function_name:
             assert error_message in item.message, f"{item.message}"
 
 
@@ -44,12 +44,12 @@ def test_incorrect_version_number(function_name, error_message):
 def test_inputs_incorrect_arguements(function_name, error_message):
     directory = ImageOperationDirectory(testing = True)
     directory.import_operations_dict()
-    not_imported = [item.import_name for item in directory.logger]
+    not_imported = [item.identifier for item in directory.logger]
 
     assert function_name not in directory.image_operation_list.keys()
     assert function_name in not_imported, f"{directory.logger},{directory.failed_imports},{directory.logger[0]}"
     for item in directory.logger:
-        if item.import_name == function_name:
+        if item.identifier == function_name:
             assert error_message in item.message, f"{item.message}"
 
 
@@ -75,12 +75,12 @@ def test_inputs_incorrect_arguements(function_name, error_message):
 def test_incorrect_code(function_name, error_message):
     directory = ImageOperationDirectory(testing = True)
     directory.import_operations_dict()
-    not_imported = [item.import_name for item in directory.logger]
+    not_imported = [item.identifier for item in directory.logger]
 
     assert function_name not in directory.image_operation_list.keys()
     assert function_name in not_imported
     for item in directory.logger:
-        if item.import_name == function_name:
+        if item.identifier == function_name:
             assert error_message in item.message, f"{item.message}"
 
 
@@ -98,7 +98,7 @@ def test_correct_code(function_name):
     directory.import_operations_dict()
 
     for item in directory.logger:
-        assert item.import_name != function_name, f"{item.message}"
+        assert item.identifier != function_name, f"{item.message}"
 
     assert function_name in directory.image_operation_list.keys()
 
@@ -110,12 +110,12 @@ def test_correct_code(function_name):
 def test_import_invalid(function_name, error_message):
     directory = ImageOperationDirectory(testing = True)
     directory.import_operations_dict()
-    not_imported = [item.import_name for item in directory.logger]
+    not_imported = [item.identifier for item in directory.logger]
 
     assert function_name not in directory.image_operation_list.keys(), f"\nSuccessfully imported operations: {directory.image_operation_list.keys()}\n"
     assert function_name in not_imported
     for item in directory.logger:
-        if item.import_name == function_name:
+        if item.identifier == function_name:
             assert error_message in item.message, f"{item.message}"
 
 # Import an ImageOperation with acceptable import
@@ -127,6 +127,6 @@ def test_import_valid(function_name):
     directory.import_operations_dict()
 
     for item in directory.logger:
-        assert item.import_name != function_name, f"{item.message}"
+        assert item.identifier != function_name, f"{item.message}"
 
     assert function_name in directory.image_operation_list.keys()
