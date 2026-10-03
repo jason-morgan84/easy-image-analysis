@@ -11,53 +11,104 @@ def test_initialise_not_image_operation_directory():
 
 # call add_node(image_operation) function where image_operation is not ImageOperation class
 def test_add_node_not_image_operation():
-    directory = ImageOperationDirectory(testing = True)
-    workflow = WorkFlow(directory)
-    with pytest.raises(TypeError, match = "new node requires ImageOperation class"):
-        workflow.add_node("test")
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    workflow.add_node("test")
+
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "add_node":
+            assert "new node requires ImageOperation class" in item.message 
+
 
 # call add_node(image_operation) function where dictionary key already exists
 def test_add_node_existing_key():
-    directory = ImageOperationDirectory(testing = True)
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(directory)
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
     workflow.add_node(directory["same_image"])
     workflow.max_id -= 1
-    with pytest.raises(TypeError, match = "new node key already in nodes dictionary:"):
-        workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "add_node":
+            assert "new node key already in nodes dictionary" in item.message 
+
 
 # check add_node adds a node
 def test_add_node_adds_node():
-    directory = ImageOperationDirectory(testing = True)
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(directory)
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
     workflow.add_node(directory["same_image"])
     assert len(workflow.nodes) == 1
     assert workflow.nodes["node.same_image.0"]
 
 #  call delete_node with an invalid key
 def test_delete_node_invalid_key():
-    directory = ImageOperationDirectory(testing = True)
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(directory)
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
     workflow.add_node(directory["same_image"])
-    with pytest.raises(ValueError,match = "id not in node list"):
-        workflow.delete_node("test")
+    workflow.delete_node("test")
+
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "delete_node":
+            assert item.identifier == "test"
+            assert "id not in node list" in item.message 
 
 #  call delete_node
 def test_delete_node_removes_node():
-    directory = ImageOperationDirectory(testing = True)
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(directory)
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
     workflow.add_node(directory["same_image"])
     workflow.delete_node("node.same_image.0")
     assert "node.same_image.0" not in workflow.nodes.keys()
 
-# call create connection
-def test_connection_add():
-    directory = ImageOperationDirectory(testing = True)
+# call add_connection where source is not a port
+def test_connection_source_not_port():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(directory)
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+    
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "add_connection":
+            assert "expected source_port as Port" in item.message 
+# call  add_connection where target is not a port
+def test_connection_target_not_port():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+    
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"])
+
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "add_connection":
+            assert "expected target_port as Port" in item.message 
+
+# check add_connection creates a connection
+def test_connection_add():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
     workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
@@ -66,33 +117,43 @@ def test_connection_add():
 
 # call delete_connection with an invalid key
 def test_connection_delete_invalid_key():
-    directory = ImageOperationDirectory(testing = True)
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(directory)
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
     workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
                             target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
-    with pytest.raises(ValueError,match = "id not in node list"):
-        workflow.delete_connection("test")
+
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "delete_connection":
+            assert item.identifier == "test"
+            assert "id not in node list" in item.message 
 
 # check delete_connection removes a connection
 def test_connection_delete():
-    directory = ImageOperationDirectory(testing = True)
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(directory)
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
     workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
                             target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
     workflow.delete_connection("connection.2")
+    
     assert "connection.2" not in workflow.connections.keys()
 
 # check delete_node removes associated connections
 def test_node_delete_removes_connections():
-    directory = ImageOperationDirectory(testing = True)
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(directory)
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
     workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
