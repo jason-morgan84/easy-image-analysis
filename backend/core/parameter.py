@@ -37,6 +37,6 @@ class Parameter:
             raise TypeError(f"arrays can only be converted to array_types, not {convert}")
         elif val_dtype in DataType.value_types() and convert not in DataType.value_types():
             raise TypeError(f"values can only be converted to value_types, not {convert}")
-        self.value = self.value.to(convert)
+        return Parameter(name = self.name, value=self.value.to(convert))
 
 

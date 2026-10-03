@@ -85,9 +85,9 @@ def test_convert_image():
 
     test_image = Image(pixel_array, image_map)
 
-    test_image.convert(DataType.ImageFloat)
+    new_image = test_image.convert(DataType.ImageFloat)
 
-    assert test_image.pixel_array.data_type == DataType.ImageFloat
+    assert new_image.pixel_array.data_type == DataType.ImageFloat
 
 """test Image.tranpose()"""
 # test image transpose
@@ -97,9 +97,9 @@ def test_tranpose():
 
     test_image = Image(pixel_array, image_map)
 
-    test_image.transpose(Shape(3,2,1,0))
+    new_image = test_image.transpose(Shape(3,2,1,0))
 
-    assert test_image.pixel_array.value.shape == (5,4,3,2)
+    assert new_image.pixel_array.value.shape == (5,4,3,2)
 
 # test image tranpose input not Shape class
 def test_tranpose_invalid_input_not_shape():

@@ -48,7 +48,7 @@ class Image:
     def convert(self, convert):
         if convert not in DataType.image_types():
             raise TypeError(f"images can only be converted to image_types, not {convert}")
-        self.pixel_array = self.pixel_array.to(convert)
+        return Image(pixel_array = self.pixel_array.to(convert), image_map = self.image_map)
 
     # tranpose to be moved to WorkFlow
     def transpose(self, new_shape):
@@ -75,8 +75,10 @@ class Image:
 
         current_dtype = getattr(self.pixel_array, "data_type")
 
-        self.pixel_array = current_dtype(transposed_array)
-        self.image_map = new_shape
+        #self.pixel_array = current_dtype(transposed_array)
+        #self.image_map = new_shape
+        return Image(pixel_array = current_dtype(transposed_array),
+                     image_map = new_shape)
 
     # old transpose, expected tuple of channel names
     """def transpose(self, new_shape):

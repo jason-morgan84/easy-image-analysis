@@ -44,6 +44,6 @@ def test_convert():
     test = Parameter(name = "Test",
                     value = DataType.ValueInt(5))
 
-    test.convert(DataType.ValueFloat)
+    new_parameter = test.convert(DataType.ValueFloat)
     
-    assert test.value.data_type == DataType.ValueFloat
+    assert new_parameter.value.data_type == DataType.ValueFloat
