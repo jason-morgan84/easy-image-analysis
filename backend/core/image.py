@@ -45,6 +45,11 @@ class Image:
                      x = self.pixel_array.value.shape[self.image_map.x])
 
 
+    def convert(self, convert):
+        if convert not in DataType.image_types():
+            raise TypeError(f"images can only be converted to image_types, not {convert}")
+        self.pixel_array = self.pixel_array.to(convert)
+
     # tranpose to be moved to WorkFlow
     def transpose(self, new_shape):
         # expect a Shape class

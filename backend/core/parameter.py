@@ -31,3 +31,12 @@ class Parameter:
            
         self._value = val
 
+    def convert(self, convert):
+        val_dtype = getattr(self.value,"data_type")
+        if val_dtype in DataType.array_types() and convert not in DataType.array_types():
+            raise TypeError(f"arrays can only be converted to array_types, not {convert}")
+        elif val_dtype in DataType.value_types() and convert not in DataType.value_types():
+            raise TypeError(f"values can only be converted to value_types, not {convert}")
+        self.value = self.value.to(convert)
+
+
