@@ -103,7 +103,7 @@
 |01/10/26|0.16.3|Added description of permitted_conversions and warned_conersions to Type classes|
 |01/10/26|0.16.4|Added description of load_image and save_image to ImageOperation files section|
 |01/10/26|0.16.5|Moved description of references to UI elements from Parameter to ParameterParcel class|
-
+|03/10/26|0.16.6|Updated description of error_handling.log to append log items to list rather than return them|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -622,7 +622,7 @@ It contains the LogItem class, which holds data for adding to the log. LogItem l
 - function_name: the function that logged the error
 - import_name: the imported ImageOperation file which caused the error. Defaults to None.
 
-It also contains a custom function, log() that reports errors and returns the associated LogItem describing the error.
+It also contains a custom function, log() that reports errors and appends the associated LogItem describing the error to a list passed to the log function.
 
 Exception chaining will be used to log errors in the WorkFlow layer and ImageOperationDirectory, but not lower layer classes (see class heirarchy).
 
