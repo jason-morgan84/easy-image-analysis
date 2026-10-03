@@ -104,6 +104,7 @@
 |01/10/26|0.16.4|Added description of load_image and save_image to ImageOperation files section|
 |01/10/26|0.16.5|Moved description of references to UI elements from Parameter to ParameterParcel class|
 |03/10/26|0.16.6|Updated description of error_handling.log to append log items to list rather than return them|
+|03/10/26|0.16.7|Added description of convert() function to Image and Parameter classes and unit testing|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -313,7 +314,9 @@ The Image class exists to hold images for transit through the WorkFlow graph. Is
 
 Other required information, such as the pixel_array data type and pixel_array shape, are properties of thet pixel_array data and are not stored separately.
 
-It contains one function, __transpose__. This takes an input of Shape class and transposes the Image so that each image dimension is in the given array dimension.
+It contains two function:
+* __transpose__ takes an input of Shape class and transposes the Image so that each image dimension is in the given array dimension
+* convert converts the pixel_array to a given data type
 
 ### 3.3.2 Parameters Class
 
@@ -323,6 +326,9 @@ Contains non-image inputs/outputs for transport through WorkFlow.
 * value – its value (initialised as correct data_type/shape (if required) by Port on instantiation therefore also defines required data type)
 
 Type checking is carried out on dtype, to ensure its a member of DataType.value_types or DataType.array_types.
+
+It contains one function:
+* convert converts the pixel_array to a given data type
 
 ## 3.4 Execution Classes
 ### 3.4.1 ImageOperation Class
@@ -772,6 +778,8 @@ Plugins to make:
 |Shape constraints	|Insert input array with more or less than min/max dimensions defined in Shape.py |Value Error	|	Wrong shape array accepted|
 |Shape constraints	|Input shape data not in Shape class|Type Error	|	Wrong class ignored|
 |get_image_shape() | Get image shape of various shape pixel arrays | Gives correct shape | Gives incorrect shape |
+|convert| convert arguement not in image_types class | Type error | No error given |
+|convert| convert test image | output of expected type | output not of expected type |
 |transpose| new_shape arguement not in Shape class | Type error | No error given |
 |transpose| new_shape arguement has values out of range |Value error | No error given |
 |transpose|transpose test image | resulting image pixel_array has expected Shape | resulting image pixel array has incorrect shape |
@@ -780,6 +788,9 @@ Plugins to make:
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
+|convert| convert arguement for array_type not in array_type class | Type error | No error given |
+|convert| convert arguement for value_type not in value_type class | Type error | No error given |
+|convert| convert test parameter | output of expected type | output not of expected type |
 
 ## Stage 7.3 – Backend Excecution Classes
 
