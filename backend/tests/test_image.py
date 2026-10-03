@@ -65,7 +65,31 @@ def test_get_image():
     for n, dimension in enumerate(Image(mock_image, image_map).get_image_shape()):
             print(dimension)
             assert dimension == mock_image.value.shape[image_map[n]], f"{dimension}, {n}"
-    
+
+"""test Image.convert() """
+# convert arguement not in image_types class
+def test_convert_wrong_type():
+    pixel_array = sample_data(DataType.ImageInt,(2,3,4,5))
+    image_map = Shape(0,1,2,3)
+
+    test_image = Image(pixel_array, image_map)
+
+    with pytest.raises(TypeError,match="images can only be converted to image_types"):
+        test_image.convert(DataType.ArrayInt)
+
+
+# convert test image 
+def test_convert_image():
+    pixel_array = sample_data(DataType.ImageInt,(2,3,4,5))
+    image_map = Shape(0,1,2,3)
+
+    test_image = Image(pixel_array, image_map)
+
+    test_image.convert(DataType.ImageFloat)
+
+    assert test_image.pixel_array.data_type == DataType.ImageFloat
+
+"""test Image.tranpose()"""
 # test image transpose
 def test_tranpose():
     pixel_array = sample_data(DataType.ImageInt,(2,3,4,5))
