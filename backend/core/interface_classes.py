@@ -68,14 +68,15 @@ class Connection:
                 (isinstance(self.source_port.output_data, Image) and self.source_port.output_data.pixel_array is None):
             raise ConnectionError(f"attempt to get output where source_port.output_data has no data present: {self.port_id}")
         output = self.source_port.output_data
-
+        print("\n\noutput\n\n", output)
         # if tranpose is not None and the source data is an image, transpose it
         if self.transpose and isinstance(output, Image):
-            output = output.tranpose(self.transpose)
-
+            output = output.transpose(self.transpose)
+        print("\n\noutput\n\n", output)
         # if convert is not None, convert it
         if self.convert:
             output = output.convert(self.convert)
+        print("\n\noutput\n\n", output)
         return output
 
     @output_data.setter
@@ -156,7 +157,9 @@ class Port:
     @property
     def output_data(self):
         """Converts input data on demand."""
-        if self.input_data is None:
+        if self.input_data is None or \
+            (isinstance(self.input_data, ImageParcel) and self.input_data.pixel_array is None) or \
+                (isinstance(self.input_data, ParameterParcel) and self.input_data.value is None):
             raise ConnectionError(f"attempt to get port output where no input present: {self.port_id}")
         return self.convert()
 
