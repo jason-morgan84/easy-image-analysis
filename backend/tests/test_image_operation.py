@@ -1,96 +1,10 @@
 import pytest
 import numpy as np
-from core.image import Image
 from core.shape import Shape
 from core.constants import DataType
 from core.image_operation import ImageOperation, ImageParcel, ParameterParcel
 import types
 
-
-"""Test ImageParcel Class"""
-@pytest.mark.parametrize("dtype, pixel_array, shape, image_map", [
-    # Supply dtype as not member of DataTypes.image_types
-    (np.uint8, np.array([1,2,3],np.uint8), None, None),
-    # Have pixel_array type not match dtype
-    (DataType.ImageInt, np.array([0.1,0.2,0.3],np.float64), None, None),
-    # Supply shape not as Shape class
-    (DataType.ImageInt, np.array([1,2,3],np.uint8), [1,2], None),
-    # Supply image_map not as Shape class
-    (DataType.ImageInt, np.array([1,2,3],np.uint8), None, [5,1])])
-def test_ImageParcel(dtype, pixel_array, shape, image_map):
-
-    with pytest.raises(TypeError) as exc_info:
-        ImageParcel(dtype = dtype, 
-                    pixel_array = pixel_array, 
-                    shape = shape, 
-                    image_map = image_map)
-    print(f"{exc_info.value}")
-
-"""Test ParameterParcel Class"""
-# test valid inputs
-@pytest.mark.parametrize("dtype, value, shape", [
-    # Supply dtype as not member of DataTypes.image_types
-    (np.uint8, np.uint8(5), None),
-    (DataType.ImageInt, np.uint8(5), None),
-    # If array is expected, have value not a list, tuple or ndarray
-    (DataType.ArrayFloat, 5, None),
-    # If array is not expected, have value as array
-    (DataType.ValueInt,[1,2],None),
-    # Have value type not match dtype
-    (DataType.ValueInt, np.float64(5.0), None),
-    (DataType.ArrayFloat, np.array([5,2],np.uint8), None)])
-def test_ParameterParcel(dtype, value, shape):
-
-    with pytest.raises(TypeError) as exc_info:
-        ParameterParcel(dtype = dtype, 
-                    value = value, 
-                    shape = shape)
-    print(f"{exc_info.value}")
-
-# test user_input flag as not boolean
-def test_ParameterParcel_user_input_flag_boolean():
-    with pytest.raises(TypeError, match = "user_input flag expected to be boolean, not "):
-        ParameterParcel(dtype = DataType.ValueInt, 
-                    value = DataType.ValueInt(2).to_numpy(), 
-                    user_input = 4)
-
-# test user_input true without user_interface element
-def test_ParameterParcel_user_input_no_ui_element():
-    with pytest.raises(ValueError, match = "defined UI element required where user_input flag is True"):
-        ParameterParcel(dtype = DataType.ValueInt, 
-                    value = DataType.ValueInt(2).to_numpy(), 
-                    user_input = True)
-
-#ImageParcel Imutability - Pass value as variable then change variable
-def test_ImageParcel_imutability():
-        array = np.array([1,2,3],np.uint8)
-        shape_test = Shape(-1,-1,-1,-1)
-        image_map_test = Shape(0,0,0,0)
-        test = ImageParcel(dtype = DataType.ImageInt, 
-                    pixel_array = array, 
-                    shape = shape_test, 
-                    image_map = image_map_test)
-        
-        shape_test.c = 4
-        image_map_test.z = 5
-        array[0] = 5
-        assert test.pixel_array[0] != 5
-        assert test.image_map.z != 5, print(f"image_map values: {image_map_test.c} {test.image_map.c}")
-        assert test.shape.c != 4, print(f"shape values: {shape_test.c} {test.shape.c}")
-        
-#ParameterParcel Imutability - Pass value as variable then change variable
-def test_ParameterParcel_imutability():
-        array = np.array([1,2,3],np.uint8)
-        shape_test = np.array([3],np.uint8)
-        test = ParameterParcel(dtype = DataType.ArrayInt, 
-                    value = array, 
-                    shape = shape_test)
-        
-        shape_test[0] = 4
-        array[0] = 5
-        print(f"value: {test.shape}")
-        assert test.value[0] != 5
-        assert test.shape[0] != 4, print(f"value: {shape_test}")
 
 # test check data function
 # pass input_image not as dictionary

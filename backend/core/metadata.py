@@ -17,10 +17,10 @@ class ImageMetadata:
         # check that dtype is a member of DataType.image_types (although the pixel_array isn't of a custom class, this is still used to define the expected
         # numpy data type of pixel_array)
         if typ not in DataType.image_types():
-            raise TypeError(f"{typ} is not a valid Image DataType.")
+            raise TypeError(f"expected type from DataType.image_type, got: {typ} ")
         self._dtype = typ
 
-    # check that shape is of type Shape
+    # check that image_shape_constraints is of type Shape
     @property 
     def image_shape_constraints(self):
         return self._image_shape_constraints
@@ -37,7 +37,7 @@ class ImageMetadata:
     @image_map.setter
     def image_map(self, map):
         if not isinstance(map, Shape) and map is not None:
-            raise TypeError(f"for ImageParcel class, expected map to be of class Shape, got {type(map)}")
+            raise TypeError(f"for ImageMetadata class, expected image_map to be of class Shape, got {type(map)}")
         self._image_map = None if map is None else map.copy()
 
 
@@ -60,7 +60,7 @@ class ParameterMetadata:
         # check that dtype is a member of DataType.array_types/value_types (although the pixel_array isn't of a custom class, this is still used to define the expected
         # numpy data type of pixel_array)
         if typ not in DataType.array_types() and typ not in DataType.value_types():
-            raise TypeError(f"{typ} is not a valid array or value DataType.")
+            raise TypeError(f"expected type from DataType.value_type or DataType.array_type, got: {typ} ")
         self._dtype = typ
 
     @property
