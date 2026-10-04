@@ -385,7 +385,7 @@ Simple class holding data for image inputs and outputs from ImageOperation. Cont
     - Type checks for Shape class
 * pixel_array - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain ndarray of dtype.numpy.
     - Type checks for Shape class
-* mapping - set to None at instantiation, given value of type Shape mapping image dimensions to pixel array dimensions.
+* image_map - The required mapping of any supplied image as a member of Shape class. Defines how an ImageOperation wants a pixel array delivered (eg, CZYX v ZCYX) and how it outputs it.
 
 ### 3.4.3 ParameterPackage
 Simple class holding data for non-image inputs and outputs from ImageOperation. Includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
@@ -547,6 +547,24 @@ On creation of a new connection, it will check for structure, shape or type viol
 
 <img src="./workflow_error_checking.svg" width="100%" height = "100%" alt="Node Graph Set-Up checks" />
 
+### Shape propagation
+
+* carry out checks at the WorkFlow level.
+
+* ImageOperations already include data on the required input shape and delivered output shape (-1 for don't care, specific values for defined input/output dimension size)
+
+* on instantiation of a Node, the input constraints are propagated to the input Port and the output Port for visibility to Connections.
+
+* when a user tries to create a Connection, shape constraints on the source and target Ports are checked for compatibility.
+
+* if compatible, the Connection is created.
+
+* on creation, the graph is updated. This includes a step of propagating any Shape constraints through the graph.
+
+* the output Port of the newly connected Node has its shape constraints updated based on the upstream graph, for checking by future connections.
+
+* Only -1 (don't care values) are changed - if a Node has an ImageOperation that's indifferent to shape, but the input is always c = 1, the output will become c = 1. If a Node has a defined output, that is constant. This is the point where the proper coding of the ImageOperation, particularly its output image shape constraints, has to be trusted.
+
 ### 3.6.1 Workflow Implementation
 
 __Stage 0__
@@ -646,6 +664,10 @@ error_handling.py also includes custom exceptions:
 * ActivationError - for errors in Node activation
 
 # 4 ImageOperation files
+
+## 4.1 Test Harness
+
+Includes testing for outputs - if an image output shape is given as (-1,-1,-1,-1) but it doesn't pass through all dimension sizes, then flag this as an error (if left, it will break image shape propagation through the graph).
 
 ## 4.2 Special cases - input and output
 

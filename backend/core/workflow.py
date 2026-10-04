@@ -2,6 +2,7 @@ from core.image_operation_directory import ImageOperationDirectory
 from core.image_operation import ImageOperation
 from core.interface_classes import Node, Connection, Port
 from core.error_handling import ConnectionError, log
+from core.image import Image
 
 class WorkFlow:
     def __init__(self, logger, image_operation_directiory):
@@ -97,7 +98,8 @@ class WorkFlow:
         else:
             # error checks (see workflow_error_checking.svg)
             self.structure_check(source_port, target_port)
-            self.shape_check(source_port, target_port)
+            if isinstance(source_port.output_data, Image):
+                self.shape_check(source_port, target_port)
             self.type_check(source_port, target_port)
 
             # create key in the form connection.ID
@@ -124,6 +126,11 @@ class WorkFlow:
         pass
 
     def shape_check(self, source_port, target_port):
+        # two checks:
+        # 1) does the image match the requirements of shape arguement - ie, z dimension of 1 where required
+        target_dim_req = target_port.output_data.shape
+        source_array_shape = source_port.output_data
+        # 2) are the image dimensions in the correct order? if not, transpose
         pass
 
     def type_check(self, source_port, target_port):
