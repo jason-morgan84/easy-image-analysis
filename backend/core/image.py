@@ -1,42 +1,43 @@
 import numpy as np
 from core.constants import DataType
 from core.shape import Shape
+from core.metadata import ImageMetadata
 
 class Image:
-    def __init__(self, pixel_array, image_map):
-        self.pixel_array = pixel_array                      # the multi-dimensional array that holds the pixel data
-        self.image_map = image_map                          # image_map of image dimensions (c,z,y,x) to Array dimensions (0,1,2,3 etc)
+    def __init__(self, data, image_metadata):
+        self.data = data                            # the multi-dimensional array that holds the pixel data
+        self.image_metadata = image_metadata        # image_map of image dimensions (c,z,y,x) to Array dimensions (0,1,2,3 etc)
 
     @property
-    def pixel_array(self):
-        return self._pixel_array
+    def data(self):
+        return self._data
 
-    @pixel_array.setter
-    def pixel_array(self, arr):
-        # check array is of one of the acceptable data types defined by DataType.image_types() in constants.py
-        array_dtype = getattr(arr, "data_type", None)
+    @data.setter
+    def data(self, value):
+        # check data is of one of the acceptable data types defined by DataType.image_types() in constants.py
+        dtype = getattr(value, "data_type", None)
 
-        if array_dtype not in DataType.image_types() or array_dtype == None:
-            raise TypeError (f"Expected Image data type (see constants.py) got {type(arr)}")
+        if dtype not in DataType.image_types() or dtype == None:
+            raise TypeError (f"expected data of image_type data type (see constants.py) got {type(value)}")
 
         # check array has correct number of dimensions
-        array_size = len(arr.value.shape)
+        array_size = len(value.value.shape)
         if array_size > Shape.max_image_dimensions or array_size < Shape.min_image_dimensions:
-            raise ValueError (f"array should have {Shape.min_image_dimensions}-{Shape.max_image_dimensions} dimensions but has {array_size}")
+            raise ValueError (f"image array should have {Shape.min_image_dimensions}-{Shape.max_image_dimensions} dimensions but has {array_size}")
 
-        self._pixel_array = arr
+        self._pixel_array = value
 
     @property
-    def image_map(self):
-        return self._image_map
+    def image_metadata(self):
+        return self._image_metadata
 
-    @image_map.setter
-    def image_map(self, map):
-        if not isinstance(map, Shape):
-            raise TypeError (f"Expected image_map of Shape class, got {type(map)}")
+    @image_metadata.setter
+    def image_metadata(self, meta):
+        if not isinstance(meta, ImageMetadata):
+            raise TypeError (f"Expected image_metadata of Image Metadata class, got {type(map)}")
         # check image_map is a Shape class
 
-        self._image_map = map
+        self._image_metadata = meta
 
     def get_image_shape(self):
         return Shape(c = self.pixel_array.value.shape[self.image_map.c],
@@ -44,11 +45,10 @@ class Image:
                      y = self.pixel_array.value.shape[self.image_map.y],
                      x = self.pixel_array.value.shape[self.image_map.x])
 
-
     def convert(self, convert):
         if convert not in DataType.image_types():
             raise TypeError(f"images can only be converted to image_types, not {convert}")
-        return Image(pixel_array = self.pixel_array.to(convert), image_map = self.image_map)
+        return Image(data = self.data.to(convert), image_metadata = self.image_metadata)
 
     # tranpose to be moved to WorkFlow
     def transpose(self, new_shape):
@@ -63,7 +63,7 @@ class Image:
 
         # receives Shape class member with new dimensions indices of each array (c,z,y,x)
         # needs to create transpose list with values c,z,y,x in order of old_c,old_z,old_y,old_x
-        transpose = [self.image_map[item] for item in new_shape]
+        transpose = [self.data[item] for item in new_shape]
 
         # receives input of new channel order, such as z,c,y,x
         # to use numpy transpose, needs to go from string z to array map for that dimension and append to list transpose
@@ -71,64 +71,18 @@ class Image:
 
         # get new shape map - ie, get the position of c,z,y,x in new_shape
         
-        transposed_array = np.transpose(self.pixel_array.to_numpy(),transpose)
+        transposed_array = np.transpose(self.data.to_numpy(),transpose)
 
-        current_dtype = getattr(self.pixel_array, "data_type")
+        current_dtype = getattr(self.data, "data_type")
 
         #self.pixel_array = current_dtype(transposed_array)
         #self.image_map = new_shape
-        return Image(pixel_array = current_dtype(transposed_array),
-                     image_map = new_shape)
-
-    # old transpose, expected tuple of channel names
-    """def transpose(self, new_shape):
-
-        # expect a list/tuple with four, non-duplicate string elements which are members of Shape.dimension_order
-        if not isinstance(new_shape, tuple) and not isinstance(new_shape,list):
-            raise TypeError (f"Expected tuple/list of channel names, got {type(new_shape)}")
-
-        if len(new_shape)>Shape.max_image_dimensions or len(new_shape)<Shape.min_image_dimensions:
-            raise ValueError (f"Expected 4 channel names, got {len(new_shape)}")
-
-        if (len(new_shape)!=len(set(new_shape))):
-            raise ValueError ("List/tuple describing new shape contains duplicate dimensions")
-
-        if not isinstance(new_shape[0],str):
-            raise TypeError (f"Expected tuple/list of strings, got {type(new_shape[0])}")
-
-        for item in new_shape:
-                if not any(dim == item.lower() for dim in Shape.dimensions):
-                    raise ValueError (f"List/tuple describing new shape contains incorrect dimension {item} dimensions")
+        return Image(data = current_dtype(transposed_array),
+                     image_metadata = ImageMetadata(dtype = self.image_metadata.dtype,
+                                                    image_shape_constraints = self.image_metadata.image_shape_constraints,
+                                                    image_map = new_shape))
 
 
-        transpose =[]
-        new_map = []
-
-        # receives input of new channel order, such as z,c,y,x
-        # to use numpy transpose, needs to go from string z to array map for that dimension and append to list transpose
-        # transpose used as input for np.transpose
-
-
-        #for n, item in enumerate(new_shape):
-        #    for dim in self.image_image_map:
-        #        if Shape.dimensions[dim] == item.lower():
-        #            transpose.append(dim)
-
-        # convert new dimension order in new_shape as strings to same order in transpose as integers
-        transpose = [self.image_image_map[item] for item in new_shape]
-
-        # get new shape map - ie, get the position of c,z,y,x in new_shape
-        shape_index_lookup = {item.lower(): idx for idx, item in enumerate(new_shape)}
-        new_map = [shape_index_lookup[item] for item in Shape.dimensions]
-
-        
-        transposed_array = np.transpose(self.array.to_numpy(),transpose)
-
-        return Image(array = self.array_dtype(transposed_array),
-                     array_dtype = self.array_dtype,
-                     image_shape = self.image_shape,
-                     #image_shape = Shape(*transposed_array.shape),
-                     image_image_map = Shape(*new_map))"""
 
 
 
