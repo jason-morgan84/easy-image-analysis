@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="210mm"
-   height="297mm"
-   viewBox="0 0 210 297"
+   width="555.03241mm"
+   height="319.11008mm"
+   viewBox="0 0 555.03241 319.11008"
    version="1.1"
    id="svg1"
    inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
@@ -24,12 +24,12 @@
      inkscape:deskcolor="#ffffff"
      inkscape:document-units="mm"
      inkscape:zoom="0.5046682"
-     inkscape:cx="481.50448"
-     inkscape:cy="593.45923"
-     inkscape:window-width="1920"
-     inkscape:window-height="1009"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:cx="689.56197"
+     inkscape:cy="714.33072"
+     inkscape:window-width="2560"
+     inkscape:window-height="1351"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
      showborder="false" />
@@ -59,7 +59,7 @@
        id="marker170"
        refX="0"
        refY="0"
-       orient="270.00"
+       orient="270"
        inkscape:stockid="Triangle arrow"
        markerWidth="1"
        markerHeight="1"
@@ -115,11 +115,19 @@
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     transform="translate(195.20552,18.001631)">
+    <rect
+       style="fill:#ffffff;stroke:#ffffff;stroke-width:0.352777;-inkscape-stroke:none"
+       id="rect31"
+       width="554.67963"
+       height="318.75729"
+       x="-195.02913"
+       y="-17.825243" />
     <rect
        style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
        id="rect192"
-       width="642.84412"
+       width="521.47522"
        height="280.53128"
        x="-177.74048"
        y="9.0200129" />
@@ -141,62 +149,62 @@
        id="text15-8-9"><tspan
          x="-19.70577"
          y="30.747581"
-         id="tspan4"><tspan
+         id="tspan13"><tspan
            style="font-weight:bold;baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
-           id="tspan3">Workflow class
+           id="tspan1">Workflow class
 </tspan></tspan><tspan
          x="-19.70577"
          y="36.039242"
-         id="tspan6"><tspan
+         id="tspan15"><tspan
            style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
-           id="tspan5">
+           id="tspan14">
 </tspan></tspan><tspan
          x="-19.70577"
          y="41.330906"
-         id="tspan8"><tspan
+         id="tspan17"><tspan
            style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
-           id="tspan7">Contains lists of all nodes, ports and connections.
+           id="tspan16">Contains lists of all nodes, ports and connections.
 </tspan></tspan><tspan
          x="-19.70577"
          y="46.62257"
-         id="tspan10"><tspan
+         id="tspan19"><tspan
            style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
-           id="tspan9">
+           id="tspan18">
 </tspan></tspan><tspan
          x="-19.70577"
          y="51.914234"
-         id="tspan12"><tspan
+         id="tspan21"><tspan
            style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
-           id="tspan11">Ports form part of node accepting inputs and delivering outputs. They act as a buffer interpreting </tspan></tspan><tspan
+           id="tspan20">Ports form part of node accepting inputs and delivering outputs. They act as a buffer interpreting </tspan></tspan><tspan
          x="-19.70577"
          y="57.205898"
-         id="tspan119"><tspan
+         id="tspan23"><tspan
            style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
-           id="tspan118">ImageOperation outputs for other backend code.
+           id="tspan22">ImageOperation outputs for other backend code.
 </tspan></tspan><tspan
          x="-19.70577"
          y="62.497562"
-         id="tspan121"><tspan
+         id="tspan25"><tspan
            style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
-           id="tspan120">
+           id="tspan24">
 </tspan></tspan><tspan
          x="-19.70577"
          y="67.789227"
-         id="tspan123"><tspan
+         id="tspan27"><tspan
            style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
-           id="tspan122">Connections connect ports between nodes. They deal with data checking.
+           id="tspan26">Connections connect ports between nodes. They deal with data checking.
 </tspan></tspan><tspan
          x="-19.70577"
          y="73.080891"
-         id="tspan125"><tspan
+         id="tspan29"><tspan
            style="baseline-shift:baseline;vector-effect:none;stop-color:#000000;stop-opacity:1"
-           id="tspan124">
+           id="tspan28">
 </tspan></tspan><tspan
          x="-19.70577"
          y="78.372555"
-         id="tspan127"><tspan
+         id="tspan31"><tspan
            style="baseline-shift:baseline;white-space:normal;vector-effect:none;stop-color:#000000;stop-opacity:1"
-           id="tspan126">Functions to create nodes, ports and connections.</tspan></tspan></text>
+           id="tspan30">Functions to create nodes, ports and connections.</tspan></tspan></text>
     <rect
        style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
        id="rect2-2"
@@ -213,48 +221,48 @@
        transform="translate(-274.86813,395.67701)"><tspan
          x="120.80676"
          y="-269.33859"
-         id="tspan132"><tspan
+         id="tspan33"><tspan
            style="font-weight:bold"
-           id="tspan131">ImageOperation class
+           id="tspan32">ImageOperation class
 </tspan></tspan><tspan
          x="120.80676"
          y="-264.04695"
-         id="tspan137">
+         id="tspan34">
 </tspan><tspan
          x="120.80676"
          y="-258.75529"
-         id="tspan138">Imports from all files in ImageOperation folder.
+         id="tspan35">Imports from all files in ImageOperation folder.
 </tspan><tspan
          x="120.80676"
          y="-253.46363"
-         id="tspan139">
+         id="tspan36">
 </tspan><tspan
          x="120.80676"
          y="-248.17198"
-         id="tspan140">Contains code, required inputs, delivered outputs, </tspan><tspan
+         id="tspan37">Contains code, required inputs, delivered outputs, </tspan><tspan
          x="120.80676"
          y="-242.88032"
-         id="tspan141">parameters, documentation (including alerts to users in </tspan><tspan
+         id="tspan38">parameters, documentation (including alerts to users in </tspan><tspan
          x="120.80676"
          y="-237.58866"
-         id="tspan142">UI), category(s) of operation.
+         id="tspan39">UI), category(s) of operation.
 </tspan><tspan
          x="120.80676"
          y="-232.29701"
-         id="tspan143">
+         id="tspan40">
 </tspan><tspan
          x="120.80676"
          y="-227.00535"
-         id="tspan144">For future proofing, also contains ImageOperation </tspan><tspan
+         id="tspan41">For future proofing, also contains ImageOperation </tspan><tspan
          x="120.80676"
          y="-221.7137"
-         id="tspan145">version it was written under (if future changes in back </tspan><tspan
+         id="tspan42">version it was written under (if future changes in back </tspan><tspan
          x="120.80676"
          y="-216.42204"
-         id="tspan146">end code change how ImageOperations interact with </tspan><tspan
+         id="tspan43">end code change how ImageOperations interact with </tspan><tspan
          x="120.80676"
          y="-211.13038"
-         id="tspan147">other code).</tspan></text>
+         id="tspan44">other code).</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
@@ -269,22 +277,22 @@
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
          x="-162.76312"
-         y="91.934502"
+         y="91.934509"
          id="tspan16-4" /><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
          x="-162.76312"
-         y="97.226158"
+         y="97.226166"
          id="tspan136-2">All ImageOperation classes</tspan><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
          x="-162.76312"
-         y="102.51785"
+         y="102.51783"
          id="tspan151" /><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
          x="-162.76312"
-         y="107.8095"
+         y="107.80949"
          id="tspan152">Code for importing ImageOperation classes</tspan></text>
     <rect
        style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
@@ -316,52 +324,52 @@
        transform="matrix(0.26458333,0,0,0.26458333,98.697795,504.87379)"><tspan
          x="-430.97623"
          y="-1566.3757"
-         id="tspan153"><tspan
+         id="tspan46"><tspan
            style="font-weight:bold"
-           id="tspan148">Node class
+           id="tspan45">Node class
 </tspan></tspan><tspan
          x="-430.97623"
          y="-1546.3758"
-         id="tspan154">
+         id="tspan47">
 </tspan><tspan
          x="-430.97623"
          y="-1526.3758"
-         id="tspan155">Defines ImageOperation to be run
+         id="tspan48">Defines ImageOperation to be run
 </tspan><tspan
          x="-430.97623"
          y="-1506.3758"
-         id="tspan156">
+         id="tspan49">
 </tspan><tspan
          x="-430.97623"
          y="-1486.3758"
-         id="tspan157">Has unique ID
+         id="tspan50">Has unique ID
 </tspan><tspan
          x="-430.97623"
          y="-1466.3758"
-         id="tspan158">
+         id="tspan51">
 </tspan><tspan
          x="-430.97623"
          y="-1446.3758"
-         id="tspan159">Has flags: IsReady, NeedsUpdate
+         id="tspan52">Has flags: IsReady, NeedsUpdate
 </tspan><tspan
          x="-430.97623"
          y="-1426.3758"
-         id="tspan160">
+         id="tspan53">
 </tspan><tspan
          x="-430.97623"
          y="-1406.3758"
-         id="tspan161">Contains input and output ports </tspan><tspan
+         id="tspan54">Contains input and output ports </tspan><tspan
          x="-430.97623"
          y="-1386.3758"
-         id="tspan162">defined by ImageOperation class
+         id="tspan55">defined by ImageOperation class
 </tspan><tspan
          x="-430.97623"
          y="-1366.3758"
-         id="tspan163">
+         id="tspan56">
 </tspan><tspan
          x="-430.97623"
          y="-1346.3758"
-         id="tspan164">Holds output image</tspan></text>
+         id="tspan57">Holds input and output image</tspan></text>
     <rect
        style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
        id="rect157-6"
@@ -378,62 +386,60 @@
        transform="matrix(0.26458333,0,0,0.26458333,188.36489,504.87379)"><tspan
          x="-430.97623"
          y="-1566.3757"
-         id="tspan166"><tspan
+         id="tspan59"><tspan
            style="font-weight:bold"
-           id="tspan165">Port class
+           id="tspan58">Port class
 </tspan></tspan><tspan
          x="-430.97623"
          y="-1546.3758"
-         id="tspan168"><tspan
+         id="tspan61"><tspan
            style="font-weight:bold"
-           id="tspan167">
+           id="tspan60">
 </tspan></tspan><tspan
          x="-430.97623"
          y="-1526.3758"
-         id="tspan171">Added to node class on creation
+         id="tspan62">Added to node class on creation
 </tspan><tspan
          x="-430.97623"
          y="-1506.3758"
-         id="tspan172">
+         id="tspan63">
 </tspan><tspan
          x="-430.97623"
          y="-1486.3758"
-         id="tspan173">Has PortID and NodeID
+         id="tspan64">Has PortID and NodeID
 </tspan><tspan
          x="-430.97623"
          y="-1466.3758"
-         id="tspan174">
+         id="tspan65">
 </tspan><tspan
          x="-430.97623"
          y="-1446.3758"
-         id="tspan175">Allows the code governing inputs and outputs to nodes </tspan><tspan
+         id="tspan66">Contains Metadata class defining data structure, </tspan><tspan
          x="-430.97623"
          y="-1426.3758"
-         id="tspan176">to be changed independently of ImageOperations
+         id="tspan67">checks data structure against Metadata, caches data.
 </tspan><tspan
          x="-430.97623"
          y="-1406.3758"
-         id="tspan177">
+         id="tspan68">
 </tspan><tspan
          x="-430.97623"
          y="-1386.3758"
-         id="tspan178">Has isInput flag:
+         id="tspan69">Is an InputPort or OutputPort:
 </tspan><tspan
          x="-430.97623"
          y="-1366.3758"
-         id="tspan179">     Inputs allow one connection to a previous output
-</tspan><tspan
+         id="tspan70">     InputPorts are alllowed one connection to a previous </tspan><tspan
          x="-430.97623"
          y="-1346.3758"
-         id="tspan180">     Outputs allow multiple connections to other inputs
+         id="tspan71">OutputPort
 </tspan><tspan
          x="-430.97623"
          y="-1326.3758"
-         id="tspan181">
-</tspan><tspan
+         id="tspan72">     Outputs are allowed multiple connections to other </tspan><tspan
          x="-430.97623"
          y="-1306.3758"
-         id="tspan182">Defines required data type and shape of input</tspan></text>
+         id="tspan73">InputPorts</tspan></text>
     <rect
        style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
        id="rect157-6-8"
@@ -450,88 +456,88 @@
        transform="matrix(0.26458333,0,0,0.26458333,188.35868,589.92381)"><tspan
          x="-430.97623"
          y="-1566.3757"
-         id="tspan184"><tspan
+         id="tspan75"><tspan
            style="font-weight:bold"
-           id="tspan183">Connection class
+           id="tspan74">Connection class
 </tspan></tspan><tspan
          x="-430.97623"
          y="-1546.3758"
-         id="tspan186"><tspan
+         id="tspan77"><tspan
            style="font-weight:bold"
-           id="tspan185">
+           id="tspan76">
 </tspan></tspan><tspan
          x="-430.97623"
          y="-1526.3758"
-         id="tspan187">Created on connection between nodes by user
+         id="tspan78">Created on connection between nodes by user
 </tspan><tspan
          x="-430.97623"
          y="-1506.3758"
-         id="tspan188">
+         id="tspan79">
 </tspan><tspan
          x="-430.97623"
          y="-1486.3758"
-         id="tspan189">Has direction - defined input and output
+         id="tspan80">Has direction - defined input and output
 </tspan><tspan
          x="-430.97623"
          y="-1466.3758"
-         id="tspan190">
+         id="tspan81">
 </tspan><tspan
          x="-430.97623"
          y="-1446.3758"
-         id="tspan191">One connection carries one item from one output to </tspan><tspan
+         id="tspan82">One connection carries one item from one output Port </tspan><tspan
          x="-430.97623"
          y="-1426.3758"
-         id="tspan195">one input
+         id="tspan83">to one input Port
 </tspan><tspan
          x="-430.97623"
          y="-1406.3758"
-         id="tspan196">
+         id="tspan84">
 </tspan><tspan
          x="-430.97623"
          y="-1386.3758"
-         id="tspan197">Carries out type structure/constraint/type checking (see </tspan><tspan
+         id="tspan85">Carries out type structure/constraint/type checking (see </tspan><tspan
          x="-430.97623"
          y="-1366.3758"
-         id="tspan198">Workflow graph map)
+         id="tspan86">Workflow graph map)
 </tspan><tspan
          x="-430.97623"
          y="-1346.3758"
-         id="tspan199">
+         id="tspan87">
 </tspan><tspan
          x="-430.97623"
          y="-1326.3758"
-         id="tspan200">Where possible, carries out type conversions to allow </tspan><tspan
+         id="tspan88">Where possible, carries out type conversions to allow </tspan><tspan
          x="-430.97623"
          y="-1306.3758"
-         id="tspan201">data flow between ports
+         id="tspan89">data flow between ports
 </tspan><tspan
          x="-430.97623"
          y="-1286.3758"
-         id="tspan202">
+         id="tspan90">
 </tspan><tspan
          x="-430.97623"
          y="-1266.3758"
-         id="tspan203">Otherwise, tries to suggest ImageOperations that may </tspan><tspan
+         id="tspan91">Otherwise, tries to suggest ImageOperations that may </tspan><tspan
          x="-430.97623"
          y="-1246.3758"
-         id="tspan204">fix incompatible shape/type
+         id="tspan92">fix incompatible shape/type
 </tspan><tspan
          x="-430.97623"
          y="-1226.3758"
-         id="tspan205">
+         id="tspan93">
 </tspan><tspan
          x="-430.97623"
          y="-1206.3758"
-         id="tspan206">Otherwise, returns defined error type (layout error, </tspan><tspan
+         id="tspan94">Otherwise, returns defined error type (layout error, </tspan><tspan
          x="-430.97623"
          y="-1186.3758"
-         id="tspan207">shape error etc)
+         id="tspan95">shape error etc)
 </tspan><tspan
          x="-430.97623"
          y="-1166.3758"
-         id="tspan209"><tspan
+         id="tspan97"><tspan
            style="font-weight:bold"
-           id="tspan208">
+           id="tspan96">
 </tspan></tspan></text>
     <g
        id="g192"
@@ -614,17 +620,6 @@
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
-       x="208.11211"
-       y="17.920219"
-       id="text192-6-97"><tspan
-         sodipodi:role="line"
-         id="tspan192-8-6"
-         style="font-size:5.64444px;stroke-width:0.189093"
-         x="208.11211"
-         y="17.920219">CharacteristicsClasses.py</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:5.64444px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
        x="-168.43536"
        y="76.816826"
        id="text192-6-9"><tspan
@@ -634,110 +629,8 @@
          x="-168.43536"
          y="76.816826">ImageOperationClasses.py</tspan></text>
     <g
-       id="g193"
-       transform="translate(167.76699,513.35719)">
-      <rect
-         style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
-         id="rect2"
-         width="119.52313"
-         height="79.924988"
-         x="-489.05777"
-         y="-401.5961" />
-      <text
-         xml:space="preserve"
-         style="font-size:3.52778px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:start;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
-         x="-486.78531"
-         y="-393.50629"
-         id="text15"><tspan
-           sodipodi:role="line"
-           id="tspan15"
-           style="font-weight:bold;font-size:4.23333px;text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-393.50629">ImageOperation file</tspan><tspan
-           sodipodi:role="line"
-           style="font-size:3.52778px;text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-388.85016"
-           id="tspan16" /><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-384.44043"
-           id="tspan17">defines inputs to function (name, type, shape)</tspan><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-379.99197"
-           id="tspan149" /><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-375.54352"
-           id="tspan150">defines function parameters</tspan><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-371.09509"
-           id="tspan128" /><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-366.64664"
-           id="tspan129">defines outputs to function (name, type, shape)</tspan><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-362.19818"
-           id="tspan193" /><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-357.74973"
-           id="tspan194">defines documentation and alerts</tspan><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-353.30127"
-           id="tspan130" /><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-348.85284"
-           id="tspan133">def ImageFunction(input1, input2, output1, parameters):</tspan><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-344.40439"
-           id="tspan134">#Do something to input1 using input2</tspan><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-339.95593"
-           id="tspan135" /><tspan
-           sodipodi:role="line"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52778px;font-family:'Courier New';-inkscape-font-specification:'Courier New';text-align:start;text-anchor:start;stroke-width:0.189093"
-           x="-486.78531"
-           y="-335.50748"
-           id="tspan136">return output1</tspan></text>
-    </g>
-    <text
-       xml:space="preserve"
-       style="font-size:8.46667px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
-       x="-322.34497"
-       y="105.56606"
-       id="text192-1"><tspan
-         sodipodi:role="line"
-         id="tspan192-4"
-         style="font-size:8.46667px;stroke-width:0.189093"
-         x="-322.34497"
-         y="105.56606">ImageOperation Folder</tspan></text>
-    <path
-       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.05833;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#marker192);stop-color:#000000;stop-opacity:1"
-       d="m -201.76763,151.72357 h 45.4338"
-       id="path193" />
-    <g
        id="g238"
-       transform="translate(296.15332,284.82889)">
+       transform="translate(175.62355,284.82889)">
       <rect
          style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529168;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
          id="rect1-5-7-9-6-0-2"
@@ -753,22 +646,22 @@
          id="text215-5"><tspan
            x="43.847683"
            y="-250.62613"
-           id="tspan211"><tspan
+           id="tspan99"><tspan
              style="font-weight:bold"
-             id="tspan210">Data type list class
+             id="tspan98">Data type list class
 </tspan></tspan><tspan
            x="43.847683"
            y="-245.33447"
-           id="tspan213"><tspan
+           id="tspan101"><tspan
              style="font-weight:bold"
-             id="tspan212">
+             id="tspan100">
 </tspan></tspan><tspan
            x="43.847683"
            y="-240.04281"
-           id="tspan214">List of all allowed data types for inputs/outputs (includes </tspan><tspan
+           id="tspan102">List of all allowed data types for inputs/outputs (includes </tspan><tspan
            x="43.847683"
            y="-234.75116"
-           id="tspan224">image and non-image data types.</tspan></text>
+           id="tspan103">image and non-image data types.</tspan></text>
       <rect
          style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529168;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
          id="rect1-5-7-9-6-0-2-0"
@@ -785,122 +678,58 @@
          transform="translate(3.0178183,28.273783)"><tspan
            x="43.847683"
            y="-250.62613"
-           id="tspan226"><tspan
+           id="tspan105"><tspan
              style="font-weight:bold"
-             id="tspan225">Data type class
+             id="tspan104">Data type class
 </tspan></tspan><tspan
            x="43.847683"
            y="-245.33447"
-           id="tspan228"><tspan
+           id="tspan107"><tspan
              style="font-weight:bold"
-             id="tspan227">
+             id="tspan106">
 </tspan></tspan><tspan
            x="43.847683"
            y="-240.04281"
-           id="tspan229">Applicable data types:     
+           id="tspan108">Applicable data types:     
 </tspan><tspan
            x="43.847683"
            y="-234.75116"
-           id="tspan230">
+           id="tspan109">
 </tspan><tspan
            x="43.847683"
            y="-229.4595"
-           id="tspan231">IntImage(0-255)
+           id="tspan110">IntImage(0-255)
 </tspan><tspan
            x="43.847683"
            y="-224.16784"
-           id="tspan232">FloatImage (0-255) 
+           id="tspan111">FloatImage (0-255) 
 </tspan><tspan
            x="43.847683"
            y="-218.87619"
-           id="tspan233">FloatImage (0-1)
+           id="tspan112">FloatImage (0-1)
 </tspan><tspan
            x="43.847683"
            y="-213.58453"
-           id="tspan234">BinaryImage (0/1)
+           id="tspan113">BinaryImage (0/1)
 </tspan><tspan
            x="43.847683"
            y="-208.29287"
-           id="tspan235">SegmentedImage (int in limts)
+           id="tspan114">SegmentedImage (int in limts)
 </tspan><tspan
            x="43.847683"
            y="-203.00122"
-           id="tspan236">Int (just integer)</tspan></text>
+           id="tspan115">Int (just integer)</tspan></text>
     </g>
     <rect
        style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
        id="rect238"
-       width="248.82791"
-       height="218.72284"
+       width="128.29811"
+       height="263.12119"
        x="208.86142"
        y="20.345116" />
     <g
-       id="g251"
-       transform="translate(175.62355,508.04522)">
-      <rect
-         style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
-         id="rect1-5-7-9-6"
-         width="112.58501"
-         height="70.558517"
-         x="41.094425"
-         y="-408.91122" />
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:pre;inline-size:109.795;display:inline;vector-effect:none;fill:#000000;fill-opacity:1;stroke-width:0.189093;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
-         x="-59.545723"
-         y="-545.39929"
-         id="text15-8-9-5-3"
-         transform="translate(103.42981,143.69322)"><tspan
-           x="-59.545723"
-           y="-545.39929"
-           id="tspan238"><tspan
-   style="font-weight:bold"
-   id="tspan237">Parameter Class</tspan>
-</tspan><tspan
-           x="-59.545723"
-           y="-540.10759"
-           id="tspan239">
-</tspan><tspan
-           x="-59.545723"
-           y="-534.8159"
-           id="tspan240">Stores parameters require to run ImageOperation (eg </tspan><tspan
-           x="-59.545723"
-           y="-529.52421"
-           id="tspan241">sigma for gaussian blur).
-</tspan><tspan
-           x="-59.545723"
-           y="-524.23252"
-           id="tspan242">
-</tspan><tspan
-           x="-59.545723"
-           y="-518.94084"
-           id="tspan243">Stores data type and limits on input.
-</tspan><tspan
-           x="-59.545723"
-           y="-513.64915"
-           id="tspan244">
-</tspan><tspan
-           x="-59.545723"
-           y="-508.35746"
-           id="tspan245">Stores input method for UI.
-</tspan><tspan
-           x="-59.545723"
-           y="-503.06581"
-           id="tspan246">
-</tspan><tspan
-           x="-59.545723"
-           y="-497.77415"
-           id="tspan247">Aim to have all data required to add as node in a </tspan><tspan
-           x="-59.545723"
-           y="-492.48249"
-           id="tspan248">consistent format to allow user input without each image </tspan><tspan
-           x="-59.545723"
-           y="-487.19084"
-           id="tspan249">operation coding its own UI element.</tspan></text>
-    </g>
-    <g
        id="g239"
-       transform="translate(175.62355,503.77446)">
+       transform="translate(175.62355,551.78648)">
       <rect
          style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
          id="rect1-5-7-9-6-0"
@@ -918,7 +747,7 @@
            id="tspan215"
            style="font-weight:bold;stroke-width:0.189093"
            x="43.847683"
-           y="-320.13611">Dimension class</tspan><tspan
+           y="-320.13611">Shape class</tspan><tspan
            sodipodi:role="line"
            style="font-weight:bold;stroke-width:0.189093"
            x="43.847683"
@@ -928,130 +757,107 @@
            style="font-weight:normal;stroke-width:0.189093"
            x="43.847683"
            y="-309.5528"
-           id="tspan217">c_dim</tspan><tspan
-           sodipodi:role="line"
-           style="font-weight:normal;stroke-width:0.189093"
-           x="43.847683"
-           y="-304.26111"
-           id="tspan218" /><tspan
-           sodipodi:role="line"
-           style="font-weight:normal;stroke-width:0.189093"
-           x="43.847683"
-           y="-298.96945"
-           id="tspan219">z_dim</tspan><tspan
-           sodipodi:role="line"
-           style="font-weight:normal;stroke-width:0.189093"
-           x="43.847683"
-           y="-293.6778"
-           id="tspan220" /><tspan
-           sodipodi:role="line"
-           style="font-weight:normal;stroke-width:0.189093"
-           x="43.847683"
-           y="-288.38614"
-           id="tspan221">y_dim</tspan><tspan
-           sodipodi:role="line"
-           style="font-weight:normal;stroke-width:0.189093"
-           x="43.847683"
-           y="-283.09448"
-           id="tspan222" /><tspan
-           sodipodi:role="line"
-           style="font-weight:normal;stroke-width:0.189093"
-           x="43.847683"
-           y="-277.8028"
-           id="tspan223">x_dim</tspan></text>
+           id="tspan223" /></text>
       <text
          xml:space="preserve"
          style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:77.3119;display:inline;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
          x="76.367531"
          y="-309.548"
          id="text224"
-         transform="translate(-3.9320393)"><tspan
+         transform="translate(-32.366542)"><tspan
            x="76.367531"
            y="-309.548"
-           id="tspan250">In image class, gives array dimension </tspan><tspan
+           id="tspan116">Class for holding data defining Shape </tspan><tspan
            x="76.367531"
            y="-304.25636"
-           id="tspan251">holding each image dimension (or -1 for </tspan><tspan
+           id="tspan117">constraints and mapping.
+</tspan><tspan
            x="76.367531"
            y="-298.9647"
-           id="tspan252">not present)</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:73.8073;display:inline;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
-         x="72.319389"
-         y="-285.82217"
-         id="text225"
-         transform="translate(0,2.678109)"><tspan
-           x="72.319389"
-           y="-285.82217"
-           id="tspan253">In ImageOperation, gives desired </tspan><tspan
-           x="72.319389"
-           y="-280.53053"
-           id="tspan254">dimensions or no preference (-1)</tspan></text>
+           id="tspan118">
+</tspan><tspan
+           x="76.367531"
+           y="-293.67305"
+           id="tspan119">Has attributes defined by Dimension </tspan><tspan
+           x="76.367531"
+           y="-288.38139"
+           id="tspan120">tuple (c, z, y, x).</tspan></text>
     </g>
     <g
-       id="g250"
-       transform="translate(175.62355,505.81098)">
+       id="g31"
+       transform="translate(-119.81398,98.723806)">
       <rect
-         style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
-         id="rect1-5-7-9"
+         style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.529168;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+         id="rect1"
          width="112.58501"
-         height="65.292336"
-         x="41.094425"
-         y="-478.76169" />
+         height="91.467598"
+         x="336.53195"
+         y="27.049288" />
       <text
          xml:space="preserve"
-         style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:98.8298;display:inline;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
-         x="55.236713"
-         y="-577.94647"
-         id="text241"
-         transform="translate(-11.357641,104.17125)"><tspan
-           x="55.236713"
-           y="-577.94647"
-           id="tspan256"><tspan
-   style="font-weight:bold"
-   id="tspan255">Image class</tspan>
+         style="font-size:4.23333px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:109.832;display:inline;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+         x="43.847683"
+         y="-250.62613"
+         id="text19"
+         transform="translate(295.43752,284.82889)"><tspan
+           x="43.847683"
+           y="-250.62613"
+           id="tspan122"><tspan
+             style="font-weight:bold"
+             id="tspan121">Metadata class
+</tspan></tspan><tspan
+           x="43.847683"
+           y="-245.33447"
+           id="tspan124"><tspan
+             style="font-weight:bold"
+             id="tspan123">
+</tspan></tspan><tspan
+           x="43.847683"
+           y="-240.04281"
+           id="tspan125">Either ImageMetadata or ParameterMetadata.
 </tspan><tspan
-           x="55.236713"
-           y="-572.65477"
-           id="tspan257">
+           x="43.847683"
+           y="-234.75116"
+           id="tspan126">
 </tspan><tspan
-           x="55.236713"
-           y="-567.36308"
-           id="tspan258">Pixel data
+           x="43.847683"
+           y="-229.4595"
+           id="tspan127">Defines characteristics of data.
 </tspan><tspan
-           x="55.236713"
-           y="-562.07139"
-           id="tspan259">
+           x="43.847683"
+           y="-224.16784"
+           id="tspan128">
 </tspan><tspan
-           x="55.236713"
-           y="-556.7797"
-           id="tspan260">Image dimensions
+           x="43.847683"
+           y="-218.87619"
+           id="tspan129">Based on ImageOperation - this will describe the </tspan><tspan
+           x="43.847683"
+           y="-213.58453"
+           id="tspan130">expectation for inputted data and format of outputted data.
 </tspan><tspan
-           x="55.236713"
-           y="-551.48802"
-           id="tspan261">
+           x="43.847683"
+           y="-208.29287"
+           id="tspan131">
 </tspan><tspan
-           x="55.236713"
-           y="-546.19633"
-           id="tspan262">Map from image dimensions to array dimensions
+           x="43.847683"
+           y="-203.00122"
+           id="tspan132">Contains:
 </tspan><tspan
-           x="55.236713"
-           y="-540.90464"
-           id="tspan263">
+           x="43.847683"
+           y="-197.70956"
+           id="tspan133">- dtype (of DataType class)
 </tspan><tspan
-           x="55.236713"
-           y="-535.61296"
-           id="tspan264">Properties to iterate through each image dimension, </tspan><tspan
-           x="55.236713"
-           y="-530.32127"
-           id="tspan265">regarldess of its array location. Avoids confusion </tspan><tspan
-           x="55.236713"
-           y="-525.02958"
-           id="tspan266">about what image dimension is in what array </tspan><tspan
-           x="55.236713"
-           y="-519.7379"
-           id="tspan267">dimension</tspan></text>
+           x="43.847683"
+           y="-192.4179"
+           id="tspan134">- shape (for array parameter)
+</tspan><tspan
+           x="43.847683"
+           y="-187.12625"
+           id="tspan135">- image_shape_constraints (for image)
+</tspan><tspan
+           x="43.847683"
+           y="-181.83459"
+           id="tspan136">- image_mapping (for image)</tspan></text>
     </g>
   </g>
 </svg>
