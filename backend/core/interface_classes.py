@@ -1,7 +1,6 @@
-from core.error_handling import ConnectionError, ActivationError
-from core.image import Image
-from core.parameter import Parameter
-from core.image_operation import ImageParcel, ParameterParcel
+import numpy as np
+from core.error_handling import ConnectionError, ActivationError, MissingDataError
+from core.metadata import ImageMetadata, ParameterMetadata
 from core.constants import DataType
 from core.image_operation import ImageOperation
 from core.shape import Shape
@@ -9,6 +8,7 @@ from core.shape import Shape
 class Connection:
     """Connection is an extremely simple class that exists only to point an output Port from one Node to the input Port of the next.
     It has an input (expected Node class), an output (expected Node class) and an ID (defined by the WorkFlow class on the Connection's instantiation)"""
+    
     def __init__(self, connection_id, source_port, target_port, transpose = None, convert = None):
         self.connection_id = connection_id
         self.source_port = source_port
@@ -62,7 +62,7 @@ class Connection:
     @property
     def output_data(self):
         """Converts input data on demand."""
-
+      
         if self.source_port.output_data is None or \
             (isinstance(self.source_port.output_data, Parameter) and self.source_port.output_data.value is None) or \
                 (isinstance(self.source_port.output_data, Image) and self.source_port.output_data.pixel_array is None):
@@ -82,7 +82,46 @@ class Connection:
     @output_data.setter
     def output_data(self, value):
         self._output_data = value
+    
+    """Copied from Image Class"""
+    
+    def convert(self, convert):
+        if convert not in DataType.image_types():
+            raise TypeError(f"images can only be converted to image_types, not {convert}")
+        return Image(data = self.data.to(convert), image_metadata = self.image_metadata)
 
+    # tranpose to be moved to WorkFlow
+    def transpose(self, new_shape):
+        # expect a Shape class
+        if not isinstance(new_shape, Shape):
+            raise TypeError (f"expected Shape class, got {type(new_shape)}")
+
+        for item in new_shape:
+            if item < 0 or item > Shape.max_image_dimensions:
+                raise ValueError (f"passed shape dimensions out of range, must be 0-{Shape.max_image_dimensions}")
+
+
+        # receives Shape class member with new dimensions indices of each array (c,z,y,x)
+        # needs to create transpose list with values c,z,y,x in order of old_c,old_z,old_y,old_x
+        transpose = [self.data[item] for item in new_shape]
+
+        # receives input of new channel order, such as z,c,y,x
+        # to use numpy transpose, needs to go from string z to array map for that dimension and append to list transpose
+        # transpose used as input for np.transpose
+
+        # get new shape map - ie, get the position of c,z,y,x in new_shape
+        
+        transposed_array = np.transpose(self.data.to_numpy(),transpose)
+
+        current_dtype = getattr(self.data, "data_type")
+
+        #self.pixel_array = current_dtype(transposed_array)
+        #self.image_map = new_shape
+        return Image(data = current_dtype(transposed_array),
+                     image_metadata = ImageMetadata(dtype = self.image_metadata.dtype,
+                                                    image_shape_constraints = self.image_metadata.image_shape_constraints,
+                                                    image_map = new_shape))
+    
 
 class Port:
     """A port converts data to/from DataTypes used in data transport through the graph and equivalent numpy types used in ImageOperations.
@@ -98,124 +137,77 @@ class Port:
         - convert their input to a Package class containing a standard numpy data type.
         - cache their output.
     """
-    def __init__(self, is_input, port_id, node_id, input_connection = None, output_connection = None, input_data = None, output_data = None):
-        self.is_input = is_input        # flags as an input (True) or output (False) 
+    
+    def __init__(self, port_id, node_id, meta_data, data = None, input_connection = None, output_connection = None):
         self.port_id = port_id          # own ID value, set during instatiation
         self.node_id = node_id          # Nodes identifier, set during instantiation
-        self.input_connection = input_connection
-        self.output_connection = output_connection
-        self.input_data = input_data
-        self.output_data = output_data
+        self.meta_data = meta_data
+        self.data = data
 
     @property
-    def is_input(self):
-        return self._is_input
+    def meta_data(self):
+        return self._meta_data
 
-    @is_input.setter
-    def is_input(self, flag):
-        if not isinstance(flag, bool):
-            raise TypeError(f"expected type bool for is_input flag, got {type(flag)}")
-
-        self._is_input = flag
-
-    @property
-    def input_connection(self):
-        return self._input_connection
-
-    @input_connection.setter
-    def input_connection(self, value):
-        if value:
-            """check the input_connection. if is_input, input_connection should be a connection. if !is_input, input should be an ImageOperation class."""
-            if self.is_input:
-                if not isinstance(value, Connection):
-                    raise TypeError(f"for an input port, expected input_connection as connection class, not {type(value)}; port: {self.port_id}")
-
-            else:
-                if not isinstance(value, ImageOperation):
-                    raise TypeError(f"for an output port, expected input_connection as ImageOpeartion class not {type(value)}; port: {self.port_id}")
-
-        self._input_connection = value
+    @meta_data.setter
+    def meta_data(self, meta):
+        # check that meta_data is set as valid class (ImageMetadata or ParameterMetadata)
+        # Metadata class checks its own arguements are valid.
+        if not isinstance(meta, ImageMetadata) and not isinstance(meta, ParameterMetadata):
+            raise TypeError(f"meta data expected as ImageMetadata or ParameterMetadata class for {self.port_id}, got: {type(meta)}")
+        self._meta_data = meta
 
     @property
-    def output_connection(self):
-        return self._output_connection
+    def data(self):
+        return self._data
 
-    @output_connection.setter
-    def output_connection(self, value):
-        if value:
-            """check the output_connection. if is_input, output_connection should be a ImageOperation. if !is_input, input should be a Connection class."""
-            if self.is_input:
-                if not isinstance(value, ImageOperation):
-                    raise TypeError(f"for an input port, expected output_connection as ImageOperation class, not {type(value)}; port: {self.port_id}")
+    @data.setter
+    def data(self, value):
+        # checks if meta_data set - can't set or check data without defining meta-data present
+        if not self.meta_data:
+            raise MissingDataError(f"attempt to set port data with missing meta_data: {self.port_id}")
+        # if meta_data defines dtype as a value type, expect a scalar value of type dtype.numpy
+        if self.meta_data.dtype in DataType.value_types():
+            if not isinstance(value, self.meta_data.dtype.numpy):
+                raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected {self.meta_data.dtype}, got {type(value)}")
+        # if meta_data defines dtype as an array type or image type, expect a numpy array.
+        elif self.meta_data.dtype in DataType.image_types() or self.meta_data.dtype in DataType.array_types():
+            if not isinstance (value, np.ndarray):
+                raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected np.ndarray, got {type(value)}")
+            # of type meta_data.dtype.numpy
+            if value.dtype is not self.meta_data.dtype.numpy:
+                raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected {self.meta_data.dtype.numpy}, got {value.dtype}")
+            # with a shape that matches constraints of meta_data
+            # for ImageTypes: meta_data.image_shape_constraints and meta_data.image_map
+            if self.meta_data.dtype in DataType.image_types():
+                # goes through each dimension in Shape.dimensions (should be c,z,y,x)
+                for dim in Shape.dimensions:
+                    # gets constrain and mapping value for that dimension
+                    try:
+                        dim_constraint = getattr(self.meta_data.image_shape_constraints, dim)
+                        dim_map = getattr(self.meta_data.image_map, dim)
+                    except:
+                        # raises a ValueError if that dimension isn't present. This should NEVER happen, if it does, fix Shape.dimensions to match the Shape class instance arguements
+                        raise ValueError(f"dimension present in Shape.dimensions that is not a Shape arguement, {dim}")
+                    # if the constraint is not -1 (where -1 = don't care about shape)
+                    if dim_constraint!= -1:
+                        # check the array dimension that maps to the constrained dimension matches the expected size
+                        if value.shape[dim_map] != dim_constraint:
+                            # if not, raise ValueError
+                            raise ValueError(f"image_type passed to port with incorrect shape; for port {self.port_id}, \
+                                             expected {dim} = {dim_constraint}, got {dim} = {value.shape[dim_map]}")
 
-            else:
-                if not isinstance(value, Connection):
-                    raise TypeError(f"for an output port, expected output_connection as Connection class not {type(value)}; port: {self.port_id}")
+            # for ArrayTypes: meta_data.shape
+            elif self.meta_data.dtype in DataType.array_types():
+                if value.shape != tuple(self.meta_data.shape):
+                    raise ValueError(f"array_type data passed to port with incorrect shape; for port {self.port_id}, expected {self.meta_data.shape}, got {value.shape}")
 
-        self._output_connection = value
-
-    @property
-    def output_data(self):
-        """Converts input data on demand."""
-        if self.input_data is None or \
-            (isinstance(self.input_data, ImageParcel) and self.input_data.pixel_array is None) or \
-                (isinstance(self.input_data, ParameterParcel) and self.input_data.value is None):
-            raise ConnectionError(f"attempt to get port output where no input present: {self.port_id}")
-        return self.convert()
-
-    @output_data.setter
-    def output_data(self, value):
-        self._output_data = value
-
-    def convert(self):
-        """Function to convert input data to correct output data type"""
-        """First, checks if this Port is connected to a node input or output"""
-        if self.is_input is True:
-            data_to_convert = self.input_data
-            """if its an input, self.input will be Image or Parameter class"""
-            # if its Image class, give output as ImageParcel
-            if isinstance(data_to_convert, Image):
-                image_dtype = getattr(data_to_convert.pixel_array, "data_type")
-                image_pixel_array = data_to_convert.pixel_array.to_numpy()
-                image_map = data_to_convert.image_map
-                output = ImageParcel(dtype = image_dtype,
-                                          pixel_array = image_pixel_array,
-                                          image_map = image_map)
-
-            # if input is Parameter class, give output as ParameterParcel
-            elif isinstance(data_to_convert,Parameter):
-                parameter_dtype = getattr(data_to_convert.value, "data_type")
-                parameter_value = data_to_convert.value.to_numpy()
-                parameter_shape = parameter_value.shape if parameter_dtype in DataType.array_types() else None
-                output = ParameterParcel(dtype = parameter_dtype,
-                                              value = parameter_value,
-                                              shape = parameter_shape)
-            else:
-                raise TypeError(f"Expected input of Image or Parameter class, got {type(data_to_convert)}")
-        elif self.is_input is False:
-            data_to_convert = self.input_data
-            """if its an output, self.input will be ImageParcel or ParamaterPackage class"""
-            # if its ImageParcel class, give output as Image
-            if isinstance(data_to_convert,ImageParcel):
-                image_dtype = data_to_convert.dtype
-                image_pixel_array = image_dtype(data_to_convert.pixel_array)
-                image_map = data_to_convert.image_map
-                output = Image(pixel_array = image_pixel_array,
-                                    image_map = image_map)
-
-            # if input is ParameterParcel class, give output as Parameter
-            elif isinstance(data_to_convert,ParameterParcel):
-                parameter_dtype = data_to_convert.dtype
-                parameter_value = parameter_dtype(data_to_convert.value)
-                parameter_name = self.node_id
-                output = Parameter(value = parameter_value,
-                                        name = parameter_name)
-            else:
-                raise TypeError(f"Expected input of ImageParcel or ParameterParcel class, got {type(data_to_convert)}")
+        # if meta_data defines dtype as something else, raise value error for meta_data.dtype
+        # this should never be raised as meta_data.dtype is checked by MetaData class
         else:
-            raise ValueError(f"expected True of False for is_input flag, got {self.is_node_input}")
-        return output
+            raise ValueError(f"port MetaData defines unexpected dtype; for port {self.port_id} expected DataType member, got {self.meta_data.dtype}")
+        self._data = value
 
+    
 class Node:
     """
     The Node class is a hanger for an ImageOperation and its associated inputs/outputs.
@@ -224,6 +216,7 @@ class Node:
     On instantiation, the Node creates Ports to provide inputs and outputs to the associated ImageOperation. 
     Data travels through these Ports to the ImageOperation; the Node class itself does not handle any data.
     """
+    
     def __init__(self, image_operation, node_id):
         self.node_id = node_id
         self.image_operation = image_operation
