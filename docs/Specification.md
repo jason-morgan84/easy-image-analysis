@@ -107,7 +107,7 @@
 |03/10/26|0.16.7|Added description of convert() function to Image and Parameter classes and unit testing|
 |06/10/26|0.17.0|Refactoring data transfer between nodes. Removed description of Image and Parameter classes|
 |06/10/26|0.17.1|Added description of MissingDataError in error_handling.py|
-
+|06/10/26|0.17.2|Refactoring data transfer between nodes. Updated description of classes and class interactions. |
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -145,14 +145,16 @@ Crucially, adding in a new function should not require messing with the UI or ba
 
 ![System Class Structure](/docs/Structure.svg)
 
-The main image analysis workflow will be made up of a series of interconnected nodes, ports and connections. 
-Nodes take an input image, carry out a given ImageOperation on that image (based on the input data and any specific parameters provided by the user), and present the adjusted image.
+The main image analysis workflow will be made up of a graph of Nodes connected by Connections.
 
-Ports attach to nodes and provide a layer of separation between the functions manipulating the image and the Connections carrying the data between Nodes. In the future, if changes are made to how data is stored and transmitted, this should only require changes to a single Port class, not all the image analysis functions.
+Each Node will act as a hanger for code to act on the inputted image. The code will be defined in an ImageOperation class. The Node will contain a reference to the relevant ImageOperation along with input and output Ports, which cache the input and output data for each ImageOperation.
 
-Connections transmit images and other parameters between nodes (via ports). They carry out type- and shape-checking on transmitted images to ensure they match what is expected by the next input port, carry out simple shape and type conversions (where required) and prompt the user to adjust the workflow where simple conversions are not sufficient to fit the image to the next node.
+Each Port acts as an input or output for a single piece of data for a single ImageOperation. For example, if an ImageOperations requires two images and a parameter and delivers a single image, it will have three input ports and one output port. Each port has two attributes, the metadata and the data. The metadata holds the constraints and expectations of the data. For an image, this will be data type, constraints on shape (eg, is this image expected to be a single channel or a single z-slice, or does it not care), the shape mapping (which image dimensions are held in which data dimension). For a parameter, this will be the data type and any requirements for getting the parameter from the UI, if relevant. Metadata will be stored in ImageMetadata and ParameterMetadata classes. These are defined by the ImageOperation and are required on Port instantiation by a Node. Data will be passed along later, either from a Connection for an input Port or an ImageOperation for an output Port and which be checked against the metadata. Data is cached in the Port, not the connection or ImageOperation.
+
+A connection connects an output Port of one Node to an input Port of another Node. It carries out a number of checks on the data to check it meets the expectations of the connected Port (defined by the metadata). Where possible, simple changes (type conversion and shape transposition) will be carried out on the data. If more complex changes to the data are required, the user will be prompted.
 
 ImageOperations are the actual image analysis functions carried out by nodes. They can use existing image analysis libraries (such as scikit image) or custom functions. To allow easy expandability, each ImageOperation is held in its own file which are imported to an ImageOperationDirectory on startup. They also contain definitions of input/output data types and image shape.
+
 To allow consistent data transfer through the workflow, a number of classes are used to define the structure of the data. These include custom DataTypes, and classes defining the image and its shape, and input parameters to ImageOperations. These are used to streamline user input and data transmission, but are not used in actual image analysis, where standard NumPy data types are used.
 
 ## 3.1 Interaction between backend classes and frontend UI
@@ -163,63 +165,9 @@ Each node is associated with a given ImageOperation and the parameters of that o
 
 They can then draw connections between the nodes. A single node has a defined number of inputs (defined by the ImageOperation) but can output to as many other nodes as required. On drawing the connection, the WorkFlow class checks that the connection can provide an image/value in the proper data type and shape. If so, the ImageOperation is carried out allowing immediate feedback in one of the two image views. If not, and the connection cannot carry out simple shape or type conversions, the user is warned of the problem. Where possible, this warning will provide hints towards available ImageOperations that could be used to fix the problems with the data (for example, carry out a Z-projection to flatten the image). 
 
-## 3.2 Class Hierarchy
+## 3.2 Classes
 
-The classes are designed as a heirarchy. The base is a foundation layer which define custom data types and provide constraints on values (for example, an integer 8bit image should not contain values above 255 or below 0). These carry out deep checks of all data to make sure it fits that class type, after which higher layers can safely assume data passed to them is of an appropriate format.
-
-The next layer is the composition layer, the Image and Parameter class, which are made up of combinations of the foundation classes to safely define and constrain their values as they are passed through the WorkFlow graph.
-
-The next two layers are both present in Nodes. The WorkFlow interface layer contains the Port class, which sits inside a Node and provides a buffer and translation between the WorkFlow graph and actual image analysis code. The Port layer takes an input from a member of the Composition layer, carries out a final check to ensure it matches the requiered data type, then outpus the data in a standard numpy format (defined by the original foundation data class).
-
-The final layer is the execution layer, which also stands slightly outside the other layers. This layer is purely involved in execution of image analysis code. As such, it doesn't receive or send data using data types from the other layers, but works in standard numpy data types. However, it does define the expectations for inputs and outputs in terms of foundation layer data classes, to safely manage communication with the DataFlow graph, via ports.
-
-This heirachy does not explicitly define the roles of the Connection, Node and WorkFlow classes in defining the WorkFlow graph. This is described in more detail in the WorkFlow section.
-
-
-```mermaid
-graph TD
-    classDef found fill:#f9f9f9,stroke:#333,stroke-width:1px,color:#000000;
-    classDef comp fill:#e1f5fe,stroke:#0288d1,stroke-width:1px,color:#000000;
-    classDef iface fill:#fff3e0,stroke:#f57c00,stroke-width:1px,color:#000000;
-    classDef exec fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000000;
-    classDef exec fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000000;
-
-    subgraph Foundation_Layer ["1. Foundation Data & Type Layer"]
-        Shape["<b>Shape</b><br>• Checks for ints<br>• Contains image min/max dimensions"]:::found
-        ImageType["<b>ImageType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
-        ValueType["<b>ValueType</b><br>• Checks for int/float<br>• Checks for 0 dimensionality"]:::found
-        ArrayType["<b>ArrayType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
-    end
-
-    subgraph Composition_Layer ["2. Structural Composition Layer"]
-        Image["<b>Image</b><br>• Check array_dtype is an ImageType<br>"]:::comp
-        Parameter["<b>Parameter</b><br>• Check dtype is a ValueType or ArrayType<br>• Check value matches dtype"]:::comp
-    end
-    subgraph Composition_layer ["Node"]
-        subgraph Interface_Layer ["3. WorkFlow Interface Layer"]
-            Port["<b>Port (Gatekeeper & Translator)</b><br>• Always associated with a node/operation<br>• Accepts Image or Parameter<br>• Outputs raw NumPy array or scalar<br>• Validates array_dtype & shape match ImageOperation requirements"]:::iface
-        end
-
-        subgraph Execution_Layer ["4. Execution Layer"]
-            ImageOperation["<b>ImageOperation</b><br>• Requires Image input (+ optional parameters)<br>• Final array type & size check<br>• Algorithm execution"]:::exec
-        end
-    end
-
-
-    Shape --> Image
-    ImageType --> Image
-    ValueType --> Parameter
-    ArrayType --> Parameter
-
-    Image --> Port
-    Parameter --> Port
-
-    Port --> ImageOperation
-```
-
-## 3.3 Foundation Classes
-
-### 3.3.1 DataType classes
+### 3.2.1 DataType classes
 
 The aim of the DataType classes is to allow data to be transferred through the WorkFlow in a reliable and predictable way.
 
@@ -276,7 +224,7 @@ The comparable numpy data type is stored in the numpy class variable. This is us
 
 All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type. For each type, the data_type class variable **must** point to the relevant name in the Enum (stored in constants.py).
 
-### 3.3.2 Shape class
+### 3.2.2 Shape class
 
 This exists to hold data related to the shape of transmitted images. It will hold integer values for:
 * c (channels)
@@ -308,8 +256,7 @@ Shape will be used to hold shape related information in a number of classes and 
 * Node and Port classes – this will mirror the usage in ImageOperation classes
 * Connection class – this may be required to reshape the image from the shape given by the input port to the shape given by the output port.
 
-## 3.4 Execution Classes
-### 3.4.1 ImageOperation Class
+### 3.2.3 ImageOperation Class
 The ImageOperation class is responsible for carrying out functions that carry out analysis on images. A key aim of this project is expandability and to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class, containing all the information required to run the function and will be imported using imagelib. 
 
 The previous classes described have been primarily related to the flow of data through the WorkFlow graph and have defined custom class types to make sure this happens in a controlled manner. The ImageOperation sits slightly outside this class structure, as existing image analysis modules work in standard or numpy classes. To allow ImageOperations code to be designed and executed in a standard manner, inputs and outputs from ImageOperations are in standard Numpy data types (for conversion from custom DataTypes to Numpy, see Node and Port classes).
@@ -355,30 +302,7 @@ Finally, following code execution checks are carried out to ensure that the outp
 
 **NOTE: At this point, any ImageOperation requires (at least) one image as an input. This is a design decision to prevent creep and bloat, based on the idea that as soon as only non-image variables are accepted this software is moving into data analysis rather than image analysis. This is checkedby the run_code function in ImageOperation and will therefore also affect other classes interacting with ImageOperations (Nodes and WorkFlow).**
 
-### 3.4.2 ImagePackage
-Simple class holding data for image inputs and outputs from ImageOperation. Contains:
-* dtype - set at instantiation based on ImageOperation code file.
-    - Type checks for member of DataType
-* shape - set at instatiation based on shape constrains defined in code file. **NOTE: this is not the shape of the array (which is defined by the array) - it is the <u>constraints</u> on the shape of the image.**
-    - Type checks for Shape class
-* pixel_array - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain ndarray of dtype.numpy.
-    - Type checks for Shape class
-* mapping - set to None at instantiation, given value of type Shape mapping image dimensions to pixel array dimensions.
-
-### 3.4.3 ParameterPackage
-Simple class holding data for non-image inputs and outputs from ImageOperation. Includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
-
-Contains:
-* dtype - set at instantiation based on ImageOperation code file.
-    - Type checks for member of DataType.
-* value - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain value of dtype.numpy.
-* shape - if dtype defines an array_type, contains a np.array defining shape of value.
-    - will accept a tuple, list or np.ndarray. Tuples and lists will be converted to np.ndarray.
-* user_input - boolean flag to say if value is expected via WorkFlow (False) or via (UI).
-* ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc) - setter checks this is present if user_input is True
-* ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
-
-### 3.4.4 ImageOperationDirectory Class
+### 3.2.4 ImageOperationDirectory Class
 This class holds for a list of all ImageOperation classes, along with the code required to import them.
 
 ImageOperations are imported from a directory defined in the ImageOperationDirectory class, currently .\backend\image_operations. 
@@ -399,56 +323,39 @@ Note that, for now, inputs are provided as variables or arrays of 0s, to avoid s
 
 If testing is sucessful, files are added to a dictionary of ImageOperations with a key of the filename without py (**TODO: address potential failure with identical filenames**). The category and version number will be added to each ImageOperations based on file and folder parameters. 
 
-## 3.5 Interface Classes
+### 3.2.5 ImageMetaData
+Simple class holding metadata for image inputs and outputs in Ports. Contains:
+* dtype - set at instantiation based on ImageOperation code file.
+    - Type checks for member of DataType
+* image_shape_constraints - set at instatiation based on shape constraints defined in code file.
+    - Type checks for Shape class
+* image_map - set at instantiation based on relationship between image dimensions and array dimensions required/delivered by ImageOperation. 
 
-### 3.5.1 Connection Class
+### 3.2.6 ParameterPackage
+Simple class holding data for non-image metadata for Ports. Includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
 
-Connections form the links between nodes and ports through which data travels through the WorkFlow. They have a defined direction, with an input and an output, and are created by the user. Before the instantiation of a connection, the WorkFlow class will check that input and output expect compatible type and shape (explained in more detail in WorkFlow class). Connections contain the following instance variables:
+Contains:
+* dtype - set at instantiation based on ImageOperation code file.
+    - Type checks for member of DataType.
+* shape - if dtype defines an array_type, contains a np.array defining shape of value.
+    - will accept a tuple, list or np.ndarray. Tuples and lists will be converted to np.ndarray.
+* user_input - boolean flag to say if value is expected via WorkFlow (False) or via (UI).
+* ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc) - setter checks this is present if user_input is True
+* ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
 
-* source_port - a reference to the preceeding Port
-* target_port - a reference to the next Port
-* connection_id - unique identifier of the connection
-* tranpose - default None, required for transposing an image from source_port to target_port
-* convert - default None, required for converting a DataType from source_port to target_port
+### 3.2.7 Port Class
 
-And the following property:
-* output_data: passes either the source_port.output_data or converted/tranposed/both source_port.output_data when requested.
-
-### 3.5.2 Port Class
-
-The port class acts as a buffer between a Node and an ImageOperation. It has two main roles: 
- * to convert between data types used for transmitting data through the WorkFlow and those used for image analysis.
- * to make sure that future changes can be made to the overall WorkFlow without impacting on the data sent to ImageOperations 
+The port class acts as a buffer between a Node and an ImageOperation. Its role is to hold metadata requirements of the ImageOperation and cache input or output data. There are two child Port classes:
+- InputPort holds input data.
+- OutputPort holds output data.
 
 Two lists of ports are created with each node, and ports do not exist independently of nodes. Each port has the instance variables:
-* is_input – flag for whether port is an input or output. Inputs only allow one connection, outputs allow multiple
 * node_id – unique identifier for connected node
 * port_id - id for port within the node (the name of the connected ImageOperation input/output)
-* input_connection – identifier for input Connection/ImageOperation
-* output_connection – identifier for output Connection/ImageOperation
-* input_data - reference to/cached input data
-* output_data - cached output data
+* metadata - ImageMetadata or ParameterMetadata class, holding metadata defined by ImageOperation and created at instantiation. Must be present, cannot be None.
+* data - cached data. None at instantiation.
 
-There are key differences between input ports (is_input = True) and output ports (is_input = False).
-Output ports:
-    - cache their input (as an Package class)
-    - convert their input to a DataType
-    - cache their output.
-Input ports:
-    - input is a reference to where their data can be found (an output of an output node, via a Connection). 
-    - convert their input to a Package class containing a standard numpy data type.
-    - cache their output.
-
-Port has a single main function for data conversion:
-* convert()
-
-This function **only** converts the data types, it doesn't carry out any checks. 
-
-For an input, these checks are carried out by the DataFlow class on creating a connection and by the ImageOperation class on receiving the data.
-
-For an output, these checks are carried out by the ImageOperation class on creating an output and the DataFlow class on creating a connection.
-
-### 3.5.3 Node Class
+### 3.2.8 Node Class
 The Node class is a hanger for an ImageOperation and its associated inputs/outputs. It is responsible for positioning an ImageOperation in the WorkFlow. There can be multiple nodes containing the same ImageOperation. On instantiation, the Node creates Ports to provide inputs and outputs to the associated ImageOperation. Data travels through these Ports to the ImageOperation; the Node class itself does not handle any data. It contains the following instance variables:
 
 * node_id - unique identifier for this Node, created by WorkFlow on Node instantiation.
@@ -491,7 +398,20 @@ Things to test after activation:
 * does the output key referenced by port_name exist in ImageOperation outputs?
 * does ImageOperation output contain data (pixel_array and mapping for images, value for parameters)?
 
-## 3.6 WorkFlow Class
+### 3.2.9 Connection Class
+
+Connections form the links between nodes and ports through which data travels through the WorkFlow. They have a defined direction, with an input and an output, and are created by the user. Before the instantiation of a connection, the WorkFlow class will check that input and output expect compatible type and shape (explained in more detail in WorkFlow class). Connections contain the following instance variables:
+
+* source_port - a reference to the preceeding Port
+* target_port - a reference to the next Port
+* connection_id - unique identifier of the connection
+* tranpose - default None, required for transposing an image from source_port to target_port
+* convert - default None, required for converting a DataType from source_port to target_port
+
+And the following property:
+* output_data: passes either the source_port.output_data or converted/tranposed/both source_port.output_data when requested.
+
+## 3.2.10 WorkFlow Class
 
 The WorkFlow class does the bulk of the work in initiating, defining and checking the graph through which image data flows.
 
