@@ -7,16 +7,33 @@ class Shape:
      max_image_dimensions = 4
      min_image_dimensions = 4
 
+     # dimensions define the available dimensions labels in Shape:
+     #    - an instance of Shape class must have values for ALL of these dimensions
+     #    - an instance of Shape class must not have values for any other attributes
      dimensions = ('c','z','y','x')
 
-     # arguements in __init_ must equal dimensions above
-     # in future, consider change to kwargs to remove hardcoded dimensions
+     def __init__(self, **kwargs):
+
+          # check no dimensions attributes are missing
+          for dim in self.dimensions:
+               if dim not in kwargs:
+                    raise AttributeError(f"Shape class instantiated with missing arguement: '{dim}'")
+        
+          # sets values for each attribute
+          for dim, value in kwargs.items():
+               if dim in self.dimensions:
+                    setattr(self, dim, value)
+               # catches any unexpected attributes
+               else:
+                    raise AttributeError(f"Shape class instantiated with unexpected arguement: '{dim}'")
+
+     """old __init__
      def __init__(self, c, z, y, x):
             self.c = c
             self.z = z
             self.y = y
             self.x = x
-
+     """
      def __iter__(self):
         for dimension in self.dimensions:
              yield getattr(self, dimension)
@@ -63,7 +80,7 @@ class Shape:
      @c.setter
      def c(self, c):
           if not isinstance(c, int) and not isinstance(c,np.integer):
-               raise TypeError (f"Expected integer, got {type(c)}")
+               raise TypeError (f"for Shape class, expected integer for 'c', got {type(c)}")
           self._c = c
 
      @property
@@ -72,7 +89,7 @@ class Shape:
      @z.setter
      def z(self, z):
           if not isinstance(z, int) and not isinstance(z,np.integer):
-               raise TypeError (f"Expected integer, got {type(z)}")
+               raise TypeError (f"for Shape class, expected integer for 'z', got {type(z)}")
           self._z = z
 
      @property
@@ -81,7 +98,7 @@ class Shape:
      @y.setter
      def y(self, y):
           if not isinstance(y, int) and not isinstance(y, np.integer):
-               raise TypeError (f"Expected integer, got {type(y)}")
+               raise TypeError (f"for Shape class, expected integer for 'y', got {type(y)}")
           self._y = y
 
 
@@ -91,7 +108,7 @@ class Shape:
      @x.setter
      def x(self, x):
           if not isinstance(x, int) and not isinstance(x,np.integer):
-               raise TypeError (f"Expected integer, got {type(x)}")
+               raise TypeError (f"for Shape class, expected integer for 'x', got {type(x)}")
           self._x = x
 
 

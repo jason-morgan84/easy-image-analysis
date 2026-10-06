@@ -2,23 +2,28 @@ import pytest
 import numpy as np
 from core.shape import Shape
 
-def test_shape_type_constraints():
+# test shape with missing attribute:
+def test_shape_missing_attribute():
+    with pytest.raises(AttributeError,match = "Shape class instantiated with missing arguement"):
+        test = Shape (c = 1, z = 2, y = 3)
 
-    test_int= Shape(1,2,3,4)
-    test_np_int = Shape(np.uint16(2),np.uint8(1),np.int64(5),np.int8(1))
+# test shape with unexpected attribute:
+def test_shape_unexpected_attribute():
+    with pytest.raises(AttributeError,match = "Shape class instantiated with unexpected arguement"):
+        test = Shape (c = 1, z = 2, y = 3, x = 2, t = 5)
 
-    with pytest.raises(TypeError):
-        Shape(0.5,1,2,3)
+# test shape with non integer values
+@pytest.mark.parametrize("c, z, y, x", [
+    (0.5,1,2,3),
+    (1,0.5,2,3),
+    (0,1,0.5,3),
+    (0,2,2,0.5)
+    ])
+def test_shape_non_int_values(c,z,y,x):
+    with pytest.raises(TypeError, match = "for Shape class, expected integer for"):
+        Shape(c = c,z = z,y = y,x = x)
 
-    with pytest.raises(TypeError):
-        Shape(1,0.5,2,3)
-
-    with pytest.raises(TypeError):
-        Shape(5,1,2.1,3)
-
-    with pytest.raises(TypeError):
-        Shape(5,1,2,3.5)
-
+# test that shape is immutable
 def test_shape_immutability():
     test_c = 1
     test_z = 2
