@@ -33,3 +33,10 @@ class ActivationError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
+
+class MissingDataError(Exception):
+    """Exception raised when nodes required data is missing"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
