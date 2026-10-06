@@ -106,6 +106,7 @@
 |03/10/26|0.16.6|Updated description of error_handling.log to append log items to list rather than return them|
 |03/10/26|0.16.7|Added description of convert() function to Image and Parameter classes and unit testing|
 |06/10/26|0.17.0|Refactoring data transfer between nodes. Removed description of Image and Parameter classes|
+|06/10/26|0.17.1|Added description of MissingDataError in error_handling.py|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -619,6 +620,7 @@ For now, error messages are simply printed. This will be developed to saving to 
 error_handling.py also includes custom exceptions:
 * ConnectionError - for errors in WorkFlow connectivity (eg, Connection with a loose end)
 * ActivationError - for errors in Node activation
+* MissingDataError - for errors where data is missing when passed to/from Ports
 
 # 4 ImageOperation files
 
@@ -745,7 +747,9 @@ Plugins to make:
 ### 7.1.2 Shape
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Type constraints	|Insert wrong type	|Type Error	| Type converted to correct type<br>Wrong type ignored|
+|init|Instantiate class with missing attribute|AttributeError: "Shape class instantiated with missing argument" | No error|
+|init|Instantiate class with unexpected attribute|AttributeError: "Shape class instantiated with unexpected arguement" | No error|
+|Type constraints	|Insert non integer data	|Type Error	| Type converted to correct type<br>Wrong type ignored|
 |Immutability|Input values based on variable then change variable |Values in DataType do not change|Values change|
 |Itterability|Test iteration|Iteration returns correct values|Iteration returns incorrect values|
 |get_item|Test getting items using either index or dimension string| returns correct values|Returns incorrect values|
