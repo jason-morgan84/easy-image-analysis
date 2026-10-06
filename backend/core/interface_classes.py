@@ -124,25 +124,38 @@ class Connection:
     
 
 class Port:
-    """A port converts data to/from DataTypes used in data transport through the graph and equivalent numpy types used in ImageOperations.
-    They are instantiated by Nodes, with respect to the inputs and outputs required by the Node's ImageOperation.
-
-    There are key differences between input ports (is_input = True) and output ports (is_input = False).
-    Output ports:
-        - cache their input (as an Package class)
-        - convert their input to a DataType
-        - cache their output.
-    Input ports:
-        - input is a reference to where their data can be found (an output of an output node, via a Connection). 
-        - convert their input to a Package class containing a standard numpy data type.
-        - cache their output.
     """
-    
+    The port class acts as a buffer between a Node and an ImageOperation. 
+    Its role is to hold metadata requirements of the ImageOperation and cache input or output data.
+    """
     def __init__(self, port_id, node_id, meta_data, data = None, input_connection = None, output_connection = None):
         self.port_id = port_id          # own ID value, set during instatiation
         self.node_id = node_id          # Nodes identifier, set during instantiation
         self.meta_data = meta_data
         self.data = data
+
+
+    @property
+    def port_id(self):
+        return self._port_id
+
+    @port_id.setter
+    def port_id(self, id):
+        # check that port_id exists
+        if not id:
+            raise ValueError(f"port_id required for port instantiation")
+        self._port_id = id
+
+    @property
+    def node_id(self):
+        return self._node_id
+
+    @node_id.setter
+    def node_id(self, id):
+        # check that node_id exists
+        if not id:
+            raise ValueError(f"node_id required for port instantiation")
+        self._node_id = id
 
     @property
     def meta_data(self):
@@ -162,9 +175,6 @@ class Port:
 
     @data.setter
     def data(self, value):
-        # checks if meta_data set - can't set or check data without defining meta-data present
-        if not self.meta_data:
-            raise MissingDataError(f"attempt to set port data with missing meta_data: {self.port_id}")
         # if meta_data defines dtype as a value type, expect a scalar value of type dtype.numpy
         if self.meta_data.dtype in DataType.value_types():
             if not isinstance(value, self.meta_data.dtype.numpy):
@@ -204,7 +214,7 @@ class Port:
         # if meta_data defines dtype as something else, raise value error for meta_data.dtype
         # this should never be raised as meta_data.dtype is checked by MetaData class
         else:
-            raise ValueError(f"port MetaData defines unexpected dtype; for port {self.port_id} expected DataType member, got {self.meta_data.dtype}")
+            raise TypeError(f"port MetaData defines unexpected dtype; for port {self.port_id} expected DataType member, got {self.meta_data.dtype}")
         self._data = value
 
     

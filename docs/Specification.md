@@ -756,16 +756,18 @@ Plugins to make:
 
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
-|is_node_input setter|Provide missign input flag|Type Error, expected type bool|No error| 
-|Convert|Provide incorrect image data (ImageParcel - numpy) data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide incorrect incorrect parameter data (ParameterParcel - numpy) data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide incorrect image data (Image of DataType) to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide incorrect paramter data (Parameter of DataType) to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide correct (ImageParcel - numpy) image data to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide correct (ImageParameter - numpy) parameter data to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide correct (Image - DataType) image data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide correct (Parameter - DataType) parameter data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
-
+|port_id setter |create port without port_id | ValueError: "port_id required for port instantiation" | No error|
+|node_id setter |create port without node_id | ValueError: "node_id required for port instantiation" | No error|
+|metadata setter | Pass in value that is not ImageMetadata or ParameterMetadata class | TypeError: "meta data expected as ImageMetadata or ParameterMetadata class" |No error|
+| data setter | For scalar data, pass in data that is not of type metadata.dtype.numpy | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype}|No error|
+| data setter | For image or array data, pass in data that is not of type np.ndarray | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected np.ndarray | No Error|
+| data setter | For image or array data, pass in data that is not a ndarray of type metadata.dtype | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype.numpy}| No error|
+| data setter | For image data, pass in a Shape arguement that is not present in Shape.dimensions* | AttributeError: dimension present in Shape.dimensions that is not a Shape arguement | No error|
+| data setter | For image data, pass in data that doesn't match metadata.image_shape_constraints and metadata.image_map | ValueError: image_type passed to port with incorrect shape | No error|
+| data setter | For array data, pass in data that doesn't match metadata.shape | ValueError: array_type data passed to port with incorrect shape| No error|
+| data setter | Pass in data where metadata.dtype does not define dtype from DataTypes** | TypeError: port MetaData defines unexpected dtype| No error|
+* this error should be impossible to generate given current structure of Shape, it will give an error from Shape class instead. Leave in case of future changes to Shape class
+** This error should also be impossible to generate given current structure of Metadata classes, wil give an error from ImageMetadata or ParameterMetadata instead.
 ### 7.4.2 Connection Class
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
