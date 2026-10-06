@@ -105,6 +105,8 @@
 |01/10/26|0.16.5|Moved description of references to UI elements from Parameter to ParameterParcel class|
 |03/10/26|0.16.6|Updated description of error_handling.log to append log items to list rather than return them|
 |03/10/26|0.16.7|Added description of convert() function to Image and Parameter classes and unit testing|
+|06/10/26|0.17.0|Refactoring data transfer between nodes. Removed description of Image and Parameter classes|
+
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -281,13 +283,16 @@ This exists to hold data related to the shape of transmitted images. It will hol
 * y (height)
 * x (width) 
 
-And contains class variables to define limits on image Shape:
-
-* max_image_dimensions - the max number of dimensions an image should have (4).
-
-* min_image_dimensions - the minimum number of dimensions an image should have. This is currently set at 4, the same as max, to allow for consistent expectations for image processing. Un-used dimensions should have size 1.
+The class attributes are defined in the class variable dimensions:
 
 * dimensions- the current dimensions and default order (c, z, y, x). This is in the form of a tuple defining the order, used in the __iter__ and __getitem__ dunders below.
+
+__init__ takes kwargs to initialise attributes. These attributes must include all the dimensions listed in dimensions and nothing else.
+
+It contains other class variables to define limits on image Shape:
+
+* max_image_dimensions - the max number of dimensions an image should have (4).
+* min_image_dimensions - the minimum number of dimensions an image should have. This is currently set at 4, the same as max, to allow for consistent expectations for image processing. Un-used dimensions should have size 1.
 
 Shape has __iter__ dunder to return values in the order defined above, __getitem__ and __setitem__ dunders to return and set values and __copy__ and copy() functions to allow copying. __getitem__ and __setitem__ accept and return values as either strings (c,z,y,x) or integer indices (0,1,2,3 - as defined by order in dimensions).
 
@@ -301,34 +306,6 @@ Shape will be used to hold shape related information in a number of classes and 
     2.	Effects on output – what effect an operation will have on the image shape, for example Z-projection will result in a Z of 1, while other dimensions will be left unchanged (-1).
 * Node and Port classes – this will mirror the usage in ImageOperation classes
 * Connection class – this may be required to reshape the image from the shape given by the input port to the shape given by the output port.
-
-## 3.3 Composition classes
-### 3.3.1 Image Class
-
-This holds the image data as a multi-dimensional array, with max and min dimensions defined in the Shape class.
-
-The Image class exists to hold images for transit through the WorkFlow graph. Is is described with two instance variables:
-
-1.	pixel_array: Contains Image pixel data, in a multi-dimensional array of defined size and type.
-2.	image_map: Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
-
-Other required information, such as the pixel_array data type and pixel_array shape, are properties of thet pixel_array data and are not stored separately.
-
-It contains two function:
-* __transpose__ takes an input of Shape class and transposes the Image so that each image dimension is in the given array dimension
-* convert converts the pixel_array to a given data type
-
-### 3.3.2 Parameters Class
-
-Contains non-image inputs/outputs for transport through WorkFlow.
-
-* Name – the name of the parameter
-* value – its value (initialised as correct data_type/shape (if required) by Port on instantiation therefore also defines required data type)
-
-Type checking is carried out on dtype, to ensure its a member of DataType.value_types or DataType.array_types.
-
-It contains one function:
-* convert converts the pixel_array to a given data type
 
 ## 3.4 Execution Classes
 ### 3.4.1 ImageOperation Class
@@ -435,8 +412,6 @@ Connections form the links between nodes and ports through which data travels th
 
 And the following property:
 * output_data: passes either the source_port.output_data or converted/tranposed/both source_port.output_data when requested.
-
-
 
 ### 3.5.2 Port Class
 
