@@ -108,6 +108,7 @@
 |06/10/26|0.17.0|Refactoring data transfer between nodes. Removed description of Image and Parameter classes|
 |06/10/26|0.17.1|Added description of MissingDataError in error_handling.py|
 |06/10/26|0.17.2|Refactoring data transfer between nodes. Updated description of classes and class interactions. |
+|06/10/26|0.17.4|Refactoring data transfer between nodes. Updated class structure diagram. | 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -143,7 +144,7 @@ Crucially, adding in a new function should not require messing with the UI or ba
 
 # 3. System Backend Architecture & Class Structure
 
-![System Class Structure](/docs/Structure.svg)
+![System Class Structure](/docs/class_structure.svg)
 
 The main image analysis workflow will be made up of a graph of Nodes connected by Connections.
 
