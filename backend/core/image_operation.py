@@ -23,7 +23,21 @@ dimension, or -1 if the analysis function is indifferent to size in that dimensi
 
 
 class ImageOperation:
-    def __init__(self, name, category, version, docs, alerts, id = None, input_image={}, input_parameter={}, output_image = {}, output_parameter = {}, ):
+    def __init__(self, 
+                 name,
+                 id,
+                 category, 
+                 version, 
+                 docs, 
+                 alerts,
+                 input_image_metadata,
+                 output_image_metadata = None,
+                 input_parameter_metadata = None,
+                 output_parameter_metadata = None,
+                 input_parameter = None, 
+                 output_parameter = None,
+                 input_image = None, 
+                 output_image = None):
         self._input_image = input_image
         self._output_image = output_image
         self.name = name
@@ -32,12 +46,25 @@ class ImageOperation:
         self.version = version
         self.docs = docs
         self.alerts = alerts 
-        self.input_image = input_image if input_image else {} # input images as dictionary of ImageParcels   { "name":  ImageParcel}
-        self.input_parameter = input_parameter if input_parameter else {}# other inputs as dictionary of ParameterParcels {   "name":  ParameterParcel}
-        self.output_image = output_image if output_image else {}# Output images as dictionary, as input_image
-        self.output_parameter = output_parameter if output_parameter else {}# other outputs as dictionary, as input_parameter
+        self.input_image = input_image # dictionary of input image data - None on instantiation
+        self.input_parameter = input_parameter # dictionary of input parameters - None on instantiation
+        self.input_image_metadata = input_image_metadata # dictionary of input image metadata - required on instantiation
+        self.input_parameter_metadata = input_parameter_metadata # dictionary of input parameter metadata - required on instantiation if parameters are required
 
-    # check input_image and output_image are dictionaries of ImagePackages
+        self.output_image = output_image # dictionary of output image data - None on instantiation
+        self.output_parameter = output_parameter # dictionary of output parameters - None on instantiation
+        self.output_image_metadata = output_image_metadata # dictionary of output image metadata - required on instantiation if imgaes are output
+        self.output_parameter_metadata = output_parameter_metadata # dictionary of output parameter metadata - required on instantiation if parameters are output
+
+    # check input_image_metadata exists and is a dictionary of class ImageMetadata
+
+    # if output_image_metadata exists, check its a dictionary of class ImageMetadata
+
+    # if input_parameter_metadata exists, check its a dictionary of class ParameterMetadata
+
+    # if output_parameter_metadata exists, check its a dictionary of class ParameterMetadata
+
+    # if input_image or output_image exist, check that they are dictionaries with values of type np.ndarray and np.dtype of metadata.dtype.numpy
     @property
     def input_image(self):
         return self._input_image
@@ -59,7 +86,9 @@ class ImageOperation:
        #                identifier = "output_image")
         self._output_image = output if output else {}
 
-    # check input parameter and output parameter are dictionaries of ParameterPackages
+    # if input_parameter or output_parameter exist, check that they are:
+    #   - if parameter dtype is array type, dictionaries with values of type np.ndarray and np.dtype of metadata.dtype.numpy
+    #   - if parameter dtype is value type, dictionaries with values of metadata.dtype.numpy
     @property
     def input_parameter(self):
         return self._input_parameter
@@ -95,8 +124,6 @@ class ImageOperation:
 
     
     def run_code(self):
-
-
 
         """carry out pre-execution tests"""
         # check code exists:
