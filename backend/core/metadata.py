@@ -29,6 +29,7 @@ class ImageMetadata:
         if not isinstance(shp, Shape):
             raise TypeError(f"for ImageMetadata class, expected image_shape_constraints to be of class Shape, got {type(shp)}")
         self._image_shape_constraints = shp.copy()
+        
     # check that image_map is of type Shape
     @property
     def image_map(self):

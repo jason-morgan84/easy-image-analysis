@@ -37,8 +37,8 @@ def test_initiation_not_image_operation():
 
 test_image_parcel = ImageMetadata(dtype = DataType.ImageInt, 
                             #pixel_array = sample_data(dtype = DataType.ImageInt, shape = (1,2,3,4), zero = True, numpy = True),
-                            image_shape_constraints= None, #Shape(-1,-1,-1,-1),
-                            image_map = None )#Shape(0,1,2,3))
+                            image_shape_constraints= Shape(c=-1,z=-1,y=-1,x=-1),
+                            image_map = Shape(c=0,z=1,y=2,x=3))
 test_image = None #Image(sample_data(dtype = DataType.ImageInt, shape = (1,2,3,4)), image_map = Shape(0,1,2,3))
 test_parameter_parcel = ParameterMetadata(dtype = DataType.ValueInt)
 test_parameter = None #Parameter("test",DataType.ValueInt(2))
@@ -49,7 +49,7 @@ test_operation_1 = ImageOperation(name = "Test Operation 1",
                                     alerts = None,
                                     input_image = {"image 1": test_image_parcel, "image 2": test_image_parcel},
                                     input_parameter = {"parameter 1": test_parameter_parcel},
-                                    output_image = {"output 1": ImageMetadata(dtype = DataType.ImageInt, image_shape_constraints = None)}#Shape(-1,-1,-1,-1))}
+                                    output_image = {"output 1": ImageMetadata(dtype = DataType.ImageInt, image_map = None,image_shape_constraints = None)}#Shape(-1,-1,-1,-1))}
 )
 def function1(self):
     self.output_image['output 1'].pixel_array = self.input_image['image 1'].pixel_array
