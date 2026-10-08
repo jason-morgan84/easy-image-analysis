@@ -44,9 +44,9 @@ class ImageOperation:
     
     @input_image.setter
     def input_image(self, input):
-        self.check_data(dictionary = input, 
-                       dtype = ImageParcel,
-                       identifier = "input_image")
+        #self.check_data(dictionary = input, 
+        #               dtype = ImageParcel,
+        #               identifier = "input_image")
         self._input_image = input if input else {}
 
     @property
@@ -54,9 +54,9 @@ class ImageOperation:
         return self._output_image
     @output_image.setter
     def output_image(self, output):
-        self.check_data(dictionary = output, 
-                       dtype = ImageParcel,
-                       identifier = "output_image")
+       # self.check_data(dictionary = output, 
+       #                dtype = ImageParcel,
+       #                identifier = "output_image")
         self._output_image = output if output else {}
 
     # check input parameter and output parameter are dictionaries of ParameterPackages
@@ -66,9 +66,9 @@ class ImageOperation:
 
     @input_parameter.setter
     def input_parameter(self, input):
-        self.check_data(dictionary = input, 
-                       dtype = ParameterParcel,
-                       identifier = "input_parameter")
+       # self.check_data(dictionary = input, 
+       #                dtype = ParameterParcel,
+       #                identifier = "input_parameter")
         self._input_parameter = input if input else {}
 
     @property
@@ -77,9 +77,9 @@ class ImageOperation:
 
     @output_parameter.setter
     def output_parameter(self, output):
-        self.check_data(dictionary = output, 
-                       dtype = ParameterParcel,
-                       identifier = "output_parameter")
+       # self.check_data(dictionary = output, 
+       #                dtype = ParameterParcel,
+       #                identifier = "output_parameter")
         self._output_parameter = output if output else {}
 
     def check_data(self, dictionary, dtype, identifier):

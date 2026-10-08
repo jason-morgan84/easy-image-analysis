@@ -2,7 +2,6 @@ from core.interface_classes import Connection, Port
 import pytest
 import numpy as np
 from core.error_handling import ConnectionError
-from core.image_operation import ParameterParcel, ImageParcel
 from core.constants import DataType
 from core.type import sample_data
 from core.shape import Shape

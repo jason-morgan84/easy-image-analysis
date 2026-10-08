@@ -56,7 +56,7 @@ class Shape:
                raise TypeError("Key must be an integer index or a string identifier")
 
      def __copy__(self):
-          return Shape(self.c,self.z,self.y,self.x)
+          return Shape(c = self.c, z = self.z, y = self.y, x = self.x)
 
      def copy(self):
         return copy.copy(self)

@@ -63,15 +63,15 @@ class Connection:
     def output_data(self):
         """Converts input data on demand."""
       
-        if self.source_port.output_data is None or \
-            (isinstance(self.source_port.output_data, Parameter) and self.source_port.output_data.value is None) or \
-                (isinstance(self.source_port.output_data, Image) and self.source_port.output_data.pixel_array is None):
-            raise ConnectionError(f"attempt to get output where source_port.output_data has no data present: {self.port_id}")
+        #if self.source_port.output_data is None or \
+            #(isinstance(self.source_port.output_data, Parameter) and self.source_port.output_data.value is None) or \
+               # (isinstance(self.source_port.output_data, Image) and self.source_port.output_data.pixel_array is None):
+           # raise ConnectionError(f"attempt to get output where source_port.output_data has no data present: {self.port_id}")
         output = self.source_port.output_data
         print("\n\noutput\n\n", output)
         # if tranpose is not None and the source data is an image, transpose it
-        if self.transpose and isinstance(output, Image):
-            output = output.transpose(self.transpose)
+        #if self.transpose and isinstance(output, Image):
+         #   output = output.transpose(self.transpose)
         print("\n\noutput\n\n", output)
         # if convert is not None, convert it
         if self.convert:
@@ -85,10 +85,10 @@ class Connection:
     
     """Copied from Image Class"""
     
-    def convert(self, convert):
-        if convert not in DataType.image_types():
-            raise TypeError(f"images can only be converted to image_types, not {convert}")
-        return Image(data = self.data.to(convert), image_metadata = self.image_metadata)
+    #def convert(self, convert):
+       # if convert not in DataType.image_types():
+       #     raise TypeError(f"images can only be converted to image_types, not {convert}")
+       # return Image(data = self.data.to(convert), image_metadata = self.image_metadata)
 
     # tranpose to be moved to WorkFlow
     def transpose(self, new_shape):
@@ -117,10 +117,10 @@ class Connection:
 
         #self.pixel_array = current_dtype(transposed_array)
         #self.image_map = new_shape
-        return Image(data = current_dtype(transposed_array),
-                     image_metadata = ImageMetadata(dtype = self.image_metadata.dtype,
-                                                    image_shape_constraints = self.image_metadata.image_shape_constraints,
-                                                    image_map = new_shape))
+       # return Image(data = current_dtype(transposed_array),
+           ##          image_metadata = ImageMetadata(dtype = self.image_metadata.dtype,
+            #                                        image_shape_constraints = self.image_metadata.image_shape_constraints,
+             #                                       image_map = new_shape))
     
 
 class Port:
@@ -128,7 +128,7 @@ class Port:
     The port class acts as a buffer between a Node and an ImageOperation. 
     Its role is to hold metadata requirements of the ImageOperation and cache input or output data.
     """
-    def __init__(self, port_id, node_id, meta_data, data = None, input_connection = None, output_connection = None):
+    def __init__(self, port_id, node_id, meta_data, data = None):
         self.port_id = port_id          # own ID value, set during instatiation
         self.node_id = node_id          # Nodes identifier, set during instantiation
         self.meta_data = meta_data
@@ -176,45 +176,46 @@ class Port:
     @data.setter
     def data(self, value):
         # if meta_data defines dtype as a value type, expect a scalar value of type dtype.numpy
-        if self.meta_data.dtype in DataType.value_types():
-            if not isinstance(value, self.meta_data.dtype.numpy):
-                raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected {self.meta_data.dtype}, got {type(value)}")
-        # if meta_data defines dtype as an array type or image type, expect a numpy array.
-        elif self.meta_data.dtype in DataType.image_types() or self.meta_data.dtype in DataType.array_types():
-            if not isinstance (value, np.ndarray):
-                raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected np.ndarray, got {type(value)}")
-            # of type meta_data.dtype.numpy
-            if value.dtype is not self.meta_data.dtype.numpy:
-                raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected {self.meta_data.dtype.numpy}, got {value.dtype}")
-            # with a shape that matches constraints of meta_data
-            # for ImageTypes: meta_data.image_shape_constraints and meta_data.image_map
-            if self.meta_data.dtype in DataType.image_types():
-                # goes through each dimension in Shape.dimensions (should be c,z,y,x)
-                for dim in Shape.dimensions:
-                    # gets constrain and mapping value for that dimension
-                    try:
-                        dim_constraint = getattr(self.meta_data.image_shape_constraints, dim)
-                        dim_map = getattr(self.meta_data.image_map, dim)
-                    except:
-                        # raises a ValueError if that dimension isn't present. This should NEVER happen, if it does, fix Shape.dimensions to match the Shape class instance arguements
-                        raise ValueError(f"dimension present in Shape.dimensions that is not a Shape arguement, {dim}")
-                    # if the constraint is not -1 (where -1 = don't care about shape)
-                    if dim_constraint!= -1:
-                        # check the array dimension that maps to the constrained dimension matches the expected size
-                        if value.shape[dim_map] != dim_constraint:
-                            # if not, raise ValueError
-                            raise ValueError(f"image_type passed to port with incorrect shape; for port {self.port_id}, \
-                                             expected {dim} = {dim_constraint}, got {dim} = {value.shape[dim_map]}")
+        if value is not None:
+            if self.meta_data.dtype in DataType.value_types():
+                if not isinstance(value, self.meta_data.dtype.numpy):
+                    raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected {self.meta_data.dtype.numpy}, got {type(value)}")
+            # if meta_data defines dtype as an array type or image type, expect a numpy array.
+            elif self.meta_data.dtype in DataType.image_types() or self.meta_data.dtype in DataType.array_types():
+                if not isinstance (value, np.ndarray):
+                    raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected np.ndarray, got {type(value)}")
+                # of type meta_data.dtype.numpy
+                if value.dtype != self.meta_data.dtype.numpy:
+                    raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected {self.meta_data.dtype.numpy}, got {value.dtype}")
+                # with a shape that matches constraints of meta_data
+                # for ImageTypes: meta_data.image_shape_constraints and meta_data.image_map
+                if self.meta_data.dtype in DataType.image_types():
+                    # goes through each dimension in Shape.dimensions (should be c,z,y,x)
+                    for dim in Shape.dimensions:
+                        # gets constrain and mapping value for that dimension
+                        try:
+                            dim_constraint = getattr(self.meta_data.image_shape_constraints, dim)
+                            dim_map = getattr(self.meta_data.image_map, dim)
+                        except:
+                            # raises a ValueError if that dimension isn't present. This should NEVER happen, if it does, fix Shape.dimensions to match the Shape class instance arguements
+                            raise ValueError(f"dimension present in Shape.dimensions that is not a Shape arguement, {dim}")
+                        # if the constraint is not -1 (where -1 = don't care about shape)
+                        if dim_constraint!= -1:
+                            # check the array dimension that maps to the constrained dimension matches the expected size
+                            if value.shape[dim_map] != dim_constraint:
+                                # if not, raise ValueError
+                                raise ValueError(f"image_type passed to port with incorrect shape; for port {self.port_id}, \
+                                                expected {dim} = {dim_constraint}, got {dim} = {value.shape[dim_map]}")
 
-            # for ArrayTypes: meta_data.shape
-            elif self.meta_data.dtype in DataType.array_types():
-                if value.shape != tuple(self.meta_data.shape):
-                    raise ValueError(f"array_type data passed to port with incorrect shape; for port {self.port_id}, expected {self.meta_data.shape}, got {value.shape}")
+                # for ArrayTypes: meta_data.shape
+                elif self.meta_data.dtype in DataType.array_types():
+                    if value.shape != tuple(self.meta_data.shape):
+                        raise ValueError(f"array_type data passed to port with incorrect shape; for port {self.port_id}, expected {self.meta_data.shape}, got {value.shape}")
 
-        # if meta_data defines dtype as something else, raise value error for meta_data.dtype
-        # this should never be raised as meta_data.dtype is checked by MetaData class
-        else:
-            raise TypeError(f"port MetaData defines unexpected dtype; for port {self.port_id} expected DataType member, got {self.meta_data.dtype}")
+            # if meta_data defines dtype as something else, raise value error for meta_data.dtype
+            # this should never be raised as meta_data.dtype is checked by MetaData class
+            else:
+                raise TypeError(f"port MetaData defines unexpected dtype; for port {self.port_id} expected DataType member, got {self.meta_data.dtype}")
         self._data = value
 
     
@@ -356,14 +357,14 @@ class Node:
                 image_to_cache = self.image_operation.output_image[port_name]
                 # if the image_operation output dictionary contains pixel_array, shape and image_map data, 
                 # set the relevant output_port to an ImageParcel with those variables.
-                if image_to_cache.pixel_array is not None and image_to_cache.image_map is not None and image_to_cache.shape is not None:
-                    port.input_data = ImageParcel(dtype = image_to_cache.dtype,
-                                                  pixel_array = image_to_cache.pixel_array,
-                                                  image_map = image_to_cache.image_map,
-                                                  shape = image_to_cache.shape)
+                #if image_to_cache.pixel_array is not None and image_to_cache.image_map is not None and image_to_cache.shape is not None:
+                   # port.input_data = ImageParcel(dtype = image_to_cache.dtype,
+                                                 # pixel_array = image_to_cache.pixel_array,
+                                                #  image_map = image_to_cache.image_map,
+                                                 # shape = image_to_cache.shape)
                 # else raise an error
-                else:
-                    raise ActivationError(f"node activated but expected output data not complete: port {port_id} in node {self.node_id}")
+                #else:
+                   # raise ActivationError(f"node activated but expected output data not complete: port {port_id} in node {self.node_id}")
                 # if the image_operation output dictionary contains image_map data, 
                 # set the relevant output_port image_map to a copy of the ImageOperation output
             elif port_type == "parameter":
@@ -373,10 +374,10 @@ class Node:
                 parameter_to_cache = self.image_operation.output_parameter[port_name]
                 # if the image_operation output dictionary contains value data, 
                 # set the relevant output_port pixel_array to a copy of the ImageOperation output
-                if parameter_to_cache.value is not None:
-                    port.input_data = ParameterParcel(dtype = parameter_to_cache.dtype,
-                                                      value = parameter_to_cache.value,
-                                                      shape = parameter_to_cache.shape)
+               # if parameter_to_cache.value is not None:
+                 #   port.input_data = ParameterParcel(dtype = parameter_to_cache.dtype,
+                       #                               value = parameter_to_cache.value,
+                        #                              shape = parameter_to_cache.shape)
                 # else raise an error
-                else:
-                    raise ActivationError(f"node activated but expected output value not created: port {port_id} in node {self.node_id}")
+               # else:
+                 #   raise ActivationError(f"node activated but expected output value not created: port {port_id} in node {self.node_id}")

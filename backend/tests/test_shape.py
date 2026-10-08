@@ -42,6 +42,21 @@ def test_shape_immutability():
     assert(test_shape.y == 3)
     assert(test_shape.x == 4)
 
+# test shape copy
+def test_shape_copy():
+    test_c = 1
+    test_z = 2
+    test_y = 3
+    test_x = 4
+
+    test_shape = Shape(c = test_c,z = test_z,y = test_y,x = test_x)
+    test_shape_copy = test_shape.copy()
+
+    assert (test_shape is not test_shape_copy)
+    test_shape.c =5
+
+    assert(test_shape_copy.c == 1)
+
 def test_shape_iteration():
     test_shape = Shape(c = 2, x = 4, y = 1, z = -1)
 

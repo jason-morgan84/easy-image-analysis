@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from core.shape import Shape
 from core.constants import DataType
-from core.image_operation import ImageOperation, ImageParcel, ParameterParcel
+from core.image_operation import ImageOperation
 import types
 
 
