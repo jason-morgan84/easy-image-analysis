@@ -1,8 +1,10 @@
 from core.constants import DataType
+from core.metadata import ImageMetadata, ParameterMetadata
 from core.shape import Shape
 import numpy as np
 import copy
 import inspect
+
 
 """Note for types: For input type checking, ImageOperation will be a part of a Node. Data will flow into the Node through a Port, which will transmit the data
 to the ImageOperation class. 
@@ -38,6 +40,7 @@ class ImageOperation:
                  output_parameter = None,
                  input_image = None, 
                  output_image = None):
+        
         self._input_image = input_image
         self._output_image = output_image
         self.name = name
@@ -57,34 +60,80 @@ class ImageOperation:
         self.output_parameter_metadata = output_parameter_metadata # dictionary of output parameter metadata - required on instantiation if parameters are output
 
     # check input_image_metadata exists and is a dictionary of class ImageMetadata
-
+    @property
+    def input_image_metadata(self):
+        return self._input_image_metadata
+    
+    @input_image_metadata.setter
+    def input_image_metadata(self, metadata):
+        if metadata is None:
+            raise ValueError(f"for ImageOperation, input_metadata is required")
+        else: 
+            self.check_metadata(dictionary = metadata,
+                                dtype = ImageMetadata,
+                                identifier = "input_image_metadata")
+        self._input_image_metadata = metadata
     # if output_image_metadata exists, check its a dictionary of class ImageMetadata
-
+    @property
+    def output_image_metadata(self):
+        return self._output_image_metadata
+    
+    @output_image_metadata.setter
+    def output_image_metadata(self, metadata):
+        if metadata is not None:
+            self.check_metadata(dictionary = metadata,
+                                dtype = ImageMetadata,
+                                identifier = "input_image_metadata")
+        self._output_image_metadata = metadata if metadata else None
     # if input_parameter_metadata exists, check its a dictionary of class ParameterMetadata
-
+    @property
+    def input_parameter_metadata(self):
+        return self._input_parameter_metadata
+    
+    @input_parameter_metadata.setter
+    def input_parameter_metadata(self, metadata):
+        if metadata is not None:
+            self.check_metadata(dictionary = metadata,
+                                dtype = ImageMetadata,
+                                identifier = "input_image_metadata")
+        self._input_parameter_metadata = metadata if metadata else None
     # if output_parameter_metadata exists, check its a dictionary of class ParameterMetadata
+    @property
+    def output_parameter_metadata(self):
+        return self._output_parameter_metadata
+    
+    @output_parameter_metadata.setter
+    def output_parameter_metadata(self, metadata):
+        if metadata is not None:
+            self.check_metadata(dictionary = metadata,
+                                dtype = ImageMetadata,
+                                identifier = "input_image_metadata")
+        self._output_parameter_metadata = metadata if metadata else None
 
     # if input_image or output_image exist, check that they are dictionaries with values of type np.ndarray and np.dtype of metadata.dtype.numpy
+    # if they're None, leave them as None - presence of inputs when required will be checked before execution.
     @property
     def input_image(self):
         return self._input_image
     
     @input_image.setter
     def input_image(self, input):
-        #self.check_data(dictionary = input, 
-        #               dtype = ImageParcel,
-        #               identifier = "input_image")
-        self._input_image = input if input else {}
+        if input is not None:
+            self.check_data(dictionary = input, 
+                        metadata = self.input_image_metadata,
+                        identifier = "input_image")
+        self._input_image = input if input else None
 
     @property
     def output_image(self):
         return self._output_image
     @output_image.setter
     def output_image(self, output):
-       # self.check_data(dictionary = output, 
-       #                dtype = ImageParcel,
-       #                identifier = "output_image")
-        self._output_image = output if output else {}
+        if output is not None:
+            self.check_data(dictionary = output, 
+                        metadata = self.output_image_metadata,
+                        identifier = "output_image")
+        self._output_image = output if output else None
 
     # if input_parameter or output_parameter exist, check that they are:
     #   - if parameter dtype is array type, dictionaries with values of type np.ndarray and np.dtype of metadata.dtype.numpy
@@ -95,10 +144,11 @@ class ImageOperation:
 
     @input_parameter.setter
     def input_parameter(self, input):
-       # self.check_data(dictionary = input, 
-       #                dtype = ParameterParcel,
-       #                identifier = "input_parameter")
-        self._input_parameter = input if input else {}
+        if input is not None:
+            self.check_data(dictionary = input, 
+                            metadata = self.input_parameter_metadata,
+                            identifier = "input_parameter")
+        self._input_parameter = input if input else None
 
     @property
     def output_parameter(self):
@@ -106,19 +156,40 @@ class ImageOperation:
 
     @output_parameter.setter
     def output_parameter(self, output):
-       # self.check_data(dictionary = output, 
-       #                dtype = ParameterParcel,
-       #                identifier = "output_parameter")
-        self._output_parameter = output if output else {}
+        self.check_data(dictionary = output, 
+                        metadata = self.output_parameter_metadata,
+                        identifier = "output_parameter")
+        self._output_parameter = output if output else None
 
-    def check_data(self, dictionary, dtype, identifier):
+    # checks data dictionaries are dictionaries, has associated metadata, matches a meta data key and matches metadata dtype
+    def check_data(self, dictionary, metadata, identifier):
+        # check dictionary is a dictionary
         if not isinstance(dictionary, dict):
-            raise TypeError(f"Expected {identifier} to be dictionary, not {type(dictionary)}")
-        
-        for key, item in dictionary.items():
-            if not isinstance(item, dtype):
-                   raise TypeError(f"Expected {identifier} to be dictionary of {dtype.type_name}, not {type(item)}")
+            raise TypeError(f"expected {identifier} to be dictionary, not {type(dictionary)}")
 
+        for key, item in dictionary.items():
+            # check metadata exists
+            if not metadata:
+                raise ValueError(f"{identifier} present with no meta_data")
+            if key not in metadata.keys():
+                # check key is present in relevant metadata
+                raise ValueError(f"key present in {identifier} but not in metadata: {key} ")
+            item_dtype = metadata[key].dtype
+            if not isinstance(item, item_dtype):
+                   # check value is of correct type
+                   raise TypeError(f"dictionary value of incorrect type: for {key} in {identifier} expected {item_dtype}, not {type(item)}")
+
+    # checks metadata dictionaries are dictionaries and values are of ImageMetadata or ParameterMetadata types
+    def check_metadata(self,dictionary,dtype,identifier):
+        # check dictionary is a dictionary
+        if not isinstance(dictionary, dict):
+            raise TypeError(f"expected {identifier} to be dictionary, not {type(dictionary)}")
+        
+        for value in dictionary.values():
+            # check values are of correct type
+            if not isinstance(value, dtype):
+                raise TypeError(f"for metadata {identifier}, expected values of type {dtype}, got {type(value)}")
+            
     def execute(self):
         pass
 
@@ -184,22 +255,20 @@ class ImageOperation:
             raise RuntimeError(f"operation altered input values ({self.name})")
 
     def reset_input(self):
-        # set output iamge values to None
+        # set input image values to None
         for image in self.input_image.values():
-            image.pixel_array = None
-            image.image_map = None
-        # set output parameter values to None
+            image = None
+        # set input parameter values to None
         for item in self.input_parameter.values():
-            item.value = None
+            item = None
 
     def reset_output(self):
         # set output iamge values to None
         for image in self.output_image.values():
-            image.pixel_array = None
-            image.image_map = None
+            image = None
         # set output parameter values to None
         for item in self.output_parameter.values():
-            item.value = None
+            item = None
         
     def check_code(self):
         function = getattr(self, "execute")
