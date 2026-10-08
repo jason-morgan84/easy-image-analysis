@@ -7,11 +7,11 @@ from core.metadata import ImageMetadata, ParameterMetadata
 """Test ImageMetadata Class"""
 @pytest.mark.parametrize("dtype, image_shape_constraints, image_map, message", [
     # Supply dtype as not member of DataTypes.image_types
-    (np.uint8, None, None,"expected type from DataType.image_type"),
+    (np.uint8, Shape(c = -1, z = -1, y = -1, x = -1), Shape(c = 0, z = 1, y = 2, x = 3),"expected type from DataType.image_type"),
     # Supply image_shape_constraints not as Shape class
-    (DataType.ImageInt, [1,2], None,"or ImageMetadata class, expected image_shape_constraints to be of class Shape"),
+    (DataType.ImageInt, [-1,-1,-1,-1], Shape(c = 0, z = 1, y = 2, x = 3),"for ImageMetadata class, expected image_shape_constraints to be of class Shape"),
     # Supply image_map not as Shape class
-    (DataType.ImageInt, None, [5,1],"for ImageMetadata class, expected image_map to be of class Shape")
+    (DataType.ImageInt, Shape(c = -1, z = -1, y = -1, x = -1), (0,1,2,3),"for ImageMetadata class, expected image_map to be of class Shape")
     ])
 def test_ImageMetadata(dtype, image_shape_constraints, image_map, message):
 

@@ -4,7 +4,7 @@ from core.shape import Shape
 
 
 class ImageMetadata:
-    def __init__(self, dtype, image_shape_constraints = None, image_map = None):
+    def __init__(self, dtype, image_shape_constraints, image_map):
         self.dtype = dtype
         self.image_shape_constraints = image_shape_constraints
         self.image_map = image_map
@@ -26,19 +26,18 @@ class ImageMetadata:
         return self._image_shape_constraints
     @image_shape_constraints.setter
     def image_shape_constraints(self, shp):
-        if not isinstance(shp, Shape) and shp is not None:
+        if not isinstance(shp, Shape):
             raise TypeError(f"for ImageMetadata class, expected image_shape_constraints to be of class Shape, got {type(shp)}")
-        self._image_shape_constraints = shp.copy() if shp is not None else None
-
+        self._image_shape_constraints = shp.copy()
     # check that image_map is of type Shape
     @property
     def image_map(self):
         return self._image_map
     @image_map.setter
     def image_map(self, map):
-        if not isinstance(map, Shape) and map is not None:
+        if not isinstance(map, Shape):
             raise TypeError(f"for ImageMetadata class, expected image_map to be of class Shape, got {type(map)}")
-        self._image_map = None if map is None else map.copy()
+        self._image_map = map.copy()
 
 
 # simple class to hold parameter inputs and outputs
