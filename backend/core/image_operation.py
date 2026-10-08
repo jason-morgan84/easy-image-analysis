@@ -255,20 +255,14 @@ class ImageOperation:
             raise RuntimeError(f"operation altered input values ({self.name})")
 
     def reset_input(self):
-        # set input image values to None
-        for image in self.input_image.values():
-            image = None
-        # set input parameter values to None
-        for item in self.input_parameter.values():
-            item = None
+        # set input image values and parameters to None
+        self.input_image = None
+        self.input_parameter_metadata = None
 
     def reset_output(self):
-        # set output iamge values to None
-        for image in self.output_image.values():
-            image = None
-        # set output parameter values to None
-        for item in self.output_parameter.values():
-            item = None
+        # set output image and parameters  to None
+        self.output_image = None
+        self.output_parameter = None
         
     def check_code(self):
         function = getattr(self, "execute")
@@ -286,6 +280,12 @@ class ImageOperation:
                 Do all image dictionary members have an associated pixel map?
                 Do all the pixel maps match the expected shape given shape/image_map values?
                 NOTE for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
+
+        If metadata exists, does dictionary exist?
+            - if dictionary exists, it will have been type checked by the setter
+        For each item in metadata:
+            - Does a relevant item in dictionary exist?
+            - If the dictionary exist, does it have the correct type?
         """
         for key, image in check_images.items():
             if not isinstance(image, ImageParcel):

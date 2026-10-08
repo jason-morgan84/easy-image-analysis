@@ -109,6 +109,7 @@
 |06/10/26|0.17.1|Added description of MissingDataError in error_handling.py|
 |06/10/26|0.17.2|Refactoring data transfer between nodes. Updated description of classes and class interactions. |
 |06/10/26|0.17.4|Refactoring data transfer between nodes. Updated class structure diagram. | 
+|08/10/26|0.17.5|Refactoring: updated unit testing for ImageOperation | 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -704,16 +705,13 @@ Plugins to make:
 ### 7.3.1 ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|ImageParcel|Supply **dtype** as not member of DataTypes.image_types| Type Error | Incorrect data type accepted|
-|ImageParcel|Have **pixel_array** type not match dtype| Type Error | Incorrect data type accepted|
-|ImageParcel|Supply **shape** not as Shape class| Type Error | Incorrect data type accepted|
-|ImageParcel|Supply **mapping** not as Shape class| Type Error | Incorrect data type accepted|
-|ImageParcel Imutability|Pass value as variable then change variable| ImageParcel value remains the same | ImageParcel value changes|
-|check_data|Supply input_image/output_image/input_parameter/output_parameter not as a dictionary| Type Error | Incorrect data type ignored|
-|ParameterParcel|Supply **dtype** as not member of DataTypes.value_types or DataTypes.array_types| Type Error | Incorrect data type accepted|
-|ParameterParcel|If array is expected, have **value** not a list, tuple or ndarray| Type Error | Incorrect data type accepted|
-|ParameterParcel|Have **value** type not match dtype| Type Error | Incorrect data type accepted|
-|ParameterParcel Imutability|Pass value as variable then change variable| ParameterParcel value remains the same |ParameterParcel value changes|
+|check_data|dictionary is a dictionary (input_image/output_image/input_parameter/output_parameter) | TypeError: expected {identifier} to be dictionary | No error|
+|check_data|resepective metadata present (input_image/output_image/input_parameter/output_parameter)|ValueError: {identifier} present with no meta_data| No error|
+|check_data|key in dictionary in metadata (input_image/output_image/input_parameter/output_parameter) | ValueError: key present in {identifier} but not in metadata| No error|
+|check_data|value in dictionary matches metadata dtype (input_image/output_image/input_parameter/output_parameter) | TypeError: dictionary value of incorrect type| No error|
+|input_image_metadata setter| check input_image_metadata exists (input_image_metadata) | ValueError: for ImageOperation, input_metadata is required| No error|
+|check_metadata | check metadata is a dictionary (input_image_metadata/output_image_metadata/input_parameter_metadata/output_parameter_metadata) | TypeError: expected {identifier} to be dictionary | No error|
+|check_metadata| check input_image_metadata values are of class ImageMetadata (input_image_metadata/output_image_metadata/input_parameter_metadata/output_parameter_metadata) | TypeError:for metadata {identifier}, expected values of type {dtype} | No error|
 |run_code|Try to execute run_code with no compiled_code or compiled code in wrong format (not types.codetype)| Type Error |Proceeds without error|
 |run_code|Don't supply a value for input_image | Value Error | Code tries to continue|
 |run_code|Supply input_image with mising pixel array | Value Error | Incorrect pixel array accepted|
