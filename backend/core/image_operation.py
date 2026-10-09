@@ -54,10 +54,12 @@ class ImageOperation:
         self.input_image_metadata = input_image_metadata # dictionary of input image metadata - required on instantiation
         self.input_parameter_metadata = input_parameter_metadata # dictionary of input parameter metadata - required on instantiation if parameters are required
 
-        self.output_image = output_image # dictionary of output image data - None on instantiation
-        self.output_parameter = output_parameter # dictionary of output parameters - None on instantiation
         self.output_image_metadata = output_image_metadata # dictionary of output image metadata - required on instantiation if imgaes are output
         self.output_parameter_metadata = output_parameter_metadata # dictionary of output parameter metadata - required on instantiation if parameters are output
+        
+        self.output_image = output_image # dictionary of output image data - None on instantiation
+        self.output_parameter = output_parameter # dictionary of output parameters - None on instantiation
+      
 
     # check input_image_metadata exists and is a dictionary of class ImageMetadata
     @property
@@ -69,7 +71,7 @@ class ImageOperation:
         if metadata is None:
             raise ValueError(f"for ImageOperation, input_metadata is required")
         else: 
-            self.check_metadata(dictionary = metadata,
+            self.check_set_metadata(dictionary = metadata,
                                 dtype = ImageMetadata,
                                 identifier = "input_image_metadata")
         self._input_image_metadata = metadata
@@ -81,9 +83,9 @@ class ImageOperation:
     @output_image_metadata.setter
     def output_image_metadata(self, metadata):
         if metadata is not None:
-            self.check_metadata(dictionary = metadata,
+            self.check_set_metadata(dictionary = metadata,
                                 dtype = ImageMetadata,
-                                identifier = "input_image_metadata")
+                                identifier = "output_image_metadata")
         self._output_image_metadata = metadata if metadata else None
     # if input_parameter_metadata exists, check its a dictionary of class ParameterMetadata
     @property
@@ -93,9 +95,9 @@ class ImageOperation:
     @input_parameter_metadata.setter
     def input_parameter_metadata(self, metadata):
         if metadata is not None:
-            self.check_metadata(dictionary = metadata,
-                                dtype = ImageMetadata,
-                                identifier = "input_image_metadata")
+            self.check_set_metadata(dictionary = metadata,
+                                dtype = ParameterMetadata,
+                                identifier = "input_parameter_metadata")
         self._input_parameter_metadata = metadata if metadata else None
     # if output_parameter_metadata exists, check its a dictionary of class ParameterMetadata
     @property
@@ -105,9 +107,9 @@ class ImageOperation:
     @output_parameter_metadata.setter
     def output_parameter_metadata(self, metadata):
         if metadata is not None:
-            self.check_metadata(dictionary = metadata,
-                                dtype = ImageMetadata,
-                                identifier = "input_image_metadata")
+            self.check_set_metadata(dictionary = metadata,
+                                dtype = ParameterMetadata,
+                                identifier = "output_parameter_metadata")
         self._output_parameter_metadata = metadata if metadata else None
 
     # if input_image or output_image exist, check that they are dictionaries with values of type np.ndarray and np.dtype of metadata.dtype.numpy
@@ -119,7 +121,7 @@ class ImageOperation:
     @input_image.setter
     def input_image(self, input):
         if input is not None:
-            self.check_data(dictionary = input, 
+            self.check_set_data(dictionary = input, 
                         metadata = self.input_image_metadata,
                         identifier = "input_image")
         self._input_image = input if input else None
@@ -130,7 +132,7 @@ class ImageOperation:
     @output_image.setter
     def output_image(self, output):
         if output is not None:
-            self.check_data(dictionary = output, 
+            self.check_set_data(dictionary = output, 
                         metadata = self.output_image_metadata,
                         identifier = "output_image")
         self._output_image = output if output else None
@@ -145,7 +147,7 @@ class ImageOperation:
     @input_parameter.setter
     def input_parameter(self, input):
         if input is not None:
-            self.check_data(dictionary = input, 
+            self.check_set_data(dictionary = input, 
                             metadata = self.input_parameter_metadata,
                             identifier = "input_parameter")
         self._input_parameter = input if input else None
@@ -156,39 +158,13 @@ class ImageOperation:
 
     @output_parameter.setter
     def output_parameter(self, output):
-        self.check_data(dictionary = output, 
-                        metadata = self.output_parameter_metadata,
-                        identifier = "output_parameter")
+        if output is not None:
+            self.check_set_data(dictionary = output, 
+                            metadata = self.output_parameter_metadata,
+                            identifier = "output_parameter")
         self._output_parameter = output if output else None
 
-    # checks data dictionaries are dictionaries, has associated metadata, matches a meta data key and matches metadata dtype
-    def check_data(self, dictionary, metadata, identifier):
-        # check dictionary is a dictionary
-        if not isinstance(dictionary, dict):
-            raise TypeError(f"expected {identifier} to be dictionary, not {type(dictionary)}")
-
-        for key, item in dictionary.items():
-            # check metadata exists
-            if not metadata:
-                raise ValueError(f"{identifier} present with no meta_data")
-            if key not in metadata.keys():
-                # check key is present in relevant metadata
-                raise ValueError(f"key present in {identifier} but not in metadata: {key} ")
-            item_dtype = metadata[key].dtype
-            if not isinstance(item, item_dtype):
-                   # check value is of correct type
-                   raise TypeError(f"dictionary value of incorrect type: for {key} in {identifier} expected {item_dtype}, not {type(item)}")
-
-    # checks metadata dictionaries are dictionaries and values are of ImageMetadata or ParameterMetadata types
-    def check_metadata(self,dictionary,dtype,identifier):
-        # check dictionary is a dictionary
-        if not isinstance(dictionary, dict):
-            raise TypeError(f"expected {identifier} to be dictionary, not {type(dictionary)}")
-        
-        for value in dictionary.values():
-            # check values are of correct type
-            if not isinstance(value, dtype):
-                raise TypeError(f"for metadata {identifier}, expected values of type {dtype}, got {type(value)}")
+   
             
     def execute(self):
         pass
@@ -201,18 +177,17 @@ class ImageOperation:
         self.check_code()
 
         # check input_image exists and is in the correct format
-        if len(self.input_image) != 0:
-            self.check_image(self.input_image,"input")
-        else:
-            raise ValueError(f"input_image expected, got none")
+        self.check_set_data(self.input_image, self.input_image_metadata, "input_image")
+        self.check_data_has_metadata(self.input_image, self.input_image_metadata, "input_image")
 
-        # check input parameter format, if they exist
-        self.check_parameter(self.input_parameter, "input")
+        # if input_parameter exists, check its format
+        if self.input_parameter_metadata is not None or self.input_parameter is not None:
+            self.check_set_data(self.input_parameter, self.input_parameter_metadata, "input_parameter")
+            self.check_data_has_metadata(self.input_parameter, self.input_parameter_metadata, "input_parameter")
 
-        # For output images, check that Shape is present (pixel array and image_map can be defined based on actual code) 
-        for key, image in self.output_image.items():
-            if image.shape is None:
-                raise ValueError(f"expected image shape constraints for output_image {key} not present")
+        # check that at least one output is present:
+        if self.output_image_metadata is None and self.output_parameter_metadata is None:
+            raise RuntimeError(f"no defined outputs present for ImageOperation {self.name}")
 
         """reset output values"""
         self.reset_output()
@@ -233,7 +208,9 @@ class ImageOperation:
             raise RuntimeError(f"operation did not generate an output ({self.name})")
 
         # check output pixel_arrays match shape and image_map
-        self.check_image(self.output_image,"output")
+        if self.output_image is not None or self.output_image_metadata is not None:
+            self.check_set_data(self.output_image, self.output_image_metadata, "output_image")
+            self.check_data_has_metadata(self.output_image, self.output_image_metadata, "output_image")
 
         # check output parameter arrays have shape
         self.check_parameter(self.output_parameter,"output")
@@ -270,62 +247,9 @@ class ImageOperation:
         if code_by_line[1].rstrip().lstrip() == "pass":
             raise RuntimeError(f"no code exists for ImageOperation {self.name}")
 
-    def check_image(self, check_images, descriptor):
-        """ 
-        Does image exist?
-            If not:
-                Value Error.
-            If so:
-                It's value has already been checked.
-                Do all image dictionary members have an associated pixel map?
-                Do all the pixel maps match the expected shape given shape/image_map values?
-                NOTE for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
 
-        If metadata exists, does dictionary exist?
-            - if dictionary exists, it will have been type checked by the setter
-        For each item in metadata:
-            - Does a relevant item in dictionary exist?
-            - If the dictionary exist, does it have the correct type?
-        """
-        for key, image in check_images.items():
-            if not isinstance(image, ImageParcel):
-                raise TypeError(f"Expected {descriptor} to be dictionary of ImageParcel, not {type(image)}")
-            if image.pixel_array is None:
-                raise ValueError(f"No image pixel array given for {descriptor} {key}")
-            if image.image_map is None: # note - for image_map and shape, if they exist their type has already been checked
-                raise ValueError(f"No image image_map data given for {descriptor} {key}")
-            if image.shape is None: 
-                raise ValueError(f"No image shape data given for {descriptor} {key}")
 
-            pixel_array_shape = image.pixel_array.shape
-            # loops through dimensions in order c, z, y, x
-            for index, dimension in enumerate(image.shape):
-                current_dimension_identifier = Shape.dimensions[index]
-                # if the dimension is -1, the image doesn't care about that dimension
-                if dimension != -1:
-                    # gets pixel_array dimension of current image dimension
-                    array_dim = image.image_map[current_dimension_identifier]
-                    # checks dimensions sizes match
-                    if pixel_array_shape[array_dim] != dimension:
-                        raise ValueError(f"For {descriptor} image {key}, pixel_array dimension {current_dimension_identifier}, expected {dimension} but got {array_dim}")
-
-    def check_parameter(self,check_parameters,descriptor):
-        """
-        Does input_parameter exist?
-            If not:
-                Not a problem, not required.
-            If so:
-                Do all the input_parameter dictionary members have an associated value?
-                Where that input_parameter is an array_value, does its shape match the defined shape?
-        """
-
-        for key, parameter in check_parameters.items():
-            if not isinstance(parameter, ParameterParcel):
-                raise TypeError(f"Expected {descriptor} to be dictionary of ParameterParcel, not {type(parameter)}")
-            if parameter.value is None:
-                raise ValueError(f"No value given for parameter {descriptor} {key}")
-            if parameter.dtype in DataType.array_types() and not np.array_equal(np.array(parameter.value.shape), parameter.shape):
-                raise ValueError(f"For parameter {descriptor} {key}, array shape {parameter.value.shape} does not match expected shape {parameter.shape}")   
+   
                                 
                                     
 

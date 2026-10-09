@@ -81,7 +81,7 @@ class BaseType:
             return self.numpy(self.value)
 
     def to(self, dtype):
-        raise NotImplementedError(f"type conversions not yet implemented for data type {self.data_type}")
+        raise NotImplementedError(f"type conversions not yet implemented for data type {self.data_type} to {dtype}")
 
 class ImageInt(BaseType):
     data_type = DataType.ImageInt
@@ -193,7 +193,7 @@ class ArrayFloat(BaseType):
         else:
             raise TypeError(f"ArrayFloat cannot be converted to type {dtype}")
 
-def sample_data(dtype, shape = None, zero = False, numpy = False):
+def sample_data(dtype, shape = None, zero = False, numpy = True):
     value_dtype = getattr(dtype, "data_type", None)
     if value_dtype == None or value_dtype not in DataType.types():
         raise TypeError (f"Expected Image data type (see constants.py) got {dtype}")
