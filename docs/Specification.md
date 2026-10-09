@@ -526,10 +526,10 @@ Unit testing list:
 ## 3.7 Data Checking
 Where checks on data are carried out repeatedly in the graph, these checks are kept in data_checking.py.
 
-This includes functions for checking data and metadata at various points in the workflow:
-    - Checks that metadata dictionaries are dictionaries of either ImageMetadata or ParameteMetadata types
-    - Checks that data dictionaries are dictionaries that have associated metadata with a matching key
-    - Checks that data dictionaries items match constraints of metadata
+Includes functions for checking data and metadata at various points in the workflow:
+    - check_metadata: checks that metadata is a dictionary with values of either ImageMetadata or ParameteMetadata types
+    - check_data_dictionaries: calls check_metadata, then also checks that data is a dictionary that have associated metadata with a matching key
+    - check_data: calls check_data_dictionarys, then also checks that data dictionary items match constraints of metadata
 
 ## 3.8 Error Handling
 
@@ -717,6 +717,7 @@ Plugins to make:
 |:--        |:--    |:--                |:--                |  
 |check_metadata| send metadata not as dictionary | TypeError: expected to be dictionary|No error|
 |check_metadata| send metadata as dictionary but not of ImageMetadata/ParameterMetadata classes| TypeError: for metadata {}, expected values of type|No error|
+|check_data_dictionaries|  data sent to function exists | ValueError: metadata present with no data: '{}'|No error|
 |check_data_dictionaries|  data sent to function is a dictionary | TypeError: expected image to be dictionary|No error|
 |check_data_dictionaries|  set data where resepective metadata not present | TypeError: data present with no metadata: '{}'|No error|
 |check_data_dictionaries|  set data where the key in data dictionary is not present in the dictionary of metadata | ValueError: key present in data dictionary '{}' but not in metadata|No error|
@@ -727,13 +728,17 @@ Plugins to make:
 ### 7.3.2 ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|check_data|dictionary is a dictionary (input_image/output_image/input_parameter/output_parameter) | TypeError: expected {identifier} to be dictionary | No error|
-|check_data|resepective metadata present (input_image/output_image/input_parameter/output_parameter)|ValueError: {identifier} present with no meta_data| No error|
-|check_data|key in dictionary in metadata (input_image/output_image/input_parameter/output_parameter) | ValueError: key present in {identifier} but not in metadata| No error|
-|check_data|value in dictionary matches metadata dtype (input_image/output_image/input_parameter/output_parameter) | TypeError: dictionary value of incorrect type| No error|
 |input_image_metadata setter| check input_image_metadata exists (input_image_metadata) | ValueError: for ImageOperation, input_metadata is required| No error|
-|check_metadata | check metadata is a dictionary (input_image_metadata/output_image_metadata/input_parameter_metadata/output_parameter_metadata) | TypeError: expected {identifier} to be dictionary | No error|
-|check_metadata| check input_image_metadata values are of class ImageMetadata (input_image_metadata/output_image_metadata/input_parameter_metadata/output_parameter_metadata) | TypeError:for metadata {identifier}, expected values of type {dtype} | No error|
+|all metadata setters| input metadata where metadata isn't a dictionary| TypeError: expected {} to be dictionary|No TypeError given|.
+|all metadata setters| input metadata where metadata is a dictionary with values of wrong class| TypeError: for metadata dictionary '{}', expected values of type|No TypeError given|
+|reset_output| check outputs are set to None| outputs set to None| outputs not set to None|
+|reset_input| check inputs are set to None| inputs set to None| inputs not set to None|
+run_code with no code
+run_code with no input_image
+run_code with input_parameter_metadata but no input_parameter
+run_code with input_parameter but not input_parameter_metadata
+run_code with no output metadata
+run_code with existing output data and check it changes
 |run_code|Try to execute run_code with no compiled_code or compiled code in wrong format (not types.codetype)| Type Error |Proceeds without error|
 |run_code|Don't supply a value for input_image | Value Error | Code tries to continue|
 |run_code|Supply input_image with mising pixel array | Value Error | Incorrect pixel array accepted|
