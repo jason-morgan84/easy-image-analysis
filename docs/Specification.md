@@ -111,6 +111,8 @@
 |06/10/26|0.17.4|Refactoring data transfer between nodes. Updated class structure diagram. | 
 |08/10/26|0.17.5|Refactoring: updated unit testing for ImageOperation | 
 |09/10/26|0.17.6|Added description of data_checks.py|
+|09/10/26|0.17.6|Added unit testing for data_checks.py|
+
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -710,7 +712,19 @@ Plugins to make:
 
 ## Stage 7.3 – Backend Excecution Classes
 
-### 7.3.1 ImageOperation
+### 7.3.1 data_checks.py
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                |  
+|check_metadata| send metadata not as dictionary | TypeError: expected to be dictionary|No error|
+|check_metadata| send metadata as dictionary but not of ImageMetadata/ParameterMetadata classes| TypeError: for metadata {}, expected values of type|No error|
+|check_data_dictionaries|  data sent to function is a dictionary | TypeError: expected image to be dictionary|No error|
+|check_data_dictionaries|  set data where resepective metadata not present | TypeError: data present with no metadata: '{}'|No error|
+|check_data_dictionaries|  set data where the key in data dictionary is not present in the dictionary of metadata | ValueError: key present in data dictionary '{}' but not in metadata|No error|
+|check_data\check_type|set data where the dtype does not match dtype defined in metadata|TypeError: dictionary value of incorrect type|No Error|
+|check_data\check_image_shape|set image where the shape does not match shape defined in metadata|ValueError: image shape does not match metadata| No Error|
+|check_data\check_parameter_shape|set parameter where shape does not exist in metadata|ValueError: no shape defined in metadata for array type parameter test.input|No Error|
+|check_data\check_parameter_shape|set parameter where the shape does not match shape defined in metadata|ValueError: array shape does not match shape metadata for test.input|No Error|
+### 7.3.2 ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |check_data|dictionary is a dictionary (input_image/output_image/input_parameter/output_parameter) | TypeError: expected {identifier} to be dictionary | No error|
@@ -735,7 +749,7 @@ Plugins to make:
 |run_code|Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data|Value Error|Incorrect value accepted|
 |run_code|Code provided returns an array value without shape data| Value Error | Incorrect value accepted|
 
-### 7.3.2 ImageOperationDirectory
+### 7.3.3 ImageOperationDirectory
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |ImportList|Import ImageOperation with correct category| Correct category saved to ImageOperation | Incorrect category|
