@@ -72,7 +72,10 @@ class ParameterMetadata:
             raise TypeError(f"Parameter array shape expected as tuple, list or np.ndarray, got {type(shp)}")
 
         #if shape is a np array, set as copy of array, else convert to np array
-        self._shape = shp.copy() if isinstance(shp, np.ndarray) else np.array(shp).copy()
+        if shp is not None:
+            self._shape = shp.copy() if isinstance(shp, np.ndarray) else np.array(shp).copy()
+        else:
+            self._shape = None
 
     @property
     def user_input(self):

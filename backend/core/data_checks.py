@@ -27,7 +27,7 @@ def check_data_dictionaries(data, metadata, dtype, identifier):
 
     # check metadata
     if not check_metadata(metadata, dtype, identifier):
-        raise ValueError(f"{identifier} present with no meta_data")
+        raise ValueError(f"data present with no metadata: '{identifier}'")
     
     # check data dictionary is a dictionary
     if not isinstance(data, dict):
@@ -36,7 +36,7 @@ def check_data_dictionaries(data, metadata, dtype, identifier):
     # check key is present in relevant metadata
     for key in data.keys():
         if key not in metadata.keys():
-            raise ValueError(f"key present in {identifier} but not in metadata: {key} ")
+            raise ValueError(f"key present in data dictionary '{identifier}' but not in metadata: {key} ")
         
 
 
@@ -47,7 +47,7 @@ def check_data(data, metadata, dtype, identifier):
     # check that a metadata key exists for all data
     for key in data.keys():
         if key not in metadata.keys():
-            raise ValueError(f"image present with no meta_data: {identifier}.{key}")
+            raise ValueError(f"data present with no metadata: {identifier}.{key}")
 
     if dtype == ImageMetadata:
         check_type(data, metadata, identifier)
@@ -62,32 +62,34 @@ def check_data(data, metadata, dtype, identifier):
 def check_type(data, metadata, identifier):
     # go through each value in metadata, check that the respective data is of the correct dtype
     for key, value in metadata.items():
+
         if value.dtype.is_array is True:
-            if data.dtype != value.dtype.numpy:
+            if data[key].dtype != value.dtype.numpy:
                 # check value is of correct type
-                raise TypeError(f"dictionary value of incorrect type: for {key} in {identifier} expected {value.dtype.numpy}, not {data.dtype}")
+                raise TypeError(f"dictionary value of incorrect type: for {key} in {identifier} expected {value.dtype.numpy}, not {data[key].dtype}")
         else:
-            if not isinstance(data, value.dtype.numpy):
+            if not isinstance(data[key], value.dtype.numpy):
                 # check value is of correct type
-                raise TypeError(f"dictionary value of incorrect type: for {key} in {identifier} expected {value.dtype.numpy}, not {type(data)}")
+                raise TypeError(f"dictionary value of incorrect type: for {key} in {identifier} expected {value.dtype.numpy}, not {type(data[key])}")
 
 def check_image_shape(data, metadata, identifier):
     # go through each value in metadata, check that the respective image matches shape constraints
     for key, value in metadata.items():
         for dimension in Shape.dimensions:
             if value.image_shape_constraints[dimension] != -1:
-                if data[key].shape(value.image_map[dimension]) != value.image_shape_constraints[dimension]:
+                print("\n\n\n",identifier, "constraints on ",dimension)
+                if data[key].shape[value.image_map[dimension]] != value.image_shape_constraints[dimension]:
                     raise ValueError(f"image shape does not match metadata; for {identifier}.{key}, \
                                      expected {dimension}={value.image_shape_constraints[dimension]}, \
-                                        got {dimension}={data[key].shape(value.image_map[dimension])}")
+                                        got {dimension}={data[key].shape[value.image_map[dimension]]}")
 
 def check_parameter_shape(data, metadata, identifier):
     # go through each value in metadata, check whether the datatype is an array. If it is, check that shape metadata is present and it matches the arrays shape
     for key, value in metadata.items():
         if value.dtype.is_array == True:
-            if metadata.shape is None:
+            if value.shape is None:
                 raise ValueError(f"no shape defined in metadata for array type parameter {identifier}.{key}")
-            for n, dimension in enumerate(metadata.shape):
+            for n, dimension in enumerate(value.shape):
                 if data[key].shape[n] != dimension:
                     raise ValueError(f"array shape does not match shape metadata for {identifier}.{key}")
 
