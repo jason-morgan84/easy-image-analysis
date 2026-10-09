@@ -110,6 +110,7 @@
 |06/10/26|0.17.2|Refactoring data transfer between nodes. Updated description of classes and class interactions. |
 |06/10/26|0.17.4|Refactoring data transfer between nodes. Updated class structure diagram. | 
 |08/10/26|0.17.5|Refactoring: updated unit testing for ImageOperation | 
+|09/10/26|0.17.6|Added description of data_checks.py|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -520,8 +521,15 @@ Unit testing list:
 * call delete_connection with an invalid key
 * check delete_connection removes a connection
 
+## 3.7 Data Checking
+Where checks on data are carried out repeatedly in the graph, these checks are kept in data_checking.py.
 
-## 3.7 Error Handling
+This includes functions for checking data and metadata at various points in the workflow:
+    - Checks that metadata dictionaries are dictionaries of either ImageMetadata or ParameteMetadata types
+    - Checks that data dictionaries are dictionaries that have associated metadata with a matching key
+    - Checks that data dictionaries items match constraints of metadata
+
+## 3.8 Error Handling
 
 error handling.py holds functions and classes that allow reporting of errors to an external log (with the future potential to pass to a UI dialog).
 
