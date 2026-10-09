@@ -1,6 +1,5 @@
-from core.constants import DataType
 from core.metadata import ImageMetadata, ParameterMetadata
-from core.shape import Shape
+from core.data_checks import check_metadata, check_data_dictionaries, check_data
 import numpy as np
 import copy
 import inspect
@@ -71,10 +70,11 @@ class ImageOperation:
         if metadata is None:
             raise ValueError(f"for ImageOperation, input_metadata is required")
         else: 
-            self.check_set_metadata(dictionary = metadata,
-                                dtype = ImageMetadata,
-                                identifier = "input_image_metadata")
+            check_metadata(metadata=metadata, 
+                           dtype=ImageMetadata,
+                           identifier="input_image_metadata")
         self._input_image_metadata = metadata
+
     # if output_image_metadata exists, check its a dictionary of class ImageMetadata
     @property
     def output_image_metadata(self):
@@ -83,10 +83,11 @@ class ImageOperation:
     @output_image_metadata.setter
     def output_image_metadata(self, metadata):
         if metadata is not None:
-            self.check_set_metadata(dictionary = metadata,
-                                dtype = ImageMetadata,
-                                identifier = "output_image_metadata")
+            check_metadata(metadata=metadata, 
+                           dtype=ImageMetadata,
+                           identifier="output_image_metadata")
         self._output_image_metadata = metadata if metadata else None
+
     # if input_parameter_metadata exists, check its a dictionary of class ParameterMetadata
     @property
     def input_parameter_metadata(self):
@@ -95,9 +96,9 @@ class ImageOperation:
     @input_parameter_metadata.setter
     def input_parameter_metadata(self, metadata):
         if metadata is not None:
-            self.check_set_metadata(dictionary = metadata,
-                                dtype = ParameterMetadata,
-                                identifier = "input_parameter_metadata")
+            check_metadata(metadata=metadata, 
+                           dtype=ParameterMetadata,
+                           identifier="input_parameter_metadata")
         self._input_parameter_metadata = metadata if metadata else None
     # if output_parameter_metadata exists, check its a dictionary of class ParameterMetadata
     @property
@@ -107,13 +108,12 @@ class ImageOperation:
     @output_parameter_metadata.setter
     def output_parameter_metadata(self, metadata):
         if metadata is not None:
-            self.check_set_metadata(dictionary = metadata,
-                                dtype = ParameterMetadata,
-                                identifier = "output_parameter_metadata")
+            check_metadata(metadata=metadata, 
+                           dtype=ParameterMetadata,
+                           identifier="output_parameter_metadata")
         self._output_parameter_metadata = metadata if metadata else None
 
-    # if input_image or output_image exist, check that they are dictionaries with values of type np.ndarray and np.dtype of metadata.dtype.numpy
-    # if they're None, leave them as None - presence of inputs when required will be checked before execution.
+    # if input_image or output_image exist, check that they are dictionaries with associated metadata
     @property
     def input_image(self):
         return self._input_image
@@ -121,9 +121,10 @@ class ImageOperation:
     @input_image.setter
     def input_image(self, input):
         if input is not None:
-            self.check_set_data(dictionary = input, 
-                        metadata = self.input_image_metadata,
-                        identifier = "input_image")
+            check_data_dictionaries(data=input,
+                                    metadata=self.input_image_metadata,
+                                    dtype=ImageMetadata,
+                                    identifier="input_image")
         self._input_image = input if input else None
 
     @property
@@ -132,14 +133,13 @@ class ImageOperation:
     @output_image.setter
     def output_image(self, output):
         if output is not None:
-            self.check_set_data(dictionary = output, 
-                        metadata = self.output_image_metadata,
-                        identifier = "output_image")
+            check_data_dictionaries(data=output,
+                                    metadata=self.output_image_metadata,
+                                    dtype=ImageMetadata,
+                                    identifier="output_image")
         self._output_image = output if output else None
 
-    # if input_parameter or output_parameter exist, check that they are:
-    #   - if parameter dtype is array type, dictionaries with values of type np.ndarray and np.dtype of metadata.dtype.numpy
-    #   - if parameter dtype is value type, dictionaries with values of metadata.dtype.numpy
+    # if input_parameter or output_parameter exist, check that they are dictionaries with matching metadata
     @property
     def input_parameter(self):
         return self._input_parameter
@@ -147,9 +147,10 @@ class ImageOperation:
     @input_parameter.setter
     def input_parameter(self, input):
         if input is not None:
-            self.check_set_data(dictionary = input, 
-                            metadata = self.input_parameter_metadata,
-                            identifier = "input_parameter")
+            check_data_dictionaries(data=input,
+                                    metadata=self.input_parameter_metadata,
+                                    dtype=ParameterMetadata,
+                                    identifier="input_parameter")
         self._input_parameter = input if input else None
 
     @property
@@ -159,9 +160,10 @@ class ImageOperation:
     @output_parameter.setter
     def output_parameter(self, output):
         if output is not None:
-            self.check_set_data(dictionary = output, 
-                            metadata = self.output_parameter_metadata,
-                            identifier = "output_parameter")
+            check_data_dictionaries(data=output,
+                                    metadata=self.output_parameter_metadata,
+                                    dtype=ParameterMetadata,
+                                    identifier="output_parameter")
         self._output_parameter = output if output else None
 
    
@@ -177,15 +179,19 @@ class ImageOperation:
         self.check_code()
 
         # check input_image exists and is in the correct format
-        self.check_set_data(self.input_image, self.input_image_metadata, "input_image")
-        self.check_data_has_metadata(self.input_image, self.input_image_metadata, "input_image")
+        check_data(data=self.input_image,
+                   metadata=self.input_image_metadata,
+                   dtype=ImageMetadata,
+                   identifier="input_image")
 
         # if input_parameter exists, check its format
         if self.input_parameter_metadata is not None or self.input_parameter is not None:
-            self.check_set_data(self.input_parameter, self.input_parameter_metadata, "input_parameter")
-            self.check_data_has_metadata(self.input_parameter, self.input_parameter_metadata, "input_parameter")
+            check_data(data=self.input_parameter,
+                       metadata=self.input_parameter_metadata,
+                       dtype=ParameterMetadata,
+                       identifier="input_parameter")
 
-        # check that at least one output is present:
+        # check that at least one output is defined:
         if self.output_image_metadata is None and self.output_parameter_metadata is None:
             raise RuntimeError(f"no defined outputs present for ImageOperation {self.name}")
 
@@ -209,11 +215,17 @@ class ImageOperation:
 
         # check output pixel_arrays match shape and image_map
         if self.output_image is not None or self.output_image_metadata is not None:
-            self.check_set_data(self.output_image, self.output_image_metadata, "output_image")
-            self.check_data_has_metadata(self.output_image, self.output_image_metadata, "output_image")
+            check_data(data=self.output_image,
+                       metadata=self.output_image_metadata,
+                       dtype=ImageMetadata,
+                       identifier="output_image")
 
         # check output parameter arrays have shape
-        self.check_parameter(self.output_parameter,"output")
+        if self.output_parameter is not None or self.output_parameter_metadata is not None:
+            check_data(data=self.output_parameter,
+                       metadata=self.output_parameter_metadata,
+                       dtype=ParameterMetadata,
+                       identifier="output_parameter")
            
         # check inputs have not changed
         input_changed = False
@@ -234,7 +246,7 @@ class ImageOperation:
     def reset_input(self):
         # set input image values and parameters to None
         self.input_image = None
-        self.input_parameter_metadata = None
+        self.input_parameter = None
 
     def reset_output(self):
         # set output image and parameters  to None
@@ -243,6 +255,8 @@ class ImageOperation:
         
     def check_code(self):
         function = getattr(self, "execute")
+        if function is None:
+            raise RuntimeError(f"no code exists for ImageOperation {self.name}")
         code_by_line = inspect.getsource(function).split("\n")
         if code_by_line[1].rstrip().lstrip() == "pass":
             raise RuntimeError(f"no code exists for ImageOperation {self.name}")
