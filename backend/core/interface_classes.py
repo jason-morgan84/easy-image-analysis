@@ -58,9 +58,7 @@ class Connection:
         if convert_type and convert_type not in DataType.types():
             raise TypeError(f"datatype class expected for transpose, not {type(convert_type)}")
         self._convert = convert_type
-
-       
-
+    
 class Port:
     """
     The port class acts as a buffer between a Node and an ImageOperation. 
@@ -169,8 +167,7 @@ class Port:
             else:
                 raise TypeError(f"port MetaData defines unexpected dtype; for port {self.port_id} expected DataType member, got {self.meta_data.dtype}")
         self._data = value
-
-    
+   
 class Node:
     """
     The Node class is a hanger for an ImageOperation and its associated inputs/outputs.
@@ -206,31 +203,46 @@ class Node:
     # on Node instantiation, initialises the Node input Ports by creating a Port for each input_image and input_parameter in
     # the associated ImageOperation
     def initialise_input_ports(self):
-        for key in self.image_operation.input_image.keys():
+        for key, value in self.image_operation.input_image_metadata.items():
             port_id = "image." + str(key)
+            input_metadata = ImageMetadata(dtype = value.dtype,
+                                           image_shape_constraints=value.image_shape_constraints,
+                                           image_map=value.image_map)
             self.input_ports[port_id] = Port(is_input = True,
-                                              port_id = port_id,
-                                              node_id = self.node_id)
-            
-        for key in self.image_operation.input_parameter.keys():
-            port_id = "parameter." + str(key)
-            self.input_ports[port_id] = Port(is_input = True,
-                                              port_id = port_id,
-                                              node_id = self.node_id)
+                                             meta_data=input_metadata,
+                                             port_id = port_id,
+                                             node_id = self.node_id)
+        if self.image_operation.input_parameter_metadata is not None:
+            for key, value in self.image_operation.input_parameter_metadata.items():
+                port_id = "parameter." + str(key)
+                input_metadata = ParameterMetadata(dtype=value.dtype,
+                                                shape=value.shape)
+                self.input_ports[port_id] = Port(is_input = True,
+                                                meta_data=input_metadata,
+                                                port_id = port_id,
+                                                node_id = self.node_id)
     # on Node instantiation, initialises the Node output Ports by creating a Port for each input_image and input_parameter in
     # the associated ImageOperation
     def initialise_output_ports(self):
-        for key in self.image_operation.output_image.keys():
-            port_id = "image." + str(key)
-            self.output_ports[port_id] = Port(is_input = False,
-                                              port_id = port_id,
-                                              node_id = self.node_id)
-            
-        for key in self.image_operation.output_parameter.keys():
-            port_id = "parameter." + str(key)
-            self.output_ports[port_id] = Port(is_input = False,
-                                              port_id = port_id,
-                                              node_id = self.node_id)
+        if self.image_operation.output_image_metadata is not None:
+            for key, value in self.image_operation.output_image_metadata.items():
+                port_id = "image." + str(key)
+                output_metadata = ImageMetadata(dtype = value.dtype,
+                                                image_shape_constraints=value.image_shape_constraints,
+                                                image_map=value.image_map)
+                self.output_ports[port_id] = Port(is_input = False,
+                                                  meta_data=output_metadata,
+                                                  port_id = port_id,
+                                                  node_id = self.node_id)
+        if self.image_operation.output_parameter_metadata is not None:
+            for key, value in self.image_operation.output_parameter_metadata.items():
+                port_id = "parameter." + str(key)
+                output_metadata = ParameterMetadata(dtype=value.dtype,
+                                                    shape=value.shape)
+                self.output_ports[port_id] = Port(is_input = False,
+                                                  meta_data=output_metadata,
+                                                  port_id = port_id,
+                                                  node_id = self.node_id)
 
     def activate_node(self):
         # only activate node if ready
