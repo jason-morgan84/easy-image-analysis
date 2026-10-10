@@ -128,3 +128,71 @@ class WorkFlow:
 
     def type_check(self, source_port, target_port):
         pass
+
+"""copied from connection for data conversion etc"""
+"""
+    @property
+    def output_data(self):
+        """"""Converts input data on demand.""""""
+        
+      
+        #if self.source_port.output_data is None or \
+            #(isinstance(self.source_port.output_data, Parameter) and self.source_port.output_data.value is None) or \
+               # (isinstance(self.source_port.output_data, Image) and self.source_port.output_data.pixel_array is None):
+           # raise ConnectionError(f"attempt to get output where source_port.output_data has no data present: {self.port_id}")
+        output = self.source_port.output_data
+        print("\n\noutput\n\n", output)
+        # if tranpose is not None and the source data is an image, transpose it
+        #if self.transpose and isinstance(output, Image):
+         #   output = output.transpose(self.transpose)
+        print("\n\noutput\n\n", output)
+        # if convert is not None, convert it
+        if self.convert:
+            output = output.convert(self.convert)
+        print("\n\noutput\n\n", output)
+        return output
+
+    @output_data.setter
+    def output_data(self, value):
+        self._output_data = value
+    
+    """"""Copied from Image Class""""""
+    
+    #def convert(self, convert):
+       # if convert not in DataType.image_types():
+       #     raise TypeError(f"images can only be converted to image_types, not {convert}")
+       # return Image(data = self.data.to(convert), image_metadata = self.image_metadata)
+
+    # tranpose to be moved to WorkFlow
+    def transpose(self, new_shape):
+        # expect a Shape class
+        if not isinstance(new_shape, Shape):
+            raise TypeError (f"expected Shape class, got {type(new_shape)}")
+
+        for item in new_shape:
+            if item < 0 or item > Shape.max_image_dimensions:
+                raise ValueError (f"passed shape dimensions out of range, must be 0-{Shape.max_image_dimensions}")
+
+
+        # receives Shape class member with new dimensions indices of each array (c,z,y,x)
+        # needs to create transpose list with values c,z,y,x in order of old_c,old_z,old_y,old_x
+        transpose = [self.data[item] for item in new_shape]
+
+        # receives input of new channel order, such as z,c,y,x
+        # to use numpy transpose, needs to go from string z to array map for that dimension and append to list transpose
+        # transpose used as input for np.transpose
+
+        # get new shape map - ie, get the position of c,z,y,x in new_shape
+        
+        transposed_array = np.transpose(self.data.to_numpy(),transpose)
+
+        current_dtype = getattr(self.data, "data_type")
+
+        #self.pixel_array = current_dtype(transposed_array)
+        #self.image_map = new_shape
+       # return Image(data = current_dtype(transposed_array),
+           ##          image_metadata = ImageMetadata(dtype = self.image_metadata.dtype,
+            #                                        image_shape_constraints = self.image_metadata.image_shape_constraints,
+             #                                       image_map = new_shape))
+
+             """
