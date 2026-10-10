@@ -757,10 +757,10 @@ Plugins to make:
 |run_code|Code provided creates an error|RuntimeError: error executing operation |No error passed on|
 |run_code|Code provided doesn't create an output|Runtime error: operation did not generate an output|No error passed|
 |run_code|Code provided changes inputs|Runtime error: operation altered input values|No error passed|
-#Code provided returns an image with type that doesn't match metadata
-#Code provided returns an image with shape that doesn't match metadata
-#Code provided returns an parameter with array type that doesn't match metadata
-#Code provided returns an parameter with array shape that doesn't match metadata
+|run_code|Code provided returns an image with type that doesn't match metadata|TypeError:dictionary value of incorrect type| No error given |
+|run_code|Code provided returns an image with shape that doesn't match metadata|ValueError:image shape does not match metadata| No error given |
+|run_code|Code provided returns an parameter with array type that doesn't match metadata|TypeError:dictionary value of incorrect type| No error given |
+|run_code|Code provided returns an parameter with array shape that doesn't match metadata|ValueError: array shape does not match shape metadata| No error given |
 
 ### 7.3.3 ImageOperationDirectory
 |Component  | Test  | Expected Outcome  | Undesired Outcome |

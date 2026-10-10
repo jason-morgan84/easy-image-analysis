@@ -79,9 +79,7 @@ def check_image_shape(data, metadata, identifier):
         for dimension in Shape.dimensions:
             if value.image_shape_constraints[dimension] != -1:
                 if data[key].shape[value.image_map[dimension]] != value.image_shape_constraints[dimension]:
-                    raise ValueError(f"image shape does not match metadata; for '{identifier}.{key}', \
-                                     expected {dimension}={value.image_shape_constraints[dimension]}, \
-                                        got {dimension}={data[key].shape[value.image_map[dimension]]}")
+                    raise ValueError(f"image shape does not match metadata; for '{identifier}.{key}', expected {dimension}={value.image_shape_constraints[dimension]}, got {dimension}={data[key].shape[value.image_map[dimension]]}")
 
 def check_parameter_shape(data, metadata, identifier):
     # go through each value in metadata, check whether the datatype is an array. If it is, check that shape metadata is present and it matches the arrays shape

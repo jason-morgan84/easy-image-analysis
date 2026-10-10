@@ -48,10 +48,12 @@ class ImageOperation:
         self.version = version
         self.docs = docs
         self.alerts = alerts 
-        self.input_image = input_image # dictionary of input image data - None on instantiation
-        self.input_parameter = input_parameter # dictionary of input parameters - None on instantiation
+
         self.input_image_metadata = input_image_metadata # dictionary of input image metadata - required on instantiation
         self.input_parameter_metadata = input_parameter_metadata # dictionary of input parameter metadata - required on instantiation if parameters are required
+        
+        self.input_image = input_image # dictionary of input image data - None on instantiation
+        self.input_parameter = input_parameter # dictionary of input parameters - None on instantiation
 
         self.output_image_metadata = output_image_metadata # dictionary of output image metadata - required on instantiation if imgaes are output
         self.output_parameter_metadata = output_parameter_metadata # dictionary of output parameter metadata - required on instantiation if parameters are output
