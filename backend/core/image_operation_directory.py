@@ -2,7 +2,7 @@ from core.image_operation import ImageOperation
 import importlib
 import pkgutil
 import os
-from core.error_handling import log
+from core.error_handling import log, VersionError
 from core.type import sample_data
 import ast
 import inspect
@@ -20,7 +20,8 @@ class ImageOperationDirectory():
     def __init__(self, logger = None, testing = False):
         self.image_operation_list = {}
         self.testing = testing
-        self.version_image_map = {"0": lambda attr: self.import_0(attr)}
+        self.version_image_map = {"0": lambda attr: self.import_0(attr),
+                                  "1": lambda attr: self.import_1(attr)}
         self.logger = logger if logger else []
         self.disallowed_modules = set()
 
@@ -51,7 +52,11 @@ class ImageOperationDirectory():
                     # checks its not another package
                     if not ispkg:
                         # imports individual file
-                        sub_module = importlib.import_module(".".join((self.package_folder, folder, name)))
+                        try:
+                            sub_module = importlib.import_module(".".join((self.package_folder, folder, name)))
+                        except Exception as e:
+                            log(self.logger,ImportError, f"unable to import module '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
+                            continue
                         """Before running the code, check for only allowed imports"""
                         try:
                             imported_modules = self.check_imports(inspect.getsource(sub_module))
@@ -80,13 +85,13 @@ class ImageOperationDirectory():
                         """ Once imports and version are checked, get actual ImageOperation class"""
                         # iterates through each attribute in module
                         for attribute_name in dir(sub_module):
-                            attribute = getattr(sub_module, attribute_name)
+                            item = getattr(sub_module, attribute_name)
                             # if its a class that is a subclass of ImageOperation, but not ImageOperation itself (which should never be in that folder anyway)
-                            if isinstance(attribute, type) and issubclass(attribute,ImageOperation) and attribute is not ImageOperation:
+                            if isinstance(item, type) and issubclass(item, ImageOperation) and item is not ImageOperation:
                                 """ Use major version number and version_image_map dictionary to import new dictionary item 
                                 # with key "name" and value based on return from relevant import function"""
                                 try:
-                                    imported_function = self.version_image_map[major](attribute)
+                                    imported_function = self.version_image_map[major](item)
                                 except Exception as e:
                                     log(self.logger,ImportError,f"cannot import module {name}: {e}","ImageOperationDirectory","import_operations_dict",name)
                                     continue                                                              
@@ -109,10 +114,14 @@ class ImageOperationDirectory():
     
     def import_0(self, attribute):
         """imports functions where major version is 0"""
-        imported_function = attribute()
-    
-        return imported_function
+        raise VersionError(f"ImportOperationDirectory not back compatible to major version 0, cannot import '{attribute}'")
 
+
+    def import_1(self, image_op):
+        """imports functions where major version is 1"""
+        imported_image_op = image_op()
+        return imported_image_op
+    
     def check_imports(self, function):
         """gets a list of all modules imported into 'function' and 
         checks them against permitted module names"""
@@ -135,8 +144,6 @@ class ImageOperationDirectory():
         # permitted imports from imported modules
         return imported_modules
 
-
-
     def test_function(self, function):
         """tests functions by providing sample inputs (given requested input dtype, shape etc). Actual outputs checked in ImageOperation.run_code and any
         errors will be chained here, then to input_list function where they're logged."""
@@ -145,35 +152,42 @@ class ImageOperationDirectory():
         default_z = 4
         default_y = 50
         default_x = 50
-        item_shape = [0,0,0,0]
+        image_shape = [0,0,0,0]
 
+        input_images = {}
+        input_parameters = {}
         #loops through input images
-        for item in function.input_image.keys():
+        for key, value in function.input_image_metadata.items():
             # gets dtype of input image
-            item_dtype = function.input_image[item].dtype
+            image_dtype = value.dtype
+
 
             # calculates dimensions of shape for pixel_array based on input_image shape and image_map arguements
-            item_shape[function.input_image[item].image_map.c] = default_c if function.input_image[item].shape.c == -1 else function.input_image[item].shape.c
-            item_shape[function.input_image[item].image_map.z] = default_z if function.input_image[item].shape.z == -1 else function.input_image[item].shape.z
-            item_shape[function.input_image[item].image_map.y] = default_y if function.input_image[item].shape.y == -1 else function.input_image[item].shape.y
-            item_shape[function.input_image[item].image_map.x] = default_x if function.input_image[item].shape.x == -1 else function.input_image[item].shape.x
+            image_shape[value.image_map.c] = default_c if value.image_shape_constraints.c == -1 else value.image_shape_constraints.c
+            image_shape[value.image_map.z] = default_z if value.image_shape_constraints.z == -1 else value.image_shape_constraints.z
+            image_shape[value.image_map.y] = default_y if value.image_shape_constraints.y == -1 else value.image_shape_constraints.y
+            image_shape[value.image_map.x] = default_x if value.image_shape_constraints.x == -1 else value.image_shape_constraintse.x
 
             # uses type.sample_data to set pixel_array as an array of the correct shape and dtype of 0s
-            function.input_image[item].pixel_array = item_dtype.to_numpy(sample_data(dtype = item_dtype,
-                                                                 shape = item_shape,
-                                                                 zero = True))
+            input_images[key] = sample_data(dtype=image_dtype,
+                                            shape = image_shape,
+                                            zero = True)
+        setattr(function,"input_image",input_images)
 
         # similar process for each input_parameter
-        for item in function.input_parameter.keys():
-            # gets dtype and shape from parameter
-            item_dtype = function.input_parameter[item].dtype
-            item_shape = function.input_parameter[item].shape
+        if function.input_parameter_metadata is not None:
+            for key, value in function.input_parameter_metadata.items():
+                # gets dtype and shape from parameter
+                parameter_dtype = value.dtype
+                parameter_shape = value.shape
 
-            # sets value to 0/array of 0s of correct dtype and shape using type.sample_data
-            function.input_image[item].value = sample_data(dtype = item_dtype,
-                                                           shape = item_shape,
-                                                           zero = True)
-
+                # sets value to 0/array of 0s of correct dtype and shape using type.sample_data
+                input_parameters[key] = sample_data(dtype = parameter_dtype,
+                                                    shape = parameter_shape,
+                                                    zero = True)
+            setattr(function,"input_parameter",input_parameters)
+        
+        
         function.run_code()
 
 

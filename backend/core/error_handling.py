@@ -40,3 +40,10 @@ class MissingDataError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
+
+class VersionError(Exception):
+    """Exception raised when incorrect version ImageOperations are imported"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)

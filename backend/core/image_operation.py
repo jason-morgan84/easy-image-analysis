@@ -40,8 +40,6 @@ class ImageOperation:
                  input_image = None, 
                  output_image = None):
         
-        self._input_image = input_image
-        self._output_image = output_image
         self.name = name
         self.id = id
         self.category = category
@@ -212,7 +210,7 @@ class ImageOperation:
 
         """carry out post-execution tests"""
         # check output generated
-        if not self.output_image and not self.output_parameter:
+        if (not self.output_image and not self.output_parameter):
             raise RuntimeError(f"operation did not generate an output ({self.name})")
 
         # check output images match image_shape_constraints and image_map
