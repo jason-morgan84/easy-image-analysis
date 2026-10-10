@@ -111,7 +111,9 @@
 |06/10/26|0.17.4|Refactoring data transfer between nodes. Updated class structure diagram. | 
 |08/10/26|0.17.5|Refactoring: updated unit testing for ImageOperation | 
 |09/10/26|0.17.6|Added description of data_checks.py|
-|09/10/26|0.17.6|Added unit testing for data_checks.py|
+|09/10/26|0.17.7|Added unit testing for data_checks.py|
+|10/10/26|0.17.8|Added is_input flag description to Ports class|
+|10/10/26|0.17.8|Refactoring: moved unit testing and description of transposition and conversion functions from Connection to WorkFlow classes|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -328,7 +330,7 @@ Note that, for now, inputs are provided as variables or arrays of 0s, to avoid s
 
 If testing is sucessful, files are added to a dictionary of ImageOperations with a key of the filename without py (**TODO: address potential failure with identical filenames**). The category and version number will be added to each ImageOperations based on file and folder parameters. 
 
-### 3.2.5 ImageMetaData
+### 3.2.5 ImageMetadata
 Simple class holding metadata for image inputs and outputs in Ports. Contains:
 * dtype - set at instantiation based on ImageOperation code file.
     - Type checks for member of DataType
@@ -336,7 +338,7 @@ Simple class holding metadata for image inputs and outputs in Ports. Contains:
     - Type checks for Shape class
 * image_map - set at instantiation based on relationship between image dimensions and array dimensions required/delivered by ImageOperation. 
 
-### 3.2.6 ParameterPackage
+### 3.2.6 ParameterMetadata
 Simple class holding data for non-image metadata for Ports. Includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
 
 Contains:
@@ -413,9 +415,6 @@ Connections form the links between nodes and ports through which data travels th
 * connection_id - unique identifier of the connection
 * tranpose - default None, required for transposing an image from source_port to target_port
 * convert - default None, required for converting a DataType from source_port to target_port
-
-And the following property:
-* output_data: passes either the source_port.output_data or converted/tranposed/both source_port.output_data when requested.
 
 ## 3.2.10 WorkFlow Class
 
@@ -523,6 +522,17 @@ Unit testing list:
   - check conversion properly made
 * call delete_connection with an invalid key
 * check delete_connection removes a connection
+|transpose| transpose passed not as Shape class | Type error | transpose accepted|
+|convert| convert passed not as DataType class | Type error | convert accepted |
+| get_output | Use get_output when no data at source_port | ConnectionError| No error|
+| get_output | Use get_output when source_port contains image with no pixel_array| ConnectionError| No error|
+| get_output | Use get_output when source_port contains parameter with no value| ConnectionError| No error|
+| get_output | Test correct output given with no transpose or convert | Correct output given| Incorrect output|
+| get_output | Test correct output given with transpose but no convert | Correct output given| Incorrect output|
+| get_output | Test correct output given with convert but no transpose | Correct output given| Incorrect output|
+| get_output | Test correct output given with transpose and convert | Correct output given| Incorrect output|
+* note: both transpose and convert have previously been unit tested in Image and/or Parameter classes
+
 
 ## 3.7 Data Checking
 Where checks on data are carried out repeatedly in the graph, these checks are kept in data_checking.py.
@@ -801,16 +811,7 @@ run_code with existing output data and check it changes
 |:--        |:--    |:--                |:--                | 
 | source_port     |source_port not Port class|Type error|source_port accepted|
 | target_port |target_port not Port class|Type error|target_port accepted|
-|transpose| transpose passed not as Shape class | Type error | transpose accepted|
-|convert| convert passed not as DataType class | Type error | convert accepted |
-| get_output | Use get_output when no data at source_port | ConnectionError| No error|
-| get_output | Use get_output when source_port contains image with no pixel_array| ConnectionError| No error|
-| get_output | Use get_output when source_port contains parameter with no value| ConnectionError| No error|
-| get_output | Test correct output given with no transpose or convert | Correct output given| Incorrect output|
-| get_output | Test correct output given with transpose but no convert | Correct output given| Incorrect output|
-| get_output | Test correct output given with convert but no transpose | Correct output given| Incorrect output|
-| get_output | Test correct output given with transpose and convert | Correct output given| Incorrect output|
-* note: both transpose and convert have previously been unit tested in Image and/or Parameter classes
+
 ### 7.4.2 Node Class
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
