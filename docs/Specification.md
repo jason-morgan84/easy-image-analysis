@@ -357,6 +357,7 @@ The port class acts as a buffer between a Node and an ImageOperation. Its role i
 Two lists of ports are created with each node, and ports do not exist independently of nodes. Each port has the instance variables:
 * node_id – unique identifier for connected node
 * port_id - id for port within the node (the name of the connected ImageOperation input/output)
+* is_input - flag for whether this is an input or output port
 * metadata - ImageMetadata or ParameterMetadata class, holding metadata defined by ImageOperation and created at instantiation. Must be present, cannot be None.
 * data - cached data. None at instantiation.
 
@@ -783,6 +784,8 @@ run_code with existing output data and check it changes
 |:--        |:--    |:--                |:--                | 
 |port_id setter |create port without port_id | ValueError: "port_id required for port instantiation" | No error|
 |node_id setter |create port without node_id | ValueError: "node_id required for port instantiation" | No error|
+|is_input setter |create port without is_input | ValueError: "is_input flag not set for port" | No error|
+|is_input setter |create port where is_input not boolean| TypeError: "is_input flag expected boolean" | No error|
 |metadata setter | Pass in value that is not ImageMetadata or ParameterMetadata class | TypeError: "meta data expected as ImageMetadata or ParameterMetadata class" |No error|
 | data setter | For scalar data, pass in data that is not of type metadata.dtype.numpy | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype}|No error|
 | data setter | For image or array data, pass in data that is not of type np.ndarray | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected np.ndarray | No Error|
