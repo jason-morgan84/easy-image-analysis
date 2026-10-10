@@ -744,26 +744,23 @@ Plugins to make:
 |all metadata setters| input metadata where metadata is a dictionary with values of wrong class| TypeError: for metadata dictionary '{}', expected values of type|No TypeError given|
 |reset_output| check outputs are set to None| outputs set to None| outputs not set to None|
 |reset_input| check inputs are set to None| inputs set to None| inputs not set to None|
-run_code with no code
-run_code with no input_image
-run_code with input_parameter_metadata but no input_parameter
-run_code with input_parameter but not input_parameter_metadata
-run_code with no output metadata
-run_code with existing output data and check it changes
-|run_code|Try to execute run_code with no compiled_code or compiled code in wrong format (not types.codetype)| Type Error |Proceeds without error|
-|run_code|Don't supply a value for input_image | Value Error | Code tries to continue|
-|run_code|Supply input_image with mising pixel array | Value Error | Incorrect pixel array accepted|
-|run_code|Supply input pixel_array with missing mapping or shape data| Value Error | Incorrect pixel array accepted|
-|run_code|Supply input pixel_array where shape does not match constraints in shape| Value Error | Incorrect pixel array accepted|
-|run_code|Supply input_parameter with mising value | Value Error | Incorrect pixel array accepted|
-|run_code|Supply parameter array where array does not match defined shape| Value Error | Incorrect value accepted|
-|run_code|Try to run with missing output definitions (shape for images or arrays, dtype for any output) | Value Error | runs code anyway|
-|run_code|Code provided creates an error|Error|No error passed on|
-|run_code|Code provided doesn't create an output|Runtime error|No error passed|
-|run_code|Code provided changes inputs|Runtime error|No error passed|
-|run_code|Code provided returns a pixel_array without mapping data| Value Error | Incorrect value accepted|
-|run_code|Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data|Value Error|Incorrect value accepted|
-|run_code|Code provided returns an array value without shape data| Value Error | Incorrect value accepted|
+|run_code| call run_code with no code | RuntimeError: no code exists | No error given |
+|run_code| run_code with no input_image | ValueError: metadata present with no data | No error given |
+|run_code|run_code with input_parameter_metadata but no input_parameter| ValueError: metadata present with no data |No error given |
+|run_code|run_code with input_parameter but not input_parameter_metadata| ValueError: data present with no metadata|No error given |
+|run_code|run_code where input_image_data type doesn't match input_image_metadata|TypeError: dictionary value of incorrect type| No error given |
+|run_code|run_code where input_image shape deosn't match input_image_metadata|ValueError: image shape does not match metadata| No error given |
+|run_code|run_code where input_parameter_data type doesn't match input_parameter_metadata|TypeError: dictionary value of incorrect type| No error given |
+|run_code|run_code where input_parameter_data shape doesn't match input_parameter_metadata|ValueError: array shape does not match shape metadata| No error given |
+|run_code|run_code with no output metadata|RuntimeError: no defined outputs present for ImageOperation| No error given |
+|run_code|run_code with existing output data and check it changes|Output changes|Output doesn't change |
+|run_code|Code provided creates an error|RuntimeError: error executing operation |No error passed on|
+|run_code|Code provided doesn't create an output|Runtime error: operation did not generate an output|No error passed|
+|run_code|Code provided changes inputs|Runtime error: operation altered input values|No error passed|
+#Code provided returns an image with type that doesn't match metadata
+#Code provided returns an image with shape that doesn't match metadata
+#Code provided returns an parameter with array type that doesn't match metadata
+#Code provided returns an parameter with array shape that doesn't match metadata
 
 ### 7.3.3 ImageOperationDirectory
 |Component  | Test  | Expected Outcome  | Undesired Outcome |

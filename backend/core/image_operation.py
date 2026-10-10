@@ -213,7 +213,7 @@ class ImageOperation:
         if not self.output_image and not self.output_parameter:
             raise RuntimeError(f"operation did not generate an output ({self.name})")
 
-        # check output pixel_arrays match shape and image_map
+        # check output images match image_shape_constraints and image_map
         if self.output_image is not None or self.output_image_metadata is not None:
             check_data(data=self.output_image,
                        metadata=self.output_image_metadata,
@@ -229,15 +229,15 @@ class ImageOperation:
            
         # check inputs have not changed
         input_changed = False
-        for key, item in self.input_image.items():
-            if not np.array_equal(item.pixel_array,current_input_image[key].pixel_array):
+        for key, value in self.input_image.items():
+            if not np.array_equal(value,current_input_image[key]):
                 input_changed = True
 
-        for key, item in self.input_parameter.items():
-            if item.value is not None:
-                if not isinstance(item.value,np.ndarray) and item.value != current_input_parameter[key].value:
+        if self.input_parameter is not None:
+            for key, value in self.input_parameter.items():
+                if not isinstance(value,np.ndarray) and value != current_input_parameter[key]:
                     input_changed = True
-                if isinstance(item.value,np.ndarray) and not np.array_equal(item.value,current_input_parameter[key].value):
+                if isinstance(value,np.ndarray) and not np.array_equal(value,current_input_parameter[key]):
                     input_changed = True
 
         if input_changed:

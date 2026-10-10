@@ -7,17 +7,7 @@ from core.metadata import ImageMetadata, ParameterMetadata
 from core.type import sample_data
 import types
 
-test_image_operation = ImageOperation(name="Test",
-                          id="test",
-                          category = "Testing",
-                          version = None,
-                          docs = None,
-                          alerts = None,
-                          input_image_metadata={"input1":ImageMetadata(dtype=DataType.ImageInt,
-                                                            image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
-                                                            image_map=Shape(c=0, z=1, y=2, x=3))
-                                                },
-                            )
+
 
 test_image_metadata_imageint = ImageMetadata(dtype=DataType.ImageInt,
                                     image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
@@ -25,9 +15,25 @@ test_image_metadata_imageint = ImageMetadata(dtype=DataType.ImageInt,
                                     )
 
 test_parameter_metadata_valueint = ParameterMetadata(dtype=DataType.ValueInt)
+test_parameter_metadata_arrayint = ParameterMetadata(dtype=DataType.ArrayInt, shape=(1,2))
 
 test_image_data_imageint = sample_data(DataType.ImageInt,(1,2,3,4))
+test_image_data_imagefloat = sample_data(DataType.ImageFloat,(1,2,3,4))
 test_parameter_data_valueint = sample_data(DataType.ValueInt)
+test_parameter_data_valuefloat = sample_data(DataType.ValueFloat)
+
+
+
+test_image_operation = ImageOperation(name="Test",
+                          id="test",
+                          category = "Testing",
+                          version = None,
+                          docs = None,
+                          alerts = None,
+                          input_image_metadata={"input1":test_image_metadata_imageint},
+                            )
+
+
 
 """input_image_metadata setter"""
 #  create ImageOperation with no input_image_metadata or set input_image_metadata to None
@@ -48,13 +54,13 @@ def test_input_image_metadata_setter_no_metadata():
 # create ImageOperation with incorrect input_image_metadata
 @pytest.mark.parametrize("attribute, metadata, message", 
                          [
-                            ("input_image_metadata","not a dictionary","expected input_image_metadata to be dictionary"),
+                            ("input_image_metadata","not a dictionary","expected 'input_image_metadata' to be dictionary"),
                             ("input_image_metadata",{"dictionary not": "right class"},"for metadata dictionary 'input_image_metadata', expected values of type"),
-                            ("output_image_metadata","not a dictionary","expected output_image_metadata to be dictionary"),
+                            ("output_image_metadata","not a dictionary","expected 'output_image_metadata' to be dictionary"),
                             ("output_image_metadata",{"dictionary not": "right class"},"for metadata dictionary 'output_image_metadata', expected values of type"),
-                            ("input_parameter_metadata","not a dictionary","expected input_parameter_metadata to be dictionary"),
+                            ("input_parameter_metadata","not a dictionary","expected 'input_parameter_metadata' to be dictionary"),
                             ("input_parameter_metadata",{"dictionary not": "right class"},"for metadata dictionary 'input_parameter_metadata', expected values of type"),
-                            ("output_parameter_metadata","not a dictionary","expected output_parameter_metadata to be dictionary"),
+                            ("output_parameter_metadata","not a dictionary","expected 'output_parameter_metadata' to be dictionary"),
                             ("output_parameter_metadata",{"dictionary not": "right class"},"for metadata dictionary 'output_parameter_metadata', expected values of type"),
                             ])
 def test_metadata_setters_wrong_metadata(attribute,metadata, message):
@@ -138,175 +144,185 @@ def test_run_code_no_code():
 
 # run_code with no input_image
 def test_run_code_no_input_image():
-    setattr(test_image_operation,"execute",function_for_testing)
+    setattr(test_image_operation,"input_parameter_metadata",None)
+    setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
+    test_image_operation.reset_input()
     with pytest.raises(ValueError, match="metadata present with no data: 'input_image'"):
         test_image_operation.run_code()
+
+#run_code with input_parameter_metadata but no input_parameter
+def test_run_code_input_parameter_metadata_no_data():
+    setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"input_parameter_metadata",{"input2": test_parameter_metadata_valueint})
+    with pytest.raises(ValueError, match="metadata present with no data: 'input_parameter'"):
+        test_image_operation.run_code()
+
+#run_code with input_parameter but not input_parameter_metadata
+def test_run_code_input_parameter_data_no_metadata():
+    setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
+    test_image_operation.reset_input()
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"input_parameter_metadata",{"input2": test_parameter_metadata_valueint})
+    setattr(test_image_operation,"input_parameter",{"input2": test_parameter_data_valueint})
+    setattr(test_image_operation,"input_parameter_metadata",None)
+    with pytest.raises(ValueError, match="data present with no metadata: 'input_parameter'"):
+        test_image_operation.run_code()
+        
+#run_code where input_image_data type doesn't match input_image_metadata
+def test_run_code_input_image_data_wrong_type():
+    setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
+    test_image_operation.reset_input()
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imagefloat})
+    with pytest.raises(TypeError, match="dictionary value of incorrect type"):
+        test_image_operation.run_code()
+
+#run_code where input_image shape deosn't match input_image_metadata
+def test_run_code_input_image_data_wrong_shape():
+    setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
+    test_image_operation.reset_input()
+    # set input_image to have input1 where c = 1
+    setattr(test_image_operation,"input_image",{"input1":sample_data(DataType.ImageInt,(1,2,3,4))})
+    # set input_image_metadata to have shape constraints for input1 as c = 2
+    test_image_operation.input_image_metadata["input1"].image_shape_constraints.c = 2
+    with pytest.raises(ValueError, match="image shape does not match metadata"):
+        test_image_operation.run_code()
+
+#run_code where input_parameter_data type doesn't match input_parameter_metadata
+def test_run_code_input_parameter_data_wrong_type():
+    setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
+    test_image_operation.reset_input()
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"input_parameter_metadata",{"input2":test_parameter_metadata_valueint})
+    setattr(test_image_operation,"input_parameter",{"input2":test_parameter_data_valuefloat})
+
+
+    with pytest.raises(TypeError, match="dictionary value of incorrect type"):
+        test_image_operation.run_code()
+
+#run_code where input_parameter_data shape doesn't match input_parameter_metadata
+def test_run_code_input_parameter_wrong_shape():
+    setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
+    test_image_operation.reset_input()
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"input_parameter_metadata",{"input2":ParameterMetadata(dtype=DataType.ArrayInt, shape=(1,2))})
+    setattr(test_image_operation,"input_parameter",{"input2":sample_data(dtype = DataType.ArrayInt, shape = (2,1))})
+    with pytest.raises(ValueError, match="array shape does not match shape metadata"):
+        test_image_operation.run_code()
+
+#run_code with no output metadata
+def test_run_code_no_output_metadata():
+    setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
+    test_image_operation.reset_input()
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    with pytest.raises(RuntimeError, match="no defined outputs present for ImageOperation"):
+        test_image_operation.run_code()
+
+#run_code with existing output data and check it changes
+def test_run_code_change_in_output():
+    def function_no_change_to_output(self):
+        self.output_image = {"output1": self.input_image["input1"].copy()}
+        self.output_image["output1"][0][0][0][0] = 15
+
+    setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
+    test_image_operation.reset_input()
+
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"output_image_metadata",{"output1":test_image_metadata_imageint})
+    setattr(test_image_operation,"output_image",{"output1":test_image_data_imageint})
+    test_image_operation.output_image["output1"][0][0][0][0] = 25
+
+    test_image_operation.run_code()
+
+    assert test_image_operation.output_image["output1"][0][0][0][0] == 15
+
+
+#Code provided creates an error
+def test_run_code_error_in_code():
+    def function_creates_error(self):
+        a = 1
+        b = 0
+        print(a/b)
+
+    setattr(test_image_operation, "execute", types.MethodType(function_creates_error, test_image_operation))
+    test_image_operation.reset_input()
+
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"output_image_metadata",{"output1":test_image_metadata_imageint})
+    
+    with pytest.raises(RuntimeError, match="error executing operation 'Test': division by zero"):
+        test_image_operation.run_code()
+
+#Code provided doesn't create an output
+def test_run_code_no_output():
+    def function_no_change_to_output(self):
+        print("Nothing changes here")
+
+    setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
+    test_image_operation.reset_input()
+
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"output_image_metadata",{"output1":test_image_metadata_imageint})
+
+    with pytest.raises(RuntimeError, match="operation did not generate an output"):
+        test_image_operation.run_code()
+
+#Code provided changes inputs
+def test_run_code_changes_input_image():
+    def function_no_change_to_output(self):
+        self.output_image = {"output1": self.input_image["input1"].copy()}
+        self.input_image["input1"][0][0][0][0] += 1
+
+    setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
+    test_image_operation.reset_input()
+
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"output_image_metadata",{"output1":test_image_metadata_imageint})
+    setattr(test_image_operation,"output_image",{"output1":test_image_data_imageint})
+    test_image_operation.output_image["output1"][0][0][0][0] = 25
+    with pytest.raises(RuntimeError,match="operation altered input values "):
+        test_image_operation.run_code()
+
+def test_run_code_changes_input_parameter_value():
+    def function_no_change_to_output(self):
+        self.output_image = {"output1": self.input_image["input1"].copy()}
+        self.input_parameter["input2"] += 1
+
+    setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
+    test_image_operation.reset_input()
+
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"output_image_metadata",{"output1":test_image_metadata_imageint})
+    setattr(test_image_operation,"input_parameter_metadata",{"input2":test_parameter_metadata_valueint})
+    setattr(test_image_operation,"input_parameter",{"input2":test_parameter_data_valueint})
+
+    with pytest.raises(RuntimeError,match="operation altered input values "):
+        test_image_operation.run_code()
+
+def test_run_code_changes_input_parameter_array():
+    def function_no_change_to_output(self):
+        self.output_image = {"output1": self.input_image["input1"].copy()}
+        self.input_parameter["input2"][0][0] += 1
+
+    setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
+    test_image_operation.reset_input()
+
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"input_image",{"input1":test_image_data_imageint})
+    setattr(test_image_operation,"output_image_metadata",{"output1":test_image_metadata_imageint})
+    setattr(test_image_operation,"input_parameter_metadata",{"input2":test_parameter_metadata_arrayint})
+    setattr(test_image_operation,"input_parameter",{"input2":sample_data(dtype = DataType.ArrayInt, shape=(1,2))})
+
+    with pytest.raises(RuntimeError,match="operation altered input values "):
+        test_image_operation.run_code()
+
+#Code provided returns an image with type that doesn't match metadata
+#Code provided returns an image with shape that doesn't match metadata
+#Code provided returns an parameter with array type that doesn't match metadata
+#Code provided returns an parameter with array shape that doesn't match metadata
+
 """
-# Supply input_image with mising pixel array
-def test_run_code_input_image_no_pixel_array():
-    test = ImageOperation(name = "Test",
-            category = "Testing",
-            version = None,
-            docs = None,
-            alerts = None,
-            #input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
-            input_parameter = None,
-            #output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
-            output_parameter = None)
-
-    def test_function(self):
-        self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].image_map = Shape(0,0,0,0)
-        self.output_image['output'].shape = Shape(3,3,3,3)
-
-    setattr(test, 'execute', types.MethodType(test_function, test))
-    
-    with pytest.raises(ValueError, match='No image pixel array given') as exc_info:
-        test.run_code() 
-    print(f"{exc_info.value}")
-
-# Supply input pixel_array with missing image_map or shape data
-def test_run_code_input_image_no_shape_or_image_map():
-    test = ImageOperation(name = "Test",
-            category = "Testing",
-            version = None,
-            docs = None,
-            alerts = None,
-            #input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = None,image_map = Shape(0,0,0,0))},
-            input_parameter = None,
-            #output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
-            output_parameter = None)
-        
-    def test_function(self):
-        self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].image_map = Shape(0,0,0,0)
-        self.output_image['output'].shape = Shape(3,3,3,3)
-
-    setattr(test, 'execute', types.MethodType(test_function, test))
-    test.input_image["input"].shape = None
-    test.input_image["input"].image_map = Shape(0,0,0,0)
-
-    with pytest.raises(ValueError) as exc_info:
-        test.run_code() 
-
-    print(f"{exc_info.value}")
-# Supply input pixel_array where shape does not match constraints in shape
-def test_run_code_input_image_array_not_matching_constraints():
-    test = ImageOperation(name = "Test",
-            category = "Testing",
-            version = None,
-            docs = None,
-            alerts = None,
-            #input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,1,-1,-1),image_map = Shape(0,0,0,0))},
-            input_parameter = None,
-            #output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
-            output_parameter = None)
-
-    def test_function(self):
-        self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].image_map = Shape(0,0,0,0)
-        self.output_image['output'].shape = Shape(3,3,3,3)
-
-    setattr(test, 'execute', types.MethodType(test_function, test))
-    with pytest.raises(ValueError) as exc_info:
-        test.run_code() 
-
-    print(f"{exc_info.value}")
-
-# Supply input_parameter with mising value
-def test_run_code_input_parameter_missing_value():
-    test = ImageOperation(name = "Test",
-            category = "Testing",
-            version = None,
-            docs = None,
-            alerts = None,
-            #input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
-            #input_parameter = {"input_parameter":ParameterParcel(dtype = DataType.ValueInt,value = None)},
-            #output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
-            output_parameter = None)
-
-    def test_function(self):
-        self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].image_map = Shape(0,0,0,0)
-        self.output_image['output'].shape = Shape(3,3,3,3)
-
-    setattr(test, 'execute', types.MethodType(test_function, test))
-        
-    with pytest.raises(ValueError) as exc_info:
-        test.run_code() 
-
-    print(f"{exc_info.value}")
-# Supply parameter array where array does not match defined shape
-@pytest.mark.parametrize("test_shape", [None,(2,1)])
-    
-def test_run_code_input_parameter_wrong_shape(test_shape):
-    test = ImageOperation(name = "Test",
-            category = "Testing",
-            version = None,
-            docs = None,
-            alerts = None,
-            #input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
-            #input_parameter = {"input_parameter":ParameterParcel(dtype = DataType.ArrayInt,value = np.array([[2,5],[2,5]],np.uint8),shape = test_shape)},
-            #output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = Shape(-1,-1,-1,-1),image_map = None)},
-            output_parameter = None)
-
-    def test_function(self):
-        self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].image_map = Shape(0,0,0,0)
-        self.output_image['output'].shape = Shape(-1,-1,-1,-1)
-
-    setattr(test, 'execute', types.MethodType(test_function, test))
-    
-    with pytest.raises(ValueError, match= "For parameter input ") as exc_info:
-        test.run_code() 
-
-    print(f"{exc_info.value}")
-# Try to run with missing output definitions (shape for images or arrays, dtype for any output) 
-
-def test_run_code_output_image_missing_definitions():
-    test = ImageOperation(name = "Test",
-            category = "Testing",
-            version = None,
-            docs = None,
-            alerts = None,
-            #input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
-            input_parameter = None,
-            #output_image = {"output":ImageParcel(dtype = DataType.ImageInt,pixel_array=None,shape = None,image_map = None)},
-            output_parameter = None)
-
-    def test_function(self):
-        self.output_image['output'].pixel_array = np.array([1,2,7],np.uint8)
-        self.output_image['output'].image_map = Shape(0,0,0,0)
-        self.output_image['output'].shape = Shape(-1,-1,-1,-1)
-
-    setattr(test, 'execute', types.MethodType(test_function, test))
-
-    with pytest.raises(ValueError, match = 'expected image shape') as exc_info:
-        test.run_code() 
-
-    print(f"{exc_info.value}")
-
-def test_run_code_output_no_image():
-    test = ImageOperation(name = "Test",
-            category = "Testing",
-            version = None,
-            docs = None,
-            alerts = None,
-            #input_image = {"input":ImageParcel(dtype = DataType.ImageInt,pixel_array=np.array([1,2,3],np.uint8),shape = Shape(-1,-1,-1,-1),image_map = Shape(0,0,0,0))},
-            input_parameter = None,
-            output_image = None,)
-            #output_parameter = {"output":ParameterParcel(dtype = DataType.ValueInt,value=None,shape = None)})
-
-    def test_function(self):
-        self.output_parameter['output'].value = np.uint8(5)
-
-    setattr(test, 'execute', types.MethodType(test_function, test))
-
-    test.run_code() 
-
-    #print(f"{exc_info.value}")
-
-
 # Code provided creates an error
 def test_run_code_broken_code():
     test = ImageOperation(name = "Test",
