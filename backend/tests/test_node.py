@@ -35,22 +35,22 @@ def test_initiation_not_image_operation():
 
 
 
-test_image_parcel = ImageMetadata(dtype = DataType.ImageInt, 
-                            #pixel_array = sample_data(dtype = DataType.ImageInt, shape = (1,2,3,4), zero = True, numpy = True),
-                            image_shape_constraints= Shape(c=-1,z=-1,y=-1,x=-1),
-                            image_map = Shape(c=0,z=1,y=2,x=3))
+test_image_metadata = ImageMetadata(dtype = DataType.ImageInt,
+                                    image_shape_constraints= Shape(c=-1, z=-1, y=-1, x=-1),
+                                    image_map = Shape(c=0, z=1, y=2, x=3))
 test_image = None #Image(sample_data(dtype = DataType.ImageInt, shape = (1,2,3,4)), image_map = Shape(0,1,2,3))
-test_parameter_parcel = ParameterMetadata(dtype = DataType.ValueInt)
+test_parameter_metadata = ParameterMetadata(dtype = DataType.ValueInt)
 test_parameter = None #Parameter("test",DataType.ValueInt(2))
-test_operation_1 = ImageOperation(name = "Test Operation 1",
-                                    category = "None",
-                                    version = None,
-                                    docs = None,
-                                    alerts = None,
-                                    input_image = {"image 1": test_image_parcel, "image 2": test_image_parcel},
-                                    input_parameter = {"parameter 1": test_parameter_parcel},
-                                    output_image = {"output 1": ImageMetadata(dtype = DataType.ImageInt, image_map = None,image_shape_constraints = None)}#Shape(-1,-1,-1,-1))}
-)
+test_operation_1 = ImageOperation(name="Test Operation 1",
+                                  id="test_operation_1",
+                                  category = "None",
+                                  version = None,
+                                  docs = None,
+                                  alerts = None,
+                                  input_image_metadata = {"image 1": test_image_metadata, "image 2": test_image_metadata},
+                                  input_parameter_metadata = {"parameter 1": test_parameter_metadata},
+                                  output_image_metadata = {"output 1": test_image_metadata}
+                                  )
 def function1(self):
     self.output_image['output 1'].pixel_array = self.input_image['image 1'].pixel_array
     self.output_image['output 1'].image_map = self.input_image['image 1'].image_map
@@ -59,13 +59,13 @@ setattr(test_operation_1, 'execute', types.MethodType(function1, test_operation_
 
 test_operation_2 = ImageOperation(name = "Test Operation 1",
                                 category = "None",
+                                id="test_operation_1",
                                 version = None,
                                 docs = None,
                                 alerts = None,
-                                input_image = {"image 1": test_image_parcel, "image 2": test_image_parcel, "image 3": test_image_parcel},
-                                input_parameter = {"parameter 1": test_parameter_parcel, "parameter 2": test_parameter_parcel},
-                                output_image = None, #{"output 1": ImageMetadata(dtype = DataType.ImageInt, shape = Shape(-1,-1,-1,-1))},
-                                output_parameter = {"out_param_1": ParameterMetadata(dtype=DataType.ValueFloat),
+                                input_image_metadata = {"image 1": test_image_metadata, "image 2": test_image_metadata, "image 3": test_image_metadata},
+                                input_parameter_metadata = {"parameter 1": test_parameter_metadata, "parameter 2": test_parameter_metadata},
+                                output_parameter_metadata= {"out_param_1": ParameterMetadata(dtype=DataType.ValueFloat),
                                                     "out_param_2": ParameterMetadata(dtype=DataType.ValueInt)}
 )
 def function2(self):
@@ -238,13 +238,13 @@ def test_post_test_mismatched_output_port_parameter_id():
 
 
 test_image_pass_through = ImageOperation(name = "test_image_pass_through",
+                                         id="test_image_pass_through",
                                     category = "None",
                                     version = None,
                                     docs = None,
                                     alerts = None,
-                                    input_image = {"image 1": test_image_parcel},
-                                    input_parameter = {},
-                                    output_image = {"output 1": ImageMetadata(dtype = DataType.ImageInt, image_shape_constraints = None )} #Shape(-1,-1,-1,-1))}
+                                    input_image_metadata= {"image 1": test_image_metadata},
+                                    output_image_metadata = {"output 1": test_image_metadata} #Shape(-1,-1,-1,-1))}
 )
 def image_pass_through(self):
     self.output_image['output 1'].pixel_array = self.input_image['image 1'].pixel_array
@@ -278,13 +278,13 @@ def test_data_flow_image_pass_through():
 
 test_parameter_pass_through = ImageOperation(name = "test_parameter_pass_through",
                                     category = "None",
-                                    version = None,
+                                    id = "test_parameter_pass_through",
+                                    version = "1.0.0",
                                     docs = None,
                                     alerts = None,
-                                    input_image = {"image 1": test_image_parcel},
-                                    input_parameter = {"parameter 1": test_parameter_parcel},
-                                    output_image = {},
-                                    output_parameter = {"out_param_1": ParameterMetadata(dtype=DataType.ValueInt)}
+                                    input_image_metadata = {"image 1": test_image_metadata},
+                                    input_parameter_metadata = {"parameter 1": test_parameter_metadata},
+                                    output_parameter_metadata = {"out_param_1": ParameterMetadata(dtype=DataType.ValueInt)}
 )
 def parameter_pass_through(self):
     self.output_parameter['out_param_1'].value = self.input_parameter['parameter 1'].value
