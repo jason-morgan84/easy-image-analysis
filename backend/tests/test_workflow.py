@@ -2,6 +2,7 @@ import pytest
 from core.workflow import WorkFlow
 from core.image_operation_directory import ImageOperationDirectory
 from core.image_operation import ImageOperation
+from core.interface_classes import Connection, Port
 
 # provide image_operation_directory arguement which is not ImageOperationDirectory class
 def test_initialise_not_image_operation_directory():
@@ -183,16 +184,16 @@ def test_node_delete_removes_connections():
 
 def test_get_output_no_data_at_source_port():
     test_connection = Connection(connection_id = "test",
-                                 source_port = Port(True,"a","b"),
-                                 target_port = Port(True,"a","b"))
+                                 source_port = Port(True,"a","b", is_input=False),
+                                 target_port = Port(True,"a","b", is_input=True))
 
-    test_connection.source_port.output_data = None
+    test_connection.source_port.data = None
     """top test commented out: attempted to get data from a port where none is present raises a ConnectionError in the port
     commented out test matches error message from connection if port is changed to break this"""
     #with pytest.raises(ConnectionError, match = "attempt to get output where source_port.output_data has no data present"):
        # test_connection.output_data
     with pytest.raises(ConnectionError, match = "attempt to get port output where no input present"):
-        test_connection.output_data
+        test_connection.data
 
 #Use get_output when source_port contains parameter with no value
 
