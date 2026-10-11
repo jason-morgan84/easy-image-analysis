@@ -246,7 +246,6 @@ class Node:
 
     def activate_node(self):
         # only activate node if ready
-        print("\n\n\n",self.is_ready)
         if self.is_ready == False:
             raise ActivationError(f"node activated when is_ready set to False: '{self.node_id}'")
         else:

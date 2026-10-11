@@ -65,8 +65,9 @@ test_operation_2 = ImageOperation(name = "Test Operation 1",
                                 alerts = None,
                                 input_image_metadata = {"image 1": test_image_metadata, "image 2": test_image_metadata, "image 3": test_image_metadata},
                                 input_parameter_metadata = {"parameter 1": test_parameter_metadata, "parameter 2": test_parameter_metadata},
+                                output_image_metadata = {"output 1": test_image_metadata},
                                 output_parameter_metadata= {"out_param_1": ParameterMetadata(dtype=DataType.ValueFloat),
-                                                    "out_param_2": ParameterMetadata(dtype=DataType.ValueInt)}
+                                                            "out_param_2": ParameterMetadata(dtype=DataType.ValueInt)}
 )
 def function2(self):
     self.output_image['output 1'].pixel_array = self.input_image['image 1'].pixel_array
@@ -79,22 +80,18 @@ setattr(test_operation_2, 'execute', types.MethodType(function2, test_operation_
 # Associate Node with ImageOperations with varying numbers of output_images and output_parameters
 def test_initiation_number_inputs():
     test_node1 = Node(test_operation_1,"test 1")
-    test_node2 = Node(test_operation_2,"test 2")
-
     assert len(test_node1.input_ports) == 3
     assert len(test_node1.output_ports) == 1
     assert "image.image 1" in test_node1.input_ports.keys()
     assert "image.image 2" in test_node1.input_ports.keys()
     assert "parameter.parameter 1" in test_node1.input_ports.keys()
 
+    test_node2 = Node(test_operation_2,"test 2")
     assert len(test_node2.input_ports) == 5
     assert len(test_node2.output_ports) == 3
     assert "image.output 1" in test_node2.output_ports.keys()
     assert "parameter.out_param_1" in test_node2.output_ports.keys()
     assert "parameter.out_param_1" in test_node2.output_ports.keys()
-
-                                
-
 
 """pre tests"""
 # Activate node where is_ready is false | ActivationError | node activates|
