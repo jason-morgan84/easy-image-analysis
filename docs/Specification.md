@@ -113,8 +113,9 @@
 |09/10/26|0.17.6|Added description of data_checks.py|
 |09/10/26|0.17.7|Added unit testing for data_checks.py|
 |10/10/26|0.17.8|Added is_input flag description to Ports class|
-|10/10/26|0.17.8|Refactoring: moved unit testing and description of transposition and conversion functions from Connection to WorkFlow classes|
-|12/10/26|0.17.8|Added documentation of warn function in error_handling.py|
+|10/10/26|0.17.9|Refactoring: moved unit testing and description of transposition and conversion functions from Connection to WorkFlow classes|
+|12/10/26|0.17.10|Added documentation of warn function in error_handling.py|
+|12/10/25|0.17.11|Added plans for next development stage (1.5 - ImageOperation files)|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -642,6 +643,12 @@ Plugins to make:
 * Plan unit testing for Workflow class.
 * Implement Workflow class.
 * Test Workflow class.
+### Stage 1.5 - ImageOperation Files
+* Sample ImageOperation files
+* ImageOperation file documentation
+* ImageOperation file test harness
+* Hardcoded ImageOperations
+  - LoadImage (note: output image_shape_constraints must equal loaded image dimensions)
 ## Stage 2 - Frontend
 ### Stage 2.1 – Frontend Planning
 * Detailed plans for frontend from initial overview.
