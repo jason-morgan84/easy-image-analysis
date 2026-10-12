@@ -146,7 +146,54 @@ class WorkFlow:
             self.connections.pop(id)
 
     def structure_check(self, source_port, target_port):
-        pass
+
+        # recursive function to look for loops between nodes in graph
+        def loop_check(node_to_search, node_to_find, visited_nodes):
+            if node_to_search not in visited_nodes:
+                visited_nodes.add(node_to_search)
+                target_list = self.get_downstream_node(node_to_search)
+                if node_to_find in target_list:
+                    raise ConnectionError(f"invalid connection: connection results in a loop")
+                else:
+                    visited_nodes.append(node_to_search)
+                    for node in target_list:
+                        loop_check(node, node_to_find, visited_nodes)
+        # is source_port and target_port the same port?
+        if source_port == target_port:
+            raise ConnectionError(f"invalid connection: source port is target port: '{source_port.port_id}'")
+        # is source_port an output and target_port an input?
+        if source_port.is_input == True:
+            raise ConnectionError(f"invalid connection: source port is an input, expected output: '{source_port.port_id}'")
+        if target_port.is_input == False:
+            raise ConnectionError(f"invalid connection: target port is an output, expected input: '{target_port.port_id}'")
+        # are there any other connections in self.connections with target_port as target_port?
+        for key, connection in self.connections.items():
+            if connection.target_port == target_port:
+                raise ConnectionError(f"invalid connection: target port already has an input connection: '{target_port.port_id}'")
+        # will this result in a loop?
+        loop_check(target_port.node_id, source_port.node_id, set())
+
+            
+
+    def get_downstream_node(self, input):
+        # gets list of downstream nodes from either a port or a 
+        def get_downstream_node_from_port(port):
+            downstream_node_from_port = []
+            for connection in self.connections.values():
+                if connection.source_port == port:
+                    downstream_node_from_port.append(connection.target_port.node_id)
+            return downstream_node_from_port
+
+        downstream_node = []
+        if isinstance(input, Port):
+            if input.is_input is True:
+                raise ValueError(f"can't get downstram nodes from input port: {input.port_id}")
+            downstream_node += get_downstream_node_from_port(input)
+
+        elif isinstance(input, Node):
+            for port in input.output_ports.values():
+                downstream_node += get_downstream_node_from_port(port)
+
 
     def shape_check(self, source_port, target_port):
         # if all dimensions in target_port.metadata.image_shape_constraints == -1:
