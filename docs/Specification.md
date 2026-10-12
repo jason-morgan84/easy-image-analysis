@@ -114,6 +114,7 @@
 |09/10/26|0.17.7|Added unit testing for data_checks.py|
 |10/10/26|0.17.8|Added is_input flag description to Ports class|
 |10/10/26|0.17.8|Refactoring: moved unit testing and description of transposition and conversion functions from Connection to WorkFlow classes|
+|12/10/26|0.17.8|Added documentation of warn function in error_handling.py|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -514,14 +515,15 @@ Unit testing list:
 * call create_connection where a connection would fail structure checks (connecting input to input/output to output)
 * call create_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
 * call create_connection where a connection would fail structure checks(would result in loop)
-* call create_connection where a connection would fail shape checks(invalid shape input image)
-* call create_connection where a connection would fail shape checks(invalid type (eg 8 bit image to binarised input))
 * call create_connection where a connection would fail shape checks(invalid shape (eg needs flattened image but has z != 1))
+* call create_connection where a connection would pass shape checks but require transposition
 * call create_connection where a connection would fail type checks(invalid type (eg 8 bit image to binarised input))
 * call create_connection where a connection fails type checks but can be converted (eg 8 bit int to float input)
-  - check conversion properly made
+* call create_connection where a connection fails type checks but can be converted with warning (eg binarised to 8 bit int)
 * call delete_connection with an invalid key
 * check delete_connection removes a connection
+
+
 |transpose| transpose passed not as Shape class | Type error | transpose accepted|
 |convert| convert passed not as DataType class | Type error | convert accepted |
 | get_output | Use get_output when no data at source_port | ConnectionError| No error|
@@ -554,7 +556,9 @@ It contains the LogItem class, which holds data for adding to the log. LogItem l
 - function_name: the function that logged the error
 - import_name: the imported ImageOperation file which caused the error. Defaults to None.
 
-It also contains a custom function, log() that reports errors and appends the associated LogItem describing the error to a list passed to the log function.
+It also contains function:
+* log: reports errors and appends the associated LogItem describing the error to a list passed to the log function
+* warn: prints a warning to terminal - will be associated with dialogue boxes to warn user in future
 
 Exception chaining will be used to log errors in the WorkFlow layer and ImageOperationDirectory, but not lower layer classes (see class heirarchy).
 
