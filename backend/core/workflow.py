@@ -1,7 +1,9 @@
 from core.image_operation_directory import ImageOperationDirectory
 from core.image_operation import ImageOperation
 from core.interface_classes import Node, Connection, Port
-from core.error_handling import ConnectionError, log
+from core.error_handling import ConnectionError, log, warning
+from core.shape import Shape
+from core.constants import DataType
 
 class WorkFlow:
     def __init__(self, logger, image_operation_directiory):
@@ -81,7 +83,7 @@ class WorkFlow:
     add_connection(source_port, target_port) function adds a key/value pair to connections dictionary where dictionary key is connection.UniqueID
     """
     def add_connection(self, source_port, target_port):
-
+        permitted = True
         # checks if source_port and target_port are ports
         if not isinstance(source_port,Port):
             log(self.workflow_logger,TypeError,f"expected source_port as Port, not {type(source_port)}","WorkFlow","add_connection")
@@ -96,17 +98,38 @@ class WorkFlow:
             log(self.workflow_logger, ConnectionError,f"target_node not in nodes dictionary: {target_port.node_id}","WorkFlow","add_connection",target_port.node_id)
         else:
             # error checks (see workflow_error_checking.svg)
-            self.structure_check(source_port, target_port)
-            self.shape_check(source_port, target_port)
-            self.type_check(source_port, target_port)
+            # structure checks - are their loops? is an input pointed at an output? is there more than one input?
+            try:
+                self.structure_check(source_port, target_port)
+            except Exception as e:
+                log()
+                permitted = False
 
-            # create key in the form connection.ID
-            new_key = ".".join(("connection",str(self.max_id)))
-            self.max_id += 1
-            # add new connection to connections dictionary
-            self.connections[new_key] = Connection(connection_id = new_key,
-                                                source_port = source_port,
-                                                target_port = target_port)
+            # type checks - does source metadata give a dtype compatible with target metadata?
+            try:
+                conversion = self.type_check(source_port, target_port)
+            except Exception as e:
+                log(self.workflow_logger, ConnectionError, f"connection not created:{e}","WorkFlow","add_connection",".".join(source_port.port_id,target_port.port_id))
+                permitted = False
+
+            # shape checks - does source metadat give a suitable shape for target metadata?
+            try:
+                transpose = self.shape_check(source_port, target_port)
+            except Exception as e:
+                log(self.workflow_logger, ConnectionError, f"connection not created:{e}","WorkFlow","add_connection",".".join(source_port.port_id,target_port.port_id))
+                permitted = False
+
+            # if error checking is passed, create connection
+            if permitted == True:
+                # create key in the form connection.ID
+                new_key = ".".join(("connection",str(self.max_id)))
+                self.max_id += 1
+                # add new connection to connections dictionary
+                self.connections[new_key] = Connection(connection_id = new_key,
+                                                    source_port = source_port,
+                                                    target_port = target_port,
+                                                    conversion = conversion,
+                                                    transpose = transpose)
 
     """
     delete_connection(id) function deletes a key/value pair of key "id" from connections dictionary
@@ -124,10 +147,46 @@ class WorkFlow:
         pass
 
     def shape_check(self, source_port, target_port):
-        pass
+        # if all dimensions in target_port.metadata.image_shape_constraints == -1:
+        #   - continue
+        # if any dimension in target_port.metadata.image_shape_constraints != -1:
+        #   - does that dimension match from source_port.metadata.image_shape_constraints.dimension to target_port.metadata.image_shape_constraints.dimension:
+        #       - if not, raise Error
+        # if target_port.metadata.image_map matches source_port.metadata.image_map:
+        #   - return None
+        # else:
+        #   - return target_port.metadata.image_map
+        if source_port.metadata.dtype in DataType.image_types:
+            for dimension in Shape.dimensions:
+                if target_port.metadata.image_shape_constraints[dimension] != -1:
+                    if target_port.metadata.image_shape_constraints[dimension] != source_port.metadata.image_shape_constraints[dimension]:
+                        raise ConnectionError(f"invalid image shapes: target port '{target_port.port_id}' requires {dimension}={target_port.metadata.image_shape_constraints[dimension]}, for source_port '{source_port.port_id}', {dimension}={source_port.metadata.image_shape_constraints[dimension]}")
+            if str(source_port.metadata.image_map) == str(target_port.metadata.image_map):
+                return None
+            else:
+                return target_port.metadata.image_mape
 
     def type_check(self, source_port, target_port):
-        pass
+        # if target_port.metadata.dtype has same dtype as source_port metadata: 
+        #   - return None
+        # if target_port.metadata.dtype is in list source_port.dtyle.permitted_conversions:
+        #   - return target_port.metadata.dtype
+        # if target_port.metadata.dtype is in list source_port.dtype.warned_conversions:
+        #   - warn about conversion
+        #   - log conversion
+        #   - return target_port.metadata.dtype
+        # else:
+        #   - raise ConnectionError
+        if target_port.metadata.dtype == source_port.metadata.dtype:
+            return None
+        elif target_port.metadata.dtype in source_port.metadata.dtype.permitted_conversions:
+            return target_port.metadata.dtype
+        elif target_port.metadata.dtype in source_port.metadata.dtype.warned_conversions:
+            log(self.workflow_logger, None, f"warning: for connection between '{source_port.port_id}' and '{target_port.port_id}', data of type {source_port.metadata.dtype} converted to {target_port.metadata.dtype}", "WorkFlow", "type_check",".".join(source_port.port_id, target_port.port_id))
+            warning(f"warning: for connection between '{source_port.port_id}' and '{target_port.port_id}', data of type {source_port.metadata.dtype} converted to {target_port.metadata.dtype}")
+            return target_port.metadata.dtype
+        else:
+            raise ConnectionError(f"invalid port data types ({source_port.metadata.dtype} not compatible with {target_port.metadata.dtype}); connection not possible between '{source_port.port_id}' and '{target_port.port_id}'")
 
 """copied from connection for data conversion etc"""
 """
