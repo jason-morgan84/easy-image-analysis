@@ -2,6 +2,7 @@ import pytest
 from core.workflow import WorkFlow
 from core.image_operation_directory import ImageOperationDirectory
 from core.image_operation import ImageOperation
+from core.constants import DataType
 from core.interface_classes import Connection, Port
 
 # provide image_operation_directory arguement which is not ImageOperationDirectory class
@@ -48,7 +49,7 @@ def test_add_node_adds_node():
     assert len(workflow.nodes) == 1
     assert workflow.nodes["node.same_image.0"]
 
-#  call delete_node with an invalid key
+# call delete_node with an invalid key
 def test_delete_node_invalid_key():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
@@ -62,7 +63,7 @@ def test_delete_node_invalid_key():
             assert item.identifier == "test"
             assert "id not in node list" in item.message 
 
-#  call delete_node
+# all delete_node
 def test_delete_node_removes_node():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
@@ -87,7 +88,7 @@ def test_connection_source_not_port():
     for item in log:
         if item.class_name == "WorkFlow" and item.function_name == "add_connection":
             assert "expected source_port as Port" in item.message 
-# call  add_connection where target is not a port
+# call add_connection where target is not a port
 def test_connection_target_not_port():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
@@ -162,17 +163,96 @@ def test_node_delete_removes_connections():
     workflow.delete_node("node.same_image.1")
     assert "connection.2" not in workflow.connections.keys()
 
+# call create_connection where a connection would fail type checks(invalid type (eg 8 bit image to binarised input))
+def test_connection_add_invalid_types():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["binarised_input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.binarised_input.1"].input_ports["image.input"])
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "add_connection":
+            assert item.identifier == "image.output.image.input"
+            assert "connection not created (failed at type checks):invalid port data types" in item.message 
+
+# call create_connection where a connection fails type checks but can be converted with warning (eg binarised to 8 bit int)
+def test_connection_add_conversion_with_warning():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow.add_node(directory["binarised_output"])
+    workflow.add_node(directory["same_image"])
+    workflow.add_connection(source_port = workflow.nodes["node.binarised_output.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    
+    assert "connection.2" in workflow.connections.keys()
+    assert workflow.connections["connection.2"].convert == DataType.ImageInt
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "add_connection":
+            assert item.identifier == "image.output.image.input"
+            assert "warning: for connection between 'image.output' and 'image.input'" in item.message 
+
+# call create_connection where a connection fails type checks but can be converted (eg 8 bit int to float input)
+def test_connection_add_with_conversion():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+
+    log += directory.logger
+
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["float_input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.float_input.1"].input_ports["image.input"])
+    
+    assert "connection.2" in workflow.connections.keys()
+    assert workflow.connections["connection.2"].convert == DataType.ImageFloat
+
+# call create_connection where a connection would fail shape checks(invalid shape (eg needs flattened image but has z != 1))
+def test_connection_wrong_shape():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["single_channel_input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.single_channel_input.1"].input_ports["image.input"])
+
+    for item in log:
+        print(item.message)
+        if item.class_name == "WorkFlow" and item.function_name == "add_connection":
+            assert item.identifier == "image.output.image.input"
+            assert "connection not created (failed at shape checks):invalid image shapes: target port 'image.input' requires c=1, for source_port 'image.output', c=-1" in item.message 
+
+# call create_connection where a connection would pass shape checks but require transposition
+def test_connection_add_with_transposition():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+
+    log += directory.logger
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image_reversed_input_image_map"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_reversed_input_image_map.1"].input_ports["image.input"])
+    
+    assert "connection.2" in workflow.connections.keys()
+    assert str(workflow.connections["connection.2"].transpose) == "(3, 2, 1, 0)"
 
 """
-* call create_connection with invalid connections (invalid port_id, id of soemthign thats not a port, input to conenction also input to node etc) - check errors chained up and logged
 * call create_connection where a connection would fail structure checks (connecting input to input/output to output)
 * call create_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
 * call create_connection where a connection would fail structure checks(would result in loop)
-* call create_connection where a connection would fail shape checks(invalid shape input image)
-* call create_connection where a connection would fail shape checks(invalid type (eg 8 bit image to binarised input))
-* call create_connection where a connection would fail shape checks(invalid shape (eg needs flattened image but has z != 1))
-* call create_connection where a connection would fail type checks(invalid type (eg 8 bit image to binarised input))
-* call create_connection where a connection fails type checks but can be converted (eg 8 bit int to float input)
-  - check conversion properly made
+
+
 """
 
