@@ -20,6 +20,9 @@ def log(log, error, message, class_name, function_name, identifier = None):
     log.append(new_log_item)
     #return new_log_item
 
+def warn(message):
+    print("\n******WARNING********\n",message)
+
 class ConnectionError(Exception):
     """Exception raised when errors are found in WorkFlow connectivity"""
 
