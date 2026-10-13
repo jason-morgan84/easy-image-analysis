@@ -102,7 +102,7 @@ class WorkFlow:
             try:
                 self.structure_check(source_port, target_port)
             except Exception as e:
-                log()
+                log(self.workflow_logger, ConnectionError, f"connection not created (failed at structure checks):{e}","WorkFlow","add_connection",".".join((source_port.port_id,target_port.port_id)))
                 return
 
             # type checks - does source metadata give a dtype compatible with target metadata?
@@ -137,7 +137,6 @@ class WorkFlow:
     delete_connection(id) function deletes a key/value pair of key "id" from connections dictionary
     """
     def delete_connection(self, id):
-
         # checks if passed id is a value connections key
         if id not in self.connections.keys():
             log(self.workflow_logger, ValueError, f"id not in node list: {id}", "WorkFlow", "delete_connection", id)
@@ -146,7 +145,6 @@ class WorkFlow:
             self.connections.pop(id)
 
     def structure_check(self, source_port, target_port):
-
         # recursive function to look for loops between nodes in graph
         def loop_check(node_to_search, node_to_find, visited_nodes):
             if node_to_search not in visited_nodes:
@@ -155,7 +153,6 @@ class WorkFlow:
                 if node_to_find in target_list:
                     raise ConnectionError(f"invalid connection: connection results in a loop")
                 else:
-                    visited_nodes.append(node_to_search)
                     for node in target_list:
                         loop_check(node, node_to_find, visited_nodes)
         # is source_port and target_port the same port?
@@ -171,28 +168,41 @@ class WorkFlow:
             if connection.target_port == target_port:
                 raise ConnectionError(f"invalid connection: target port already has an input connection: '{target_port.port_id}'")
         # will this result in a loop?
-        loop_check(target_port.node_id, source_port.node_id, set())
+        visited = set()
+        visited.add(source_port)
+        #loop_check(target_port, source_port, visited)
 
             
 
-    def get_downstream_node(self, input):
-        # gets list of downstream nodes from either a port or a 
-        def get_downstream_node_from_port(port):
-            downstream_node_from_port = []
-            for connection in self.connections.values():
-                if connection.source_port == port:
-                    downstream_node_from_port.append(connection.target_port.node_id)
-            return downstream_node_from_port
-
-        downstream_node = []
+    def get_next_nodes(self, input):
+        # gets list of IDs of downstream node(s) immediately after given Port, Node or Connection 
+        next_node = []
+        # if input is a Port
         if isinstance(input, Port):
+            # check its an output Port
             if input.is_input is True:
-                raise ValueError(f"can't get downstram nodes from input port: {input.port_id}")
-            downstream_node += get_downstream_node_from_port(input)
+                raise ValueError(f"get_next_nodes requires output port, not input port: '{input.port_id}'")
+            # go through all connections, find connections with input as source_port and append output node ids
+            for connection in self.connections.values():
+                if connection.source_port == input:
+                    next_node.append(connection.target_port.node_id)
 
+        # if input is a Node
         elif isinstance(input, Node):
+            # goes through each output Port in the Node and calls get_next_nodes with that Port as input
             for port in input.output_ports.values():
-                downstream_node += get_downstream_node_from_port(port)
+                next_node += self.get_next_nodes(port)
+
+        # if input is a Connection, just gets node_id from target_port
+        elif isinstance(input, Connection):
+            next_node.append(input.target_port.node_id)
+
+        # otherwise, raises error.
+        else:
+            raise TypeError(f"get_next_nodes requires input of Port, Node or Connection class, not: {type(input)}")
+
+        # returns list of Node ids
+        return next_node
 
 
     def shape_check(self, source_port, target_port):

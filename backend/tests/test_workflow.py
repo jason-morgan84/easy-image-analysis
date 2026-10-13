@@ -101,8 +101,69 @@ def test_connection_target_not_port():
                             target_port = workflow.nodes["node.same_image.1"])
 
     for item in log:
+        print ("\n",item.message,"\n")
         if item.class_name == "WorkFlow" and item.function_name == "add_connection":
             assert "expected target_port as Port" in item.message 
+
+# test get_downsream_node
+def test_get_next_nodes():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+    # four nodes, node.same_image.0, node.same_image.1, node.same_image.2, node.same_image.3
+    # node.same_image.0 connects to node.same_image.1 (connection.4)
+    # node.same_image.1 connects to node.same_image.2 (connection.5) and node.same_image.3 (connection.6) through output port image.output
+
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.2"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.3"].input_ports["image.input"])
+    
+    # test get_downstream_node from node "node.same_image.0", expect single node returned
+    nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.0"])
+    assert len(nodes) == 1
+    assert "node.same_image.1" in nodes
+
+
+    # test get_downstream_node from node "node.same_image.1", expect two nodes returned
+    nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.1"])
+    assert len(nodes) == 2
+    assert "node.same_image.2" in nodes
+    assert "node.same_image.3" in nodes
+
+    # test get_downstream_node from port "node.same_image.0.output_ports["image.output"]", expect single node returned
+    nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.0"].output_ports["image.output"])
+    assert len(nodes) == 1
+    assert "node.same_image.1" in nodes
+
+
+    # test get_downstream_node from port "workflow.nodes["node.same_image.1"].output_ports["image.output"]", expect two nodes returned
+    nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.1"].output_ports["image.output"])
+    assert len(nodes) == 2
+    assert "node.same_image.2" in nodes
+    assert "node.same_image.3" in nodes
+
+    # test get_downstream_node from connection "workflow.connections["connection.5"]", expect one nodes returned
+    nodes = workflow.get_next_nodes(workflow.connections["connection.5"])
+    assert len(nodes) == 1
+    assert "node.same_image.2" in nodes
+
+    # test get_downstream_node from string "node.same_image.0" expect typeerror
+    with pytest.raises(TypeError, match = "get_next_nodes requires input of Port, Node or Connection class"):
+        nodes = workflow.get_next_nodes("node.same_image.0")
+
+    # test get_downstream_node from input port "workflow.nodes["node.same_image.1"].input_ports["image.input"]"
+    with pytest.raises(ValueError, match = "get_next_nodes requires output port, not input port"):
+        nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.1"].input_ports["image.input"])
+
 
 # check add_connection creates a connection
 def test_connection_add():
@@ -248,11 +309,8 @@ def test_connection_add_with_transposition():
     assert "connection.2" in workflow.connections.keys()
     assert str(workflow.connections["connection.2"].transpose) == "(3, 2, 1, 0)"
 
-"""
-* call create_connection where a connection would fail structure checks (connecting input to input/output to output)
-* call create_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
-* call create_connection where a connection would fail structure checks(would result in loop)
-
-
-"""
+# call create_connection where a connection would fail structure checks (connecting port to itself)
+# call create_connection where a connection would fail structure checks (connecting input to input/output to output)
+# call create_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
+# call create_connection where a connection would fail structure checks(would result in loop)
 
