@@ -116,6 +116,7 @@
 |10/10/26|0.17.9|Refactoring: moved unit testing and description of transposition and conversion functions from Connection to WorkFlow classes|
 |12/10/26|0.17.10|Added documentation of warn function in error_handling.py|
 |12/10/25|0.17.11|Added plans for next development stage (1.5 - ImageOperation files)|
+|13/10/25|0.17.12|Added get_next_nodes to WorkFlow class description|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -439,10 +440,15 @@ It contains instance variables:
 
 It also contains the following functions:
 * update_graph
-* node_create
-* node_remove
-* connection_create
-* connection_remove
+* add_node - adds a node to node dictionary "nodes"
+* delete_node - deletes a node from node dictionary along with associated connections
+* add_connection - adds a connection to connection dictionary "connections", uses other functions to carry out checks before creation:
+  - type_check - checks type of source metadata is compatible with target metadata
+  - shape_check - checks image shape of source metadata is compatible with target metadata
+  - structure_check - checks connection is appropriate for graph structure
+* remove_connection - removes a connection from connections dictionary
+* get_next_nodes - returns a list of node ids of node(s) immediately after an input Node, Port or Connection
+* get_downstream_nodes - returns a list of node ids of nodes downstream of a given Node, Port or Connection
 * ~~Transpose - tranposes pixel_arrays passing through the graph, given requirements of input and output Ports. Previously part of Image class./~~
 * ~~Squeeze/unsqueeze - changes array shape, as Tranpose.~~
 
@@ -513,6 +519,7 @@ Unit testing list:
 * check delete_node removes a node
 * check delete_node removes associated connections
 * call create_connection with invalid connections (invalid port_id, id of soemthign thats not a port, input to conenction also input to node etc) - check errors chained up and logged
+* call create_connection where a connection would fail structure checks (connecting port to itself)
 * call create_connection where a connection would fail structure checks (connecting input to input/output to output)
 * call create_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
 * call create_connection where a connection would fail structure checks(would result in loop)
@@ -523,6 +530,11 @@ Unit testing list:
 * call create_connection where a connection fails type checks but can be converted with warning (eg binarised to 8 bit int)
 * call delete_connection with an invalid key
 * check delete_connection removes a connection
+* check get_next_nodes from a Node
+* check get_next_nodes from a Port
+* check get_next_nodes from a Connection
+* check get_next_nodes returns an error when input is not a Node, Port or Connection
+* check get_next_nodes returns an error when input is an input Port
 
 
 |transpose| transpose passed not as Shape class | Type error | transpose accepted|
