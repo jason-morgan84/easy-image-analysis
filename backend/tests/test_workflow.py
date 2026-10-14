@@ -105,7 +105,7 @@ def test_connection_target_not_port():
         if item.class_name == "WorkFlow" and item.function_name == "add_connection":
             assert "expected target_port as Port" in item.message 
 
-# test get_downsream_node
+# test get_next_nodes
 def test_get_next_nodes():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
@@ -127,40 +127,40 @@ def test_get_next_nodes():
     workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
                             target_port = workflow.nodes["node.same_image.3"].input_ports["image.input"])
     
-    # test get_downstream_node from node "node.same_image.0", expect single node returned
+    # test get_next_nodes from node "node.same_image.0", expect single node returned
     nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.0"])
     assert len(nodes) == 1
     assert "node.same_image.1" in nodes
 
 
-    # test get_downstream_node from node "node.same_image.1", expect two nodes returned
+    # test get_next_nodes from node "node.same_image.1", expect two nodes returned
     nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.1"])
     assert len(nodes) == 2
     assert "node.same_image.2" in nodes
     assert "node.same_image.3" in nodes
 
-    # test get_downstream_node from port "node.same_image.0.output_ports["image.output"]", expect single node returned
+    # test get_next_nodes from port "node.same_image.0.output_ports["image.output"]", expect single node returned
     nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.0"].output_ports["image.output"])
     assert len(nodes) == 1
     assert "node.same_image.1" in nodes
 
 
-    # test get_downstream_node from port "workflow.nodes["node.same_image.1"].output_ports["image.output"]", expect two nodes returned
+    # test get_next_nodes from port "workflow.nodes["node.same_image.1"].output_ports["image.output"]", expect two nodes returned
     nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.1"].output_ports["image.output"])
     assert len(nodes) == 2
     assert "node.same_image.2" in nodes
     assert "node.same_image.3" in nodes
 
-    # test get_downstream_node from connection "workflow.connections["connection.5"]", expect one nodes returned
+    # test get_next_nodes from connection "workflow.connections["connection.5"]", expect one nodes returned
     nodes = workflow.get_next_nodes(workflow.connections["connection.5"])
     assert len(nodes) == 1
     assert "node.same_image.2" in nodes
 
-    # test get_downstream_node from string "node.same_image.0" expect typeerror
+    # test get_next_nodes from string "node.same_image.0" expect typeerror
     with pytest.raises(TypeError, match = "get_next_nodes requires input of Port, Node or Connection class"):
         nodes = workflow.get_next_nodes("node.same_image.0")
 
-    # test get_downstream_node from input port "workflow.nodes["node.same_image.1"].input_ports["image.input"]"
+    # test get_next_nodes from input port "workflow.nodes["node.same_image.1"].input_ports["image.input"]"
     with pytest.raises(ValueError, match = "get_next_nodes requires output port, not input port"):
         nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.1"].input_ports["image.input"])
 
@@ -314,3 +314,116 @@ def test_connection_add_with_transposition():
 # call create_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
 # call create_connection where a connection would fail structure checks(would result in loop)
 
+# call create_connection where a connection would fail structure checks (connecting port to itself)
+def test_structure_check_add_connection_same_node():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+
+
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].input_ports["image.input"],
+                                target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
+    for item in log:
+        print(item.message)
+        if item.class_name == "WorkFlow" and item.function_name == "add_connection":
+            assert "connection not created (failed at structure checks):invalid connection: source port is target port" in item.message
+
+# call create_connection where a connection would fail structure checks (connecting input to input/output to output)
+def test_structure_check_add_connection_source_input():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].input_ports["image.input"],
+                            target_port = workflow.nodes["node.same_image.0"].output_ports["image.output"])
+    for item in log:
+        print(item.message)
+        if item.class_name == "WorkFlow" and item.function_name == "add_connection":
+            assert "connection not created (failed at structure checks):invalid connection: source port is an input" in item.message
+
+# call create_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
+def test_structure_check_add_connection_already_present():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    for item in log:
+        print(item.message)
+        if item.class_name == "WorkFlow" and item.function_name == "add_connection":
+            assert "invalid connection: target port already has an input connection" in item.message
+
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.2"].input_ports["image.input"])
+
+    assert "connection.3" in workflow.connections.keys()
+
+# call create_connection where a connection would fail structure checks(would result in loop)
+def test_structure_check_add_connection_loop():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    # create the following structure:
+    # node0
+    #   |
+    #   v
+    # node1 --> node2
+    #   |
+    #   V
+    # node 3
+    # then try to connect node2 output to node1 input
+
+    workflow.add_node(directory["same_image"]) # node0: node.same_image.0
+    workflow.add_node(directory["same_image"]) # node1: node.same_image.1
+    workflow.add_node(directory["same_image"]) # node2: node.same_image.2
+    workflow.add_node(directory["same_image"]) # node3: node.same_image.3
+
+    # connect node0 to node1 and check connection exists
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+
+    assert len(workflow.connections) == 1
+    assert "connection.4" in workflow.connections.keys()
+
+    # connect node1 to node2 and check connection exists
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.2"].input_ports["image.input"])
+
+    assert len(workflow.connections) == 2
+    assert "connection.5" in workflow.connections.keys()
+
+    # connect node1 to node3 and check connection exists
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.3"].input_ports["image.input"])
+
+    assert len(workflow.connections) == 3
+    assert "connection.6" in workflow.connections.keys()
+
+    # attempt to connect node2 to node0 - check connection doesn't exist and correct error in log
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.2"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
+
+    assert len(workflow.connections) == 3
+    assert "connection.7" not in workflow.connections.keys()
+
+    for item in log:
+        print(item.message)
+        if item.class_name == "WorkFlow" and item.function_name == "add_connection":
+            assert "invalid connection: connection results in a loop" in item.message

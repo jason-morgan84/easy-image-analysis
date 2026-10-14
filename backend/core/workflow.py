@@ -149,12 +149,13 @@ class WorkFlow:
         def loop_check(node_to_search, node_to_find, visited_nodes):
             if node_to_search not in visited_nodes:
                 visited_nodes.add(node_to_search)
-                target_list = self.get_downstream_node(node_to_search)
+                target_list = self.get_next_nodes(self.nodes[node_to_search])
                 if node_to_find in target_list:
                     raise ConnectionError(f"invalid connection: connection results in a loop")
                 else:
                     for node in target_list:
                         loop_check(node, node_to_find, visited_nodes)
+
         # is source_port and target_port the same port?
         if source_port == target_port:
             raise ConnectionError(f"invalid connection: source port is target port: '{source_port.port_id}'")
@@ -168,9 +169,8 @@ class WorkFlow:
             if connection.target_port == target_port:
                 raise ConnectionError(f"invalid connection: target port already has an input connection: '{target_port.port_id}'")
         # will this result in a loop?
-        visited = set()
-        visited.add(source_port)
-        #loop_check(target_port, source_port, visited)
+        loop_check(target_port.node_id, source_port.node_id, set([source_port.node_id]))
+
 
             
 
