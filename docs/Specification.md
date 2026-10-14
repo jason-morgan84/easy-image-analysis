@@ -117,7 +117,8 @@
 |12/10/26|0.17.10|Added documentation of warn function in error_handling.py|
 |12/10/25|0.17.11|Added plans for next development stage (1.5 - ImageOperation files)|
 |13/10/25|0.17.12|Added get_next_nodes to WorkFlow class description|
-|13/10/25|0.17.13|Updated WorkFlow unit testing|
+|14/10/25|0.17.13|Updated WorkFlow unit testing|
+|14/10/25|0.17.14|Clarified description of shape checks carried out during add_connection|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -430,6 +431,8 @@ It contains lists of all existing nodes, connections and ports, contains functio
 On creation of new nodes, it interacts with the frontend to get node parameters.
 
 On creation of new connections, it checks the validity of those connections and, if necessary, gives feedback to the user.
+__Note__: Not all checks are done at this stage - shape checks for unambiguous mismatches are carried out here, for example, if connecting a port with image metadata defining c=4 to a port requiring an image with c=1, this will be rejected. However, if either input or output shape is undefined (-1) then further shape checks are carried out when the graph is updated (by update_graph function) when the shape of data flowing through the graph is fully defined.
+
 It defines the starting node in the graph, allowing it to generate upstream and downstream paths through the WorkFlow.
 It contains instance variables:
 
