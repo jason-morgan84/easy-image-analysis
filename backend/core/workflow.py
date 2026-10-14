@@ -53,7 +53,34 @@ class WorkFlow:
             else:
                 self.nodes[new_key] = Node(image_operation = image_operation,
                                         node_id = new_key)
-            
+
+    """
+    edit_node(id) - partial placeholder function. If a node is edited after creation, particularly by parameter changes via the UI, all downstream nodes need to 
+    have needs_update flag set to true
+    """
+    def edit_node(self, id):
+
+        # if id is a Node class member, get its id string
+        if isinstance(id, Node):
+            id = id.node_id
+
+        # check id is a string
+        if not isinstance(id, str):
+            raise TypeError(f"edit node requires input as key for nodes dictionary (as string) or Node class object, not {type(id)}")
+
+        # check id is in nodes list
+        if id not in self.nodes.keys():
+            raise ValueError(f"edit_node requires key for nodes dictionary, not {id}")
+
+        # set needs_update to True
+        setattr(self.nodes[id], "needs_update", True)
+
+        # get list of all donstream nodes
+        downstream_list = self.get_downstream_nodes(id)
+
+        # set needs_update flag for all downstream nodes to True
+        for node in downstream_list:
+            setattr(self.nodes[node], "needs_update", True)
 
     """
     delete_node(id) function adds a key/value pair to nodes dictionary where dictionary key is node.ImageOperation.UniqueID
