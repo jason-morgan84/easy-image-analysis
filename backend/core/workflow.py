@@ -142,7 +142,6 @@ class WorkFlow:
             try:
                 transpose = self.shape_check(source_port, target_port)
             except Exception as e:
-                print("\n\n\nfailed shape checks")
                 log(self.workflow_logger, ConnectionError, f"connection not created (failed at shape checks):{e}","WorkFlow","add_connection",".".join((source_port.port_id,target_port.port_id)))
                 return
 
@@ -382,6 +381,16 @@ class WorkFlow:
         return downstream_nodes
 
     def get_graph_map(self, start_node):
+        def check_nodes(node, node_list):
+            previous_nodes = self.get_previous_nodes(self.nodes[node])
+            for previous_node in previous_nodes:
+                if previous_node not in node_list:
+                    check_nodes(previous_node, node_list)
+            if node not in node_list: node_list.append(node)
+            next_nodes = self.get_next_nodes(self.nodes[node])
+            for next_node in next_nodes:
+                if next_node not in node_list:
+                    check_nodes(next_node, node_list)
         # will accept nodes dictionary key (string) or value (Node)
         if not isinstance(start_node, (str,Node)):
             raise TypeError(f"get_graph_map requires input of Node class, or nodes dictionary key, not: {type(start_node)}")
@@ -397,18 +406,9 @@ class WorkFlow:
         next_nodes = self.get_next_nodes(start_node)
         for node in next_nodes:
             check_nodes(node, running_list)
+        return running_list
 
-        def check_nodes(node, node_list):
-            print("\n\nnode list: ", node_list)
-            previous_nodes = self.get_previous_nodes(self.nodes[node])
-            for previous_node in previous_nodes:
-                if previous_node not in node_list:
-                    check_nodes(previous_node, node_list)
-            if previous_node not in node_list: node_list.append(previous_node)
-            next_nodes = self.get_next_nodes(self.nodes[node])
-            for next_node in next_nodes:
-                if next_node not in node_list:
-                    check_nodes(next_node, node_list)
+
 
 
 """copied from connection for data conversion etc"""

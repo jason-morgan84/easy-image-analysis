@@ -188,7 +188,6 @@ def test_connection_wrong_shape():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-
     workflow = WorkFlow(logger = log, image_operation_directiory = directory)
     workflow.add_node(directory["multi_channel_output"])
     workflow.add_node(directory["single_channel_input"])
@@ -196,10 +195,9 @@ def test_connection_wrong_shape():
                             target_port = workflow.nodes["node.single_channel_input.1"].input_ports["image.input"])
 
     for item in log:
-        print(item.message)
         if item.class_name == "WorkFlow" and item.function_name == "add_connection":
             assert item.identifier == "image.output.image.input"
-            assert "connection not created (failed at shape checks):invalid image shapes: target port 'image.input' requires c=1, for source_port 'image.output', c=-1" in item.message 
+            assert "connection not created (failed at shape checks):invalid image shapes: target port 'image.input' requires c=1, for source_port 'image.output', c=4" in item.message 
 
 # call add_connection where a connection would pass shape checks but require transposition
 def test_connection_add_with_transposition():
@@ -712,21 +710,34 @@ def test_get_graph_map():
 
     # test with invalid input (not string or Node)
     with pytest.raises(TypeError, match = "get_graph_map requires input of Node class, or nodes dictionary key"):
-        nodes = workflow.get_graph_map(workflow)
+        map = workflow.get_graph_map(workflow)
 
     # test with invalid input (string but not nodes dictionary key)
     with pytest.raises(ValueError, match = "for string inputs, get_graph_map expects a node dictionary key"):
-        nodes = workflow.get_graph_map("not_a_node_id")
+        map = workflow.get_graph_map("not_a_node_id")
 
     # test with invalid input (Node class but not nodes dictionary value) 
     test_node = copy.copy(workflow.nodes["node.same_image.0"])
     with pytest.raises(ValueError, match = "for node inputs, get_graph_map expects value from nodes dictionary"):
-        nodes = workflow.get_graph_map(test_node)
+        map = workflow.get_graph_map(test_node)
 
     workflow.starting_node = "node.same_image.0"
-    order = workflow.get_graph_map(workflow.starting_node)
+    map = workflow.get_graph_map(workflow.starting_node)
 
-    assert len(order) == 11
+    assert len(map) == 12
+    assert map[0] == "node.same_image.0"
+    assert map[1] == "node.same_image.1"
+    assert map[2] == "node.same_image.3"
+    assert map[3] == "node.same_image.2"
+    assert map[4] == "node.same_image.4"
+    assert map[5] == "node.same_image.6"
+    assert map[6] == "node.same_image.9"
+    assert map[7] == "node.same_image.8"
+    assert map[8] == "node.same_image_two_inputs.7"
+    assert map[9] == "node.same_image.10"
+    assert map[10] == "node.same_image.11"
+    assert map[11] == "node.same_image.5"
+    
 
 """test edit_node()"""
 # pass in wrong data type, expect TypeError

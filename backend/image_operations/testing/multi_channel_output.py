@@ -25,4 +25,4 @@ class MultiChannelOutput(ImageOperation):
     def execute(self):
         random_array = np.random.random(size = (4,2,3,1))
         random_array *= 255
-        self.output_image={"output":random_array}
+        self.output_image={"output":np.uint8(random_array)}
