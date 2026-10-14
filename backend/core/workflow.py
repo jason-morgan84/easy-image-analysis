@@ -290,7 +290,7 @@ class WorkFlow:
         if isinstance(input, Port):
             # check its an input Port
             if input.is_input is False:
-                raise ValueError(f"can't get downstram nodes from output port: {input.port_id}")
+                raise ValueError(f"get_previous_nodes requires input port, not output port: {input.port_id}")
             # go through all connections, find connections with input as target_port and append source_port node ids
             for connection in self.connections.values():
                 if connection.target_port == input:
@@ -302,7 +302,7 @@ class WorkFlow:
                 previous_node += self.get_previous_nodes(port)
         # if input is a Connection, just gets node_id from source_port
         elif isinstance(input, Connection):
-            previous_node.append(input.source_port_port.node_id)
+            previous_node.append(input.source_port.node_id)
         # otherwise, raises error.
         else:
             raise TypeError(f"get_previous_nodes requires input of Port, Node or Connection class, or nodes/connections dictionary key, not: {type(input)}")
@@ -322,19 +322,21 @@ class WorkFlow:
         return downstream_nodes
 
     def get_graph_map(self, start_node):
+        # currently expects dictionary key as input for start_node
         def check_nodes(node, node_list):
+            print("\n\nnode list: ", node_list)
             previous_nodes = self.get_previous_nodes(self.nodes[node])
             for previous_node in previous_nodes:
                 if previous_node not in node_list:
                     check_nodes(previous_node, node_list)
             if previous_node not in node_list: node_list.append(previous_node)
-            next_nodes = self.get_downstream_node(self.nodes[node])
+            next_nodes = self.get_next_nodes(self.nodes[node])
             for next_node in next_nodes:
                 if next_node not in node_list:
                     check_nodes(next_node, node_list)
 
         running_list = [start_node]
-        next_nodes = self.get_downstream_node(start_node)
+        next_nodes = self.get_next_nodes(start_node)
         for node in next_nodes:
             check_nodes(node, running_list)
 

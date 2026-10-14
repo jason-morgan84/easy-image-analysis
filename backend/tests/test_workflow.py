@@ -185,6 +185,9 @@ def test_get_next_nodes():
         nodes = workflow.get_next_nodes(workflow.nodes["node.same_image.1"].input_ports["image.input"])
 
 
+
+
+
 # check add_connection creates a connection
 def test_connection_add():
     log = []
@@ -520,3 +523,134 @@ def test_get_downstream_nodes():
     assert "node.same_image.5" in nodes
     assert "node.same_image.6" in nodes
     assert "node.same_image.7" in nodes
+
+# test get_previous_nodes
+def test_get_previous_nodes():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    # four nodes, node.same_image.1, node.same_image.2, node.same_image.3
+    workflow.add_node(directory["same_image"])              # node0: node.same_image.0
+    workflow.add_node(directory["same_image"])              # node1: node.same_image.1
+    workflow.add_node(directory["same_image_two_inputs"])   # node2: node.same_image_two_inputs.2
+    workflow.add_node(directory["same_image"])              # node3: node.same_image.3
+
+    # create the following structure:
+    # node0 ------
+    #   |        |
+    #   v        V
+    # node1 --> node2
+    #   |
+    #   V
+    # node3
+
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.2"].input_ports["image.input1"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.2"].input_ports["image.input2"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.3"].input_ports["image.input"])
+    
+    # test get_previous_nodes from node "node3", expect single node returned, node1
+    nodes = workflow.get_previous_nodes(workflow.nodes["node.same_image.3"])
+    assert len(nodes) == 1
+    assert "node.same_image.1" in nodes
+
+    # test get_previous_nodes from node "node2", expect single node returned, node1 and node0
+    # test using dictionary key
+    nodes = workflow.get_previous_nodes("node.same_image_two_inputs.2")
+    assert len(nodes) == 2
+    assert "node.same_image.0" in nodes
+    assert "node.same_image.1" in nodes
+    
+
+    # test get_previous_nodes from port "node.same_image.1.input_ports["image.input"]", expect single node returned
+    nodes = workflow.get_previous_nodes(workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    assert len(nodes) == 1
+    assert "node.same_image.0" in nodes
+
+    # test get_previous_nodes from port "node.same_image.1.input_ports["image.input"]" provided as string, expect ValueError
+    with pytest.raises(ValueError, match = "for string inputs, get_previous_nodes expects a nodes or connections dictionary key"):
+        nodes = workflow.get_previous_nodes("image.input")
+
+    # test get_previous_nodes from connection "workflow.connections["connection.5"]", expect one node returned
+    nodes = workflow.get_previous_nodes(workflow.connections["connection.5"])
+    assert len(nodes) == 1
+    assert "node.same_image.0" in nodes
+    # same test but with connections key passed
+    nodes = workflow.get_previous_nodes("connection.5")
+    assert len(nodes) == 1
+    assert "node.same_image.0" in nodes
+
+    
+    # test get_previous_nodes from non-string/Node/Connection/Port object expect TypeError
+    with pytest.raises(TypeError, match = "get_previous_nodes requires input of Port, Node or Connection class"):
+        nodes = workflow.get_previous_nodes(workflow)
+
+    # test get_previous_nodes from output port "workflow.nodes["node.same_image.1"].output_ports["image.output"]"
+    with pytest.raises(ValueError, match = "get_previous_nodes requires input port, not output port"):
+        nodes = workflow.get_previous_nodes(workflow.nodes["node.same_image.1"].output_ports["image.output"])
+
+# test get_previous_nodes
+def test_get_graph_map():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    # create the following structure:
+    # node0 -------                     node9 ---------
+    #   |         |                       |           |
+    #   v         V                       V           V
+    # node1     node2 ----> node4       node8       node10
+    #   |         |           |           |           |
+    #   V         V           V           V           V
+    # node3     node5       node6 ----> node7       node11
+
+    workflow.add_node(directory["same_image"])              # node0: node.same_image.0
+    workflow.add_node(directory["same_image"])              # node1: node.same_image.1
+    workflow.add_node(directory["same_image"])              # node2: node.same_image.2
+    workflow.add_node(directory["same_image"])              # node3: node.same_image.3
+    workflow.add_node(directory["same_image"])              # node4: node.same_image.4
+    workflow.add_node(directory["same_image"])              # node5: node.same_image.5
+    workflow.add_node(directory["same_image"])              # node6: node.same_image.6
+    workflow.add_node(directory["same_image_two_inputs"])   # node7: node.same_image_two_inputs.7
+    workflow.add_node(directory["same_image"])              # node8: node.same_image.8
+    workflow.add_node(directory["same_image"])              # node9: node.same_image.9
+    workflow.add_node(directory["same_image"])              # node10: node.same_image.10
+    workflow.add_node(directory["same_image"])              # node11: node.same_image.11
+
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.3"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.2"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.2"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.4"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.2"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.5"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.4"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.6"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.6"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.7"].input_ports["image.input1"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.8"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.7"].input_ports["image.input2"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.9"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.8"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.9"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.10"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.10"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.11"].input_ports["image.input"])
+
+    assert len(workflow.nodes) == 12
+    assert len(workflow.connections) == 11
+
+    workflow.starting_node = "node.same_image.0"
+    order = workflow.get_graph_map(workflow.starting_node)
+
+    assert len(order) == 11
