@@ -41,7 +41,6 @@ class WorkFlow:
         if not isinstance(image_operation,ImageOperation):
             log(self.workflow_logger,TypeError,f"new node requires ImageOperation class, not {type(image_operation)}","WorkFlow","add_node")
 
-            #raise TypeError(f"new node requires ImageOperation class, not {type(image_operation)}")
         else:
             new_key = ".".join(("node",image_operation.id,str(self.max_id)))
             self.max_id += 1
@@ -58,25 +57,25 @@ class WorkFlow:
     edit_node(id) - partial placeholder function. If a node is edited after creation, particularly by parameter changes via the UI, all downstream nodes need to 
     have needs_update flag set to true
     """
-    def edit_node(self, id):
-
-        # if id is a Node class member, get its id string
-        if isinstance(id, Node):
-            id = id.node_id
-
-        # check id is a string
-        if not isinstance(id, str):
-            raise TypeError(f"edit node requires input as key for nodes dictionary (as string) or Node class object, not {type(id)}")
-
-        # check id is in nodes list
-        if id not in self.nodes.keys():
-            raise ValueError(f"edit_node requires key for nodes dictionary, not {id}")
+    def edit_node(self, input):
+        # checks for string or Node input
+        if not isinstance(input, (str,Node)):
+            raise TypeError(f"edit_node requires input of Node class, or nodes dictionary key, not: {type(input)}")
+        if isinstance(input, str):
+            # if string is a key in self.nodes, get Node, else raise ValueError
+            if input in self.nodes.keys():
+                input = self.nodes[input]
+            else: 
+                raise ValueError(f"for string inputs, edit_node expects a node dictionary key: {input}")
+        # if id is not of Node class, raise TypeError           
+        if input not in self.nodes.values():
+            raise ValueError(f"for node inputs, edit_node expects value from nodes dictionary")
 
         # set needs_update to True
-        setattr(self.nodes[id], "needs_update", True)
+        setattr(input, "needs_update", True)
 
         # get list of all donstream nodes
-        downstream_list = self.get_downstream_nodes(id)
+        downstream_list = self.get_downstream_nodes(input)
 
         # set needs_update flag for all downstream nodes to True
         for node in downstream_list:
@@ -110,7 +109,6 @@ class WorkFlow:
     add_connection(source_port, target_port) function adds a key/value pair to connections dictionary where dictionary key is connection.UniqueID
     """
     def add_connection(self, source_port, target_port):
-        permitted = True
         # checks if source_port and target_port are ports
         if not isinstance(source_port,Port):
             log(self.workflow_logger,TypeError,f"expected source_port as Port, not {type(source_port)}","WorkFlow","add_connection")
@@ -208,16 +206,20 @@ class WorkFlow:
         # if all dimensions in target_port.metadata.image_shape_constraints == -1:
         #   - continue
         # if any dimension in target_port.metadata.image_shape_constraints != -1:
-        #   - does that dimension match from source_port.metadata.image_shape_constraints.dimension to target_port.metadata.image_shape_constraints.dimension:
-        #       - if not, raise Error
+        #   - if that dimension in source_port.image_shape_constraints is not -1 and 
+        #       does NOT match the target port shape constraints metadat for that dimension:
+        #       - raise error
         # if target_port.metadata.image_map matches source_port.metadata.image_map:
         #   - return None
         # else:
         #   - return target_port.metadata.image_map
+        # NOTE - SOME ASPECTS OF SHAPE CHECKING TAKE PLACE WHEN THE WORKFLOW IS RUN - WHERE SHAPE CONSTRAINTS ARE -1 (UNDEFINED)
+        # ITS IMPOSSIBLE TO SAY IF THE SOURCE DATA MATCHES THE TARGET METADATA UNTIL THE GRAPH IS RUN
         if source_port.metadata.dtype in DataType.image_types():
             for dimension in Shape.dimensions:
                 if target_port.metadata.image_shape_constraints[dimension] != -1:
-                    if target_port.metadata.image_shape_constraints[dimension] != source_port.metadata.image_shape_constraints[dimension]:
+                    if target_port.metadata.image_shape_constraints[dimension] != -1 and \
+                        target_port.metadata.image_shape_constraints[dimension] != source_port.metadata.image_shape_constraints[dimension]:
                         raise ConnectionError(f"invalid image shapes: target port '{target_port.port_id}' requires {dimension}={target_port.metadata.image_shape_constraints[dimension]}, for source_port '{source_port.port_id}', {dimension}={source_port.metadata.image_shape_constraints[dimension]}")
             if str(source_port.metadata.image_map) == str(target_port.metadata.image_map):
                 return None
@@ -262,14 +264,26 @@ class WorkFlow:
     # expects input as Node, Connection or Port class, or string as self.nodes/self.connections dictionary key  
     # gives an output as a list of self.nodes dictionary keys (strings, node_id of given Nodes)
     def get_next_nodes(self, input):
-        # if input is a string, checks if its a nodes or connections dictionary key
+
+        # checks for string or Node input
+        if not isinstance(input, (str, Node, Port, Connection)):
+            raise TypeError(f"get_next_nodes requires input of Node, Port or Connection class, or nodes or connections dictionary key, not: {type(input)}")
         if isinstance(input, str):
+            # if string is a key in self.nodes, get Node, else raise ValueError
             if input in self.nodes.keys():
                 input = self.nodes[input]
             elif input in self.connections.keys():
                 input = self.connections[input]
-            else:
+            else: 
                 raise ValueError(f"for string inputs, get_next_nodes expects a nodes or connections dictionary key: {input}")
+        # if input is not of Node class, raise TypeError           
+        if isinstance (input, Node) and input not in self.nodes.values():
+            raise ValueError(f"for Node inputs, get_next_nodes expects value from nodes dictionary")
+        if isinstance (input, Connection) and input not in self.connections.values():
+            raise ValueError(f"for Connection inputs, get_next_nodes expects value from nodes dictionary")
+        if isinstance (input, Port) and input.node_id not in self.nodes.keys():
+            raise ValueError(f"for Port inputs, get_next_nodes expects Port to me part of Node from nodes dictionary")
+              
         # gets list of IDs of downstream node(s) immediately after given Port, Node or Connection 
         next_node = []
         # if input is a Port
@@ -303,14 +317,24 @@ class WorkFlow:
     # expects input as Node, Connection or Port class, or string as self.nodes/self.connections dictionary key  
     # gives an output as a list of self.nodes dictionary keys (strings, node_id of given Nodes)
     def get_previous_nodes(self, input): 
-        # if input is a string, checks if its a nodes or connections dictionary key
+        # checks for string or Node input
+        if not isinstance(input, (str, Node, Port, Connection)):
+            raise TypeError(f"get_previous_nodes requires input of Node, Port or Connection class, or nodes or connections dictionary key, not: {type(input)}")
         if isinstance(input, str):
+            # if string is a key in self.nodes, get Node, else raise ValueError
             if input in self.nodes.keys():
                 input = self.nodes[input]
             elif input in self.connections.keys():
                 input = self.connections[input]
-            else:
+            else: 
                 raise ValueError(f"for string inputs, get_previous_nodes expects a nodes or connections dictionary key: {input}")
+        # if input is not of Node class, raise TypeError           
+        if isinstance (input, Node) and input not in self.nodes.values():
+            raise ValueError(f"for Node inputs, get_previous_nodes expects value from nodes dictionary")
+        if isinstance (input, Connection) and input not in self.connections.values():
+            raise ValueError(f"for Connection inputs, get_previous_nodes expects value from nodes dictionary")
+        if isinstance (input, Port) and input.node_id not in self.nodes.keys():
+            raise ValueError(f"for Port inputs, get_previous_nodes expects Port to me part of Node from nodes dictionary")
         # gets list of previous nodes from either a Port or a Node 
         previous_node = []
         # if input is a Port
@@ -337,9 +361,18 @@ class WorkFlow:
         return previous_node
 
     def get_downstream_nodes(self, input):
+        # checks for string or Node input
+        if not isinstance(input, (str,Node)):
+            raise TypeError(f"get_downstream_nodes requires input of Node class, or nodes dictionary key, not: {type(input)}")
         if isinstance(input, str):
+            # if string is a key in self.nodes, get Node, else raise ValueError
             if input in self.nodes.keys():
                 input = self.nodes[input]
+            else: 
+                raise ValueError(f"for string inputs, get_downstream_nodes expects a node dictionary key: {input}")
+        # if input is not in nodes dictionary, raise ValueError         
+        if input not in self.nodes.values():
+            raise ValueError(f"for node inputs, get_downstream_nodes expects value from nodes dictionary")
         # gets list of IDs of all nodes downstream from given node
         downstream_nodes = set()
         next_nodes = self.get_next_nodes(input)
@@ -349,7 +382,22 @@ class WorkFlow:
         return downstream_nodes
 
     def get_graph_map(self, start_node):
-        # currently expects dictionary key as input for start_node
+        # will accept nodes dictionary key (string) or value (Node)
+        if not isinstance(start_node, (str,Node)):
+            raise TypeError(f"get_graph_map requires input of Node class, or nodes dictionary key, not: {type(start_node)}")
+        if isinstance(start_node, Node):
+            if start_node in self.nodes.values():
+                start_node = start_node.node_id
+            else:
+                raise ValueError(f"for node inputs, get_graph_map expects value from nodes dictionary")
+        if start_node not in self.nodes.keys():
+            raise ValueError(f"for string inputs, get_graph_map expects a node dictionary key")
+
+        running_list = [start_node]
+        next_nodes = self.get_next_nodes(start_node)
+        for node in next_nodes:
+            check_nodes(node, running_list)
+
         def check_nodes(node, node_list):
             print("\n\nnode list: ", node_list)
             previous_nodes = self.get_previous_nodes(self.nodes[node])
@@ -361,11 +409,6 @@ class WorkFlow:
             for next_node in next_nodes:
                 if next_node not in node_list:
                     check_nodes(next_node, node_list)
-
-        running_list = [start_node]
-        next_nodes = self.get_next_nodes(start_node)
-        for node in next_nodes:
-            check_nodes(node, running_list)
 
 
 """copied from connection for data conversion etc"""
