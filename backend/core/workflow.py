@@ -143,6 +143,12 @@ class WorkFlow:
         else:
             # removes node from dictionary
             self.connections.pop(id)
+    """
+    Checks for add_connection.
+        - structure_check checks how the connection interacts with the shape of the graph
+        - type_check checks that data passed will be of compatible types
+        - shape_check checks that images passed will be of compatible shapes
+    """
 
     def structure_check(self, source_port, target_port):
         # recursive function to look for loops between nodes in graph
@@ -170,40 +176,6 @@ class WorkFlow:
                 raise ConnectionError(f"invalid connection: target port already has an input connection: '{target_port.port_id}'")
         # will this result in a loop?
         loop_check(target_port.node_id, source_port.node_id, set([source_port.node_id]))
-
-
-            
-
-    def get_next_nodes(self, input):
-        # gets list of IDs of downstream node(s) immediately after given Port, Node or Connection 
-        next_node = []
-        # if input is a Port
-        if isinstance(input, Port):
-            # check its an output Port
-            if input.is_input is True:
-                raise ValueError(f"get_next_nodes requires output port, not input port: '{input.port_id}'")
-            # go through all connections, find connections with input as source_port and append output node ids
-            for connection in self.connections.values():
-                if connection.source_port == input:
-                    next_node.append(connection.target_port.node_id)
-
-        # if input is a Node
-        elif isinstance(input, Node):
-            # goes through each output Port in the Node and calls get_next_nodes with that Port as input
-            for port in input.output_ports.values():
-                next_node += self.get_next_nodes(port)
-
-        # if input is a Connection, just gets node_id from target_port
-        elif isinstance(input, Connection):
-            next_node.append(input.target_port.node_id)
-
-        # otherwise, raises error.
-        else:
-            raise TypeError(f"get_next_nodes requires input of Port, Node or Connection class, not: {type(input)}")
-
-        # returns list of Node ids
-        return next_node
-
 
     def shape_check(self, source_port, target_port):
         # if all dimensions in target_port.metadata.image_shape_constraints == -1:
@@ -250,6 +222,122 @@ class WorkFlow:
                     return target_port.metadata.dtype
         else:
             raise ConnectionError(f"invalid port data types (source {source_port.metadata.dtype} not compatible with target {target_port.metadata.dtype}); connection not possible between '{source_port.port_id}' and '{target_port.port_id}'")
+
+    """
+    Graph functions:
+        - get_next_nodes gets the IDs of node(s) immediately following a Port, Node or Connection
+        - get_previous_nodes gets the ID of node(s) immediately before a given Port, Node or Connection
+        - get_downstream_nodes gets ALL the nodes downstream of a given node
+        - get_graph_map generates a list of order nodes should be run"""
+
+
+    # gets node(s) that receive output from given Node/Port/Connection
+    # expects input as Node, Connection or Port class, or string as self.nodes/self.connections dictionary key  
+    # gives an output as a list of self.nodes dictionary keys (strings, node_id of given Nodes)
+    def get_next_nodes(self, input):
+        # if input is a string, checks if its a nodes or connections dictionary key
+        if isinstance(input, str):
+            if input in self.nodes.keys():
+                input = self.nodes[input]
+            elif input in self.connections.keys():
+                input = self.connections[input]
+            else:
+                raise ValueError(f"for string inputs, get_next_nodes expects a nodes or connections dictionary key: {input}")
+        # gets list of IDs of downstream node(s) immediately after given Port, Node or Connection 
+        next_node = []
+        # if input is a Port
+        if isinstance(input, Port):
+            # check its an output Port
+            if input.is_input is True:
+                raise ValueError(f"get_next_nodes requires output port, not input port: '{input.port_id}'")
+            # go through all connections, find connections with input as source_port and append target_port node ids
+            for connection in self.connections.values():
+                if connection.source_port == input:
+                    next_node.append(connection.target_port.node_id)
+
+        # if input is a Node
+        elif isinstance(input, Node):
+            # goes through each output Port in the Node and calls get_next_nodes with that Port as input
+            for port in input.output_ports.values():
+                next_node += self.get_next_nodes(port)
+
+        # if input is a Connection, just gets node_id from target_port
+        elif isinstance(input, Connection):
+            next_node.append(input.target_port.node_id)
+
+        # otherwise, raises error.
+        else:
+            raise TypeError(f"get_next_nodes requires input of Port, Node or Connection class, or nodes/connections dictionary key, not: {type(input)}")
+
+        # returns list of Node ids
+        return next_node
+
+    # gets node(s) that act as inputs to given Node/Port/Connection
+    # expects input as Node, Connection or Port class, or string as self.nodes/self.connections dictionary key  
+    # gives an output as a list of self.nodes dictionary keys (strings, node_id of given Nodes)
+    def get_previous_nodes(self, input): 
+        # if input is a string, checks if its a nodes or connections dictionary key
+        if isinstance(input, str):
+            if input in self.nodes.keys():
+                input = self.nodes[input]
+            elif input in self.connections.keys():
+                input = self.connections[input]
+            else:
+                raise ValueError(f"for string inputs, get_previous_nodes expects a nodes or connections dictionary key: {input}")
+        # gets list of previous nodes from either a Port or a Node 
+        previous_node = []
+        # if input is a Port
+        if isinstance(input, Port):
+            # check its an input Port
+            if input.is_input is False:
+                raise ValueError(f"can't get downstram nodes from output port: {input.port_id}")
+            # go through all connections, find connections with input as target_port and append source_port node ids
+            for connection in self.connections.values():
+                if connection.target_port == input:
+                    previous_node.append(connection.source_port.node_id)
+        # if input is a Node
+        elif isinstance(input, Node):
+            # goes through each output Port in the Node and calls get_previous_nodes with that Port as input
+            for port in input.input_ports.values():
+                previous_node += self.get_previous_nodes(port)
+        # if input is a Connection, just gets node_id from source_port
+        elif isinstance(input, Connection):
+            previous_node.append(input.source_port_port.node_id)
+        # otherwise, raises error.
+        else:
+            raise TypeError(f"get_previous_nodes requires input of Port, Node or Connection class, or nodes/connections dictionary key, not: {type(input)}")
+        # returns list of Node ids
+        return previous_node
+
+    def get_downstream_nodes(self, input):
+        if isinstance(input, str):
+            if input in self.nodes.keys():
+                input = self.nodes[input]
+        # gets list of IDs of all nodes downstream from given node
+        downstream_nodes = set()
+        next_nodes = self.get_next_nodes(input)
+        downstream_nodes.update(next_nodes)
+        for node in next_nodes:
+            downstream_nodes.update(self.get_downstream_nodes(self.nodes[node]))
+        return downstream_nodes
+
+    def get_graph_map(self, start_node):
+        def check_nodes(node, node_list):
+            previous_nodes = self.get_previous_nodes(self.nodes[node])
+            for previous_node in previous_nodes:
+                if previous_node not in node_list:
+                    check_nodes(previous_node, node_list)
+            if previous_node not in node_list: node_list.append(previous_node)
+            next_nodes = self.get_downstream_node(self.nodes[node])
+            for next_node in next_nodes:
+                if next_node not in node_list:
+                    check_nodes(next_node, node_list)
+
+        running_list = [start_node]
+        next_nodes = self.get_downstream_node(start_node)
+        for node in next_nodes:
+            check_nodes(node, running_list)
+
 
 """copied from connection for data conversion etc"""
 """
