@@ -1,5 +1,7 @@
 from core.metadata import ImageMetadata, ParameterMetadata
 from core.shape import Shape
+from core.constants import DataType
+import numpy as np
 """
 Includes functions for checking data and metadata at various points in the workflow:
     - check_metadata: checks that metadata is a dictionary with values of either ImageMetadata or ParameteMetadata types
@@ -38,8 +40,6 @@ def check_data_dictionaries(data, metadata, dtype, identifier):
     for key in data.keys():
         if key not in metadata.keys():
             raise ValueError(f"key present in data dictionary '{identifier}' but not in metadata: '{key}'")
-        
-
 
 def check_data(data, metadata, dtype, identifier):
     # check data is in correct format
@@ -91,4 +91,39 @@ def check_parameter_shape(data, metadata, identifier):
                 if data[key].shape[n] != dimension:
                     raise ValueError(f"array shape does not match shape metadata for '{identifier}.{key}'")
 
-            
+def sample_data(dtype, shape = None, zero = False):
+    if dtype not in DataType:
+        raise TypeError(f"sample_data dtype must be member of DataType (see constants.py)")
+    value_dtype = getattr(dtype, "data_type", None)
+    if value_dtype == None or value_dtype not in DataType.types():
+        raise TypeError (f"Expected Image data type (see constants.py) got {dtype}")
+    # used for generating sample data sets of given type
+
+        
+    if dtype.is_array is True or dtype.is_image is True:
+        if shape == None:
+            raise TypeError (f"{"array" if dtype.is_array else "image"} data type ({dtype}) supplied without shape")
+        if type(shape) not in [list,tuple]:
+            raise TypeError (f"Expected shape as list or tuple, got {type(shape)}")
+        if not isinstance(shape[0],(int,np.integer)):
+            raise TypeError (f"Shape should be array of integers, not {type(shape[0])}")
+        if zero:
+            output = dtype.numpy(np.zeros(shape))
+            return output
+        else:
+            max = 255 if dtype.max_value == None else dtype.max_value
+            min = 0 if dtype.min_value == None else dtype.min_value
+            range = max - min
+            random_array = np.random.random(size = shape) # gives random array between 0 and 1 of desired shape
+            random_array = (random_array * range) + min # gets array between min and max values
+            output = dtype.numpy(random_array)
+            return output
+    else:
+        if zero:
+            return dtype.numpy(0)
+        else:
+            max = 255 if dtype.max_value == None else dtype.max_value
+            min = 0 if dtype.min_value == None else dtype.min_value
+            range = max - min
+            output = dtype.numpy(np.random.random() * range + min)
+            return output
