@@ -654,7 +654,7 @@ def test_get_downstream_nodes():
 
 
 # test test_get_graph_map
-def test_get_graph_map():
+def test_get_graph_map_structure_1():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
@@ -738,6 +738,194 @@ def test_get_graph_map():
     assert map[10] == "node.same_image.11"
     assert map[11] == "node.same_image.5"
     
+def test_get_graph_map_structure_2():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+#            node0 -------
+#              |         |
+#              v         v
+#            node1     node2
+#              |         |
+#              v         v
+#            node3     node4
+#              |         |
+#              v         |
+#            node5 <------
+#              |
+#              v
+#            node6
+
+
+    workflow.add_node(directory["same_image"])              # node0: node.same_image.0
+    workflow.add_node(directory["same_image"])              # node1: node.same_image.1
+    workflow.add_node(directory["same_image"])              # node2: node.same_image.2
+    workflow.add_node(directory["same_image"])              # node3: node.same_image.3
+    workflow.add_node(directory["same_image"])              # node4: node.same_image.4
+    workflow.add_node(directory["same_image_two_inputs"])   # node7: node.same_image_two_inputs.5
+    workflow.add_node(directory["same_image"])              # node6: node.same_image.6
+
+    # left branch
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.3"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.3"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.5"].input_ports["image.input1"])
+
+    # right branch
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.2"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.2"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.4"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.4"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.5"].input_ports["image.input2"])
+
+    workflow.add_connection(source_port = workflow.nodes["node.same_image_two_inputs.5"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.6"].input_ports["image.input"])
+
+    assert len(workflow.nodes) == 7
+    assert len(workflow.connections) == 7
+
+    workflow.starting_node = "node.same_image.0"
+    map = workflow.get_graph_map(workflow.starting_node)
+
+    assert len(map) == 7
+    assert map[0] == "node.same_image.0"
+    assert map[1] == "node.same_image.1"
+    assert map[2] == "node.same_image.3"
+    assert map[3] == "node.same_image.2"
+    assert map[4] == "node.same_image.4"
+    assert map[5] == "node.same_image_two_inputs.5"
+    assert map[6] == "node.same_image.6"
+
+def test_get_graph_map_structure_3():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+
+
+#            node0           node1
+#              |               |
+#              v               |
+#            node2             |
+#              |               |
+#              v               |
+#            node3  <----------   
+#              |         
+#              v         
+#            node4           node5
+#              |               |
+#              v               |
+#            node6  <----------
+#              |
+#              v
+#            node7
+
+
+    workflow.add_node(directory["same_image"])              # node0: node.same_image.0
+    workflow.add_node(directory["same_image"])              # node1: node.same_image.1
+    workflow.add_node(directory["same_image"])              # node2: node.same_image.2
+    workflow.add_node(directory["same_image_two_inputs"])   # node3: node.same_image_two_inputs.3
+    workflow.add_node(directory["same_image"])              # node4: node.same_image.4
+    workflow.add_node(directory["same_image"])              # node5: node.same_image.5
+    workflow.add_node(directory["same_image_two_inputs"])   # node6: node.same_image_two_inputs.6
+    workflow.add_node(directory["same_image"])              # node7: node.same_image.7
+
+    # left branch
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.2"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.2"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.3"].input_ports["image.input1"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image_two_inputs.3"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.4"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.4"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.6"].input_ports["image.input1"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image_two_inputs.6"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.7"].input_ports["image.input"])
+
+    # right branch
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.3"].input_ports["image.input2"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.5"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.6"].input_ports["image.input2"])
+
+
+    assert len(workflow.nodes) == 8
+    assert len(workflow.connections) == 7
+
+    workflow.starting_node = "node.same_image.0"
+    map = workflow.get_graph_map(workflow.starting_node)
+
+    assert len(map) == 8
+    assert map[0] == "node.same_image.0"
+    assert map[1] == "node.same_image.2"
+    assert map[2] == "node.same_image.1"
+    assert map[3] == "node.same_image_two_inputs.3"
+    assert map[4] == "node.same_image.4"
+    assert map[5] == "node.same_image.5"
+    assert map[6] == "node.same_image_two_inputs.6"
+    assert map[7] == "node.same_image.7"
+
+
+def test_get_graph_map_structure_4():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    #         ----- node0 -----
+    #         |       |       |
+    #         v       v       v
+    #       node1   node3   node5
+    #         |       |       |
+    #         v       v       v
+    #       node2   node4   node6
+
+    workflow.add_node(directory["same_image"])              # node0: node.same_image.0
+    workflow.add_node(directory["same_image"])              # node1: node.same_image.1
+    workflow.add_node(directory["same_image"])              # node2: node.same_image.2
+    workflow.add_node(directory["same_image"])              # node3: node.same_image.3
+    workflow.add_node(directory["same_image"])              # node4: node.same_image.4
+    workflow.add_node(directory["same_image"])              # node5: node.same_image.5
+    workflow.add_node(directory["same_image"])              # node6: node.same_image.6
+
+    # left branch
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.2"].input_ports["image.input"])
+
+    # middle branch
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.3"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.3"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.4"].input_ports["image.input"])
+
+    # right branch
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.5"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.5"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.6"].input_ports["image.input"])
+
+    assert len(workflow.nodes) == 7
+    assert len(workflow.connections) == 6
+
+    workflow.starting_node = "node.same_image.0"
+    map = workflow.get_graph_map(workflow.starting_node)
+
+    assert len(map) == 7
+    assert map[0] == "node.same_image.0"
+    assert map[1] == "node.same_image.1"
+    assert map[2] == "node.same_image.2"
+    assert map[3] == "node.same_image.3"
+    assert map[4] == "node.same_image.4"
+    assert map[5] == "node.same_image.5"
+    assert map[6] == "node.same_image.6"
 
 """test edit_node()"""
 # pass in wrong data type, expect TypeError
