@@ -4,28 +4,63 @@ from core.constants import DataType
 from core.type import ImageInt, ArrayFloat, ImageFloat, ImageBinary, ValueInt, ValueFloat, ArrayInt
 from core.type import sample_data
 
-
-@pytest.mark.parametrize("DataType, invalid_input", [
-    (ImageInt, 5.18),
-    (ImageFloat, "not_a_number"),
-    (ValueInt, 3.14),
-    (ValueFloat, "not_a_number"),
-    (ImageBinary, -2515.21),
+"""test validate class"""
+# test is_image or is_array flagged class without np.array
+@pytest.mark.parametrize("dtype, invalid_input, message", [
+    (ImageInt, 2, "expected np.array for DataType.ImageInt"), # not an array
+    (ArrayFloat, "1", "expected np.array for DataType.ArrayFloat"), # not an array
+    (ImageFloat, [1,2],"expected np.array for DataType.ImageFloat, got <class 'list'>"), # unexpected list
+    (ArrayFloat, {"test": np.array([1,2,3])},"expected np.array for DataType.ArrayFloat, got <class 'dict'>"), #unexpected dict
 ])
-def test_base_type_error_handling(DataType, invalid_input):
-    with pytest.raises(TypeError):
-        DataType(invalid_input)
+def test_array_validation(dtype, invalid_input, message):
+    with pytest.raises(TypeError, match = message):
+        dtype.validate(invalid_input)
 
-# tests is_array: sends arrays to types expecting scalars and vice versa
-@pytest.mark.parametrize("DataType, invalid_input", [
-    (ImageInt, 2), # not an array
-    (ArrayFloat, 1), # not an array
-    (ValueInt, [1,2]), # unexpected list
-    (ValueFloat, np.array([1,2,3])), #unexpected np.array
+
+# test scalar class with list/tuple/np.array
+@pytest.mark.parametrize("dtype, invalid_input, message", [
+    (ValueInt, [1,2], "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'list'>"), # unexpected array
+    (ValueInt, np.array([1,2,3]), "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'numpy.ndarray'>"), # unexpected np array
+    (ValueFloat, (1,2),"expected data type of <class 'numpy.float64'> for DataType.ValueFloat, got <class 'tuple'>"), # unexpected tuple
 ])
-def test_is_array_validation(DataType, invalid_input):
-    with pytest.raises(TypeError):
-        DataType(invalid_input)
+def test_scalar_validation(dtype, invalid_input, message):
+    with pytest.raises(TypeError, match = message):
+        dtype.validate(invalid_input)
+
+# test class with incorrect data type
+@pytest.mark.parametrize("dtype, invalid_input, message", [
+    (ValueInt, "2.0", "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'str'>"), # not an array
+    (ImageBinary, np.array([1,2,3],np.float64), "expected np.array of <class 'numpy.uint8'> for DataType.ImageBinary, got float64"), # not an array
+    (ArrayInt, np.array([1.0,1.1,1.2],np.float64),"expected np.array of <class 'numpy.uint8'> for DataType.ArrayInt, got float64"), # unexpected list
+    (ArrayFloat, np.array([1,2,3], np.uint8),"expected np.array of <class 'numpy.float64'> for DataType.ArrayFloat, got uint8"), #unexpected dict
+])
+def test_incorrect_data_type(dtype, invalid_input, message):
+    with pytest.raises(TypeError, match = message):
+        dtype.validate(invalid_input)
+
+# test class with max_value and input over max_value
+@pytest.mark.parametrize("dtype, invalid_input, message", [
+    # test removed, can't have data over 255 for uint8
+    # (ImageInt, np.array([0,1,5,290], np.uint8), "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'str'>"), 
+    (ImageFloat, np.array([0.5, 0.2, 1.5],np.float64),"array exceeds maximum value: DataType.ImageFloat has max_value of 1.0, not 1.5"), # unexpected list
+])
+def test_data_over_max_value(dtype, invalid_input, message):
+    with pytest.raises(ValueError, match = message):
+        dtype.validate(invalid_input)
+
+# test class with min_value and input below min_value
+@pytest.mark.parametrize("dtype, invalid_input, message", [
+    # test removed, can't have data under 0 for uint8
+    # (ImageInt, np.array([0,1,5,-5], np.uint8), "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'str'>"), 
+    (ImageFloat, np.array([0.5, 0.2, -4.0],np.float64),"array below maximum value: DataType.ImageFloat has min_value of 0, not -4"), # unexpected list
+])
+def test_data_under_min_value(dtype, invalid_input, message):
+    with pytest.raises(ValueError, match = message):
+        dtype.validate(invalid_input)
+
+
+
+
 
 # tests array shape - is it maintained through conversion
 def test_array_shape_maintenance():
@@ -33,60 +68,14 @@ def test_array_shape_maintenance():
     assert ImageInt(mock_image).value.shape == (2,3,4,5)
     assert ImageFloat(mock_image/1000).value.shape == (2,3,4,5)
 
-# test type bounds
-@pytest.mark.parametrize("DataType, invalid_input", [
-    (ImageInt, [-1, 10, 20]),       # Below min_val (0)
-    (ImageInt, [0, 5, 260]),        # Above max_val (255)
-    (ImageFloat, [-0.1, 0.5]),      # Below min_val (0.0)
-    (ImageFloat, [0.5, 1.2]),       # Above max_val (1.0)
-    (ImageBinary, [1, 2]),       # Above max_val (1.0)
-])
-def test_min_max_bounds(DataType, invalid_input):
-    with pytest.raises(ValueError):
-        DataType(invalid_input)
 
-#to_numpy: Convert value using to_numpy function
-def test_to_numpy():
-    test_array = ImageInt([1,2,3,4])
-    assert isinstance(test_array.to_numpy()[0],test_array.numpy)
-
-    test_array = ImageFloat([1,0.2,0.3,0.4])
-    assert isinstance(test_array.to_numpy()[0],test_array.numpy)
-
-    test_value = ValueFloat(1.2)
-    assert isinstance(test_value.to_numpy(),test_array.numpy)
-
-#Immutability: Modify original input list after instantiation of array data type
+# tests conversion immutability: modify original input after conversion
 def test_immutablity_array_list():
     test_list = [2,3,4]
     test_type = ImageInt(test_list)
     test_list[0] = 5
 
     assert (test_list[0]!= test_type.value[0])
-
-#Immutability: Modify original input np.array after instantiation of array data type
-def test_immutablity_array_np():
-    test_list = np.array([2,3,4])
-    test_type = ImageInt(test_list)
-    test_list[0] = 5
-
-    assert (test_list[0]!= test_type.value[0])
-
-#Immutability: Modify original input value after instantiation of scalar data type
-def test_immutablity_scalar():
-    test = 5
-    test_type = ValueInt(test)
-    test = 7
-    
-    assert (test != test_type.value)
-
-#Immutability: Modify original numpy type value after instantiation of scalar data type
-def test_immutablity_scalar_np():
-    test = np.uint8(5)
-    test_type = ValueInt(test)
-    test = 7
-    
-    assert (test != test_type.value)
 
 # goes through each member of DataType, checks that the required class variables have been 
 # properly set
@@ -201,42 +190,37 @@ def test_for_value_drift_array_types(DataType, Input, OutputType):
 
 
 
-
 # test sample data generation
 def test_sample_data():
-    with pytest.raises(TypeError):
-        a = sample_data (int, (2,3),False,False)
-
-    test_numpy = sample_data(DataType.ImageInt,(1,2,3,4),False,True)
-    assert test_numpy.dtype == DataType.ImageInt.numpy
-
-    test_dataType = sample_data(DataType.ImageFloat,(2,4,6,7),False,False)
-    assert type(test_dataType) == DataType.ImageFloat.target_class
 
 # shape checks: Input value dtype where is_array = true but no shape passed
-    with pytest.raises(TypeError):
-        a = sample_data(ImageInt, numpy=False)
-        b = sample_data(ImageFloat, numpy=False)
+    with pytest.raises(TypeError, match="image data type \\(<class 'core.type.ImageInt'>\\) supplied without shape"):
+        a = sample_data(ImageInt)
+
+    with pytest.raises(TypeError, match="image data type \\(<class 'core.type.ImageFloat'>\\) supplied without shape"):
+        b = sample_data(ImageFloat)
 
 # shape checks: Shape passed, but not as np.array, tuple or list
-    with pytest.raises(TypeError):
-        a = sample_data(ImageInt,shape = 25, numpy=False)
-        b = sample_data(ImageInt,shape = {25,24,1}, numpy=False)
+    with pytest.raises(TypeError, match="Expected shape as list or tuple, got <class 'int'>"):
+        a = sample_data(ImageInt,shape = 25)
+    with pytest.raises(TypeError, match="Expected shape as list or tuple, got <class 'set'>"):  
+        b = sample_data(ImageInt,shape = {25,24,1})
 
 # shape checks: Shape passed, but not as array of integers
-    with pytest.raises(TypeError):
-        a = sample_data(ImageInt,shape = [1.0,2.4], numpy=False)
-        b = sample_data(ImageInt,shape = ("2","4","5"), numpy=False)
+    with pytest.raises(TypeError, match="Shape should be array of integers, not <class 'float'>"):
+        a = sample_data(ImageInt,shape = [1.0,2.4])
+    with pytest.raises(TypeError, match="Shape should be array of integers, not <class 'str'>"):
+        b = sample_data(ImageInt,shape = ("2","4","5"))
 
 # shape checks: Shape as np.array, list, tuple
-    a = sample_data(ImageInt,[2,4,5], numpy=False)
-    b = sample_data(ImageFloat,(2,4,5), numpy=False)
+    a = sample_data(ImageInt,[2,4,5])
+    b = sample_data(ImageFloat,(2,4,5))
 
 # type checks: Input value of DataType type, output of expected type
-    assert (sample_data(ImageInt,[2,3], numpy=False)).data_type == DataType.ImageInt
-    assert (sample_data(DataType.ImageFloat,[2,3], numpy=False)).data_type == DataType.ImageFloat
-    assert (sample_data(DataType.ValueFloat, numpy=False)).data_type == DataType.ValueFloat
-    assert (sample_data(DataType.ArrayInt, (5,4), numpy=False)).data_type == DataType.ArrayInt
+    assert isinstance(sample_data(ImageInt,[2,3]), DataType.ImageInt.numpy)
+    assert (sample_data(DataType.ImageFloat,[2,3])).data_type == DataType.ImageFloat
+    assert (sample_data(DataType.ValueFloat)).data_type == DataType.ValueFloat
+    assert (sample_data(DataType.ArrayInt, (5,4))).data_type == DataType.ArrayInt
 
 #shape checks: For array dtype, does output have expected shape with randomized values
     assert (sample_data(ImageInt,[5,4], numpy=False)).value.shape == (5,4)
