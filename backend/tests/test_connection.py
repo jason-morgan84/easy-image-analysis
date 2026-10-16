@@ -4,7 +4,7 @@ import numpy as np
 from core.metadata import ParameterMetadata
 from core.error_handling import ConnectionError
 from core.constants import DataType
-from core.type import sample_data
+from core.data_checks import sample_data
 from core.shape import Shape
 
 sample_metadata = ParameterMetadata(dtype=DataType.ValueInt)
