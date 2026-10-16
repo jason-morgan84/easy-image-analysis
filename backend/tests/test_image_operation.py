@@ -4,7 +4,7 @@ from core.shape import Shape
 from core.constants import DataType
 from core.image_operation import ImageOperation
 from core.metadata import ImageMetadata, ParameterMetadata
-from core.type import sample_data
+from core.data_checks import sample_data
 import types
 import copy
 
