@@ -1,12 +1,11 @@
 import numpy as np
 import pytest
 
-from core.interface_classes import Port, Connection, Node
-from core.image_operation_directory import ImageOperationDirectory
+from core.interface_classes import Node
 from core.error_handling import ActivationError
 from core.image_operation import ImageOperation
 from core.constants import DataType
-from core.type import sample_data
+from core.data_checks import sample_data
 from core.shape import Shape
 from core.metadata import ImageMetadata, ParameterMetadata
 import types

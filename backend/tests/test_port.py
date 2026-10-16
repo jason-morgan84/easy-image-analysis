@@ -58,7 +58,7 @@ def test_unexpected_scalar_data():
                       node_id = "test",
                       is_input=True,
                       metadata = ParameterMetadata(dtype = DataType.ValueInt))
-    with pytest.raises(TypeError, match = "data passed to port with unexpected dtype; for port test expected <class 'numpy.uint8'>"):
+    with pytest.raises(TypeError, match = "port 'test.test' set to value that does not pass validation as DataType.ValueInt"):
         test_port.data = 25
 
 # For image or array data, pass in data that is not of type np.ndarray | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected np.ndarray
@@ -70,7 +70,7 @@ def test_unexpected_array_not_array():
                       metadata = ImageMetadata(dtype = DataType.ImageInt,
                                                 image_map = Shape(c = 0, z = 1, y = 2, x = 3),
                                                 image_shape_constraints = Shape(c = -1, z = -1, y = -1, x = -1)))
-    with pytest.raises(TypeError, match = "data passed to port with unexpected dtype; for port test expected np.ndarray"):
+    with pytest.raises(TypeError, match = "port 'test.test' set to value that does not pass validation as DataType.ImageInt"):
         test_port.data = 25
 
 # For image or array data, pass in data that is not a ndarray of type metadata.dtype | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype.numpy}
@@ -82,7 +82,7 @@ def test_unexpected_array_incorrect_dtype():
                       metadata = ImageMetadata(dtype = DataType.ImageInt,
                                                 image_map = Shape(c = 0, z = 1, y = 2, x = 3),
                                                 image_shape_constraints = Shape(c = -1, z = -1, y = -1, x = -1)))
-    with pytest.raises(TypeError, match = "data passed to port with unexpected dtype; for port test expected <class 'numpy.uint8'>"):
+    with pytest.raises(TypeError, match = "port 'test.test' set to value that does not pass validation as DataType.ImageInt"):
         test_port.data = np.array([0.1,0.2,0.3],np.float64)
 
 # For image data, pass in a Shape arguement that is not present in Shape.dimensions* | AttributeError: dimension present in Shape.dimensions that is not a Shape arguement 
@@ -115,7 +115,7 @@ def test_image_incorrect_shape():
                       metadata = ImageMetadata(dtype = DataType.ImageInt,
                                                 image_map = Shape(c = 0, z = 1, y = 2, x = 3),
                                                 image_shape_constraints = Shape(c = 1, z = -1, y = -1, x = -1)))
-    with pytest.raises(ValueError, match = "image_type passed to port with incorrect shape"):
+    with pytest.raises(ValueError, match = "port 'test.test' set to image that does not match metadata shape constraints"):
         test_port.data = sample_data(DataType.ImageInt, shape = (2,3,1,4))
 
 # For array data, pass in data that doesn't match metadata.shape | ValueError: array_type data passed to port with incorrect shape
@@ -126,7 +126,7 @@ def test_array_incorrect_shape():
                       is_input=True,
                       metadata = ParameterMetadata(dtype = DataType.ArrayInt,
                                                 shape = (1,2)))
-    with pytest.raises(ValueError, match = "array_type data passed to port with incorrect shape"):
+    with pytest.raises(ValueError, match = "port 'test.test' set to array that does not match metadata shape constraints"):
         test_port.data = np.array([0,1,2],DataType.ArrayInt.numpy)
 
 # Pass in data where metadata.dtype does not define dtype from DataTypes** | TypeError: port MetaData defines unexpected dtype

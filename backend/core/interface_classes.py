@@ -3,6 +3,7 @@ from core.error_handling import ConnectionError, ActivationError, MissingDataErr
 from core.metadata import ImageMetadata, ParameterMetadata
 from core.constants import DataType
 from core.image_operation import ImageOperation
+from core.data_checks import check_image_shape, check_parameter_shape
 from core.shape import Shape
 
 class Connection:
@@ -125,47 +126,26 @@ class Port:
 
     @data.setter
     def data(self, value):
-        # if metadata defines dtype as a value type, expect a scalar value of type dtype.numpy
         if value is not None:
-            if self.metadata.dtype.is_array is False and self.metadata.dtype.is_image is False:
-                if not isinstance(value, self.metadata.dtype.numpy):
-                    raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype.numpy}, got {type(value)}")
-            # if metadata defines dtype as an array type or image type, expect a numpy array.
-            elif self.metadata.dtype.is_array is True or self.metadata.dtype.is_image is True:
-                if not isinstance (value, np.ndarray):
-                    raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected np.ndarray, got {type(value)}")
-                # of type metadata.dtype.numpy
-                if value.dtype != self.metadata.dtype.numpy:
-                    raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype.numpy}, got {value.dtype}")
-                # with a shape that matches constraints of metadata
-                # for ImageTypes: metadata.image_shape_constraints and metadata.image_map
-                if self.metadata.dtype.is_image is True:
-                    # goes through each dimension in Shape.dimensions (should be c,z,y,x)
-                    for dim in Shape.dimensions:
-                        # gets constrain and mapping value for that dimension
-                        try:
-                            dim_constraint = getattr(self.metadata.image_shape_constraints, dim)
-                            dim_map = getattr(self.metadata.image_map, dim)
-                        except:
-                            # raises a ValueError if that dimension isn't present. This should NEVER happen, if it does, fix Shape.dimensions to match the Shape class instance arguements
-                            raise ValueError(f"dimension present in Shape.dimensions that is not a Shape arguement, {dim}")
-                        # if the constraint is not -1 (where -1 = don't care about shape)
-                        if dim_constraint!= -1:
-                            # check the array dimension that maps to the constrained dimension matches the expected size
-                            if value.shape[dim_map] != dim_constraint:
-                                # if not, raise ValueError
-                                raise ValueError(f"image_type passed to port with incorrect shape; for port {self.port_id}, \
-                                                expected {dim} = {dim_constraint}, got {dim} = {value.shape[dim_map]}")
+            # check value passes validation for dtype defined in metadata
+            try: 
+                self.metadata.dtype.validate(value)
+            except Exception as e:
+                raise TypeError(f"port '{self.node_id}.{self._port_id}' set to value that does not pass validation as {self.metadata.dtype.data_type}: {e}")
+            if self.metadata.dtype.is_image is True:
+                # check image matches shape constraints for metadata
+                try: 
+                    check_image_shape(data=value, metadata=self.metadata, identifier=".".join([self.node_id,self.port_id]))
+                except Exception as e:
+                    raise ValueError(f"port '{self.node_id}.{self._port_id}' set to image that does not match metadata shape constraints: {e}")
+            
+            elif self.metadata.dtype.is_array is True:
+                # check array matches shape constraints for metadata
+                try: 
+                    check_parameter_shape(data=value, metadata=self.metadata, identifier=".".join([self.node_id,self.port_id]))
+                except Exception as e:
+                    raise ValueError(f"port '{self.node_id}.{self._port_id}' set to array that does not match metadata shape constraints: {e}")
 
-                # for ArrayTypes: metadata.shape
-                elif self.metadata.dtype.is_array is True:
-                    if value.shape != tuple(self.metadata.shape):
-                        raise ValueError(f"array_type data passed to port with incorrect shape; for port {self.port_id}, expected {self.metadata.shape}, got {value.shape}")
-
-            # if metadata defines dtype as something else, raise value error for metadata.dtype
-            # this should never be raised as metadata.dtype is checked by MetaData class
-            else:
-                raise TypeError(f"port MetaData defines unexpected dtype; for port {self.port_id} expected DataType member, got {self.metadata.dtype}")
         self._data = value
    
 class Node:
@@ -303,6 +283,7 @@ class Node:
                     raise ActivationError(f"node activated when input value not present: port '{port_id}' in node '{self.node_id}'")
         self.image_operation.input_image = image_inputs if len(image_inputs) > 0 else None
         self.image_operation.input_parameter = parameter_inputs if len(parameter_inputs) > 0 else None
+
     def cache_output_data(self):
         # go through each output port
         for port_id, port in self.output_ports.items():
@@ -316,10 +297,15 @@ class Node:
                 # if port_name is not a valid reference to a key in the image_operation output_image dictionary, raise an error
                 if port_name not in self.image_operation.output_image.keys():
                     raise ActivationError(f"node activated where output image port name not present in ImageOperation output dictionary: port '{port_id}' in node '{self.node_id}'")
+                
                 image_to_cache = self.image_operation.output_image[port_name]
-                # if the image_operation output dictionary contains data set the relevant output_port.data
+                
+                # if the image_operation output dictionary contains data type then set the relevant output_port.data
                 if image_to_cache is not None:
-                    port.data = image_to_cache.copy() 
+                    try:
+                        port.data = image_to_cache.copy()
+                    except Exception as e:
+                        raise ActivationError(f"ImageOperation returned invalid data for '{self.node_id}.{port_name}': {e}")
                 # else raise an error
                 else:
                     raise ActivationError(f"node activated but expected output data not present: port '{port_id}' in node '{self.node_id}'")
@@ -328,10 +314,13 @@ class Node:
                 if port_name not in self.image_operation.output_parameter.keys():
                     raise ActivationError(f"node activated where output parameter port name not present in ImageOperation output dictionary: port '{port_id}' in node '{self.node_id}'")
                 parameter_to_cache = self.image_operation.output_parameter[port_name]
-                # if the image_operation output dictionary contains data, set the relevant output_port to a copy of the output
+                # if the image_operation output dictionary contains data then set the relevant output_port to a copy of the output
                 if parameter_to_cache is not None:
-                    port.data = parameter_to_cache.copy()
-
+                    try:
+                        port.data = parameter_to_cache.copy()
+                    except Exception as e:
+                        raise ActivationError(f"ImageOperation returned invalid data for '{self.node_id}.{port_name}': {e}")
+  
                 # else raise an error
                 else:
                     raise ActivationError(f"node activated but expected output value not created: port '{port_id}' in node '{self.node_id}'")

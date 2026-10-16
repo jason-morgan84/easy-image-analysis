@@ -257,7 +257,7 @@ def test_run_code_input_image_data_wrong_type():
     setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
 
     setattr(test_image_operation,"input_image",{"input1":test_image_data_imagefloat})
-    with pytest.raises(TypeError, match="dictionary value of incorrect type"):
+    with pytest.raises(TypeError, match="data dictionary value for 'input_image.input1' does not pass dtype validation"):
         test_image_operation.run_code()
 
 #run_code where input_image shape deosn't match input_image_metadata
@@ -300,7 +300,7 @@ def test_run_code_input_parameter_data_wrong_type():
         )
 
     setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
-    with pytest.raises(TypeError, match="dictionary value of incorrect type"):
+    with pytest.raises(TypeError, match="data dictionary value for 'input_parameter.input2' does not pass dtype validation"):
         test_image_operation.run_code()
 
 #run_code where input_parameter_data shape doesn't match input_parameter_metadata
@@ -489,7 +489,7 @@ def test_run_code_image_output_wrong_type():
 
     setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
 
-    with pytest.raises(TypeError,match="dictionary value of incorrect type: for 'output1'"):
+    with pytest.raises(TypeError,match="data dictionary value for 'output_image.output1' does not pass dtype validation"):
         test_image_operation.run_code()
 
 #Code provided returns an image with shape that doesn't match metadata
@@ -535,7 +535,7 @@ def test_run_code_parameter_output_wrong_type():
 
     setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
 
-    with pytest.raises(TypeError,match="dictionary value of incorrect type: for 'output2'"):
+    with pytest.raises(TypeError,match="data dictionary value for 'output_parameter.output2' does not pass dtype validation"):
         test_image_operation.run_code()
 
 #Code provided returns an parameter with array shape that doesn't match metadata

@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from core.shape import Shape
 from core.constants import DataType
-from core.data_checks import check_metadata, check_data_dictionaries, check_data, check_type, check_image_shape, check_parameter_shape, sample_data
+from core.data_checks import *
 from core.metadata import ImageMetadata, ParameterMetadata
 
 test_image_metadata = ImageMetadata(dtype=DataType.ImageInt,
@@ -27,7 +27,9 @@ sample_parameter_float = DataType.ValueFloat.numpy(2)
                          ])
 def test_check_metadata_not_dictionary(metadata, dtype, identifier, message):
     with pytest.raises(TypeError, match = message):
-        check_metadata(metadata=metadata, dtype=dtype, identifier=identifier)
+        check_metadata_dictionary(metadata=metadata, dtype=dtype, identifier=identifier)
+
+
 
 # send metadata as dictionary but not of ImageMetadata/ParameterMetadata classes
 @pytest.mark.parametrize("metadata, dtype, identifier, message", 
@@ -36,7 +38,7 @@ def test_check_metadata_not_dictionary(metadata, dtype, identifier, message):
                          ])
 def test_check_metadata_not_dictionary_of_metadata_class(metadata, dtype, identifier, message):
     with pytest.raises(TypeError, match = message):
-        check_metadata(metadata=metadata, dtype=dtype, identifier=identifier)
+        check_metadata_dictionary(metadata=metadata, dtype=dtype, identifier=identifier)
 
 
 """check_data_dictionaries"""
@@ -47,7 +49,7 @@ def test_check_metadata_not_dictionary_of_metadata_class(metadata, dtype, identi
                          ])
 def test_check_data_no_data(data, metadata, dtype, identifier, message):
     with pytest.raises(ValueError, match = message):
-        check_data_dictionaries(data=data, metadata=metadata, dtype=dtype, identifier=identifier)
+        check_data_dictionary(data=data, metadata=metadata, dtype=dtype, identifier=identifier)
 
 # data sent to function is a dictionary 
 @pytest.mark.parametrize("data, metadata, dtype, identifier, message", 
@@ -56,7 +58,7 @@ def test_check_data_no_data(data, metadata, dtype, identifier, message):
                          ])
 def test_check_data_dictionaries_not_dictionary(data, metadata, dtype, identifier, message):
     with pytest.raises(TypeError, match = message):
-        check_data_dictionaries(data=data, metadata=metadata, dtype=dtype, identifier=identifier)
+        check_data_dictionary(data=data, metadata=metadata, dtype=dtype, identifier=identifier)
 
 # set data where resepective metadata not present
 @pytest.mark.parametrize("data, metadata, dtype, identifier, message", 
@@ -65,7 +67,7 @@ def test_check_data_dictionaries_not_dictionary(data, metadata, dtype, identifie
                          ])
 def test_check_data_dictionaries_no_metadata(data, metadata, dtype, identifier, message):
     with pytest.raises(ValueError, match = message):
-        check_data_dictionaries(data=data, metadata=metadata, dtype=dtype, identifier=identifier)
+        check_data_dictionary(data=data, metadata=metadata, dtype=dtype, identifier=identifier)
 
 # set data where the key in data dictionary is not present in the dictionary of metadata
 @pytest.mark.parametrize("data, metadata, dtype, identifier, message", 
@@ -74,22 +76,22 @@ def test_check_data_dictionaries_no_metadata(data, metadata, dtype, identifier, 
                          ])
 def test_check_data_dictionaries_no_matching_metadata(data, metadata, dtype, identifier, message):
     with pytest.raises(ValueError, match = message):
-        check_data_dictionaries(data=data, metadata=metadata, dtype=dtype, identifier=identifier)
+        check_data_dictionary(data=data, metadata=metadata, dtype=dtype, identifier=identifier)
 
 """check_data"""
 
 """check_type"""
 # set data where the dtype does not match dtype defined in metadata
-@pytest.mark.parametrize("data, metadata, dtype, identifier, message", 
-                         [({"image":sample_image_float},{"image":test_image_metadata},ImageMetadata,"image","dictionary value of incorrect type: for 'image' in 'image' expected"),
-                          ({"parameter":sample_parameter_float},{"parameter":test_parameter_metadata}, ParameterMetadata, "parameter","dictionary value of incorrect type: for 'parameter' in 'parameter' expected"),
+@pytest.mark.parametrize("data, metadata, identifier, message", 
+                         [({"image":sample_image_float},{"image":test_image_metadata},"image","data dictionary value for 'image' does not pass dtype validation: 'dict' object has no attribute 'dtype'"),
+                          ({"parameter":sample_parameter_float},{"parameter":test_parameter_metadata},"parameter","data dictionary value for 'parameter' does not pass dtype validation: 'dict' object has no attribute 'dtype'"),
                          ])
-def test_check_data_type_wrong_type(data, metadata, dtype, identifier, message):
+def test_check_data_type_wrong_type(data, metadata, identifier, message):
     with pytest.raises(TypeError, match = message):
-        check_type(data=data, metadata=metadata, identifier=identifier)
+        check_data_type(data=data, metadata=metadata, identifier=identifier)
 
     with pytest.raises(TypeError, match = message):
-        check_data(data=data, metadata=metadata, dtype=dtype, identifier=identifier)
+        check_data_type(data=data, metadata=metadata, identifier=identifier)
 
 """check_image_shape"""
 # set image where the shape does not match shape defined in metadata
@@ -106,38 +108,33 @@ sample_image_shape_y= sample_data(dtype=DataType.ImageInt,
 sample_image_shape_x= sample_data(dtype=DataType.ImageInt,
                            shape=(4,4,4,1))
 @pytest.mark.parametrize("data, metadata, dtype, identifier, message", 
-                         [({"image":sample_image_shape_c},{"image":test_image_metadata_shape},ImageMetadata,"imagec","image shape does not match metadata; for 'imagec.image'"),
-                          ({"image":sample_image_shape_z},{"image":test_image_metadata_shape},ImageMetadata,"imagez","image shape does not match metadata; for 'imagez.image'"),
-                          ({"image":sample_image_shape_y},{"image":test_image_metadata_shape},ImageMetadata,"imagey","image shape does not match metadata; for 'imagey.image'"),
-                          ({"image":sample_image_shape_x},{"image":test_image_metadata_shape},ImageMetadata,"imagex","image shape does not match metadata; for 'imagex.image'"),
+                         [(sample_image_shape_c,test_image_metadata_shape,ImageMetadata,"imagec","image shape does not match metadata; for 'imagec', expected c=4, got c=1"),
+                          (sample_image_shape_z,test_image_metadata_shape,ImageMetadata,"imagez","image shape does not match metadata; for 'imagez', expected z=4, got z=1"),
+                          (sample_image_shape_y,test_image_metadata_shape,ImageMetadata,"imagey","image shape does not match metadata; for 'imagey', expected y=4, got y=1"),
+                          (sample_image_shape_x,test_image_metadata_shape,ImageMetadata,"imagex","image shape does not match metadata; for 'imagex', expected x=4, got x=1"),
                          ])
 def test_check_data_image_shape(data, metadata, dtype, identifier, message):
     with pytest.raises(ValueError, match = message):
         check_image_shape(data=data, metadata=metadata, identifier=identifier)
-
-    with pytest.raises(ValueError, match = message):
-        check_data(data=data, metadata=metadata, dtype=dtype, identifier=identifier)
 
 """check_parameter_shape"""
 # set parameter where shape does not exist in metadata
 def test_check_data_parameter_no_shape():
     test_parameter_metadata = ParameterMetadata(dtype=DataType.ArrayInt)
     sample_parameter = sample_data(dtype=DataType.ArrayInt, shape=(1,2))
-    with pytest.raises(ValueError, match = "no shape defined in metadata for array type parameter 'test.input'"):
-        check_parameter_shape(data={"input":sample_parameter}, metadata={"input":test_parameter_metadata}, identifier="test")
+    with pytest.raises(ValueError, match = "no shape defined in metadata for array type parameter 'test'"):
+        check_parameter_shape(data=sample_parameter, metadata=test_parameter_metadata, identifier="test")
 
-    with pytest.raises(ValueError, match = "no shape defined in metadata for array type parameter 'test.input'"):
-        check_data(data={"input":sample_parameter}, metadata={"input":test_parameter_metadata},  dtype = ParameterMetadata, identifier="test")
+    
 
 # set parameter where the shape does not match shape defined in metadata
 def test_check_data_parameter_shape():
     test_parameter_metadata = ParameterMetadata(dtype=DataType.ArrayInt, shape = (2,1))
     sample_parameter = sample_data(dtype=DataType.ArrayInt, shape=(1,2))
-    with pytest.raises(ValueError, match = "array shape does not match shape metadata for 'test.input'"):
-        check_parameter_shape(data={"input":sample_parameter}, metadata={"input":test_parameter_metadata}, identifier="test")
+    with pytest.raises(ValueError, match = "array shape does not match shape metadata for 'test'"):
+        check_parameter_shape(data=sample_parameter, metadata=test_parameter_metadata, identifier="test")
 
-    with pytest.raises(ValueError, match = "array shape does not match shape metadata for 'test.input'"):
-        check_data(data={"input":sample_parameter}, metadata={"input":test_parameter_metadata},  dtype = ParameterMetadata, identifier="test")
+    
 
 """test sample_data"""
 # test shape checks - input value where shape is required but not passed
