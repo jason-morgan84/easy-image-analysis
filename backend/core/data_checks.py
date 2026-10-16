@@ -64,7 +64,7 @@ def check_type(data, metadata, identifier):
     # go through each value in metadata, check that the respective data is of the correct dtype
     for key, value in metadata.items():
 
-        if value.dtype.is_array is True:
+        if value.dtype.is_array is True or value.dtype.is_image is True:
             if data[key].dtype != value.dtype.numpy:
                 # check value is of correct type
                 raise TypeError(f"dictionary value of incorrect type: for '{key}' in '{identifier}' expected {value.dtype.numpy}, not {data[key].dtype}")

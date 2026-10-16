@@ -142,8 +142,8 @@ def test_check_data_parameter_shape():
 """test sample_data"""
 # test shape checks - input value where shape is required but not passed
 @pytest.mark.parametrize("dtype, message", [
-    (DataType.ArrayFloat, "array data type \\(<class 'core.type.ArrayFloat'>\\) supplied without shape"),   
-    (DataType.ImageInt, "image data type \\(<class 'core.type.ImageInt'>\\) supplied without shape")     
+    (DataType.ArrayFloat, "array data type \\(DataType.ArrayFloat\\) supplied without shape"),   
+    (DataType.ImageInt, "image data type \\(DataType.ImageInt\\) supplied without shape")     
 ])
 def test_sample_data_shape_no_shape(dtype, message):
     with pytest.raises(TypeError, match=message):
@@ -179,8 +179,8 @@ def test_sample_data_shape_correct():
 
 # test sample_data dtype - input incorrect dtype
 @pytest.mark.parametrize("dtype, shape, message", [
-    (int, [1.0,2.4], "Shape should be array of integers, not <class 'float'>"),   
-    (float, ("2","4","5"), "Shape should be array of integers, not <class 'str'>")     
+    (int, [1.0,2.4], "sample_data dtype must be member of DataType"),   
+    (float, ("2","4","5"), "sample_data dtype must be member of DataType")     
 ])
 
 def test_sample_data_type_incorrect(dtype, shape, message):
@@ -190,35 +190,50 @@ def test_sample_data_type_incorrect(dtype, shape, message):
 # test sample_data type - Input value of DataType type, output of expected numpy type
 
 def test_sample_data_type_correct():
-    assert sample_data(DataType.ImageInt,[2,3]).dtype == DataType.ImageInt.numpy
-    assert sample_data(DataType.ImageFloat,[2,3]).dtype == DataType.ImageFloat.numpy
-    assert type(sample_data(DataType.ValueFloat,[2,3])) ==DataType.ValueFloat.numpy
-    assert sample_data(DataType.ArrayInt,[2,3]).dtype == DataType.ArrayInt.numpy
+    test_image = sample_data(dtype=DataType.ImageInt,
+                             shape=[2,3],
+                             zero=False)
+    assert test_image.dtype == DataType.ImageInt.numpy
+    assert test_image.shape == (2,3)
+
+    test_image_zeros = sample_data(dtype=DataType.ImageFloat, 
+                                   shape=[1,5,9], 
+                                   zero=True)
+    assert test_image_zeros.dtype == DataType.ImageFloat.numpy
+    assert test_image_zeros.shape == (1,5,9)
+    assert test_image_zeros.min() == 0
+    assert test_image_zeros.max() == 0
+
+    test_array = sample_data(dtype=DataType.ArrayInt,
+                             shape=[1,4],
+                             zero=False)
+    assert test_array.dtype == DataType.ArrayInt.numpy
+    assert test_array.shape == (1,4)
+
+    test_array_zeros = sample_data(dtype=DataType.ArrayInt,
+                                   shape=[5,2],
+                                   zero=True)
+    assert test_array_zeros.dtype == DataType.ArrayInt.numpy
+    assert test_array_zeros.shape == (5,2)
+    assert test_array_zeros.min() == 0
+    assert test_array_zeros.max() == 0
+
+    test_value = sample_data(dtype=DataType.ValueFloat,
+                                   zero=False)
+    assert test_value.dtype == DataType.ValueFloat.numpy
+
+
+    test_value_zero = sample_data(dtype=DataType.ValueInt,
+                                   zero=True)
+    assert test_value_zero.dtype == DataType.ValueInt.numpy
+    assert test_value_zero == 0
 
 
 
-def test_sample_data():
-
-# type checks: Input value of DataType type, output of expected type
-    assert isinstance(sample_data(DataType.ImageInt,[2,3]), DataType.ImageInt.numpy)
-    assert (sample_data(DataType.ImageFloat,[2,3])).data_type == DataType.ImageFloat
-    assert (sample_data(DataType.ValueFloat)).data_type == DataType.ValueFloat
-    assert (sample_data(DataType.ArrayInt, (5,4))).data_type == DataType.ArrayInt
-
-#shape checks: For array dtype, does output have expected shape with randomized values
-    assert (sample_data(DataType.ImageInt,[5,4], numpy=False)).value.shape == (5,4)
-    assert (sample_data(DataType.ImageFloat,[1,2,3], numpy=False)).value.shape == (1,2,3)
-    assert (sample_data(DataType.ArrayInt,[1,2,3,4], numpy=False)).value.shape == (1,2,3,4)
-
-#shape checks: For array dtype, does output have expected shape with 0 values
-    assert (sample_data(DataType.ImageInt,[5,4],zero = True, numpy=False)).value.shape == (5,4)
-    assert (sample_data(DataType.ImageFloat,[1,2,3],zero = True, numpy=False)).value.shape == (1,2,3)
-    assert (sample_data(DataType.ArrayInt,[1,2,3,4],zero = True, numpy=False)).value.shape == (1,2,3,4)
-    #def sample_data(dtype, shape = None, zero = False):
-
+def test_sample_data_min_max():
 # value constraint check: For dtype with min, max values, do random values conform to min and max
-    a = (sample_data(DataType.ImageInt,[200,300,400], zero = True, numpy=False))
-    assert a.value.max() <= a.data_type.max_value
-    assert a.value.min() >= a.data_type.min_value
+    a = (sample_data(DataType.ImageInt,[200,300,400]))
+    assert a.max() <= DataType.ImageInt.max_value
+    assert a.min() >= DataType.ImageInt.min_value
 
 
