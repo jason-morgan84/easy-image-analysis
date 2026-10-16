@@ -3,7 +3,7 @@ import numpy as np
 from core.constants import DataType
 from core.shape import Shape
 from core.interface_classes import Port
-from core.type import sample_data
+from core.data_checks import sample_data
 from core.metadata import ParameterMetadata, ImageMetadata
 
 """port_id setter"""
@@ -116,7 +116,7 @@ def test_image_incorrect_shape():
                                                 image_map = Shape(c = 0, z = 1, y = 2, x = 3),
                                                 image_shape_constraints = Shape(c = 1, z = -1, y = -1, x = -1)))
     with pytest.raises(ValueError, match = "image_type passed to port with incorrect shape"):
-        test_port.data = sample_data(DataType.ImageInt, shape = (2,3,1,4), numpy = True)
+        test_port.data = sample_data(DataType.ImageInt, shape = (2,3,1,4))
 
 # For array data, pass in data that doesn't match metadata.shape | ValueError: array_type data passed to port with incorrect shape
 def test_array_incorrect_shape():
@@ -132,7 +132,7 @@ def test_array_incorrect_shape():
 # Pass in data where metadata.dtype does not define dtype from DataTypes** | TypeError: port MetaData defines unexpected dtype
 # (this error should also be impossible to generate given current structure of Metadata classes, wil give an error from ImageMetadata or ParameterMetadata instead)
 def test_incorrect_metadata_dtype():
-    with pytest.raises(TypeError, match = "expected type from DataType.image_type, got: <class 'int'>"):
+    with pytest.raises(TypeError, match = "expected ImageMetadata dtype from DataType.types"):
         test_port = Port (port_id = "test",
                         node_id = "test",
                         is_input=True,
@@ -140,7 +140,7 @@ def test_incorrect_metadata_dtype():
                                                     image_map = Shape(c = 0, z = 1, y = 2, x = 3),
                                                     image_shape_constraints = Shape(c = 1, z = -1, y = -1, x = -1)))
         
-    with pytest.raises(TypeError, match = "expected type from DataType.value_type or DataType.array_type, got: <class 'int'>"):
+    with pytest.raises(TypeError, match = "expected ParameterMetadata dtype from DataType.types"):
         test_port = Port (port_id = "test",
                         node_id = "test",
                         is_input=True,

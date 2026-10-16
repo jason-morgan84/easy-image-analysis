@@ -127,11 +127,11 @@ class Port:
     def data(self, value):
         # if metadata defines dtype as a value type, expect a scalar value of type dtype.numpy
         if value is not None:
-            if self.metadata.dtype in DataType.value_types():
+            if self.metadata.dtype.is_array is False and self.metadata.dtype.is_image is False:
                 if not isinstance(value, self.metadata.dtype.numpy):
                     raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype.numpy}, got {type(value)}")
             # if metadata defines dtype as an array type or image type, expect a numpy array.
-            elif self.metadata.dtype in DataType.image_types() or self.metadata.dtype in DataType.array_types():
+            elif self.metadata.dtype.is_array is True or self.metadata.dtype.is_image is True:
                 if not isinstance (value, np.ndarray):
                     raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected np.ndarray, got {type(value)}")
                 # of type metadata.dtype.numpy
@@ -139,7 +139,7 @@ class Port:
                     raise TypeError(f"data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype.numpy}, got {value.dtype}")
                 # with a shape that matches constraints of metadata
                 # for ImageTypes: metadata.image_shape_constraints and metadata.image_map
-                if self.metadata.dtype in DataType.image_types():
+                if self.metadata.dtype.is_image is True:
                     # goes through each dimension in Shape.dimensions (should be c,z,y,x)
                     for dim in Shape.dimensions:
                         # gets constrain and mapping value for that dimension
@@ -158,7 +158,7 @@ class Port:
                                                 expected {dim} = {dim_constraint}, got {dim} = {value.shape[dim_map]}")
 
                 # for ArrayTypes: metadata.shape
-                elif self.metadata.dtype in DataType.array_types():
+                elif self.metadata.dtype.is_array is True:
                     if value.shape != tuple(self.metadata.shape):
                         raise ValueError(f"array_type data passed to port with incorrect shape; for port {self.port_id}, expected {self.metadata.shape}, got {value.shape}")
 
