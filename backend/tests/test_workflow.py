@@ -336,10 +336,13 @@ def test_connection_add():
     directory.import_operations_dict()
     workflow = WorkFlow(logger = log, image_operation_directiory = directory)
 
+
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
     workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
                             target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    for item in log:
+        print(item.message)
     assert "connection.2" in workflow.connections.keys()
 
 # call delete_connection with an invalid key

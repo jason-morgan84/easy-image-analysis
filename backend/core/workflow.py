@@ -214,7 +214,7 @@ class WorkFlow:
         #   - return target_port.metadata.image_map
         # NOTE - SOME ASPECTS OF SHAPE CHECKING TAKE PLACE WHEN THE WORKFLOW IS RUN - WHERE SHAPE CONSTRAINTS ARE -1 (UNDEFINED)
         # ITS IMPOSSIBLE TO SAY IF THE SOURCE DATA MATCHES THE TARGET METADATA UNTIL THE GRAPH IS RUN
-        if source_port.metadata.dtype in DataType.image_types():
+        if source_port.metadata.dtype.is_image is True:
             for dimension in Shape.dimensions:
                 if target_port.metadata.image_shape_constraints[dimension] != -1:
                     if target_port.metadata.image_shape_constraints[dimension] != -1 and \
