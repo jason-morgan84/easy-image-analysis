@@ -3,7 +3,7 @@ import importlib
 import pkgutil
 import os
 from core.error_handling import log, VersionError
-from core.type import sample_data
+from core.data_checks import sample_data
 import ast
 import inspect
 
