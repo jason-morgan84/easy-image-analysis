@@ -10,7 +10,7 @@ class DataType(Enum):
     ArrayInt = auto()
 
     #categorise DataTypes into image_types, for multi-dimensional arrays, and value_types, for 1d variables.
-    @classmethod
+    """    @classmethod
     def image_types(cls) -> set:
         return {cls.ImageInt, cls.ImageFloat, cls.ImageBinary}
 
@@ -21,7 +21,7 @@ class DataType(Enum):
     @classmethod
     def array_types(cls) -> set:
         return {cls.ArrayInt, cls.ArrayFloat}
-
+    """
     @classmethod
     def types(cls) -> set:
         return {cls.ImageInt, cls.ImageFloat, cls.ImageBinary,

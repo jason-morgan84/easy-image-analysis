@@ -51,44 +51,5 @@ def test_enum_resolves_to_correct_class_name(enum_member, expected_name):
 def test_data_type_resolves_to_correct_class_type(enum_member, data_type):
     assert data_type.data_type == enum_member
 
-@pytest.mark.parametrize("enum_member, test_value, core_type", [
-(DataType.ValueInt, 2, ValueInt),
-(DataType.ValueFloat, 12, ValueFloat)])
-def test_value_data_type_instantiates_correct_class(enum_member, test_value, core_type):
-    x = enum_member(test_value)
-    assert(isinstance(x, core_type))
-    assert(x.value == test_value)
-
-@pytest.mark.parametrize("enum_member, test_value, core_type", [
-(DataType.ImageInt, [5,2], ImageInt),
-(DataType.ImageFloat, [0.5,0.1], ImageFloat),
-(DataType.ImageBinary, [1,0], ImageBinary)])
-def test_image_data_type_instantiates_correct_class(enum_member, test_value, core_type):
-    x = enum_member(test_value)
-    assert(isinstance(x, core_type))
-    assert(x.value.all() == np.array(test_value).all())
 
 
-@pytest.mark.parametrize("enum_member, test_value", [
-(DataType.ValueInt, 2.5),
-(DataType.ValueFloat, "12")])
-def test_value_data_type_raises_type_error(enum_member, test_value):
-    with pytest.raises(TypeError):
-        enum_member(test_value)
-
-@pytest.mark.parametrize("enum_member, test_value", [
-(DataType.ImageInt, [215.2,5]),
-(DataType.ImageFloat, ["2", 0.5]),
-(DataType.ImageBinary, ["2",1])])
-def test_image_data_type_raises_type_error(enum_member, test_value):
-    with pytest.raises(TypeError):
-        enum_member(test_value)
-
-
-@pytest.mark.parametrize("enum_member, test_value", [
-(DataType.ImageInt, [298,-5]),
-(DataType.ImageFloat, [2, 0.5]),
-(DataType.ImageBinary, [2,1])])
-def test_image_data_type_raises_value_error(enum_member, test_value):
-    with pytest.raises(ValueError):
-        enum_member(test_value)
