@@ -14,10 +14,11 @@ class ImageMetadata:
         return self._dtype
     @dtype.setter
     def dtype(self, typ):
-        # check that dtype is a member of DataType.image_types (although the pixel_array isn't of a custom class, this is still used to define the expected
-        # numpy data type of pixel_array)
-        if typ not in DataType.image_types():
-            raise TypeError(f"expected type from DataType.image_type, got: {typ} ")
+        # check that dtype is a member of DataType.types and that dtype is_image flag is set to True
+        if typ not in DataType.types():
+            raise TypeError(f"expected ImageMetadata dtype from DataType.types: {typ} ")
+        if typ.is_image is not True:
+            raise TypeError(f"expected ImageMetadata dtype to have is_image flag set to True")
         self._dtype = typ
 
     # check that image_shape_constraints is of type Shape
@@ -27,7 +28,7 @@ class ImageMetadata:
     @image_shape_constraints.setter
     def image_shape_constraints(self, shp):
         if not isinstance(shp, Shape):
-            raise TypeError(f"for ImageMetadata class, expected image_shape_constraints to be of class Shape, got {type(shp)}")
+            raise TypeError(f"expected ImageMetadata image_shape_constraints to be of class Shape, got {type(shp)}")
         self._image_shape_constraints = shp.copy()
         
     # check that image_map is of type Shape
@@ -37,7 +38,7 @@ class ImageMetadata:
     @image_map.setter
     def image_map(self, map):
         if not isinstance(map, Shape):
-            raise TypeError(f"for ImageMetadata class, expected image_map to be of class Shape, got {type(map)}")
+            raise TypeError(f"expected ImageMetadata image_map to be of class Shape, got {type(map)}")
         self._image_map = map.copy()
 
 
@@ -57,10 +58,11 @@ class ParameterMetadata:
         return self._dtype
     @dtype.setter
     def dtype(self, typ):
-        # check that dtype is a member of DataType.array_types/value_types (although the pixel_array isn't of a custom class, this is still used to define the expected
-        # numpy data type of pixel_array)
-        if typ not in DataType.array_types() and typ not in DataType.value_types():
-            raise TypeError(f"expected type from DataType.value_type or DataType.array_type, got: {typ} ")
+        # check that dtype is a member of DataType.types and dtype is_image flag is set to False
+        if typ not in DataType.types():
+            raise TypeError(f"expected ParameterMetadata dtype from DataType.types, got: {typ} ")
+        if typ.is_image is True:
+            raise TypeError(f"expected ParameterMetadata dtype to have is_image flag set to False")
         self._dtype = typ
 
     @property
@@ -69,7 +71,7 @@ class ParameterMetadata:
     @shape.setter
     def shape(self, shp):
         if not isinstance(shp, (np.ndarray,list,tuple)) and shp is not None:
-            raise TypeError(f"Parameter array shape expected as tuple, list or np.ndarray, got {type(shp)}")
+            raise TypeError(f"expected ParameterMetadata shape as tuple, list or np.ndarray, got {type(shp)}")
 
         #if shape is a np array, set as copy of array, else convert to np array
         if shp is not None:
