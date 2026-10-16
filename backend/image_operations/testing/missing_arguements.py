@@ -1,7 +1,7 @@
 from core.image_operation import ImageOperation
 from core.metadata import ImageMetadata
 from core.shape import Shape
-from core.constants import DataType
+from core.constants import DataPolicy
 
 version = "1.0.0"
 class MissingArguements(ImageOperation):
@@ -16,7 +16,7 @@ class MissingArguements(ImageOperation):
             input_image = { "input":  ImageMetadata(dtype = None, # this is required
                                                    shape = Shape(-1,-1,-1,-1),
                                                    image_map = Shape(0,1,2,3))},
-            output_image = { "output": ImageMetadata(dtype = DataType.ImageInt,
+            output_image = { "output": ImageMetadata(dtype = DataPolicy.ImageInt,
                                                      image_shape_constraints = Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map = Shape(c=0, z=1, y=2, x=3))}, 
             )

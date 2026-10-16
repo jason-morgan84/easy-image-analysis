@@ -1,6 +1,6 @@
 from core.image_operation import ImageOperation
 from core.shape import Shape
-from core.constants import DataType
+from core.constants import DataPolicy
 from core.metadata import ImageMetadata
 
 version = "1.0.0"
@@ -16,7 +16,7 @@ class InvalidArguement(ImageOperation):
             input_image_metadata={ "input":  ImageMetadata(dtype = int, # this is in the wrong format
                                                    shape = Shape(-1,-1,-1,-1),
                                                    image_map = Shape(0,1,2,3))},
-            output_image_metadata={ "output": ImageMetadata(dtype = DataType.ImageInt,
+            output_image_metadata={ "output": ImageMetadata(dtype = DataPolicy.ImageInt,
                                                      image_shape_constraints = Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map = Shape(c=0, z=1, y=2, x=3))}, 
             )

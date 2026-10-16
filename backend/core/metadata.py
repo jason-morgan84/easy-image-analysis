@@ -1,5 +1,5 @@
 import numpy as np
-from core.constants import DataType
+from core.constants import DataPolicy
 from core.shape import Shape
 
 
@@ -15,7 +15,7 @@ class ImageMetadata:
     @dtype.setter
     def dtype(self, typ):
         # check that dtype is a member of DataType.types and that dtype is_image flag is set to True
-        if typ not in DataType.types():
+        if typ not in DataPolicy.policies():
             raise TypeError(f"expected ImageMetadata dtype from DataType.types: {typ} ")
         if typ.is_image is not True:
             raise TypeError(f"expected ImageMetadata dtype to have is_image flag set to True")
@@ -59,7 +59,7 @@ class ParameterMetadata:
     @dtype.setter
     def dtype(self, typ):
         # check that dtype is a member of DataType.types and dtype is_image flag is set to False
-        if typ not in DataType.types():
+        if typ not in DataPolicy.policies():
             raise TypeError(f"expected ParameterMetadata dtype from DataType.types, got: {typ} ")
         if typ.is_image is True:
             raise TypeError(f"expected ParameterMetadata dtype to have is_image flag set to False")

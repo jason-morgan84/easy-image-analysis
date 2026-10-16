@@ -1,9 +1,9 @@
 import numpy as np
 import numbers
-from core.constants import DataType
+from core.constants import DataPolicy
 
 
-class BaseType:
+class BasePolicy:
     """ Create new DataTypes based on this framework.
     Each new DataType must have data_type and numpy set.
     min_value, max_value and is_array can be set based on requirements.
@@ -79,127 +79,127 @@ class BaseType:
     def _convert(cls, value, dtype):
         raise NotImplementedError(f"type conversions not yet implemented for data type {cls.data_type} to {dtype}")
 
-class ImageInt(BaseType):
-    data_type = DataType.ImageInt
+class ImageInt(BasePolicy):
+    data_type = DataPolicy.ImageInt
     description = "Describes multi-dimensional arrays for images as integers in the range 0 - 255 (inclusive)"
     numpy = np.uint8
     is_array = False
     is_image = True
     min_value = 0
     max_value = 255
-    permitted_conversions = [DataType.ImageFloat]
+    permitted_conversions = [DataPolicy.ImageFloat]
 
     @classmethod
     def _convert(cls, value, dtype):
-        if dtype == DataType.ImageFloat:
+        if dtype == DataPolicy.ImageFloat:
             return dtype.numpy(value/255).copy()
-        elif dtype == DataType.ImageBinary:
+        elif dtype == DataPolicy.ImageBinary:
             return dtype.numpy(value).copy()
-        elif dtype == DataType.ImageInt and dtype == cls.data_type:
+        elif dtype == DataPolicy.ImageInt and dtype == cls.data_type:
             return value.copy()
         else:
             raise TypeError(f"ImageInt cannot be converted to type {dtype}")
 
-class ImageFloat(BaseType):
-    data_type = DataType.ImageFloat
+class ImageFloat(BasePolicy):
+    data_type = DataPolicy.ImageFloat
     description = "Data type to hold multi-dimensional arrays for images as floats in the range 0 - 1 (inclusive)"
     numpy = np.float64
     is_array = False
     is_image = True
     min_value = 0.0
     max_value = 1.0
-    permitted_conversions = [DataType.ImageInt]
+    permitted_conversions = [DataPolicy.ImageInt]
     
     @classmethod
     def _convert(cls, value, dtype):
-        if dtype == DataType.ImageInt:
+        if dtype == DataPolicy.ImageInt:
             return dtype.numpy(np.round(value * 255)).copy()
-        elif dtype == DataType.ImageBinary:
+        elif dtype == DataPolicy.ImageBinary:
             return dtype.numpy(np.round(value)).copy()
-        elif dtype == DataType.ImageFloat:
+        elif dtype == DataPolicy.ImageFloat:
             return value.copy()
         else:
             raise TypeError(f"ImageFloat cannot be converted to type {dtype}")
 
-class ImageBinary(BaseType):
-    data_type = DataType.ImageBinary
+class ImageBinary(BasePolicy):
+    data_type = DataPolicy.ImageBinary
     description = "Data type to hold multi-dimensional arrays for images as either 1 or 0"
     numpy = np.uint8
     is_array = False
     is_image = True
     min_value = 0
     max_value = 1
-    warned_conversions = [DataType.ImageInt, DataType.ImageFloat]
+    warned_conversions = [DataPolicy.ImageInt, DataPolicy.ImageFloat]
 
     @classmethod
     def _convert(cls, value, dtype):
-        if dtype == DataType.ImageFloat:
+        if dtype == DataPolicy.ImageFloat:
             return dtype.numpy(value).copy()
-        elif dtype == DataType.ImageInt:
+        elif dtype == DataPolicy.ImageInt:
             return dtype.numpy(value).copy()
-        elif dtype == DataType.ImageBinary:
+        elif dtype == DataPolicy.ImageBinary:
             return value.copy()
         else:
             raise TypeError(f"ImageBinary cannot be converted to type {dtype}")
         
-class ValueInt(BaseType):
-    data_type = DataType.ValueInt
+class ValueInt(BasePolicy):
+    data_type = DataPolicy.ValueInt
     description = "Data type to hold single variables as integers"
     numpy = np.uint8
-    permitted_conversions = [DataType.ValueFloat]
+    permitted_conversions = [DataPolicy.ValueFloat]
 
     @classmethod
     def _convert(cls, value, dtype):
-        if dtype == DataType.ValueFloat:
+        if dtype == DataPolicy.ValueFloat:
             return dtype.numpy(value).copy()
-        elif dtype == DataType.ValueInt:
+        elif dtype == DataPolicy.ValueInt:
             return dtype.numpy(value).copy()
         else:
             raise TypeError(f"ValueInt cannot be converted to type {dtype}")
 
-class ValueFloat(BaseType):
-    data_type = DataType.ValueFloat
+class ValueFloat(BasePolicy):
+    data_type = DataPolicy.ValueFloat
     description = "Data type to hold single variables as floats"
     numpy = np.float64
-    permitted_conversions = [DataType.ValueInt]
+    permitted_conversions = [DataPolicy.ValueInt]
 
     @classmethod
     def _convert(cls, value, dtype):
-        if dtype == DataType.ValueInt:
+        if dtype == DataPolicy.ValueInt:
             return dtype.numpy(np.round(value)).copy()
-        elif dtype == DataType.ValueFloat:
+        elif dtype == DataPolicy.ValueFloat:
             return dtype.numpy(value).copy()
         else:
             raise TypeError(f"ValueFloat cannot be converted to type {dtype}")
 
-class ArrayInt(BaseType):
-    data_type = DataType.ArrayInt
+class ArrayInt(BasePolicy):
+    data_type = DataPolicy.ArrayInt
     description = "Data type to hold variables lists as ints"
     numpy = np.uint8
     is_array = True
-    permitted_conversions = [DataType.ArrayFloat]
+    permitted_conversions = [DataPolicy.ArrayFloat]
 
     @classmethod
     def _convert(cls, value, dtype):
-        if dtype == DataType.ArrayFloat:
+        if dtype == DataPolicy.ArrayFloat:
             return dtype.numpy(value).copy()
-        elif dtype == DataType.ArrayInt:
+        elif dtype == DataPolicy.ArrayInt:
             return value.copy()
         else:
             raise TypeError(f"ArrayInt cannot be converted to type {dtype}")
 
-class ArrayFloat(BaseType):
-    data_type = DataType.ArrayFloat
+class ArrayFloat(BasePolicy):
+    data_type = DataPolicy.ArrayFloat
     description = "Data type to hold variables lists as floats"
     numpy = np.float64
     is_array = True
-    permitted_conversions = [DataType.ArrayInt]
+    permitted_conversions = [DataPolicy.ArrayInt]
 
     @classmethod
     def _convert(cls, value, dtype):
-        if dtype == DataType.ArrayInt:
+        if dtype == DataPolicy.ArrayInt:
             return dtype.numpy(np.round(value)).copy()
-        elif dtype == DataType.ArrayFloat:
+        elif dtype == DataPolicy.ArrayFloat:
             return value.copy()
         else:
             raise TypeError(f"ArrayFloat cannot be converted to type {dtype}")

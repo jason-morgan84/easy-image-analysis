@@ -1,16 +1,16 @@
 import pytest
 import numpy as np
-from core.constants import DataType
-from core.type import ImageInt, ArrayFloat, ImageFloat, ImageBinary, ValueInt, ValueFloat, ArrayInt
+from core.constants import DataPolicy
+from core.type_policies import ImageInt, ArrayFloat, ImageFloat, ImageBinary, ValueInt, ValueFloat, ArrayInt
 from core.data_checks import sample_data
 
 """test validate class"""
 # test is_image or is_array flagged class without np.array
 @pytest.mark.parametrize("dtype, invalid_input, message", [
-    (ImageInt, 2, "expected np.array for DataType.ImageInt"), # not an array
-    (ArrayFloat, "1", "expected np.array for DataType.ArrayFloat"), # not an array
-    (ImageFloat, [1,2],"expected np.array for DataType.ImageFloat, got <class 'list'>"), # unexpected list
-    (ArrayFloat, {"test": np.array([1,2,3])},"expected np.array for DataType.ArrayFloat, got <class 'dict'>"), #unexpected dict
+    (ImageInt, 2, "expected np.array for DataPolicy.ImageInt"), # not an array
+    (ArrayFloat, "1", "expected np.array for DataPolicy.ArrayFloat"), # not an array
+    (ImageFloat, [1,2],"expected np.array for DataPolicy.ImageFloat, got <class 'list'>"), # unexpected list
+    (ArrayFloat, {"test": np.array([1,2,3])},"expected np.array for DataPolicy.ArrayFloat, got <class 'dict'>"), #unexpected dict
 ])
 def test_array_validation(dtype, invalid_input, message):
     with pytest.raises(TypeError, match = message):
@@ -19,9 +19,9 @@ def test_array_validation(dtype, invalid_input, message):
 
 # test scalar class with list/tuple/np.array
 @pytest.mark.parametrize("dtype, invalid_input, message", [
-    (ValueInt, [1,2], "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'list'>"), # unexpected array
-    (ValueInt, np.array([1,2,3]), "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'numpy.ndarray'>"), # unexpected np array
-    (ValueFloat, (1,2),"expected data type of <class 'numpy.float64'> for DataType.ValueFloat, got <class 'tuple'>"), # unexpected tuple
+    (ValueInt, [1,2], "expected data type of <class 'numpy.uint8'> for DataPolicy.ValueInt, got <class 'list'>"), # unexpected array
+    (ValueInt, np.array([1,2,3]), "expected data type of <class 'numpy.uint8'> for DataPolicy.ValueInt, got <class 'numpy.ndarray'>"), # unexpected np array
+    (ValueFloat, (1,2),"expected data type of <class 'numpy.float64'> for DataPolicy.ValueFloat, got <class 'tuple'>"), # unexpected tuple
 ])
 def test_scalar_validation(dtype, invalid_input, message):
     with pytest.raises(TypeError, match = message):
@@ -29,10 +29,10 @@ def test_scalar_validation(dtype, invalid_input, message):
 
 # test class with incorrect data type
 @pytest.mark.parametrize("dtype, invalid_input, message", [
-    (ValueInt, "2.0", "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'str'>"), # not an array
-    (ImageBinary, np.array([1,2,3],np.float64), "expected np.array of <class 'numpy.uint8'> for DataType.ImageBinary, got float64"), # not an array
-    (ArrayInt, np.array([1.0,1.1,1.2],np.float64),"expected np.array of <class 'numpy.uint8'> for DataType.ArrayInt, got float64"), # unexpected list
-    (ArrayFloat, np.array([1,2,3], np.uint8),"expected np.array of <class 'numpy.float64'> for DataType.ArrayFloat, got uint8"), #unexpected dict
+    (ValueInt, "2.0", "expected data type of <class 'numpy.uint8'> for DataPolicy.ValueInt, got <class 'str'>"), # not an array
+    (ImageBinary, np.array([1,2,3],np.float64), "expected np.array of <class 'numpy.uint8'> for DataPolicy.ImageBinary, got float64"), # not an array
+    (ArrayInt, np.array([1.0,1.1,1.2],np.float64),"expected np.array of <class 'numpy.uint8'> for DataPolicy.ArrayInt, got float64"), # unexpected list
+    (ArrayFloat, np.array([1,2,3], np.uint8),"expected np.array of <class 'numpy.float64'> for DataPolicy.ArrayFloat, got uint8"), #unexpected dict
 ])
 def test_incorrect_data_type(dtype, invalid_input, message):
     with pytest.raises(TypeError, match = message):
@@ -41,8 +41,8 @@ def test_incorrect_data_type(dtype, invalid_input, message):
 # test class with max_value and input over max_value
 @pytest.mark.parametrize("dtype, invalid_input, message", [
     # test removed, can't have data over 255 for uint8
-    # (ImageInt, np.array([0,1,5,290], np.uint8), "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'str'>"), 
-    (ImageFloat, np.array([0.5, 0.2, 1.5],np.float64),"array exceeds maximum value: DataType.ImageFloat has max_value of 1.0, not 1.5"), # unexpected list
+    # (ImageInt, np.array([0,1,5,290], np.uint8), "expected data type of <class 'numpy.uint8'> for DataPolicy.ValueInt, got <class 'str'>"), 
+    (ImageFloat, np.array([0.5, 0.2, 1.5],np.float64),"array exceeds maximum value: DataPolicy.ImageFloat has max_value of 1.0, not 1.5"), # unexpected list
 ])
 def test_data_over_max_value(dtype, invalid_input, message):
     with pytest.raises(ValueError, match = message):
@@ -52,7 +52,7 @@ def test_data_over_max_value(dtype, invalid_input, message):
 @pytest.mark.parametrize("dtype, invalid_input, message", [
     # test removed, can't have data under 0 for uint8
     # (ImageInt, np.array([0,1,5,-5], np.uint8), "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'str'>"), 
-    (ImageFloat, np.array([0.5, 0.2, -4.0],np.float64),"array below minimum value: DataType.ImageFloat has min_value of 0.0, not -4.0"), # unexpected list
+    (ImageFloat, np.array([0.5, 0.2, -4.0],np.float64),"array below minimum value: DataPolicy.ImageFloat has min_value of 0.0, not -4.0"), # unexpected list
 ])
 def test_data_under_min_value(dtype, invalid_input, message):
     with pytest.raises(ValueError, match = message):
@@ -61,10 +61,10 @@ def test_data_under_min_value(dtype, invalid_input, message):
 """test to"""
 # call to function with incorrect input (input data not supplied dtype)
 @pytest.mark.parametrize("dtype_call, invalid_input, dtype_to, message", [
-    (ValueInt, sample_data(DataType.ValueFloat), DataType.ValueFloat,"data for conversion from DataType.ValueInt to DataType.ValueFloat does not meet constraints"), 
-    (ImageBinary, sample_data(DataType.ImageInt,[1,2,3,4]), DataType.ImageInt, "data for conversion from DataType.ImageBinary to DataType.ImageInt does not meet constraints"),
-    (ArrayInt, sample_data(DataType.ArrayFloat, [1,2]), DataType.ArrayInt,"data for conversion from DataType.ArrayInt to DataType.ArrayInt does not meet constraints"), 
-    (ImageFloat, sample_data(DataType.ImageInt, [1,2,3]), DataType.ImageInt,"data for conversion from DataType.ImageFloat to DataType.ImageInt does not meet constraints"),
+    (ValueInt, sample_data(DataPolicy.ValueFloat), DataPolicy.ValueFloat,"data for conversion from DataPolicy.ValueInt to DataPolicy.ValueFloat does not meet constraints"), 
+    (ImageBinary, sample_data(DataPolicy.ImageInt,[1,2,3,4]), DataPolicy.ImageInt, "data for conversion from DataPolicy.ImageBinary to DataPolicy.ImageInt does not meet constraints"),
+    (ArrayInt, sample_data(DataPolicy.ArrayFloat, [1,2]), DataPolicy.ArrayInt,"data for conversion from DataPolicy.ArrayInt to DataPolicy.ArrayInt does not meet constraints"), 
+    (ImageFloat, sample_data(DataPolicy.ImageInt, [1,2,3]), DataPolicy.ImageInt,"data for conversion from DataPolicy.ImageFloat to DataPolicy.ImageInt does not meet constraints"),
 ],
     ids=["value_int","image_binary","array_int","image_float"]
 )
@@ -74,9 +74,9 @@ def test_to_incorrect_input(dtype_call, invalid_input,dtype_to, message):
 
 # call to function with non-permitted conversion
 @pytest.mark.parametrize("dtype_call, invalid_input, dtype_to, message", [
-    (ValueInt, sample_data(DataType.ValueInt), DataType.ArrayFloat,"conversion from DataType.ValueInt to DataType.ArrayFloat not permitted"), 
-    (ImageFloat, sample_data(DataType.ImageFloat,[1,2,3,4]), DataType.ImageBinary, "conversion from DataType.ImageFloat to DataType.ImageBinary not permitted"),
-    (ArrayInt, sample_data(DataType.ArrayInt, [1,2]), DataType.ValueInt,"conversion from DataType.ArrayInt to DataType.ValueInt not permitted"), 
+    (ValueInt, sample_data(DataPolicy.ValueInt), DataPolicy.ArrayFloat,"conversion from DataPolicy.ValueInt to DataPolicy.ArrayFloat not permitted"), 
+    (ImageFloat, sample_data(DataPolicy.ImageFloat,[1,2,3,4]), DataPolicy.ImageBinary, "conversion from DataPolicy.ImageFloat to DataPolicy.ImageBinary not permitted"),
+    (ArrayInt, sample_data(DataPolicy.ArrayInt, [1,2]), DataPolicy.ValueInt,"conversion from DataPolicy.ArrayInt to DataPolicy.ValueInt not permitted"), 
 ],
     ids=["value_int","image_binary","array_int"]
 )
@@ -88,8 +88,8 @@ def test_to_non_permitted_dtype(dtype_call, invalid_input,dtype_to, message):
 """test _convert"""
 # test conversions from ImageInt
 @pytest.mark.parametrize("input, dtype_to", [
-    (sample_data(DataType.ImageInt,[1,2,3]), DataType.ImageFloat), 
-    (sample_data(DataType.ImageInt, [1,2,3]), DataType.ImageInt), 
+    (sample_data(DataPolicy.ImageInt,[1,2,3]), DataPolicy.ImageFloat), 
+    (sample_data(DataPolicy.ImageInt, [1,2,3]), DataPolicy.ImageInt), 
 ],
     ids=["image_float","image_int"]
 )
@@ -104,8 +104,8 @@ def test_convert_image_int(input, dtype_to):
 
 # test conversions from ImageFloat
 @pytest.mark.parametrize("input, dtype_to", [
-    (sample_data(DataType.ImageFloat,[1,2,3]), DataType.ImageFloat), 
-    (sample_data(DataType.ImageFloat, [1,2,3]), DataType.ImageInt), 
+    (sample_data(DataPolicy.ImageFloat,[1,2,3]), DataPolicy.ImageFloat), 
+    (sample_data(DataPolicy.ImageFloat, [1,2,3]), DataPolicy.ImageInt), 
 ],
     ids=["image_float","image_int"]
 )
@@ -120,9 +120,9 @@ def test_convert_image_float(input, dtype_to):
 
 # test conversions from ImageBinary
 @pytest.mark.parametrize("input, dtype_to", [
-    (sample_data(DataType.ImageBinary,[1,2,3]), DataType.ImageFloat), 
-    (sample_data(DataType.ImageBinary, [1,2,3]), DataType.ImageInt), 
-    (sample_data(DataType.ImageBinary, [1,2,3]), DataType.ImageBinary),
+    (sample_data(DataPolicy.ImageBinary,[1,2,3]), DataPolicy.ImageFloat), 
+    (sample_data(DataPolicy.ImageBinary, [1,2,3]), DataPolicy.ImageInt), 
+    (sample_data(DataPolicy.ImageBinary, [1,2,3]), DataPolicy.ImageBinary),
 ],
     ids=["image_float","image_int","image_bianry"]
 )
@@ -137,8 +137,8 @@ def test_convert_image_binary(input, dtype_to):
 
 # test conversions from ArrayInt
 @pytest.mark.parametrize("input, dtype_to", [
-    (sample_data(DataType.ArrayInt,[1,2,3]), DataType.ArrayInt), 
-    (sample_data(DataType.ArrayInt, [1,2,3]), DataType.ArrayFloat), 
+    (sample_data(DataPolicy.ArrayInt,[1,2,3]), DataPolicy.ArrayInt), 
+    (sample_data(DataPolicy.ArrayInt, [1,2,3]), DataPolicy.ArrayFloat), 
 ],
     ids=["array_int","array_float"]
 )
@@ -153,8 +153,8 @@ def test_convert_array_int(input, dtype_to):
 
 # test conversions from ArrayFloat
 @pytest.mark.parametrize("input, dtype_to", [
-    (sample_data(DataType.ArrayFloat,[1,2,3]), DataType.ArrayInt), 
-    (sample_data(DataType.ArrayFloat, [1,2,3]), DataType.ArrayFloat), 
+    (sample_data(DataPolicy.ArrayFloat,[1,2,3]), DataPolicy.ArrayInt), 
+    (sample_data(DataPolicy.ArrayFloat, [1,2,3]), DataPolicy.ArrayFloat), 
 ],
     ids=["array_int","array_float"]
 )
@@ -169,8 +169,8 @@ def test_convert_array_float(input, dtype_to):
 
 # test conversions from ValueInt
 @pytest.mark.parametrize("input, dtype_to", [
-    (sample_data(DataType.ValueInt), DataType.ValueInt), 
-    (sample_data(DataType.ValueInt), DataType.ValueFloat), 
+    (sample_data(DataPolicy.ValueInt), DataPolicy.ValueInt), 
+    (sample_data(DataPolicy.ValueInt), DataPolicy.ValueFloat), 
 ],
     ids=["value_int","value_float"]
 )
@@ -183,8 +183,8 @@ def test_convert_value_int(input, dtype_to):
 
 # test conversions from ValueFloat
 @pytest.mark.parametrize("input, dtype_to", [
-    (sample_data(DataType.ValueFloat), DataType.ValueInt), 
-    (sample_data(DataType.ValueFloat), DataType.ValueFloat), 
+    (sample_data(DataPolicy.ValueFloat), DataPolicy.ValueInt), 
+    (sample_data(DataPolicy.ValueFloat), DataPolicy.ValueFloat), 
 ],
     ids=["value_int","value_float"]
 )
@@ -197,8 +197,8 @@ def test_convert_value_float(input, dtype_to):
 
 # test for drift within ImageTypes
 @pytest.mark.parametrize("DataType, Input, OutputType", [
-    (DataType.ImageInt, np.array([1, 2], np.uint8), DataType.ImageFloat),      
-    (DataType.ImageFloat, np.array([0.1, 1.0], np.float64), DataType.ImageInt),       
+    (DataPolicy.ImageInt, np.array([1, 2], np.uint8), DataPolicy.ImageFloat),      
+    (DataPolicy.ImageFloat, np.array([0.1, 1.0], np.float64), DataPolicy.ImageInt),       
 ])
 def test_for_value_drift_image_types(DataType, Input, OutputType):
     a = Input
@@ -216,7 +216,7 @@ def test_for_value_drift_image_types(DataType, Input, OutputType):
 
 # test for drift within value_types
 @pytest.mark.parametrize("DataType, Input, OutputType", [
-    (DataType.ValueFloat, 5.6, DataType.ValueInt),        
+    (DataPolicy.ValueFloat, 5.6, DataPolicy.ValueInt),        
 ])
 def test_for_value_drift_value_types(DataType, Input, OutputType):
     a = DataType.numpy(Input)
@@ -235,7 +235,7 @@ def test_for_value_drift_value_types(DataType, Input, OutputType):
 
 # test for drift within array_types
 @pytest.mark.parametrize("DataType, Input, OutputType", [
-    (DataType.ArrayFloat, [5.6, 8.1], DataType.ArrayInt),        
+    (DataPolicy.ArrayFloat, [5.6, 8.1], DataPolicy.ArrayInt),        
 ])
 def test_for_value_drift_array_types(DataType, Input, OutputType):
     a = DataType.numpy(Input)
@@ -254,7 +254,7 @@ def test_for_value_drift_array_types(DataType, Input, OutputType):
 
 # goes through each member of DataType, checks that the required class variables have been 
 # properly set
-@pytest.mark.parametrize("enum_member", list(DataType))
+@pytest.mark.parametrize("enum_member", list(DataPolicy))
 def test_all_datatype_classes_have_required_attributes(enum_member):
 
     

@@ -3,11 +3,11 @@ import pytest
 import numpy as np
 from core.metadata import ParameterMetadata
 from core.error_handling import ConnectionError
-from core.constants import DataType
+from core.constants import DataPolicy
 from core.data_checks import sample_data
 from core.shape import Shape
 
-sample_metadata = ParameterMetadata(dtype=DataType.ValueInt)
+sample_metadata = ParameterMetadata(dtype=DataPolicy.ValueInt)
 # Input not Port class
 def test_incorrect_input():
     with pytest.raises(ConnectionError, match = "port class expected as source for connection"):

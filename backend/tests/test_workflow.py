@@ -2,7 +2,7 @@ import pytest
 from core.workflow import WorkFlow
 from core.image_operation_directory import ImageOperationDirectory
 from core.image_operation import ImageOperation
-from core.constants import DataType
+from core.constants import DataPolicy
 from core.interface_classes import Connection, Port
 import copy
 # provide image_operation_directory arguement which is not ImageOperationDirectory class
@@ -160,7 +160,7 @@ def test_connection_add_conversion_with_warning():
                             target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
     
     assert "connection.2" in workflow.connections.keys()
-    assert workflow.connections["connection.2"].convert == DataType.ImageInt
+    assert workflow.connections["connection.2"].convert == DataPolicy.ImageInt
     for item in log:
         if item.class_name == "WorkFlow" and item.function_name == "add_connection":
             assert item.identifier == "image.output.image.input"
@@ -181,7 +181,7 @@ def test_connection_add_with_conversion():
                             target_port = workflow.nodes["node.float_input.1"].input_ports["image.input"])
     
     assert "connection.2" in workflow.connections.keys()
-    assert workflow.connections["connection.2"].convert == DataType.ImageFloat
+    assert workflow.connections["connection.2"].convert == DataPolicy.ImageFloat
 
 # call add_connection where a connection would fail shape checks(invalid shape (eg needs flattened image but has z != 1))
 def test_connection_wrong_shape():

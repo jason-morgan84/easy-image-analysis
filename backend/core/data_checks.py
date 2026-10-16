@@ -1,6 +1,6 @@
 from core.metadata import ImageMetadata, ParameterMetadata
 from core.shape import Shape
-from core.constants import DataType
+from core.constants import DataPolicy
 import numpy as np
 """
 Includes functions for checking data and metadata at various points in the workflow:
@@ -87,10 +87,10 @@ def check_parameter_shape(data, metadata, identifier):
                     raise ValueError(f"array shape does not match shape metadata for '{identifier}'")
 
 def sample_data(dtype, shape = None, zero = False):
-    if dtype not in DataType:
+    if dtype not in DataPolicy:
         raise TypeError(f"sample_data dtype must be member of DataType (see constants.py)")
     value_dtype = getattr(dtype, "data_type", None)
-    if value_dtype == None or value_dtype not in DataType.types():
+    if value_dtype == None or value_dtype not in DataPolicy.policies():
         raise TypeError (f"Expected Image data type (see constants.py) got {dtype}")
     # used for generating sample data sets of given type
 

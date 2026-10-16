@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from core.shape import Shape
-from core.constants import DataType
+from core.constants import DataPolicy
 from core.image_operation import ImageOperation
 from core.metadata import ImageMetadata, ParameterMetadata
 from core.data_checks import sample_data
@@ -9,18 +9,18 @@ import types
 import copy
 
 
-test_image_metadata_imageint = ImageMetadata(dtype=DataType.ImageInt,
+test_image_metadata_imageint = ImageMetadata(dtype=DataPolicy.ImageInt,
                                     image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                     image_map=Shape(c=0, z=1, y=2, x=3)
                                     )
 
-test_parameter_metadata_valueint = ParameterMetadata(dtype=DataType.ValueInt)
-test_parameter_metadata_arrayint = ParameterMetadata(dtype=DataType.ArrayInt, shape=(1,2))
+test_parameter_metadata_valueint = ParameterMetadata(dtype=DataPolicy.ValueInt)
+test_parameter_metadata_arrayint = ParameterMetadata(dtype=DataPolicy.ArrayInt, shape=(1,2))
 
-test_image_data_imageint = sample_data(DataType.ImageInt,(1,2,3,4))
-test_image_data_imagefloat = sample_data(DataType.ImageFloat,(1,2,3,4))
-test_parameter_data_valueint = sample_data(DataType.ValueInt)
-test_parameter_data_valuefloat = sample_data(DataType.ValueFloat)
+test_image_data_imageint = sample_data(DataPolicy.ImageInt,(1,2,3,4))
+test_image_data_imagefloat = sample_data(DataPolicy.ImageFloat,(1,2,3,4))
+test_parameter_data_valueint = sample_data(DataPolicy.ValueInt)
+test_parameter_data_valuefloat = sample_data(DataPolicy.ValueFloat)
 
 """input_image_metadata setter"""
 #  create ImageOperation with no input_image_metadata or set input_image_metadata to None
@@ -269,7 +269,7 @@ def test_run_code_input_image_data_wrong_shape():
         version = None,
         docs = None,
         alerts = None,
-        input_image_metadata={"input1":ImageMetadata(dtype=DataType.ImageInt,
+        input_image_metadata={"input1":ImageMetadata(dtype=DataPolicy.ImageInt,
                                     image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                     image_map=Shape(c=0, z=1, y=2, x=3)
                                     )},
@@ -279,7 +279,7 @@ def test_run_code_input_image_data_wrong_shape():
         )
     setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
     # set input_image to have input1 where c = 1
-    setattr(test_image_operation,"input_image",{"input1":sample_data(DataType.ImageInt,(1,2,3,4))})
+    setattr(test_image_operation,"input_image",{"input1":sample_data(DataPolicy.ImageInt,(1,2,3,4))})
     # set input_image_metadata to have shape constraints for input1 as c = 2
     test_image_operation.input_image_metadata["input1"].image_shape_constraints.c = 2
     with pytest.raises(ValueError, match="image shape does not match metadata"):
@@ -313,8 +313,8 @@ def test_run_code_input_parameter_wrong_shape():
         alerts = None,
         input_image_metadata={"input1":test_image_metadata_imageint},
         input_image = {"input1":test_image_data_imageint},
-        input_parameter_metadata={"input2":ParameterMetadata(dtype=DataType.ArrayInt, shape=(1,2))},
-        input_parameter = {"input2":sample_data(dtype = DataType.ArrayInt, shape = (2,1))}
+        input_parameter_metadata={"input2":ParameterMetadata(dtype=DataPolicy.ArrayInt, shape=(1,2))},
+        input_parameter = {"input2":sample_data(dtype = DataPolicy.ArrayInt, shape = (2,1))}
         )
     setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
 
@@ -464,7 +464,7 @@ def test_run_code_changes_input_parameter_array():
         input_image = {"input1":test_image_data_imageint},
         output_image_metadata={"output1":test_image_metadata_imageint},
         input_parameter_metadata={"input2":test_parameter_metadata_arrayint},
-        input_parameter={"input2":sample_data(dtype = DataType.ArrayInt, shape=(1,2))}
+        input_parameter={"input2":sample_data(dtype = DataPolicy.ArrayInt, shape=(1,2))}
         )
     setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
 
@@ -474,7 +474,7 @@ def test_run_code_changes_input_parameter_array():
 #Code provided returns an image with type that doesn't match metadata
 def test_run_code_image_output_wrong_type():
     def function_no_change_to_output(self):
-        self.output_image = {"output1": sample_data(dtype=DataType.ImageFloat, shape=(1,2,3,4))}
+        self.output_image = {"output1": sample_data(dtype=DataPolicy.ImageFloat, shape=(1,2,3,4))}
 
     test_image_operation = ImageOperation(name="Test",
         id="test",
@@ -495,7 +495,7 @@ def test_run_code_image_output_wrong_type():
 #Code provided returns an image with shape that doesn't match metadata
 def test_run_code_output_wrong_shape():
     def function_no_change_to_output(self):
-        self.output_image = {"output1": sample_data(dtype=DataType.ImageInt, shape=(1,2,3,4))}
+        self.output_image = {"output1": sample_data(dtype=DataPolicy.ImageInt, shape=(1,2,3,4))}
 
     test_image_operation = ImageOperation(name="Test",
         id="test",
@@ -505,7 +505,7 @@ def test_run_code_output_wrong_shape():
         alerts = None,
         input_image_metadata={"input1":test_image_metadata_imageint},
         input_image = {"input1":test_image_data_imageint},
-        output_image_metadata={"output1":ImageMetadata(dtype = DataType.ImageInt,
+        output_image_metadata={"output1":ImageMetadata(dtype = DataPolicy.ImageInt,
                                                        image_shape_constraints=Shape(c=5, z=-1, y=-1, x=-1),
                                                        image_map=Shape(c=0, z=1, y=2, x=-3))},
         )
@@ -518,8 +518,8 @@ def test_run_code_output_wrong_shape():
 #Code provided returns an parameter with array type that doesn't match metadata
 def test_run_code_parameter_output_wrong_type():
     def function_no_change_to_output(self):
-        self.output_image = {"output1": sample_data(dtype=DataType.ImageInt, shape=(1,2,3,4))}
-        self.output_parameter = {"output2": sample_data(dtype=DataType.ValueFloat)}
+        self.output_image = {"output1": sample_data(dtype=DataPolicy.ImageInt, shape=(1,2,3,4))}
+        self.output_parameter = {"output2": sample_data(dtype=DataPolicy.ValueFloat)}
 
     test_image_operation = ImageOperation(name="Test",
         id="test",
@@ -541,8 +541,8 @@ def test_run_code_parameter_output_wrong_type():
 #Code provided returns an parameter with array shape that doesn't match metadata
 def test_run_code_parameter_output_wrong_shape():
     def function_no_change_to_output(self):
-        self.output_image = {"output1": sample_data(dtype=DataType.ImageInt, shape=(1,2,3,4))}
-        self.output_parameter = {"output2": sample_data(dtype=DataType.ArrayInt, shape = (2,1))}
+        self.output_image = {"output1": sample_data(dtype=DataPolicy.ImageInt, shape=(1,2,3,4))}
+        self.output_parameter = {"output2": sample_data(dtype=DataPolicy.ArrayInt, shape = (2,1))}
 
     test_image_operation = ImageOperation(name="Test",
         id="test",
@@ -553,7 +553,7 @@ def test_run_code_parameter_output_wrong_shape():
         input_image_metadata={"input1":test_image_metadata_imageint},
         input_image = {"input1":test_image_data_imageint},
         output_image_metadata={"output1":test_image_metadata_imageint},
-        output_parameter_metadata={"output2": ParameterMetadata(dtype=DataType.ArrayInt, shape = (1,2))}
+        output_parameter_metadata={"output2": ParameterMetadata(dtype=DataPolicy.ArrayInt, shape = (1,2))}
         )
 
     setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))

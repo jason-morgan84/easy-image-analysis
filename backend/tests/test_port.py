@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from core.constants import DataType
+from core.constants import DataPolicy
 from core.shape import Shape
 from core.interface_classes import Port
 from core.data_checks import sample_data
@@ -13,7 +13,7 @@ def test_port_without_port_id():
         Port(port_id=None,
              node_id="node_id",
              is_input=False,
-             metadata=ImageMetadata(DataType.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
+             metadata=ImageMetadata(DataPolicy.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
 
 """node_id setter"""
 # create port without node_id - ValueError: "node_id required for port instantiation" 
@@ -22,7 +22,7 @@ def test_port_without_node_id():
         Port(port_id="port_id", 
              node_id=None,
              is_input=False,
-             metadata=ImageMetadata(DataType.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
+             metadata=ImageMetadata(DataPolicy.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
 
 """is_input flag setter"""
 # create port without is_input flag
@@ -31,7 +31,7 @@ def test_port_without_is_input():
         Port(port_id="port_id", 
              node_id="node_id",
              is_input=None,
-             metadata=ImageMetadata(DataType.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
+             metadata=ImageMetadata(DataPolicy.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
         
 # create port where is_input flag is not boolean
 def test_port_is_input_not_bool():
@@ -39,7 +39,7 @@ def test_port_is_input_not_bool():
         Port(port_id="port_id", 
              node_id="node_id",
              is_input="input",
-             metadata=ImageMetadata(DataType.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
+             metadata=ImageMetadata(DataPolicy.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
         
 """metadata setter"""
 # Pass in value that is not ImageMetadata or ParameterMetadata class - TypeError: "meta data expected as ImageMetadata or ParameterMetadata class" 
@@ -57,8 +57,8 @@ def test_unexpected_scalar_data():
     test_port = Port (port_id = "test",
                       node_id = "test",
                       is_input=True,
-                      metadata = ParameterMetadata(dtype = DataType.ValueInt))
-    with pytest.raises(TypeError, match = "port 'test.test' set to value that does not pass validation as DataType.ValueInt"):
+                      metadata = ParameterMetadata(dtype = DataPolicy.ValueInt))
+    with pytest.raises(TypeError, match = "port 'test.test' set to value that does not pass validation as DataPolicy.ValueInt"):
         test_port.data = 25
 
 # For image or array data, pass in data that is not of type np.ndarray | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected np.ndarray
@@ -67,10 +67,10 @@ def test_unexpected_array_not_array():
     test_port = Port (port_id = "test",
                       node_id = "test",
                       is_input=True,
-                      metadata = ImageMetadata(dtype = DataType.ImageInt,
+                      metadata = ImageMetadata(dtype = DataPolicy.ImageInt,
                                                 image_map = Shape(c = 0, z = 1, y = 2, x = 3),
                                                 image_shape_constraints = Shape(c = -1, z = -1, y = -1, x = -1)))
-    with pytest.raises(TypeError, match = "port 'test.test' set to value that does not pass validation as DataType.ImageInt"):
+    with pytest.raises(TypeError, match = "port 'test.test' set to value that does not pass validation as DataPolicy.ImageInt"):
         test_port.data = 25
 
 # For image or array data, pass in data that is not a ndarray of type metadata.dtype | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype.numpy}
@@ -79,10 +79,10 @@ def test_unexpected_array_incorrect_dtype():
     test_port = Port (port_id = "test",
                       node_id = "test",
                       is_input=False,
-                      metadata = ImageMetadata(dtype = DataType.ImageInt,
+                      metadata = ImageMetadata(dtype = DataPolicy.ImageInt,
                                                 image_map = Shape(c = 0, z = 1, y = 2, x = 3),
                                                 image_shape_constraints = Shape(c = -1, z = -1, y = -1, x = -1)))
-    with pytest.raises(TypeError, match = "port 'test.test' set to value that does not pass validation as DataType.ImageInt"):
+    with pytest.raises(TypeError, match = "port 'test.test' set to value that does not pass validation as DataPolicy.ImageInt"):
         test_port.data = np.array([0.1,0.2,0.3],np.float64)
 
 # For image data, pass in a Shape arguement that is not present in Shape.dimensions* | AttributeError: dimension present in Shape.dimensions that is not a Shape arguement 
@@ -92,7 +92,7 @@ def test_incorrect_shape_arguement():
         test_port = Port (port_id = "test",
                         node_id = "test",
                         is_input=False,
-                        metadata = ImageMetadata(dtype = DataType.ImageInt,
+                        metadata = ImageMetadata(dtype = DataPolicy.ImageInt,
                                                     image_map = Shape(c = 0, z = 1, y = 2, x = 3, t = 5),
                                                     image_shape_constraints = Shape(c = -1, z = -1, y = -1, x = -1)))  
     """commented out: this is the error that would be raised by Port class, but it gets caught earlier by Shape class - keeping in case Shape class changes potentially break this"""
@@ -112,11 +112,11 @@ def test_image_incorrect_shape():
     test_port = Port (port_id = "test",
                       node_id = "test",
                       is_input=True,
-                      metadata = ImageMetadata(dtype = DataType.ImageInt,
+                      metadata = ImageMetadata(dtype = DataPolicy.ImageInt,
                                                 image_map = Shape(c = 0, z = 1, y = 2, x = 3),
                                                 image_shape_constraints = Shape(c = 1, z = -1, y = -1, x = -1)))
     with pytest.raises(ValueError, match = "port 'test.test' set to image that does not match metadata shape constraints"):
-        test_port.data = sample_data(DataType.ImageInt, shape = (2,3,1,4))
+        test_port.data = sample_data(DataPolicy.ImageInt, shape = (2,3,1,4))
 
 # For array data, pass in data that doesn't match metadata.shape | ValueError: array_type data passed to port with incorrect shape
 def test_array_incorrect_shape():
@@ -124,10 +124,10 @@ def test_array_incorrect_shape():
     test_port = Port (port_id = "test",
                       node_id = "test",
                       is_input=True,
-                      metadata = ParameterMetadata(dtype = DataType.ArrayInt,
+                      metadata = ParameterMetadata(dtype = DataPolicy.ArrayInt,
                                                 shape = (1,2)))
     with pytest.raises(ValueError, match = "port 'test.test' set to array that does not match metadata shape constraints"):
-        test_port.data = np.array([0,1,2],DataType.ArrayInt.numpy)
+        test_port.data = np.array([0,1,2],DataPolicy.ArrayInt.numpy)
 
 # Pass in data where metadata.dtype does not define dtype from DataTypes** | TypeError: port MetaData defines unexpected dtype
 # (this error should also be impossible to generate given current structure of Metadata classes, wil give an error from ImageMetadata or ParameterMetadata instead)

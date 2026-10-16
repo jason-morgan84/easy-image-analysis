@@ -1,7 +1,7 @@
 from core.image_operation import ImageOperation
 from core.metadata import ImageMetadata
 from core.shape import Shape
-from core.constants import DataType
+from core.constants import DataPolicy
 
 version = "1.0.0"
 
@@ -15,7 +15,7 @@ class MissingInputImage(ImageOperation):
             docs="Contains no input_image",
             alerts=None,
             input_image_metadata=None, # this is required
-            output_image={ "output": ImageMetadata(dtype = DataType.ImageInt,
+            output_image={ "output": ImageMetadata(dtype = DataPolicy.ImageInt,
                                                      image_shape_constraints = Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map = Shape(c=0, z=1, y=2, x=3))}, 
             )

@@ -1,7 +1,7 @@
 import numpy as np
 from core.error_handling import ConnectionError, ActivationError, MissingDataError
 from core.metadata import ImageMetadata, ParameterMetadata
-from core.constants import DataType
+from core.constants import DataPolicy
 from core.image_operation import ImageOperation
 from core.data_checks import check_image_shape, check_parameter_shape
 from core.shape import Shape
@@ -56,7 +56,7 @@ class Connection:
     @convert.setter
     def convert(self, convert_type):
         
-        if convert_type and convert_type not in DataType.types():
+        if convert_type and convert_type not in DataPolicy.policies():
             raise TypeError(f"datatype class expected for transpose, not {type(convert_type)}")
         self._convert = convert_type
     

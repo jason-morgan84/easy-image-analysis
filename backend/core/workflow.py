@@ -3,7 +3,7 @@ from core.image_operation import ImageOperation
 from core.interface_classes import Node, Connection, Port
 from core.error_handling import ConnectionError, log, warn
 from core.shape import Shape
-from core.constants import DataType
+from core.constants import DataPolicy
 
 class WorkFlow:
     def __init__(self, logger, image_operation_directiory):

@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-class DataType(Enum):
+class DataPolicy(Enum):
     ImageInt = auto()    
     ImageFloat = auto()  
     ImageBinary = auto()       
@@ -9,21 +9,8 @@ class DataType(Enum):
     ArrayFloat = auto()
     ArrayInt = auto()
 
-    #categorise DataTypes into image_types, for multi-dimensional arrays, and value_types, for 1d variables.
-    """    @classmethod
-    def image_types(cls) -> set:
-        return {cls.ImageInt, cls.ImageFloat, cls.ImageBinary}
-
     @classmethod
-    def value_types(cls) -> set:
-        return {cls.ValueInt, cls.ValueFloat}
-
-    @classmethod
-    def array_types(cls) -> set:
-        return {cls.ArrayInt, cls.ArrayFloat}
-    """
-    @classmethod
-    def types(cls) -> set:
+    def policies(cls) -> set:
         return {cls.ImageInt, cls.ImageFloat, cls.ImageBinary,
                 cls.ValueInt, cls.ValueFloat,
                 cls.ArrayInt, cls.ArrayFloat}
@@ -32,16 +19,16 @@ class DataType(Enum):
     # allows resolving of target class from DataType (e.g, can access DataType.ValueInt.to_numpy() as DataType.ValueInt.target_class.to_numpy()
     @property
     def target_class(self):
-        from core.type import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat, ArrayInt, ArrayFloat
+        from core.type_policies import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat, ArrayInt, ArrayFloat
         
         mapping = {
-            DataType.ImageInt: ImageInt,
-            DataType.ImageFloat: ImageFloat,
-            DataType.ImageBinary: ImageBinary,
-            DataType.ValueInt: ValueInt,
-            DataType.ValueFloat: ValueFloat,
-            DataType.ArrayInt: ArrayInt,
-            DataType.ArrayFloat: ArrayFloat
+            DataPolicy.ImageInt: ImageInt,
+            DataPolicy.ImageFloat: ImageFloat,
+            DataPolicy.ImageBinary: ImageBinary,
+            DataPolicy.ValueInt: ValueInt,
+            DataPolicy.ValueFloat: ValueFloat,
+            DataPolicy.ArrayInt: ArrayInt,
+            DataPolicy.ArrayFloat: ArrayFloat
         }
         
         cls_ = mapping.get(self)
@@ -65,6 +52,3 @@ class DataType(Enum):
         # otherwise, returns error
         raise AttributeError(f"target class {target.__name__} has no attribute {name}")
 
-    # allows direct instantiation of target_class (ie, can say a = DataType.ValueInt(5) and a will be a member of ValueInt with value = 5)
-    def __call__(self, *args, **kwargs):
-        return self.target_class(*args, **kwargs)

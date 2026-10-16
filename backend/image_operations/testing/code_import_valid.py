@@ -1,6 +1,6 @@
 from core.image_operation import ImageOperation
 from core.shape import Shape
-from core.constants import DataType
+from core.constants import DataPolicy
 from core.metadata import ImageMetadata
 import math
 from numpy import ndarray
@@ -16,10 +16,10 @@ class SameImage(ImageOperation):
             version="1.0.1",
             docs="Returns an identical image to that inserted",
             alerts=None,
-            input_image_metadata={ "input":  ImageMetadata(dtype=DataType.ImageInt,
+            input_image_metadata={ "input":  ImageMetadata(dtype=DataPolicy.ImageInt,
                                                   image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                   image_map=Shape(c=0, z=1, y=2, x=3))},
-            output_image_metadata={ "output": ImageMetadata(dtype=DataType.ImageInt,
+            output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))}, 
             )

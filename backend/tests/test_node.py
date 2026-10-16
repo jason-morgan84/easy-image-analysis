@@ -4,7 +4,7 @@ import pytest
 from core.interface_classes import Node
 from core.error_handling import ActivationError
 from core.image_operation import ImageOperation
-from core.constants import DataType
+from core.constants import DataPolicy
 from core.data_checks import sample_data
 from core.shape import Shape
 from core.metadata import ImageMetadata, ParameterMetadata
@@ -34,12 +34,12 @@ def test_initiation_not_image_operation():
 
 
 
-test_image_metadata = ImageMetadata(dtype = DataType.ImageInt,
+test_image_metadata = ImageMetadata(dtype = DataPolicy.ImageInt,
                                     image_shape_constraints= Shape(c=-1, z=-1, y=-1, x=-1),
                                     image_map = Shape(c=0, z=1, y=2, x=3))
-test_image = sample_data(dtype = DataType.ImageInt, shape = (1,2,3,4))
-test_parameter_metadata = ParameterMetadata(dtype = DataType.ValueInt)
-test_parameter = sample_data(dtype=DataType.ValueInt)
+test_image = sample_data(dtype = DataPolicy.ImageInt, shape = (1,2,3,4))
+test_parameter_metadata = ParameterMetadata(dtype = DataPolicy.ValueInt)
+test_parameter = sample_data(dtype=DataPolicy.ValueInt)
 test_operation_1 = ImageOperation(name="Test Operation 1",
                                   id="test_operation_1",
                                   category = "None",
@@ -66,8 +66,8 @@ test_operation_2 = ImageOperation(name = "Test Operation 1",
                                 input_image_metadata = {"image 1": test_image_metadata, "image 2": test_image_metadata, "image 3": test_image_metadata},
                                 input_parameter_metadata = {"parameter 1": test_parameter_metadata, "parameter 2": test_parameter_metadata},
                                 output_image_metadata = {"output 1": test_image_metadata},
-                                output_parameter_metadata= {"out_param_1": ParameterMetadata(dtype=DataType.ValueFloat),
-                                                            "out_param_2": ParameterMetadata(dtype=DataType.ValueInt)}
+                                output_parameter_metadata= {"out_param_1": ParameterMetadata(dtype=DataPolicy.ValueFloat),
+                                                            "out_param_2": ParameterMetadata(dtype=DataPolicy.ValueInt)}
 )
 def function2(self):
     self.output_image = {'output 1': self.input_image['image 1']}
@@ -267,7 +267,7 @@ test_parameter_pass_through = ImageOperation(name = "test_parameter_pass_through
                                     alerts = None,
                                     input_image_metadata = {"image 1": test_image_metadata},
                                     input_parameter_metadata = {"parameter 1": test_parameter_metadata},
-                                    output_parameter_metadata = {"out_param_1": ParameterMetadata(dtype=DataType.ValueInt)}
+                                    output_parameter_metadata = {"out_param_1": ParameterMetadata(dtype=DataPolicy.ValueInt)}
 )
 def parameter_pass_through(self):
 
