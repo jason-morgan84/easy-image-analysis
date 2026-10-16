@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 from core.constants import DataType
 from core.type import ImageInt, ArrayFloat, ImageFloat, ImageBinary, ValueInt, ValueFloat, ArrayInt
+from core.data_checks import sample_data
 
 """test validate class"""
 # test is_image or is_array flagged class without np.array
@@ -51,30 +52,205 @@ def test_data_over_max_value(dtype, invalid_input, message):
 @pytest.mark.parametrize("dtype, invalid_input, message", [
     # test removed, can't have data under 0 for uint8
     # (ImageInt, np.array([0,1,5,-5], np.uint8), "expected data type of <class 'numpy.uint8'> for DataType.ValueInt, got <class 'str'>"), 
-    (ImageFloat, np.array([0.5, 0.2, -4.0],np.float64),"array below maximum value: DataType.ImageFloat has min_value of 0, not -4"), # unexpected list
+    (ImageFloat, np.array([0.5, 0.2, -4.0],np.float64),"array below minimum value: DataType.ImageFloat has min_value of 0.0, not -4.0"), # unexpected list
 ])
 def test_data_under_min_value(dtype, invalid_input, message):
     with pytest.raises(ValueError, match = message):
         dtype.validate(invalid_input)
 
+"""test to"""
+# call to function with incorrect input (input data not supplied dtype)
+@pytest.mark.parametrize("dtype_call, invalid_input, dtype_to, message", [
+    (ValueInt, sample_data(DataType.ValueFloat), DataType.ValueFloat,"data for conversion from DataType.ValueInt to DataType.ValueFloat does not meet constraints"), 
+    (ImageBinary, sample_data(DataType.ImageInt,[1,2,3,4]), DataType.ImageInt, "data for conversion from DataType.ImageBinary to DataType.ImageInt does not meet constraints"),
+    (ArrayInt, sample_data(DataType.ArrayFloat, [1,2]), DataType.ArrayInt,"data for conversion from DataType.ArrayInt to DataType.ArrayInt does not meet constraints"), 
+    (ImageFloat, sample_data(DataType.ImageInt, [1,2,3]), DataType.ImageInt,"data for conversion from DataType.ImageFloat to DataType.ImageInt does not meet constraints"),
+],
+    ids=["value_int","image_binary","array_int","image_float"]
+)
+def test_to_incorrect_input(dtype_call, invalid_input,dtype_to, message):
+    with pytest.raises(ValueError, match = message):
+        dtype_call.to(invalid_input, dtype_to)
+
+# call to function with non-permitted conversion
+@pytest.mark.parametrize("dtype_call, invalid_input, dtype_to, message", [
+    (ValueInt, sample_data(DataType.ValueInt), DataType.ArrayFloat,"conversion from DataType.ValueInt to DataType.ArrayFloat not permitted"), 
+    (ImageFloat, sample_data(DataType.ImageFloat,[1,2,3,4]), DataType.ImageBinary, "conversion from DataType.ImageFloat to DataType.ImageBinary not permitted"),
+    (ArrayInt, sample_data(DataType.ArrayInt, [1,2]), DataType.ValueInt,"conversion from DataType.ArrayInt to DataType.ValueInt not permitted"), 
+],
+    ids=["value_int","image_binary","array_int"]
+)
+def test_to_non_permitted_dtype(dtype_call, invalid_input,dtype_to, message):
+    with pytest.raises(ValueError, match = message):
+        dtype_call.to(invalid_input, dtype_to)
 
 
+"""test _convert"""
+# test conversions from ImageInt
+@pytest.mark.parametrize("input, dtype_to", [
+    (sample_data(DataType.ImageInt,[1,2,3]), DataType.ImageFloat), 
+    (sample_data(DataType.ImageInt, [1,2,3]), DataType.ImageInt), 
+],
+    ids=["image_float","image_int"]
+)
+def test_convert_image_int(input, dtype_to):
+    a = input
+    a[0][0][0] = 0
+    test_image = ImageInt.to(a, dtype_to)
+    a[0][0][0] = 1
+    dtype_to.validate(test_image)
+    assert test_image.shape == (1,2,3)
+    assert test_image[0][0][0] != 1
+
+# test conversions from ImageFloat
+@pytest.mark.parametrize("input, dtype_to", [
+    (sample_data(DataType.ImageFloat,[1,2,3]), DataType.ImageFloat), 
+    (sample_data(DataType.ImageFloat, [1,2,3]), DataType.ImageInt), 
+],
+    ids=["image_float","image_int"]
+)
+def test_convert_image_float(input, dtype_to):
+    a = input
+    a[0][0][0] = 0
+    test_image = ImageFloat.to(a, dtype_to)
+    a[0][0][0] = 1
+    dtype_to.validate(test_image)
+    assert test_image.shape == (1,2,3)
+    assert test_image[0][0][0] != 1
+
+# test conversions from ImageBinary
+@pytest.mark.parametrize("input, dtype_to", [
+    (sample_data(DataType.ImageBinary,[1,2,3]), DataType.ImageFloat), 
+    (sample_data(DataType.ImageBinary, [1,2,3]), DataType.ImageInt), 
+    (sample_data(DataType.ImageBinary, [1,2,3]), DataType.ImageBinary),
+],
+    ids=["image_float","image_int","image_bianry"]
+)
+def test_convert_image_binary(input, dtype_to):
+    a = input
+    a[0][0][0] = 0
+    test_image = ImageBinary.to(a, dtype_to)
+    a[0][0][0] = 1
+    dtype_to.validate(test_image)
+    assert test_image.shape == (1,2,3)
+    assert test_image[0][0][0] != 1
+
+# test conversions from ArrayInt
+@pytest.mark.parametrize("input, dtype_to", [
+    (sample_data(DataType.ArrayInt,[1,2,3]), DataType.ArrayInt), 
+    (sample_data(DataType.ArrayInt, [1,2,3]), DataType.ArrayFloat), 
+],
+    ids=["array_int","array_float"]
+)
+def test_convert_array_int(input, dtype_to):
+    a = input
+    a[0][0][0] = 0
+    test_image = ArrayInt.to(a, dtype_to)
+    a[0][0][0] = 1
+    dtype_to.validate(test_image)
+    assert test_image.shape == (1,2,3)
+    assert test_image[0][0][0] != 1
+
+# test conversions from ArrayFloat
+@pytest.mark.parametrize("input, dtype_to", [
+    (sample_data(DataType.ArrayFloat,[1,2,3]), DataType.ArrayInt), 
+    (sample_data(DataType.ArrayFloat, [1,2,3]), DataType.ArrayFloat), 
+],
+    ids=["array_int","array_float"]
+)
+def test_convert_array_float(input, dtype_to):
+    a = input
+    a[0][0][0] = 0
+    test_image = ArrayFloat.to(a, dtype_to)
+    a[0][0][0] = 1
+    dtype_to.validate(test_image)
+    assert test_image.shape == (1,2,3)
+    assert test_image[0][0][0] != 1
+
+# test conversions from ValueInt
+@pytest.mark.parametrize("input, dtype_to", [
+    (sample_data(DataType.ValueInt), DataType.ValueInt), 
+    (sample_data(DataType.ValueInt), DataType.ValueFloat), 
+],
+    ids=["value_int","value_float"]
+)
+def test_convert_value_int(input, dtype_to):
+    a = input
+    test_image = ValueInt.to(a, dtype_to)
+    a = 1
+    dtype_to.validate(test_image)
+    assert test_image != 1
+
+# test conversions from ValueFloat
+@pytest.mark.parametrize("input, dtype_to", [
+    (sample_data(DataType.ValueFloat), DataType.ValueInt), 
+    (sample_data(DataType.ValueFloat), DataType.ValueFloat), 
+],
+    ids=["value_int","value_float"]
+)
+def test_convert_value_float(input, dtype_to):
+    a = input
+    test_image = ValueFloat.to(a, dtype_to)
+    a = 1
+    dtype_to.validate(test_image)
+    assert test_image != 1
+
+# test for drift within ImageTypes
+@pytest.mark.parametrize("DataType, Input, OutputType", [
+    (DataType.ImageInt, np.array([1, 2], np.uint8), DataType.ImageFloat),      
+    (DataType.ImageFloat, np.array([0.1, 1.0], np.float64), DataType.ImageInt),       
+])
+def test_for_value_drift_image_types(DataType, Input, OutputType):
+    a = Input
+    for i in range (5):
+        b = DataType.to(value=a, dtype=OutputType)
+        a = OutputType.to(value=b, dtype=DataType)
+    c = Input
+    for i in range (15):
+        d = DataType.to(value=c, dtype=OutputType)
+        c = OutputType.to(value=d, dtype=DataType)
+
+    assert(a[0]== c[0])
+    assert(a[1]== c[1])
 
 
-# tests array shape - is it maintained through conversion
-def test_array_shape_maintenance():
-    mock_image = np.arange(120).reshape(2,3,4,5)
-    assert ImageInt(mock_image).value.shape == (2,3,4,5)
-    assert ImageFloat(mock_image/1000).value.shape == (2,3,4,5)
+# test for drift within value_types
+@pytest.mark.parametrize("DataType, Input, OutputType", [
+    (DataType.ValueFloat, 5.6, DataType.ValueInt),        
+])
+def test_for_value_drift_value_types(DataType, Input, OutputType):
+    a = DataType.numpy(Input)
+    for i in range (5):
+        b = DataType.to(value=a, dtype=OutputType)
+        a = OutputType.to(value=b, dtype=DataType)
+
+    c = DataType.numpy(Input)
+    for i in range (15):
+        d = DataType.to(value=c, dtype=OutputType)
+        c = OutputType.to(value=d, dtype=DataType)
+
+    assert(a == c)
+    assert(b == d)
 
 
-# tests conversion immutability: modify original input after conversion
-def test_immutablity_array_list():
-    test_list = [2,3,4]
-    test_type = ImageInt(test_list)
-    test_list[0] = 5
+# test for drift within array_types
+@pytest.mark.parametrize("DataType, Input, OutputType", [
+    (DataType.ArrayFloat, [5.6, 8.1], DataType.ArrayInt),        
+])
+def test_for_value_drift_array_types(DataType, Input, OutputType):
+    a = DataType.numpy(Input)
+    for i in range (5):
+        b = DataType.to(value=a, dtype=OutputType)
+        a = OutputType.to(value=b, dtype=DataType)
 
-    assert (test_list[0]!= test_type.value[0])
+    c = DataType.numpy(Input)
+    for i in range (15):
+        d = DataType.to(value=c, dtype=OutputType)
+        c = OutputType.to(value=d, dtype=DataType)
+
+    assert(a[0] == c[0])
+    assert(b[0] == d[0])
+
 
 # goes through each member of DataType, checks that the required class variables have been 
 # properly set
@@ -85,107 +261,9 @@ def test_all_datatype_classes_have_required_attributes(enum_member):
     assert enum_member.data_type is not None, f"'{enum_member.__name__}.data_type' is not defined"
     assert enum_member.data_type == enum_member, f"'{enum_member.__name__}.data_type' ({enum_member.data_type}) does not match Enum member {enum_member}"
     assert enum_member.numpy is not None, f"'{enum_member.__name__}.numpy' is not defined"
-    assert enum_member.allowed_sub_types is not None, f"'{enum_member.__name__}.allowed_subdtypes' is not defined"
     assert isinstance(enum_member.is_array, bool), f"'{enum_member.__name__}.is_array' is not boolean"
 
-# test image conversions within image_types
-@pytest.mark.parametrize("DataType, Input, OutputType, Output", [
-    (ImageInt, [51, 10, 20], ImageFloat, 0.2),      
-    (ImageInt, [0, 1, 1], ImageBinary, 0),       
-    (ImageFloat, [0.4, 0.5], ImageInt, 102),     
-    (ImageFloat, [1.0, 0.0], ImageBinary, 1),      
-    (ImageBinary, [1, 0], ImageFloat, 1.0),    
-    (ImageBinary, [0, 1], ImageInt, 0),  
-])
-def test_image_conversions(DataType, Input, OutputType, Output):
-# test explict type conversions within ImageTypes gives expected output type
-    assert DataType(Input).to(OutputType).data_type == OutputType.data_type, f"{DataType(Input).to(OutputType).value}"
-# test implicit type conversions within ImageTypes gives expected output type
-    assert OutputType(DataType(Input)).data_type == OutputType.data_type
-# test explict type conversions gives expected output value
-    assert (DataType(Input).to(OutputType).value[0] == Output)
-# test implicit type conversions gives expected output value
-    assert OutputType(DataType(Input)).value[0] == Output
 
-# test for drift within ImageTypes
-@pytest.mark.parametrize("DataType, Input, OutputType", [
-    (ImageInt, [1, 2], ImageFloat),      
-    (ImageFloat, [0.1, 1.0], ImageInt),       
-    (ImageFloat, [0.1, 0.9], ImageBinary),     
-    (ImageBinary, [1, 0], ImageFloat),      
-    (ImageInt, [1, 0], ImageBinary),    
-    (ImageBinary, [0, 1], ImageInt),    
-])
-def test_for_value_drift_image_types(DataType, Input, OutputType):
-    a = DataType(Input)
-    for i in range (5):
-        b = a.to(OutputType).to(DataType)
-
-    for i in range (15):
-        c = a.to(OutputType).to(DataType)
-
-    assert(b.value[0]== c.value[0])
-    assert(b.value[1]== c.value[1])
-
-# test conversions within value_types
-@pytest.mark.parametrize("DataType, Input, OutputType, Output", [
-    (ValueInt, 5, ValueFloat, 5.0),      
-    (ValueFloat, 0.6, ValueInt, 1),       
-])
-def test_value_conversions(DataType, Input, OutputType, Output):
-# test explict type conversions within value_types gives expected output type
-    assert DataType(Input).to(OutputType).data_type == OutputType.data_type, f"{DataType(Input).to(OutputType).value}"
-# test implicit type conversions within value_types gives expected output type
-    assert OutputType(DataType(Input)).data_type == OutputType.data_type
-# test explict type conversions gives expected output value
-    assert (DataType(Input).to(OutputType).value == Output)
-# test implicit type conversions gives expected output value
-    assert OutputType(DataType(Input)).value == Output
-
-# test for drift within value_types
-@pytest.mark.parametrize("DataType, Input, OutputType", [
-    (ValueFloat, 5.6, ValueInt),        
-])
-def test_for_value_drift_value_types(DataType, Input, OutputType):
-    a = DataType(Input)
-    for i in range (5):
-        b = a.to(OutputType).to(DataType)
-
-    for i in range (15):
-        c = a.to(OutputType).to(DataType)
-
-    assert(b.value== c.value)
-    assert(b.value== c.value)
-
-# test conversions within array_types
-@pytest.mark.parametrize("DataType, Input, OutputType, Output", [
-    (ArrayInt, [5, 2], ArrayFloat, 5.0),      
-    (ArrayFloat, [0.6, 17.1], ArrayInt, 1),       
-])
-def test_array_conversions(DataType, Input, OutputType, Output):
-# test explict type conversions within array_types gives expected output type
-    assert DataType(Input).to(OutputType).data_type == OutputType.data_type, f"{DataType(Input).to(OutputType).value}"
-# test implicit type conversions within array_types gives expected output type
-    assert OutputType(DataType(Input)).data_type == OutputType.data_type
-# test explict type conversions gives expected output value
-    assert (DataType(Input).to(OutputType).value[0] == Output)
-# test implicit type conversions gives expected output value
-    assert OutputType(DataType(Input)).value[0] == Output
-
-# test for drift within array_types
-@pytest.mark.parametrize("DataType, Input, OutputType", [
-    (ArrayFloat, [5.6, 8.1], ArrayInt),        
-])
-def test_for_value_drift_array_types(DataType, Input, OutputType):
-    a = DataType(Input)
-    for i in range (5):
-        b = a.to(OutputType).to(DataType)
-
-    for i in range (15):
-        c = a.to(OutputType).to(DataType)
-
-    assert(b.value[0] == c.value[0])
-    assert(b.value[0] == c.value[0])
 
 
 

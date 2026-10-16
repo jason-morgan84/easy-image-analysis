@@ -19,7 +19,7 @@ class BaseType:
     is_image = False                # does this type define an image? An image is assumed to be mutli-dimensional, is_array does not need to be set to True
     is_array = False                # does this represent a multi-dimensional value?
     permitted_conversions = []    # list of other DataType classes this can be converted to automatically
-    warned_conversion = []        # list of other DataType classes this can be converted to, with a prompt to user
+    warned_conversions = []        # list of other DataType classes this can be converted to, with a prompt to user
 
     @classmethod
     def validate(cls, val):
@@ -32,10 +32,10 @@ class BaseType:
             if val.dtype != cls.numpy:
                 raise TypeError(f"expected np.array of {cls.numpy} for {cls.data_type}, got {val.dtype}")
             # if a max_value is set, raise ValueError if this is exceeded
-            if cls.max_value and val.max() > cls.max_value:
+            if cls.max_value is not None and val.max() > cls.max_value:
                 raise ValueError(f"array exceeds maximum value: {cls.data_type} has max_value of {cls.max_value}, not {val.max()}") 
             # if a min_value is set, raise ValueError if this is exceeded
-            if cls.min_value and val.min() < cls.min_value:
+            if cls.min_value is not None and val.min() < cls.min_value:
                 raise ValueError(f"array below minimum value: {cls.data_type} has min_value of {cls.min_value}, not {val.min()}") 
         # if type has is scalar variable (is_image and is_array are False)
         elif cls.is_image is False and cls.is_array is False:
@@ -43,29 +43,28 @@ class BaseType:
             if not isinstance(val, cls.numpy):
                 raise TypeError(f"expected data type of {cls.numpy} for {cls.data_type}, got {type(val)}")
             # if a max_value is set, raise ValueError if this is exceeded
-            if cls.max_value and val > cls.max_value:
+            if cls.max_value is not None and val > cls.max_value:
                 raise ValueError(f"value exceeds maximum value: {cls.data_type} has max_value of {cls.max_value}, not {val}") 
             # if a min_value is set, raise ValueError if this is exceeded
-            if cls.min_value and val < cls.min_value:
+            if cls.min_value is not None and val < cls.min_value:
                 raise ValueError(f"value below minimum value: {cls.data_type} has min_value of {cls.min_value}, not {val}") 
-
-    def to(cls, value, dtype):
+    @classmethod
+    def to(cls, value, dtype):       
         # check value meets definition of self.data_type
         try: 
             cls.validate(value)
         except Exception as e:
-            raise ValueError(f"data for conversion from {cls.data_type} to {cls.dtype} does not meet constraints: {e}")
+            raise ValueError(f"data for conversion from {cls.data_type} to {dtype} does not meet constraints: {e}")
 
         # check dtype is permitted type to convert self.data_type to
         cls.permitted_conversions = [] if cls.permitted_conversions == None else cls.permitted_conversions
         cls.warned_conversions = [] if cls.warned_conversions == None else cls.warned_conversions
-
         if dtype in cls.permitted_conversions or dtype in cls.warned_conversions or dtype == cls.data_type:
             # if acceptable dtype, carry out conversion
             try:
                 output = cls._convert(value, dtype)
             except Exception as e:
-                raise ValueError(f"error in conversion from {cls.data_type} to {cls.dtype}: {e}")
+                raise ValueError(f"error in conversion from {cls.data_type} to {dtype}: {e}")
         else:
             raise ValueError(f"conversion from {cls.data_type} to {dtype} not permitted")
 
@@ -75,9 +74,10 @@ class BaseType:
         except Exception as e:
             raise ValueError(f"converted data does not validate as {dtype}: {e}")
         return output
-
-    def _convert(self, value, dtype):
-        raise NotImplementedError(f"type conversions not yet implemented for data type {self.data_type} to {dtype}")
+    
+    @classmethod
+    def _convert(cls, value, dtype):
+        raise NotImplementedError(f"type conversions not yet implemented for data type {cls.data_type} to {dtype}")
 
 class ImageInt(BaseType):
     data_type = DataType.ImageInt
@@ -89,12 +89,13 @@ class ImageInt(BaseType):
     max_value = 255
     permitted_conversions = [DataType.ImageFloat]
 
-    def _convert(self, value, dtype):
+    @classmethod
+    def _convert(cls, value, dtype):
         if dtype == DataType.ImageFloat:
             return dtype.numpy(value/255).copy()
         elif dtype == DataType.ImageBinary:
             return dtype.numpy(value).copy()
-        elif dtype == DataType.ImageInt and dtype == self.data_type:
+        elif dtype == DataType.ImageInt and dtype == cls.data_type:
             return value.copy()
         else:
             raise TypeError(f"ImageInt cannot be converted to type {dtype}")
@@ -108,8 +109,9 @@ class ImageFloat(BaseType):
     min_value = 0.0
     max_value = 1.0
     permitted_conversions = [DataType.ImageInt]
-
-    def _convert(self, value, dtype):
+    
+    @classmethod
+    def _convert(cls, value, dtype):
         if dtype == DataType.ImageInt:
             return dtype.numpy(np.round(value * 255)).copy()
         elif dtype == DataType.ImageBinary:
@@ -129,13 +131,14 @@ class ImageBinary(BaseType):
     max_value = 1
     warned_conversions = [DataType.ImageInt, DataType.ImageFloat]
 
-    def _convert(self, value, dtype):
+    @classmethod
+    def _convert(cls, value, dtype):
         if dtype == DataType.ImageFloat:
             return dtype.numpy(value).copy()
         elif dtype == DataType.ImageInt:
-            return dtype.numpy(value).ccopy()
+            return dtype.numpy(value).copy()
         elif dtype == DataType.ImageBinary:
-            return value
+            return value.copy()
         else:
             raise TypeError(f"ImageBinary cannot be converted to type {dtype}")
         
@@ -143,10 +146,13 @@ class ValueInt(BaseType):
     data_type = DataType.ValueInt
     description = "Data type to hold single variables as integers"
     numpy = np.uint8
-    allowed_conversions = [DataType.ValueFloat]
+    permitted_conversions = [DataType.ValueFloat]
 
-    def _convert(self, value, dtype):
+    @classmethod
+    def _convert(cls, value, dtype):
         if dtype == DataType.ValueFloat:
+            return dtype.numpy(value).copy()
+        elif dtype == DataType.ValueInt:
             return dtype.numpy(value).copy()
         else:
             raise TypeError(f"ValueInt cannot be converted to type {dtype}")
@@ -155,11 +161,14 @@ class ValueFloat(BaseType):
     data_type = DataType.ValueFloat
     description = "Data type to hold single variables as floats"
     numpy = np.float64
-    allowed_conversions = [DataType.ValueInt]
+    permitted_conversions = [DataType.ValueInt]
 
-    def _convert(self, value, dtype):
+    @classmethod
+    def _convert(cls, value, dtype):
         if dtype == DataType.ValueInt:
             return dtype.numpy(np.round(value)).copy()
+        elif dtype == DataType.ValueFloat:
+            return dtype.numpy(value).copy()
         else:
             raise TypeError(f"ValueFloat cannot be converted to type {dtype}")
 
@@ -168,9 +177,10 @@ class ArrayInt(BaseType):
     description = "Data type to hold variables lists as ints"
     numpy = np.uint8
     is_array = True
-    allowed_conversions = [DataType.ArrayFloat]
+    permitted_conversions = [DataType.ArrayFloat]
 
-    def _convert(self, value, dtype):
+    @classmethod
+    def _convert(cls, value, dtype):
         if dtype == DataType.ArrayFloat:
             return dtype.numpy(value).copy()
         elif dtype == DataType.ArrayInt:
@@ -183,9 +193,10 @@ class ArrayFloat(BaseType):
     description = "Data type to hold variables lists as floats"
     numpy = np.float64
     is_array = True
-    allowed_conversions = [DataType.ArrayInt]
+    permitted_conversions = [DataType.ArrayInt]
 
-    def _convert(self, value, dtype):
+    @classmethod
+    def _convert(cls, value, dtype):
         if dtype == DataType.ArrayInt:
             return dtype.numpy(np.round(value)).copy()
         elif dtype == DataType.ArrayFloat:
