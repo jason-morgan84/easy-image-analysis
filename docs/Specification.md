@@ -119,6 +119,7 @@
 |13/10/25|0.17.12|Added get_next_nodes to WorkFlow class description|
 |14/10/25|0.17.13|Updated WorkFlow unit testing|
 |14/10/25|0.17.14|Clarified description of shape checks carried out during add_connection|
+|16/10/25|0.17.15|Updated descriptions of type policies|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -178,36 +179,26 @@ They can then draw connections between the nodes. A single node has a defined nu
 
 ## 3.2 Classes
 
-### 3.2.1 DataType classes
+### 3.2.1 DataPolicy classes
 
-The aim of the DataType classes is to allow data to be transferred through the WorkFlow in a reliable and predictable way.
+Data is passed through the WorkFlow as numpy data types. DataPolicy classes define constraints and characteristics of this data, allowing it to be transferred through the WorkFlow in a reliable and predictable way.
 
-Data can **only** be passed through the WorkFlow as a DataType class - equivalent types such as np.uint8 or np.float64 **will** result in type errors.
+Policies are all based on a defined base class, BasePolicy. This defines the characteristics of a custom data type with the following variables:
 
-This is a deliberate design choice to maintain control and consistency in how data moves through the WorkFlow.
+* data_policy - this provides a reference to this policy in the DataPolicy enum in constant.py
+* numpy - the defines the required numpy data type (eg np.uint8, np.bool, np.float64)
 
-A distinction should be made between data transferred through the WorkFlow and data used for image manipulation in members of the ImageOperation class. Input and output data to ImageOperations will be in **defined** numpy equivalents to DataType classes. The conversion from DataType classes to their numpy equivalent will take place in the Port for each input and output. This means image analysis can be carried out using standard types and functions, and there is no requirement for data manipulation using the DataType classes. 
-
-While image manipulation is carried out using standard Numpy types, DataTypes are still used to define the format of expected inputs to and output from ImageOperations.
-
-The interaction between DataTypes, Ports and ImageOperations will be described in more detail in the Port and ImageOperation class descriptions.
-
-DataTypes are all based on a defined base class, BaseType. This defines the characteristics of a custom data type with the following variables. The first three variables are required - the class types will not function without them and will fail unit testing. The remaining four variables are optional:
-
-* data_type - this provides a reference to this DataType in the DataType enum in constant.py
-* numpy - the defines the equivalent numpy data type (eg np.uint8, np.bool, np.float64)
-* allowed_sub_types - a tuple of allowed data types (eg np.integers, bool, numbers.Number)
-
-* description - text description of class and what its for
+* description - text description of policy and what its for
 * min_value - if the value must be with a range, this defines a minimum value (default is None)
 * max_value - maximum allowed value, if defined (default is None)
-* is_array - type classes must define as either a 1d or multi-dimensional data type (default is False)
+* is_image - does this policy describe an image? 
+* is_array - does this policy describe an array (true) or scalar (false) value? An image is assumed to be mutli-dimensional, is_array should not be set to True.
 
-* permitted_conversions - these are the other DataType classes this is permitted to be be automatically converted into by WorkFlow (eg, between 8bit int and 8bit float)
-* warned_conversions - these are the DataType classes this can be converted into by WorkFlow, with a prompt to the user (ie, binary image to 8 bit image - this is possible, but will likely unbinarise the image)
+* permitted_conversions - these are the other policies this data is allowed to be be automatically converted into by WorkFlow (eg, between 8bit int and 8bit float)
+* warned_conversions - these are the policies classes this data can be converted into by WorkFlow, with a prompt to the user (ie, binary image to 8 bit image - this is possible, but will likely unbinarise the image)
 
 
-By default, seven custom data types are defined. Three are used to define images, two to define 1D variables and two to define non-image arrays:
+By default, seven data policies are defined. Three are used to define images, two to define 1D variables and two to define non-image arrays:
 
 * ImageInt - For images stored as integers in the range 0 ≤ int ≤ 255
 * ImageFloat - For images stored as floats in the range 0 ≤ float ≤ 1
@@ -219,21 +210,18 @@ By default, seven custom data types are defined. Three are used to define images
 * ArrayInt - for multi dimensional integer variables
 * ArrayFloat - for multi dimensional float variables
 
-Note again that these data types are for transferring data through the WorkFlow, for example an image threshold value may be transmitted from one node to the next as a ValueInt. They are not expected to be used in any code unrelated to data transfer.
+BasePolicy has three @classmethods:
+  - validate - this checks that an inputed value matches the policy definition
+  - to - this converts a passed value to a format compatible with another policy, for example, converting an 8bit integer image to a float image.
+  - _convert - this carries out the actual conversion - the default function will return an error when used, this needs to be coded for any new policy for the relevant conversions.
 
 For new DataTypes, conversion between types will result in a NotImplementedError. To fix this, implement a custom to(self, dtype) function in your custom class defining the possible conversions.
 
-By default, each ImageType can be converted to each other. Likewise ValueTypes and ArrayTypes can be converted to other members of the same type.
 
-Where the 'to' function has been implemented, conversions can be explicit (eg, by using ImageInt.to(DataType.ImageFloat)) or implicit (eg, by calling ImageFloat(x) where x is an ImageInt).
 
-Each Image type has __init__, value property and value.getter functions along with conversion functions for the other two image types and the relevant standard numpy type. For numpy conversion, this will be available as an explicit function (to_uint8 or to_float64) or as a generic function (to_numpy).
 
-The comparable numpy data type is stored in the numpy class variable. This is used in the to_numpy function and for type checking once the DataType class has been converted to a standard numpy class for image analysis in a Port.
 
-~~Each DataType includes a test_sample() function, which creates a variable of that type for testing and providing default values. This can be generated as random numbers (for testing) or 0s (for instantiating default input and output variables for ImageOperations, if zero = True - by default, zero = False).~~
-
-All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type. For each type, the data_type class variable **must** point to the relevant name in the Enum (stored in constants.py).
+DataPolicies are wrapped in an Enum to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. For each policy, the data_type class variable must point to the relevant name in the Enum (stored in constants.py).
 
 ### 3.2.2 Shape class
 
