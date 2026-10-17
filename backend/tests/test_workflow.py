@@ -536,7 +536,10 @@ def test_get_previous_nodes():
     assert len(nodes) == 1
     assert "node.same_image.0" in nodes
 
-    
+    # test get_previous_nodes from node "node0", expect no nodes
+    nodes = workflow.get_previous_nodes(workflow.nodes["node.same_image.0"])
+    assert len(nodes) == 0
+
     # test get_previous_nodes from non-string/Node/Connection/Port object expect TypeError
     with pytest.raises(TypeError, match = "get_previous_nodes requires input of Node, Port or Connection class, or nodes or connections dictionary key, not"):
         nodes = workflow.get_previous_nodes(workflow)
