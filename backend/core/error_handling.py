@@ -50,3 +50,11 @@ class VersionError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
+
+
+class GraphError(Exception):
+    """Exception raised when error in updating graph"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
