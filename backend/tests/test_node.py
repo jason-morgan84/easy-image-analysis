@@ -150,14 +150,7 @@ def test_pre_test_missing_data_input_port_image():
     with pytest.raises(ActivationError, match = "node activated when input not present"):
         test_node1.input_ports["image.image 1"].data = None
         test_node1.activate_node()
-    """planned test commented out here: Port output doesn't exist until Node.activate_node() is run and tries to grab Port.Output, at which point the Output getter
-    in port converts the input to an output. This means the only way to set pixel_array to None is to change Port.Input.pixel_array to None, but Port.Input for an
-    input_image is an Image class, which won't accept None as as image pixel_array.
-    
-    This means that an exception is raised in the previous line, setting pixel_array to None, not in the Node class.
-    I'm leaving this as a unit test because, if the previous line stops creating an error, the Node test still needs to be run."""
-    #with pytest.raises(ActivationError, match = "node activated when input pixel_array not present"):
-    #    test_node1.activate_node()
+
 
 # Activate node where a parameter input port does not contain value
 def test_pre_test_missing_value_input_port_parameter():
@@ -170,10 +163,7 @@ def test_pre_test_missing_value_input_port_parameter():
     with pytest.raises(ActivationError, match = "node activated when input value not present"):
         test_node1.input_ports["parameter.parameter 1"].data = None
         test_node1.activate_node()
-    """as with the previous test, this causes an error in the Parameter class when setting value to 0. Keeping the actual tests for the Node class below
-    in case something changes in the Image class down the line"""
-    #with pytest.raises(ActivationError, match = "node activated when input image_map not present"):
-       # test_node1.activate_node()
+
 
 """post tests"""
 # Activate node where an output port_id is in an incorrect format (not type.name) | ActivationError | node activates|
@@ -212,9 +202,6 @@ def test_post_test_mismatched_output_port_parameter_id():
     with pytest.raises(ActivationError, match = "node activated where output parameter port name not present in ImageOperation output dictionary"):
         test_node2.activate_node()
 
-"""These two unit tests has been removed, because ImageOperation itself will raise an error if this occurs"""
-# Activate node where an ImageOperation output_image does not contain pixel_array or image_map
-# Activate node where an ImageOperation output_parameter does not contain value | ActivationError | node activates|
 
 
 """Data flow through tests"""
