@@ -66,12 +66,11 @@ class Port:
     Its role is to hold metadata requirements of the ImageOperation and cache input or output data.
     """
     def __init__(self, port_id, node_id, metadata, is_input, data = None):
-        self.port_id = port_id          # own ID value, set during instatiation
-        self.node_id = node_id          # Nodes identifier, set during instantiation
+        self.port_id = port_id                          # own ID value, set during instatiation
+        self.node_id = node_id                          # Nodes identifier, set during instantiation
         self.metadata = metadata
         self.data = data
         self.is_input = is_input
-
 
     @property
     def port_id(self):
@@ -185,22 +184,17 @@ class Node:
     def initialise_input_ports(self):
         for key, value in self.image_operation.input_image_metadata.items():
             port_id = "image." + str(key)
-            input_metadata = ImageMetadata(dtype = value.dtype,
-                                           image_shape_constraints=value.image_shape_constraints,
-                                           image_map=value.image_map)
             self.input_ports[port_id] = Port(is_input = True,
-                                             metadata=input_metadata,
+                                             metadata=value,
                                              port_id = port_id,
                                              node_id = self.node_id)
         if self.image_operation.input_parameter_metadata is not None:
             for key, value in self.image_operation.input_parameter_metadata.items():
                 port_id = "parameter." + str(key)
-                input_metadata = ParameterMetadata(dtype=value.dtype,
-                                                shape=value.shape)
                 self.input_ports[port_id] = Port(is_input = True,
-                                                metadata=input_metadata,
-                                                port_id = port_id,
-                                                node_id = self.node_id)
+                                                 metadata=value,
+                                                 port_id = port_id,
+                                                 node_id = self.node_id)
     # on Node instantiation, initialises the Node output Ports by creating a Port for each input_image and input_parameter in
     # the associated ImageOperation
     def initialise_output_ports(self):
