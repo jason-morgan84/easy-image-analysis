@@ -49,7 +49,12 @@ class BasePolicy:
             if cls.min_value is not None and val < cls.min_value:
                 raise ValueError(f"value below minimum value: {cls.data_type} has min_value of {cls.min_value}, not {val}") 
     @classmethod
-    def to(cls, value, dtype):       
+    def to(cls, value, dtype):
+
+        # if to is called with no dtype, return input value
+        if dtype == None:
+            return value.copy()
+               
         # check value meets definition of self.data_type
         try: 
             cls.validate(value)
