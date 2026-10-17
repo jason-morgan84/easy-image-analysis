@@ -5,7 +5,7 @@ from core.error_handling import ConnectionError, log, warn, GraphError
 from core.shape import Shape
 from core.constants import DataPolicy
 from core.io_image_operations import start_nodes
-
+import numpy as np
 class WorkFlow:
     def __init__(self, logger, image_operation_directiory):
         self.image_operation_directiory = image_operation_directiory
@@ -409,116 +409,120 @@ class WorkFlow:
             check_nodes(node, running_list)
         return running_list
 
-def update_graph(self):
-    """1. Generate ordered node list"""
-    # get list of start nodes by comparing nodes dictionary value to start_nodes list from io_image_operations.py
-    start_node_list = [node for node in self.nodes.values() if node.image_operation.id in start_nodes]
+    def update_graph(self):
+        """1. Generate ordered node list"""
+        # get list of start nodes by comparing nodes dictionary value to start_nodes list from io_image_operations.py
+        start_node_list = [node for node in self.nodes.values() if node.image_operation.id in start_nodes]
 
-    # if no start nodes, log error
-    if len(start_node_list) == 0:
-        log(self.workflow_logger, GraphError, f"cannot update graph without defined start nodes","WorkFlow","update_graph") 
+        # if no start nodes, log error
+        if len(start_node_list) == 0:
+            log(self.workflow_logger, GraphError, f"cannot update graph without defined start nodes","WorkFlow","update_graph") 
 
-    # get node_list from graph map from each start_node
-    node_list = []
-    for start_node in start_node_list():
-        try:
-            node_list.append(self.get_graph_map(start_node))
-        except Exception as e:
-            log(self.workflow_logger, GraphError, f"error generating graph map for start node {start_node}: {e}","WorkFlow","update_graph") 
+        # get node_list from graph map from each start_node
+        node_list = []
+        for start_node in start_node_list():
+            try:
+                node_list.append(self.get_graph_map(start_node))
+            except Exception as e:
+                log(self.workflow_logger, GraphError, f"error generating graph map for start node {start_node}: {e}","WorkFlow","update_graph") 
 
-    """2. Iterate through node list, update is_ready flags, transfer input data, run nodes"""
-    """input data to Node is transferred in but output data is not transferred out: for upstream nodes to exist, connection must exist. No guarantee dowsntream connection exists"""
-    for node in node_list:
-        # 2.1: check that all input nodes are either UI nodes or have connections. If not, not ready
+        """2. Iterate through node list, update is_ready flags, transfer input data, run nodes"""
+        """input data to Node is transferred in but output data is not transferred out: for upstream nodes to exist, connection must exist. No guarantee dowsntream connection exists"""
 
-        # 2.2: check that all previous nodes are ready
-        try:
-            previous_nodes = self.get_previous_nodes(node)
-        except Exception as e:
-            log(self.workflow_logger, GraphError, f"error generating list of previous nodes for node {node}: {e}","WorkFlow","update_graph")
-        # is is_ready flag for all previous nodes set to True
-        ready_state = [self.nodes[previous_node].is_ready for previous_node in previous_nodes].all()
-        if ready_state is not True:
-            continue
+        for node in node_list:
+            active_node = self.nodes[node]
+            port_connections_dict = {}
 
-        # 2.3: set node is_ready to True
-        active_node = self.nodes[node]
-        active_node.is_ready = True
+            # 2.1: check that all input Ports are either UI Ports or have connections. If not, not ready
+            # generate dictionary of {port: connection} for all input_ports of active_node
+            for port in active_node.input_ports.values():
+                if port.metatdata.user_input is True:
+                    port_connections_dict[port] = "user_input"
+                else:
+                    port_connections_dict[port] = next(
+                        (connection for connection in self.connections.values() if connection.target_port == port), None)
 
-        # 2.4: check node needs_update is True
-        if active_node.needs_update is True:
-            # 2.5: copy data from previous nodes
-            # 2.6: activate node
+            # if any ports are missing a connection, continue to next Node
+            if None in port_connections_dict.values():
+                continue
+            
+            # 2.2: check that all previous nodes are ready
+            try:
+                previous_nodes = self.get_previous_nodes(node)
+            except Exception as e:
+                log(self.workflow_logger, GraphError, f"error generating list of previous nodes for node {node}: {e}","WorkFlow","update_graph")
 
+            ready_state = [self.nodes[previous_node].is_ready for previous_node in previous_nodes].all()
+            if ready_state is not True:
+                continue
 
+            # 2.3: set node is_ready to True
+            active_node.is_ready = True
 
+            # 2.4: check node needs_update is True
+            if active_node.needs_update is True:
+                # 2.5: copy data from previous nodes
+                try:
+                    for input_port, connection in port_connections_dict.items():
+                        # tranpose data if transposition required
+                        try:
+                            transposed_data = connection.source_port.data if connection.tranpose == None else \
+                                self.transpose(value = connection.source_port.data,
+                                               old_shape = connection.source_port.metadata.image_map,
+                                               new_shape = connection.transpose)
+                        except Exception as e:
+                            raise GraphError(f"error transposing data for port '{input_port.port_id}'")
+                        
+                        # convert data if conversion required
+                        try:
+                            converted_data = transposed_data if connection.convert == None else \
+                                connection.source_port.metadata.dtype.to(value=connection.source_port.data,
+                                                                        dtype=connection.convert)
+                        except Exception as e:
+                            raise GraphError(f"error converting data for port '{input_port.port_id}'")
+                            
+                        # copy data to input_port
+                        try:
+                            input_port.data = converted_data
+                        except Exception as e:
+                            raise GraphError(f"error copying data for port '{input_port.port_id}'")
+                           
+                except Exception as e:
+                    log(self.workflow_logger, GraphError, f"error transferring data data for node '{node}': {e}","WorkFlow","update_graph")
+                    continue
+                # 2.6: activate node
+                try:
+                    node.activate_node()
+                except Exception as e:
+                    log(self.workflow_logger, GraphError, f"error activating node '{node}': {e}","WorkFlow","update_graph")
+                    continue
+                node.needs_update = False
+                log(self.workflow_logger, None, f"node activated sucessfully","WorkFlow","update_graph",node.node_id)
+                
+    def transpose(self, value, current_shape, new_shape):    
+        # check value is a np.ndarray
+        if not isinstance(value, np.ndarray):
+            raise TypeError(f"expected value as np.array, got {type(value)}")
         
-
-
-"""copied from connection for data conversion etc"""
-"""
-    @property
-    def output_data(self):
-        """"""Converts input data on demand.""""""
-        
-      
-        #if self.source_port.output_data is None or \
-            #(isinstance(self.source_port.output_data, Parameter) and self.source_port.output_data.value is None) or \
-               # (isinstance(self.source_port.output_data, Image) and self.source_port.output_data.pixel_array is None):
-           # raise ConnectionError(f"attempt to get output where source_port.output_data has no data present: {self.port_id}")
-        output = self.source_port.output_data
-        print("\n\noutput\n\n", output)
-        # if tranpose is not None and the source data is an image, transpose it
-        #if self.transpose and isinstance(output, Image):
-         #   output = output.transpose(self.transpose)
-        print("\n\noutput\n\n", output)
-        # if convert is not None, convert it
-        if self.convert:
-            output = output.convert(self.convert)
-        print("\n\noutput\n\n", output)
-        return output
-
-    @output_data.setter
-    def output_data(self, value):
-        self._output_data = value
-    
-    """"""Copied from Image Class""""""
-    
-    #def convert(self, convert):
-       # if convert not in DataType.image_types():
-       #     raise TypeError(f"images can only be converted to image_types, not {convert}")
-       # return Image(data = self.data.to(convert), image_metadata = self.image_metadata)
-
-    # tranpose to be moved to WorkFlow
-    def transpose(self, new_shape):
-        # expect a Shape class
+        # check new_shape is Shape class with dimension values between 0 and max_image_dimensions
         if not isinstance(new_shape, Shape):
-            raise TypeError (f"expected Shape class, got {type(new_shape)}")
-
+            raise TypeError (f"expected new_shape as Shape class, got {type(new_shape)}")
         for item in new_shape:
             if item < 0 or item > Shape.max_image_dimensions:
-                raise ValueError (f"passed shape dimensions out of range, must be 0-{Shape.max_image_dimensions}")
+                raise ValueError (f"new_shape shape dimensions out of range, must be 0-{Shape.max_image_dimensions}")
+            
+        # check current_shape is Shape class with dimension values between 0 and max_image_dimensions
+        if not isinstance(current_shape, Shape):
+            raise TypeError (f"expected current_shape as Shape class, got {type(current_shape)}")
+        for item in current_shape:
+            if item < 0 or item > Shape.max_image_dimensions:
+                raise ValueError (f"current_shape shape dimensions out of range, must be 0-{Shape.max_image_dimensions}")
+            
+        # new_shape is Shape class with new dimensions indices of each array (c,z,y,x)
+        # needs to create transpose list with values new_c, new_z, new_y, new_x in order of old_c, old_z, old_y, old_x
+        transpose = [current_shape[item] for item in new_shape]       
+        transposed_array = np.transpose(value, transpose)
 
+        return transposed_array
+    
 
-        # receives Shape class member with new dimensions indices of each array (c,z,y,x)
-        # needs to create transpose list with values c,z,y,x in order of old_c,old_z,old_y,old_x
-        transpose = [self.data[item] for item in new_shape]
-
-        # receives input of new channel order, such as z,c,y,x
-        # to use numpy transpose, needs to go from string z to array map for that dimension and append to list transpose
-        # transpose used as input for np.transpose
-
-        # get new shape map - ie, get the position of c,z,y,x in new_shape
-        
-        transposed_array = np.transpose(self.data.to_numpy(),transpose)
-
-        current_dtype = getattr(self.data, "data_type")
-
-        #self.pixel_array = current_dtype(transposed_array)
-        #self.image_map = new_shape
-       # return Image(data = current_dtype(transposed_array),
-           ##          image_metadata = ImageMetadata(dtype = self.image_metadata.dtype,
-            #                                        image_shape_constraints = self.image_metadata.image_shape_constraints,
-             #                                       image_map = new_shape))
-
-             """
