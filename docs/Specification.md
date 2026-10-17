@@ -120,6 +120,7 @@
 |14/10/25|0.17.13|Updated WorkFlow unit testing|
 |14/10/25|0.17.14|Clarified description of shape checks carried out during add_connection|
 |16/10/25|0.17.15|Updated descriptions of type policies|
+|17/10/25|0.17.16|Updated get_previous_nodes unit testing and added GraphError description to error handling|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -547,6 +548,7 @@ error_handling.py also includes custom exceptions:
 * ConnectionError - for errors in WorkFlow connectivity (eg, Connection with a loose end)
 * ActivationError - for errors in Node activation
 * MissingDataError - for errors where data is missing when passed to/from Ports
+* GraphError - Exception raised when error updating graph in WorkFlow
 
 # 4 ImageOperation files
 
@@ -863,6 +865,7 @@ Plugins to make:
 |get_next_nodes| call get_next_nodes with Port that is not in a Node that is a nodes dictionary value | ValueError: for Port inputs, get_next_nodes expects Port to me part of Node from nodes dictionary |
 |get_next_nodes| call get_next_node from input port | ValueError: get_next_nodes requires output port, not input port|
 |get_previous_nodes| call get_previous_nodes from node with Node class input | get list of previous nodes |
+|get_previous_nodes| call get_previous_nodes from node with no previous nodes | get empty list |
 |get_previous_nodes| call get_previous_nodes from node with nodes key string input | get list of previous nodes |
 |get_previous_nodes| call get_previous_nodes from node with Connection class input | get list of previous nodes |
 |get_previous_nodes| call get_previous_nodes from node with connections key string input | get list of previous nodes |
