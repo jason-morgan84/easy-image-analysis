@@ -1,9 +1,10 @@
 from core.image_operation_directory import ImageOperationDirectory
 from core.image_operation import ImageOperation
 from core.interface_classes import Node, Connection, Port
-from core.error_handling import ConnectionError, log, warn
+from core.error_handling import ConnectionError, log, warn, GraphError
 from core.shape import Shape
 from core.constants import DataPolicy
+from core.io_image_operations import start_nodes
 
 class WorkFlow:
     def __init__(self, logger, image_operation_directiory):
@@ -408,7 +409,50 @@ class WorkFlow:
             check_nodes(node, running_list)
         return running_list
 
+def update_graph(self):
+    """1. Generate ordered node list"""
+    # get list of start nodes by comparing nodes dictionary value to start_nodes list from io_image_operations.py
+    start_node_list = [node for node in self.nodes.values() if node.image_operation.id in start_nodes]
 
+    # if no start nodes, log error
+    if len(start_node_list) == 0:
+        log(self.workflow_logger, GraphError, f"cannot update graph without defined start nodes","WorkFlow","update_graph") 
+
+    # get node_list from graph map from each start_node
+    node_list = []
+    for start_node in start_node_list():
+        try:
+            node_list.append(self.get_graph_map(start_node))
+        except Exception as e:
+            log(self.workflow_logger, GraphError, f"error generating graph map for start node {start_node}: {e}","WorkFlow","update_graph") 
+
+    """2. Iterate through node list, update is_ready flags, transfer input data, run nodes"""
+    """input data to Node is transferred in but output data is not transferred out: for upstream nodes to exist, connection must exist. No guarantee dowsntream connection exists"""
+    for node in node_list:
+        # 2.1: check that all input nodes are either UI nodes or have connections. If not, not ready
+
+        # 2.2: check that all previous nodes are ready
+        try:
+            previous_nodes = self.get_previous_nodes(node)
+        except Exception as e:
+            log(self.workflow_logger, GraphError, f"error generating list of previous nodes for node {node}: {e}","WorkFlow","update_graph")
+        # is is_ready flag for all previous nodes set to True
+        ready_state = [self.nodes[previous_node].is_ready for previous_node in previous_nodes].all()
+        if ready_state is not True:
+            continue
+
+        # 2.3: set node is_ready to True
+        active_node = self.nodes[node]
+        active_node.is_ready = True
+
+        # 2.4: check node needs_update is True
+        if active_node.needs_update is True:
+            # 2.5: copy data from previous nodes
+            # 2.6: activate node
+
+
+
+        
 
 
 """copied from connection for data conversion etc"""
