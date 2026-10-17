@@ -121,6 +121,7 @@
 |14/10/25|0.17.14|Clarified description of shape checks carried out during add_connection|
 |16/10/25|0.17.15|Updated descriptions of type policies|
 |17/10/25|0.17.16|Updated get_previous_nodes unit testing and added GraphError description to error handling|
+|18/10/25|0.17.17|Planned unit testing for WorkFlow transpose and update_graph functions|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -827,6 +828,10 @@ Plugins to make:
 |:--        |:--    |:--                |
 |init | Pass arguement thats not mageOperationDirectory to WorkFlow | TypeError: expected ImageOperationDirectory class on WorkFlow instantiation|
 
+## 7.5.1 Node functions
+
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
 |add_node| call add_node with arguement that's not a valid ImageOperation | Logged TypeError: new node requires ImageOperation class  |
 |add_node| call add_node(image_operation) function where dictionary key already exists | Logged ValueError: new node key already in nodes dictionary  |
 |add_node| call add_node with proper parameters   | node added to nodes dictionary     |
@@ -839,6 +844,11 @@ Plugins to make:
 |edit_node | call edit_node with invalid input - Node not nodes value | Logs ValueError: for node inputs, edit_node expects value from nodes dictionary|
 |edit_node | call edit_node with valid input | sets own "needs_update" flag to True |
 |edit_node | call edit_node with valid input | sets all downstream "needs_update" flags to True |
+
+## 7.5.2 Connection Functions
+
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
 |add_connection |  call add_connection where source is not a port    | Logged TypeError: expected source_port as Port    |
 |add_connection |  call add_connection where target is not a port    | Logged TypeError: expected target_port as Port    |
 |add_connection | check add_connection with proper arguements and graph structure creates a connection| Connection created |
@@ -853,6 +863,11 @@ Plugins to make:
 | structure_checks | call add_connection where a connection would fail structure checks - would result in loop | Log ConnectionError: invalid connection: connection results in a loop |
 |delete_connection | call delete_connection with an invalid key | ValueError: id not in node list |
 |delete_connection | call delete_connection with proper arguements | Connection deleted |
+
+
+## 7.5.3 Graph topography functions
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
 |get_next_nodes| call get_next_nodes from node with Node class input | get list of next nodes |
 |get_next_nodes| call get_next_nodes from node with nodes key string input | get list of next nodes |
 |get_next_nodes| call get_next_nodes from node with Connection class input | get list of next nodes |
@@ -882,11 +897,32 @@ Plugins to make:
 |get_downstream_nodes | call get_downstream_nodes with invalid input - Node not nodes value | Logs ValueError: for node inputs, get_downstream_nodes expects value from nodes dictionary|
 |get_downstream_nodes | call get_downstream_nodes with valid Node | gives list of all downstream nodes |
 |get_downstream_nodes | call get_downstream_nodes with valid nodes dictionary key | gives list of all downstream nodes |
-
 |get_graph_map | call get_graph_map with invalid input - not Node or string | Logs TypeError: get_graph_map requires input of Node class, or nodes dictionary key|
 |get_graph_map | call get_graph_map with invalid input - string not nodes key | Logs ValueError: for string inputs, get_graph_map expects a node dictionary key|
 |get_graph_map | call get_graph_map with invalid input - Node not nodes value | Logs ValueError: for node inputs, get_graph_map expects value from nodes dictionary|
 
+## 7.5.4 Tranpose Function
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|tranpose | send in non nparray 'value' | TypeError: expected value as np.array|
+|tranpose | send in non new_shape not as Shape class | TypeError: expected new_shape as Shape class|
+|tranpose | send in non new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)| ValueError: new_shape shape dimensions out of range |
+|tranpose | Send in valid new_shape and value| output with expected shape |
+
+## 7.5.5 update_graph Function
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|start_node_list | Set io_image_operation.start_nodes | start_node_list properly updates|
+|start_node_list | Set io_image_operation.start_nodes to empty list | log GraphError: cannot update graph without defined start nodes|
+|get_node_list | Remove start_node from nodes dictionary before calling update_graph | GraphError: error generating graph map for start node|
+|node input_port check | Node in graph with 1 input port connected and ready, 1 not connected | Node not activated |
+|node ready_state check | Node in graph with where all ports connected but not all previous nodes is_ready flagged as True | Node not activated |
+|node needs_update check | Node in graph with where all ports connected and ready but needs_update set to False| Node not activated |
+|data transposition | Set transpose attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error transposing data for port{} <br> Node not activated |
+|data conversion | Set convert attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error converting data for port{} <br> Node not activated |
+|node activation | Find some way of causing an error on node activation?| log GraphError: error activating node<br> Node not activated |
+|update_graph | create graph with single source, correct input data and connections | all nodes run<br> all nodes needs_update flag set to False <br> all nodes is_ready set to True |
+|update_graph | create graph with two sources, correct connections and input_data from one source | all expected nodes run<br> all run nodes needs_update flag set to False <br> all run nodes is_ready flag set to True |
 
 # 8 Versioning
 
