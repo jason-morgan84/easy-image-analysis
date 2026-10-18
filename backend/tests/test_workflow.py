@@ -8,6 +8,8 @@ import copy
 from core.shape import Shape
 from core.data_checks import sample_data
 import core.io_image_operations
+import numpy as np
+
 # provide image_operation_directory arguement which is not ImageOperationDirectory class
 def test_initialise_not_image_operation_directory():
     a = "test"
@@ -1306,6 +1308,86 @@ def test_update_graph_connected_but_needs_update_false():
             assert "node activated sucessfully" not in item.message
 # data transposition 
 # Set transpose attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error transposing data for port{} <br> Node not activated |
+def test_update_graph_tranpose_improper_value():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+
+    workflow.add_node(directory["same_image"])  # node0: node.same_images.0
+    workflow.add_node(directory["load_image"]) # node1: node.load_image.1            
+
+
+    # create the following structure:
+    # node1         
+    #   |             
+    #   v             
+    # node0 
+
+    
+    workflow.nodes["node.load_image.1"].output_ports["image.output"].data = sample_data(dtype = DataPolicy.ImageInt, shape = (4,3,2,1))
+    workflow.nodes["node.load_image.1"].output_ports["image.output"].metadata.image_map = Shape(c=4, z=3, y=2, x=1)
+
+    workflow.nodes["node.same_image.0"].input_ports["image.input"].metadata.image_map = Shape(c=1, z=2, y=3, x=4)
+
+    workflow.add_connection(source_port = workflow.nodes["node.load_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
+
+    assert workflow.connections["connection.2"].transpose.c == 1
+    assert workflow.connections["connection.2"].transpose.z == 2
+    assert workflow.connections["connection.2"].transpose.y == 3
+    assert workflow.connections["connection.2"].transpose.x == 4
+
+    workflow.connections["connection.2"].transpose = Shape(c=5,z=4,y=1,x=-1)
+    
+    workflow.update_graph(test=True)
+
+    for item in workflow.workflow_logger:
+        if item.identifier == "node.same_image.0":
+            assert "new_shape shape dimensions out of range" in item.message
+
+# check data properly transposed
+def test_update_graph_tranpose():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+
+    workflow.add_node(directory["same_image"])  # node0: node.same_images.0
+    workflow.add_node(directory["test_load_image"]) # node1: node.test_load_image.1            
+
+
+    # create the following structure:
+    # node1         
+    #   |             
+    #   v             
+    # node0 
+
+    
+    workflow.nodes["node.test_load_image.1"].input_ports["parameter.dtype"].data = "DataPolicy.ImageInt"
+    workflow.nodes["node.test_load_image.1"].input_ports["parameter.shape"].data = np.array([1,2,3,4], np.uint8)
+
+    workflow.nodes["node.same_image.0"].input_ports["image.input"].metadata.image_map = Shape(c=1, z=2, y=3, x=4)
+
+    workflow.add_connection(source_port = workflow.nodes["node.test_load_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
+
+
+
+    assert workflow.connections["connection.2"].transpose.c == 1
+    assert workflow.connections["connection.2"].transpose.z == 2
+    assert workflow.connections["connection.2"].transpose.y == 3
+    assert workflow.connections["connection.2"].transpose.x == 4
+   
+    workflow.update_graph(test=True)
+
+    for item in workflow.workflow_logger:
+        print(f"{item.identifier}: {item.message}")
+        if item.identifier == "node.same_image.0":
+            assert "new_shape shape dimensions out of range" in item.message
+
 # data conversion 
 # Set convert attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error converting data for port{} <br> Node not activated |
 # update_graph

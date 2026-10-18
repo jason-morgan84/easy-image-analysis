@@ -437,7 +437,10 @@ class WorkFlow:
             print("\n checking node:",node_id)
 
             # 2.1: check that all input Ports are either UI Ports or have connections. If not, not ready
-            # generate dictionary of {port: connection} for all input_ports of active_node
+            # generate port_connections_dict of all input_ports of active_node
+            # if it requires user data, in format {Port class: "user_input"}
+            # it it requires a connection and one is present, in format {Port class: Connection class}
+            # if it requires a connection but none is present, in format {Port class: None}
             for port in active_node.input_ports.values():
                 if hasattr(port.metadata, "user_input") and port.metadata.user_input is True:
                     port_connections_dict[port] = "user_input"
@@ -460,12 +463,13 @@ class WorkFlow:
             ready_state = all([self.nodes[node_id].is_ready for node_id in previous_node_ids])
             for node_id in previous_node_ids:
                 print(f"\n{node_id} is_ready: {self.nodes[node_id].is_ready}")
-            print("ready state:",ready_state)
+
             if ready_state is not True:
                 if test is True: log(self.workflow_logger, None, f"node '{node_id}' not activated, previous nodes not ready","WorkFlow","update_graph",node_id)
                 continue
 
             # 2.3: set node is_ready to True
+            # TODO: CONSIDER TESTING INPUT VALUES PRIOR TO SETTING IS_READY
             active_node.is_ready = True
 
             # 2.4: check node needs_update is True
@@ -473,40 +477,46 @@ class WorkFlow:
                 # 2.5: copy data from previous nodes
                 try:
                     for input_port, connection in port_connections_dict.items():
+                        # if user input, skip data transfer through graph
+                        if connection == "user_input": 
+                            continue
+
+                        incoming_data = connection.source_port.data
                         # tranpose data if transposition required
-                        if connection != "user_input" and connection.transpose is not None:
+                        if connection.transpose is not None:
                             try:
-                                transposed_data = connection.source_port.data if connection.tranpose == None else \
-                                    self.transpose(value = connection.source_port.data,
-                                                old_shape = connection.source_port.metadata.image_map,
+                                incoming_data = self.transpose(value = incoming_data,
+                                                current_shape=connection.source_port.metadata.image_map,
                                                 new_shape = connection.transpose)
                             except Exception as e:
-                                raise GraphError(f"error transposing data for port '{input_port.port_id}'")
+                                raise GraphError(f"error transposing data for port '{input_port.port_id}': {e}")
+
                         
                         # convert data if conversion required
-                        if connection != "user_input" and connection.convert is not None:
+                        if connection.convert is not None:
                             try:
-                                converted_data = transposed_data if connection.convert == None else \
-                                    connection.source_port.metadata.dtype.to(value=connection.source_port.data,
+                                incoming_data = connection.source_port.metadata.dtype.to(value=incoming_data,
                                                                             dtype=connection.convert)
                             except Exception as e:
-                                raise GraphError(f"error converting data for port '{input_port.port_id}'")
+                                raise GraphError(f"error converting data for port '{input_port.port_id}': {e}")
                             
                         # copy data to input_port
                         try:
-                            input_port.data = converted_data
+                            input_port.data = incoming_data
                         except Exception as e:
-                            raise GraphError(f"error copying data for port '{input_port.port_id}'")
+                            raise GraphError(f"error copying data for port '{input_port.port_id}': {e}")
                            
                 except Exception as e:
                     log(self.workflow_logger, GraphError, f"error transferring data data for node '{node_id}': {e}","WorkFlow","update_graph")
                     continue
+
                 # 2.6: activate node
                 try:
                     active_node.activate_node()
                 except Exception as e:
                     log(self.workflow_logger, GraphError, f"error activating node '{node_id}': {e}","WorkFlow","update_graph")
                     continue
+                
                 active_node.needs_update = False
                 if test is True: log(self.workflow_logger, None, f"node activated sucessfully","WorkFlow","update_graph",node_id)
         
