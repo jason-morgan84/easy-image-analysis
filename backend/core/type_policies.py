@@ -209,4 +209,8 @@ class ArrayFloat(BasePolicy):
         else:
             raise TypeError(f"ArrayFloat cannot be converted to type {dtype}")
 
+class ValueString(BasePolicy):
+    data_type = DataPolicy.ValueString
+    description = "Data type to hold variables lists as floats"
+    numpy = str
 

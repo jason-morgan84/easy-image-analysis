@@ -6,20 +6,23 @@ class DataPolicy(Enum):
     ImageBinary = auto()       
     ValueInt = auto()      
     ValueFloat = auto()  
+    ValueString = auto()
     ArrayFloat = auto()
     ArrayInt = auto()
+
 
     @classmethod
     def policies(cls) -> set:
         return {cls.ImageInt, cls.ImageFloat, cls.ImageBinary,
-                cls.ValueInt, cls.ValueFloat,
+                cls.ValueInt, cls.ValueFloat, cls.ValueString,
                 cls.ArrayInt, cls.ArrayFloat}
                 
 
     # allows resolving of target class from DataType (e.g, can access DataType.ValueInt.to_numpy() as DataType.ValueInt.target_class.to_numpy()
     @property
     def target_class(self):
-        from core.type_policies import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat, ArrayInt, ArrayFloat
+        from core.type_policies import ImageInt, ImageFloat, ImageBinary, ValueInt, ValueFloat, ArrayInt, ArrayFloat, ValueString
+        
         
         mapping = {
             DataPolicy.ImageInt: ImageInt,
@@ -27,6 +30,7 @@ class DataPolicy(Enum):
             DataPolicy.ImageBinary: ImageBinary,
             DataPolicy.ValueInt: ValueInt,
             DataPolicy.ValueFloat: ValueFloat,
+            DataPolicy.ValueString: ValueString,
             DataPolicy.ArrayInt: ArrayInt,
             DataPolicy.ArrayFloat: ArrayFloat
         }
