@@ -1,4 +1,5 @@
 from core.image_operation import ImageOperation
+import core.io_image_operations
 import importlib
 import pkgutil
 import os
@@ -108,7 +109,9 @@ class ImageOperationDirectory():
                                 operations_dict[name].id = name
                                 operations_dict[name].category = current_category
                                 operations_dict[name].version = version
+                                
         self.image_operation_list = operations_dict
+        self.image_operation_list.update(core.io_image_operations.io_imageoperations)
     
     def import_0(self, attribute):
         """imports functions where major version is 0"""
