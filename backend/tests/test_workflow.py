@@ -7,6 +7,7 @@ from core.interface_classes import Connection, Port
 import copy
 from core.shape import Shape
 from core.data_checks import sample_data
+import core.io_image_operations
 # provide image_operation_directory arguement which is not ImageOperationDirectory class
 def test_initialise_not_image_operation_directory():
     a = "test"
@@ -1138,8 +1139,6 @@ def test_transpose_current_shape_incorrect_dimensions():
     with pytest.raises(ValueError, match = "current_shape shape dimensions out of range"):
         workflow.transpose(value=value, new_shape=right_shape, current_shape=wrong_shape)
 
-
-
 # Send in valid new_shape and value| output with expected shape |
 def test_transpose():
     log = []
@@ -1162,3 +1161,153 @@ def test_transpose():
     assert output_shape.shape == (2,1,4,3)
     assert value[0][0][0][0] == output_shape[0][0][0][0]
     assert value[0][1][2][3] == output_shape[1][0][3][2]
+
+
+    """update_graph function"""
+# start_node_list
+# Set io_image_operation.start_nodes | start_node_list properly updates|
+def test_update_graph_start_node_list():
+
+
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.0
+    workflow.add_node(directory["same_image"]) # node0: node.same_image.1            
+    workflow.add_node(directory["load_image"])  # node0: node.same_image_two_inputs.2
+    workflow.update_graph(test=True)
+
+    for item in workflow.workflow_logger:
+        if item.message == "nodes added to start node list":
+            assert "node.load_image.2" in item.identifier
+            assert "node.same_image_two_inputs.1" not in item.identifier
+            assert "node.same_image_two_inputs.0" not in item.identifier
+
+
+    
+# Set io_image_operation.start_nodes to empty list | log GraphError: cannot update graph without defined start nodes|
+def test_update_graph_start_node_list_no_list():
+
+    core.io_image_operations.start_nodes = []
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.0
+    workflow.add_node(directory["same_image"]) # node0: node.same_image.1            
+    workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.2
+
+    workflow.update_graph(test=True)
+    assert log[1].message == "cannot update graph without defined start nodes"
+
+# node input_port check 
+# Node in graph with 1 input port connected and ready, 1 not connected | Node not activated |
+def test_update_graph_previous_input_port_not_connected():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+
+    workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.0
+    workflow.add_node(directory["load_image"]) # node1: node.load_image.1            
+    workflow.add_node(directory["same_image"])  # node2: node.same_image.2
+
+    # create the following structure:
+    # node1         node2
+    #   |             |
+    #   v             |
+    # node0 <----------
+
+
+    workflow.add_connection(source_port = workflow.nodes["node.load_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.0"].input_ports["image.input1"])
+
+    workflow.update_graph(test=True)
+
+    for item in workflow.workflow_logger:
+        if item.identifier == "node.same_image_two_inputs.0":
+            assert "missing connections" in item.message
+
+
+
+
+# node ready_state check
+# Node in graph with where all ports connected but not all previous nodes is_ready flagged as True | Node not activated |
+def test_update_graph_previous_input_port_not_ready():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+
+    workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.0
+    workflow.add_node(directory["load_image"]) # node1: node.load_image.1            
+    workflow.add_node(directory["same_image"])  # node2: node.same_image.2
+
+    # create the following structure:
+    # node1         node2
+    #   |             |
+    #   v             |
+    # node0 <----------
+
+
+    workflow.add_connection(source_port = workflow.nodes["node.load_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.0"].input_ports["image.input1"])
+
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.2"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.0"].input_ports["image.input2"])
+    workflow.update_graph(test=True)
+
+    assert workflow.nodes["node.load_image.1"].is_ready == True
+    assert workflow.nodes["node.same_image.2"].is_ready == False
+
+    for item in workflow.workflow_logger:
+        if item.identifier == "node.same_image_two_inputs.0":
+            assert "not activated, previous nodes not ready" in item.message
+
+# node needs_update check 
+# Node in graph with where all ports connected and ready but needs_update set to False| Node not activated |
+def test_update_graph_connected_but_needs_update_false():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+
+    workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.0
+    workflow.add_node(directory["load_image"]) # node1: node.load_image.1            
+    workflow.add_node(directory["load_image"])  # node2: node.same_image.2
+
+    # create the following structure:
+    # node1         node2
+    #   |             |
+    #   v             |
+    # node0 <----------
+
+    workflow.nodes["node.same_image_two_inputs.0"].needs_update = False
+
+
+    workflow.add_connection(source_port = workflow.nodes["node.load_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.0"].input_ports["image.input1"])
+
+    workflow.add_connection(source_port = workflow.nodes["node.load_image.2"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image_two_inputs.0"].input_ports["image.input2"])
+    workflow.update_graph(test=True)
+
+    assert workflow.nodes["node.load_image.1"].is_ready == True
+    assert workflow.nodes["node.load_image.2"].is_ready == True
+    assert workflow.nodes["node.same_image_two_inputs.0"].is_ready == True
+
+    for item in workflow.workflow_logger:
+        if item.identifier == "node.same_image_two_inputs.0":
+            assert "node activated sucessfully" not in item.message
+# data transposition 
+# Set transpose attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error transposing data for port{} <br> Node not activated |
+# data conversion 
+# Set convert attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error converting data for port{} <br> Node not activated |
+# update_graph
+# create graph with single source, correct input data and connections | all nodes run<br> all nodes needs_update flag set to False <br> all nodes is_ready set to True |
+# create graph with two sources, correct connections and input_data from one source | all expected nodes run<br> all run nodes needs_update flag set to False <br> all run nodes is_ready flag set to True |

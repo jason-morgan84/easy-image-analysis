@@ -4,7 +4,7 @@ from core.interface_classes import Node, Connection, Port
 from core.error_handling import ConnectionError, log, warn, GraphError
 from core.shape import Shape
 from core.constants import DataPolicy
-from core.io_image_operations import start_nodes
+import core.io_image_operations
 import numpy as np
 class WorkFlow:
     def __init__(self, logger, image_operation_directiory):
@@ -40,7 +40,7 @@ class WorkFlow:
     def add_node(self, image_operation):
 
         if not isinstance(image_operation,ImageOperation):
-            log(self.workflow_logger,TypeError,f"new node requires ImageOperation class, not {type(image_operation)}","WorkFlow","add_node")
+            log(self.workflow_logger,TypeError,f"add_node requires ImageOperation class, not {type(image_operation)}","WorkFlow","add_node")
 
         else:
             new_key = ".".join(("node",image_operation.id,str(self.max_id)))
@@ -382,6 +382,7 @@ class WorkFlow:
         return downstream_nodes
 
     def get_graph_map(self, start_node):
+        # for a start_node as either a node_id in nodes dictionary or Node class, gets graph_map as orderd list of node_ids to run
         def check_nodes(node, node_list):
             previous_nodes = self.get_previous_nodes(self.nodes[node])
             for previous_node in previous_nodes:
@@ -409,34 +410,36 @@ class WorkFlow:
             check_nodes(node, running_list)
         return running_list
 
-    def update_graph(self):
+    def update_graph(self, test = False):
         """1. Generate ordered node list"""
         # get list of start nodes by comparing nodes dictionary value to start_nodes list from io_image_operations.py
-        start_node_list = [node for node in self.nodes.values() if node.image_operation.id in start_nodes]
-
+        start_node_id_list = [node.node_id for node in self.nodes.values() if node.image_operation.id in core.io_image_operations.start_nodes]
+        if test: log(self.workflow_logger, None, f"nodes added to start node list","WorkFlow","update_graph",start_node_id_list)
+        print("\nstart node list:",start_node_id_list)
         # if no start nodes, log error
-        if len(start_node_list) == 0:
+        if len(start_node_id_list) == 0:
             log(self.workflow_logger, GraphError, f"cannot update graph without defined start nodes","WorkFlow","update_graph") 
 
         # get node_list from graph map from each start_node
         node_list = []
-        for start_node in start_node_list():
+        for start_node_id in start_node_id_list:
             try:
-                node_list.append(self.get_graph_map(start_node))
+                for item in self.get_graph_map(start_node_id):
+                    if item not in node_list: node_list.append(item)
             except Exception as e:
-                log(self.workflow_logger, GraphError, f"error generating graph map for start node {start_node}: {e}","WorkFlow","update_graph") 
-
+                log(self.workflow_logger, GraphError, f"error generating graph map for start node {start_node_id}: {e}","WorkFlow","update_graph") 
         """2. Iterate through node list, update is_ready flags, transfer input data, run nodes"""
         """input data to Node is transferred in but output data is not transferred out: for upstream nodes to exist, connection must exist. No guarantee dowsntream connection exists"""
 
-        for node in node_list:
-            active_node = self.nodes[node]
+        for node_id in node_list:
+            active_node = self.nodes[node_id]
             port_connections_dict = {}
+            print("\n checking node:",node_id)
 
             # 2.1: check that all input Ports are either UI Ports or have connections. If not, not ready
             # generate dictionary of {port: connection} for all input_ports of active_node
             for port in active_node.input_ports.values():
-                if port.metatdata.user_input is True:
+                if hasattr(port.metadata, "user_input") and port.metadata.user_input is True:
                     port_connections_dict[port] = "user_input"
                 else:
                     port_connections_dict[port] = next(
@@ -444,16 +447,22 @@ class WorkFlow:
 
             # if any ports are missing a connection, continue to next Node
             if None in port_connections_dict.values():
+                if test is True: log(self.workflow_logger, None, f"node '{node_id}' not activated, missing connections","WorkFlow","update_graph",node_id)
+                print("\nports missing connections")
                 continue
             
             # 2.2: check that all previous nodes are ready
             try:
-                previous_nodes = self.get_previous_nodes(node)
+                previous_node_ids = self.get_previous_nodes(node_id)
             except Exception as e:
-                log(self.workflow_logger, GraphError, f"error generating list of previous nodes for node {node}: {e}","WorkFlow","update_graph")
+                log(self.workflow_logger, GraphError, f"error generating list of previous nodes for node {node_id}: {e}","WorkFlow","update_graph")
 
-            ready_state = [self.nodes[previous_node].is_ready for previous_node in previous_nodes].all()
+            ready_state = all([self.nodes[node_id].is_ready for node_id in previous_node_ids])
+            for node_id in previous_node_ids:
+                print(f"\n{node_id} is_ready: {self.nodes[node_id].is_ready}")
+            print("ready state:",ready_state)
             if ready_state is not True:
+                if test is True: log(self.workflow_logger, None, f"node '{node_id}' not activated, previous nodes not ready","WorkFlow","update_graph",node_id)
                 continue
 
             # 2.3: set node is_ready to True
@@ -465,21 +474,23 @@ class WorkFlow:
                 try:
                     for input_port, connection in port_connections_dict.items():
                         # tranpose data if transposition required
-                        try:
-                            transposed_data = connection.source_port.data if connection.tranpose == None else \
-                                self.transpose(value = connection.source_port.data,
-                                               old_shape = connection.source_port.metadata.image_map,
-                                               new_shape = connection.transpose)
-                        except Exception as e:
-                            raise GraphError(f"error transposing data for port '{input_port.port_id}'")
+                        if connection != "user_input" and connection.transpose is not None:
+                            try:
+                                transposed_data = connection.source_port.data if connection.tranpose == None else \
+                                    self.transpose(value = connection.source_port.data,
+                                                old_shape = connection.source_port.metadata.image_map,
+                                                new_shape = connection.transpose)
+                            except Exception as e:
+                                raise GraphError(f"error transposing data for port '{input_port.port_id}'")
                         
                         # convert data if conversion required
-                        try:
-                            converted_data = transposed_data if connection.convert == None else \
-                                connection.source_port.metadata.dtype.to(value=connection.source_port.data,
-                                                                        dtype=connection.convert)
-                        except Exception as e:
-                            raise GraphError(f"error converting data for port '{input_port.port_id}'")
+                        if connection != "user_input" and connection.convert is not None:
+                            try:
+                                converted_data = transposed_data if connection.convert == None else \
+                                    connection.source_port.metadata.dtype.to(value=connection.source_port.data,
+                                                                            dtype=connection.convert)
+                            except Exception as e:
+                                raise GraphError(f"error converting data for port '{input_port.port_id}'")
                             
                         # copy data to input_port
                         try:
@@ -488,16 +499,17 @@ class WorkFlow:
                             raise GraphError(f"error copying data for port '{input_port.port_id}'")
                            
                 except Exception as e:
-                    log(self.workflow_logger, GraphError, f"error transferring data data for node '{node}': {e}","WorkFlow","update_graph")
+                    log(self.workflow_logger, GraphError, f"error transferring data data for node '{node_id}': {e}","WorkFlow","update_graph")
                     continue
                 # 2.6: activate node
                 try:
-                    node.activate_node()
+                    active_node.activate_node()
                 except Exception as e:
-                    log(self.workflow_logger, GraphError, f"error activating node '{node}': {e}","WorkFlow","update_graph")
+                    log(self.workflow_logger, GraphError, f"error activating node '{node_id}': {e}","WorkFlow","update_graph")
                     continue
-                node.needs_update = False
-                log(self.workflow_logger, None, f"node activated sucessfully","WorkFlow","update_graph",node.node_id)
+                active_node.needs_update = False
+                if test is True: log(self.workflow_logger, None, f"node activated sucessfully","WorkFlow","update_graph",node_id)
+        
                 
     def transpose(self, value, current_shape, new_shape):    
         # check value is a np.ndarray
