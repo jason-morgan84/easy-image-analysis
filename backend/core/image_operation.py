@@ -178,11 +178,14 @@ class ImageOperation:
         # check code exists:
         self.check_code()
 
-        # check input_image exists and is in the correct format
-        check_data_dictionary_value(data=self.input_image,
-                   metadata=self.input_image_metadata,
-                   dtype=ImageMetadata,
-                   identifier="input_image")
+        # if input_image exists, check its format
+        # NOTE: at least one input_image is expected in all imported ImageOperations and is tested for in ImageOperationDirectory import_operations_dict function.
+        # but, input images are not required for hardcoded I/O functions and therefore they are not assumed to exist when running run_code
+        if self.input_image_metadata is not None or self.input_image is not None:
+            check_data_dictionary_value(data=self.input_image,
+                    metadata=self.input_image_metadata,
+                    dtype=ImageMetadata,
+                    identifier="input_image")
 
         # if input_parameter exists, check its format
         if self.input_parameter_metadata is not None or self.input_parameter is not None:
@@ -192,14 +195,15 @@ class ImageOperation:
                        identifier="input_parameter")
 
         # check that at least one output is defined:
-        if self.output_image_metadata is None and self.output_parameter_metadata is None:
-            raise RuntimeError(f"no defined outputs present for ImageOperation {self.name}")
+        # NOTE: this is now checked at the input level, not at the level of running code, as ImageOperations saving data may not have an output.
+        #if self.output_image_metadata is None and self.output_parameter_metadata is None:
+            #raise RuntimeError(f"no defined outputs present for ImageOperation {self.name}")
 
         """reset output values"""
         self.reset_output()
 
         # save current input values (to allow for checking that inputs have not been changed):
-        current_input_image = copy.deepcopy(self.input_image)
+        current_input_image = copy.deepcopy(self.input_image) if self.input_image else None
         current_input_parameter = copy.deepcopy(self.input_parameter) if self.input_parameter else None
 
         # run compiled code on given inputs
@@ -209,9 +213,10 @@ class ImageOperation:
             raise RuntimeError(f"error executing operation '{self.name}': {e}")
 
         """carry out post-execution tests"""
-        # check output generated
-        if (not self.output_image and not self.output_parameter):
-            raise RuntimeError(f"operation did not generate an output ({self.name})")
+        # check output generated where output metadata exists
+        if (self.output_image_metadata and not self.output_image) or \
+           (self.output_parameter_metadata and not self.output_parameter):
+            raise RuntimeError(f"operation did not generate an expected output ({self.name})")
 
         # check output images match image_shape_constraints and image_map
         if self.output_image is not None or self.output_image_metadata is not None:
@@ -229,9 +234,10 @@ class ImageOperation:
            
         # check inputs have not changed
         input_changed = False
-        for key, value in self.input_image.items():
-            if not np.array_equal(value,current_input_image[key]):
-                input_changed = True
+        if self.input_image is not None:
+            for key, value in self.input_image.items():
+                if not np.array_equal(value,current_input_image[key]):
+                    input_changed = True
 
         if self.input_parameter is not None:
             for key, value in self.input_parameter.items():

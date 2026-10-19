@@ -321,7 +321,7 @@ def test_run_code_input_parameter_wrong_shape():
     with pytest.raises(ValueError, match="array shape does not match shape metadata"):
         test_image_operation.run_code()
 
-#run_code with no output metadata
+#run_code with output but no output metadata
 def test_run_code_no_output_metadata():
     test_image_operation = ImageOperation(name="Test",
         id="test",
@@ -335,7 +335,7 @@ def test_run_code_no_output_metadata():
     setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
     setattr(test_image_operation,"output_parameter_metadata",None)
     setattr(test_image_operation,"output_image_metadata",None)
-    with pytest.raises(RuntimeError, match="no defined outputs present for ImageOperation"):
+    with pytest.raises(RuntimeError, match="data present with no metadata"):
         test_image_operation.run_code()
 
 #run_code with existing output data and check it changes
@@ -403,7 +403,7 @@ def test_run_code_no_output():
         )
     setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
 
-    with pytest.raises(RuntimeError, match="operation did not generate an output"):
+    with pytest.raises(RuntimeError, match="operation did not generate an expected output"):
         test_image_operation.run_code()
 
 #Code provided changes inputs
