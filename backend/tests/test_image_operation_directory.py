@@ -65,11 +65,11 @@ def test_inputs_incorrect_arguements(function_name, error_message):
 @pytest.mark.parametrize("function_name, error_message", [
     # Supply dtype as not member of DataTypes.image_types
     ("code_invalid","error executing operation"),
-    ("code_output_missing","operation did not generate an output"),
+    ("code_output_missing","operation did not generate an expected output"),
     ("code_output_wrong_format_image","module 'code_output_wrong_format_image' failed import tests: data dictionary value for 'output_image.output' does not pass dtype validation"),
     ("code_output_wrong_format_parameter","module 'code_output_wrong_format_parameter' failed import tests: data dictionary value for 'output_parameter.output' does not pass dtype validation"),
-    ("code_output_missing_image","metadata present with no data: 'output_image'"),
-    ("code_outout_missing_parameter","metadata present with no data: 'output_parameter'")])
+    ("code_output_missing_image","operation did not generate an expected output"),
+    ("code_outout_missing_parameter","operation did not generate an expected output")])
 def test_incorrect_code(function_name, error_message):
     directory = ImageOperationDirectory(testing = True)
     directory.import_operations_dict()

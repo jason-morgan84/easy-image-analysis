@@ -96,7 +96,10 @@ class ImageOperationDirectory():
                                 except Exception as e:
                                     log(self.logger,ImportError,f"cannot import module '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
                                     continue                                                              
+                                """check code has required inputs and outputs"""
                                 
+
+
                                 """test code to ensure it runs and gives expected output given sample input"""
                                 try:
                                     self.test_function(imported_function)
