@@ -32,10 +32,10 @@ class LoadImage(ImageOperation):
         try:
             imported_image = self.output_image_metadata["output"].dtype.numpy(imported_image)
         except:
-            raise ImportError(f"failed to convert imported image into defind dtype")
+            raise ImportError(f"failed to convert imported image into defined dtype")
         
         shape = self.input_parameter["shape"]
-        if shape is not None:
+        if shape:
             if len(shape) != len(Shape.dimensions):
                 raise ValueError(f"for load image, shape parameter has incorrect length")
 
