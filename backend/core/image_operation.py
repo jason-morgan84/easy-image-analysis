@@ -67,9 +67,7 @@ class ImageOperation:
     
     @input_image_metadata.setter
     def input_image_metadata(self, metadata):
-        if metadata is None:
-            raise ValueError(f"for ImageOperation, input_metadata is required")
-        else: 
+        if metadata:
             check_metadata_dictionary(metadata=metadata, 
                            dtype=ImageMetadata,
                            identifier="input_image_metadata")
@@ -82,7 +80,7 @@ class ImageOperation:
     
     @output_image_metadata.setter
     def output_image_metadata(self, metadata):
-        if metadata is not None:
+        if metadata:
             check_metadata_dictionary(metadata=metadata, 
                            dtype=ImageMetadata,
                            identifier="output_image_metadata")
@@ -95,7 +93,7 @@ class ImageOperation:
     
     @input_parameter_metadata.setter
     def input_parameter_metadata(self, metadata):
-        if metadata is not None:
+        if metadata:
             check_metadata_dictionary(metadata=metadata, 
                            dtype=ParameterMetadata,
                            identifier="input_parameter_metadata")
@@ -107,7 +105,7 @@ class ImageOperation:
     
     @output_parameter_metadata.setter
     def output_parameter_metadata(self, metadata):
-        if metadata is not None:
+        if metadata:
             check_metadata_dictionary(metadata=metadata, 
                            dtype=ParameterMetadata,
                            identifier="output_parameter_metadata")
@@ -120,7 +118,7 @@ class ImageOperation:
     
     @input_image.setter
     def input_image(self, input):
-        if input is not None:
+        if input:
             check_data_dictionary(data=input,
                                     metadata=self.input_image_metadata,
                                     dtype=ImageMetadata,
@@ -132,7 +130,7 @@ class ImageOperation:
         return self._output_image
     @output_image.setter
     def output_image(self, output):
-        if output is not None:
+        if output:
             check_data_dictionary(data=output,
                                     metadata=self.output_image_metadata,
                                     dtype=ImageMetadata,
@@ -146,7 +144,7 @@ class ImageOperation:
 
     @input_parameter.setter
     def input_parameter(self, input):
-        if input is not None:
+        if input:
             check_data_dictionary(data=input,
                                     metadata=self.input_parameter_metadata,
                                     dtype=ParameterMetadata,
@@ -159,7 +157,7 @@ class ImageOperation:
 
     @output_parameter.setter
     def output_parameter(self, output):
-        if output is not None:
+        if output:
             check_data_dictionary(data=output,
                                     metadata=self.output_parameter_metadata,
                                     dtype=ParameterMetadata,
@@ -181,14 +179,14 @@ class ImageOperation:
         # if input_image exists, check its format
         # NOTE: at least one input_image is expected in all imported ImageOperations and is tested for in ImageOperationDirectory import_operations_dict function.
         # but, input images are not required for hardcoded I/O functions and therefore they are not assumed to exist when running run_code
-        if self.input_image_metadata is not None or self.input_image is not None:
+        if self.input_image_metadata or self.input_image:
             check_data_dictionary_value(data=self.input_image,
                     metadata=self.input_image_metadata,
                     dtype=ImageMetadata,
                     identifier="input_image")
 
         # if input_parameter exists, check its format
-        if self.input_parameter_metadata is not None or self.input_parameter is not None:
+        if self.input_parameter_metadata or self.input_parameter:
             check_data_dictionary_value(data=self.input_parameter,
                        metadata=self.input_parameter_metadata,
                        dtype=ParameterMetadata,

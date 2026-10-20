@@ -11,7 +11,7 @@ Includes functions for checking data and metadata at various points in the workf
 
 # checks metadata dictionaries are dictionaries and values are of ImageMetadata or ParameterMetadata types
 def check_metadata_dictionary(metadata, dtype, identifier):
-    if metadata:
+    if metadata is not None:
         # check dictionary is a dictionary
         if not isinstance(metadata, dict):
             raise TypeError(f"expected '{identifier}' to be dictionary, not {type(metadata)}")
@@ -25,14 +25,17 @@ def check_metadata_dictionary(metadata, dtype, identifier):
 # checks data dictionaries are dictionaries, have associated metadata and match a meta data key
 def check_data_dictionary(data, metadata, dtype, identifier):
     check_metadata_dictionary(metadata, dtype, identifier)
-    # check metadata
+    # if data exists, check its a dictionary
+    if data is not None and not isinstance(data, dict):
+        raise TypeError(f"expected '{identifier}' to be dictionary, not {type(data)}") 
+    # if data exists, check metadata exists
     if data and not metadata:
         raise ValueError(f"data present with no metadata: '{identifier}'")
+    # if metadata exists, check data exists
     if metadata and not data:
         raise ValueError(f"metadata present with no data: '{identifier}'")
-    # check data dictionary is a dictionary
-    if not isinstance(data, dict):
-        raise TypeError(f"expected '{identifier}' to be dictionary, not {type(data)}")           
+
+                  
     
     # check key is present in relevant metadata
     for key in data.keys():
@@ -78,7 +81,7 @@ def check_image_shape(data, metadata, identifier):
 def check_parameter_shape(data, metadata, identifier):
     # check whether the datatype is an array. If it is, check that shape metadata is present and it matches the arrays shape
         if metadata.dtype.is_array == True:
-            if not metadata.shape:
+            if metadata.shape is None:
                 raise ValueError(f"no shape defined in metadata for array type parameter '{identifier}'")
             for n, dimension in enumerate(metadata.shape):
                 if data.shape[n] != dimension:
