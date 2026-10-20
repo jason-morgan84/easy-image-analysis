@@ -11,7 +11,7 @@ Includes functions for checking data and metadata at various points in the workf
 
 # checks metadata dictionaries are dictionaries and values are of ImageMetadata or ParameterMetadata types
 def check_metadata_dictionary(metadata, dtype, identifier):
-    if metadata is not None:
+    if metadata:
         # check dictionary is a dictionary
         if not isinstance(metadata, dict):
             raise TypeError(f"expected '{identifier}' to be dictionary, not {type(metadata)}")
@@ -20,17 +20,15 @@ def check_metadata_dictionary(metadata, dtype, identifier):
             # check values are of correct type
             if not isinstance(value, dtype):
                 raise TypeError(f"for metadata dictionary '{identifier}', expected values of type {dtype}, got {type(value)}")
-        return True
-    else:
-        return False
+
 
 # checks data dictionaries are dictionaries, have associated metadata and match a meta data key
 def check_data_dictionary(data, metadata, dtype, identifier):
-
+    check_metadata_dictionary(metadata, dtype, identifier)
     # check metadata
-    if not check_metadata_dictionary(metadata, dtype, identifier):
+    if data and not metadata:
         raise ValueError(f"data present with no metadata: '{identifier}'")
-    if data is None:
+    if metadata and not data:
         raise ValueError(f"metadata present with no data: '{identifier}'")
     # check data dictionary is a dictionary
     if not isinstance(data, dict):
@@ -80,7 +78,7 @@ def check_image_shape(data, metadata, identifier):
 def check_parameter_shape(data, metadata, identifier):
     # check whether the datatype is an array. If it is, check that shape metadata is present and it matches the arrays shape
         if metadata.dtype.is_array == True:
-            if metadata.shape is None:
+            if not metadata.shape:
                 raise ValueError(f"no shape defined in metadata for array type parameter '{identifier}'")
             for n, dimension in enumerate(metadata.shape):
                 if data.shape[n] != dimension:
