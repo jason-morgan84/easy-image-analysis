@@ -4,7 +4,7 @@ import importlib
 import pkgutil
 import os
 from core.error_handling import log, VersionError
-from core.data_checks import sample_data
+from core.data_checks import sample_data, check_metadata_dictionary
 import ast
 import inspect
 
@@ -58,6 +58,7 @@ class ImageOperationDirectory():
                         except Exception as e:
                             log(self.logger,ImportError, f"unable to import module '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
                             continue
+
                         """Before running the code, check for only allowed imports"""
                         try:
                             imported_modules = self.check_imports(inspect.getsource(sub_module))
@@ -95,10 +96,14 @@ class ImageOperationDirectory():
                                     imported_function = self.version_image_map[major](item)
                                 except Exception as e:
                                     log(self.logger,ImportError,f"cannot import module '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
-                                    continue                                                              
-                                """check code has required inputs and outputs"""
-                                
+                                    continue          
 
+
+                                """check code has required inputs and outputs"""
+                                try:
+                                    self.check_inputs_outputs(imported_function)
+                                except Exception as e:
+                                    log(self.logger,ImportError,f"module '{name}' has incorrect inputs/outputs: {e}","ImageOperationDirectory","import_operations_dict", name)
 
                                 """test code to ensure it runs and gives expected output given sample input"""
                                 try:
@@ -146,6 +151,19 @@ class ImageOperationDirectory():
         # non-permited imports are any modules left after subtracting 
         # permitted imports from imported modules
         return imported_modules
+
+    def check_inputs_outputs(self, function):
+        # to import an ImageOperation, it must define an input image (through input_image_metadata dictionary) and an output 
+        # (through either output_image_metadata or output_parameter_metadata dictionaries)
+        if not function.input_image_metadata:
+            raise AttributeError(f"imported ImageOperations require input_image_metadata")
+              
+        if not function.output_image_metadata and not function.output_parameter_metadata:
+            raise AttributeError(f"imported ImageOperations require output_image_metadata or output_parameter_metadata")
+
+        # if dictionaries exist, their format will have been checked by ImageOperation clas
+
+        
 
     def test_function(self, function):
         """tests functions by providing sample inputs (given requested input dtype, shape etc). Actual outputs checked in ImageOperation.run_code and any
