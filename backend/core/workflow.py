@@ -411,6 +411,11 @@ class WorkFlow:
         return running_list
 
     def update_graph(self, test = False):
+
+        #TODO#######################################################
+        # Did I ever add checks of image/array shape data when passing data through the graph?
+
+
         """1. Generate ordered node list"""
         # get list of start nodes by comparing nodes dictionary value to start_nodes list from io_image_operations.py
         start_node_id_list = [node.node_id for node in self.nodes.values() if node.image_operation.id in core.io_image_operations.start_nodes]
