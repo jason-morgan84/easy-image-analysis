@@ -52,74 +52,80 @@ class ImageOperationDirectory():
                 for _, name, ispkg in pkgutil.iter_modules(package.__path__):
                     # checks its not another package
                     if not ispkg:
-                        # imports individual file
-                        try:
-                            sub_module = importlib.import_module(".".join((self.package_folder, folder, name)))
-                        except Exception as e:
-                            log(self.logger,ImportError, f"unable to import module '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
-                            continue
-
-                        """Before running the code, check for only allowed imports"""
-                        try:
-                            imported_modules = self.check_imports(inspect.getsource(sub_module))
-                        except Exception as e:
-                            log(self.logger, ImportError, f"unable to check for permitted module imports in '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
-                            continue
-
-                        self.disallowed_modules = imported_modules - self.permitted_imports
-                        if self.disallowed_modules:
-                            log(self.logger, ImportError, f"non-permitted imports found in module '{name}': {self.disallowed_modules}","ImageOperationDirectory","import_operations_dict", name)
-                            continue
-
-                        """Next, check version is acceptable"""
-                        try:
-                            version = getattr(sub_module, "version")
-                        except Exception as e:
-                            log(self.logger,ImportError,f"version number expected for module '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
-                            continue
-
-                        try: 
-                            major, _, _ = version.split(".")
-                        except Exception as e:
-                            log(self.logger,ImportError,f"incorrect version format in '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
-                            continue
-
-                        """ Once imports and version are checked, get actual ImageOperation class"""
-                        # iterates through each attribute in module
-                        for attribute_name in dir(sub_module):
-                            item = getattr(sub_module, attribute_name)
-                            # if its a class that is a subclass of ImageOperation, but not ImageOperation itself (which should never be in that folder anyway)
-                            if isinstance(item, type) and issubclass(item, ImageOperation) and item is not ImageOperation:
-                                """ Use major version number and version_image_map dictionary to import new dictionary item 
-                                # with key "name" and value based on return from relevant import function"""
-                                try:
-                                    imported_function = self.version_image_map[major](item)
-                                except Exception as e:
-                                    log(self.logger,ImportError,f"cannot import module '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
-                                    continue          
-
-
-                                """check code has required inputs and outputs"""
-                                try:
-                                    self.check_inputs_outputs(imported_function)
-                                except Exception as e:
-                                    log(self.logger,ImportError,f"module '{name}' has incorrect inputs/outputs: {e}","ImageOperationDirectory","import_operations_dict", name)
-
-                                """test code to ensure it runs and gives expected output given sample input"""
-                                try:
-                                    self.test_function(imported_function)
-                                except Exception as e:
-                                    log(self.logger,ImportError,f"module '{name}' failed import tests: {e}","ImageOperationDirectory","import_operations_dict", name)
-                                    continue
-
-                                """if code passes these tests, add to dictionary of operations"""
-                                operations_dict[name] = imported_function
-                                operations_dict[name].id = name
-                                operations_dict[name].category = current_category
-                                operations_dict[name].version = version
+                        imported_function = self.import_file(folder = folder, name = name, logger = self.logger)
+                        if imported_function:
+                            operations_dict[name] = imported_function
+                            operations_dict[name].id = name
+                            operations_dict[name].category = current_category
+                                
                                 
         self.image_operation_list = operations_dict
         self.image_operation_list.update(core.io_image_operations.io_imageoperations)
+
+    def import_file(self, folder, name, logger):
+        # imports individual file
+        try:
+            sub_module = importlib.import_module(".".join((self.package_folder, folder, name)))
+        except Exception as e:
+            log(logger,ImportError, f"unable to import module '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
+            return
+
+        """Before running the code, check for only allowed imports"""
+        try:
+            imported_modules = self.check_imports(inspect.getsource(sub_module))
+        except Exception as e:
+            log(logger, ImportError, f"unable to check for permitted module imports in '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
+            return
+
+        self.disallowed_modules = imported_modules - self.permitted_imports
+        if self.disallowed_modules:
+            log(logger, ImportError, f"non-permitted imports found in module '{name}': {self.disallowed_modules}","ImageOperationDirectory","import_operations_dict", name)
+            return
+
+        """Next, check version is acceptable"""
+        try:
+            version = getattr(sub_module, "version")
+        except Exception as e:
+            log(logger,ImportError,f"version number expected for module '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
+            return
+
+        try: 
+            major, _, _ = version.split(".")
+        except Exception as e:
+            log(logger,ImportError,f"incorrect version format in '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
+            return
+
+        """ Once imports and version are checked, get actual ImageOperation class"""
+        # iterates through each attribute in module
+        for attribute_name in dir(sub_module):
+            item = getattr(sub_module, attribute_name)
+            # if its a class that is a subclass of ImageOperation, but not ImageOperation itself (which should never be in that folder anyway)
+            if isinstance(item, type) and issubclass(item, ImageOperation) and item is not ImageOperation:
+                """ Use major version number and version_image_map dictionary to import new dictionary item 
+                # with key "name" and value based on return from relevant import function"""
+                try:
+                    imported_function = self.version_image_map[major](item)
+                except Exception as e:
+                    log(logger,ImportError,f"cannot import module '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
+                    return          
+
+
+                """check code has required inputs and outputs"""
+                try:
+                    self.check_inputs_outputs(imported_function)
+                except Exception as e:
+                    log(logger,ImportError,f"module '{name}' has incorrect inputs/outputs: {e}","ImageOperationDirectory","import_operations_dict", name)
+                    return
+
+                """test code to ensure it runs and gives expected output given sample input"""
+                try:
+                    self.test_function(imported_function)
+                except Exception as e:
+                    log(logger,ImportError,f"module '{name}' failed import tests: {e}","ImageOperationDirectory","import_operations_dict", name)
+                    return
+                
+                imported_function.version = version
+                return imported_function
     
     def import_0(self, attribute):
         """imports functions where major version is 0"""
