@@ -171,7 +171,7 @@ class ImageOperationDirectory():
 
         
 
-    def test_function(self, function):
+    def test_function(self, function, input_image_dictionary = None, input_parameter_dictionary = None):
         """tests functions by providing sample inputs (given requested input dtype, shape etc). Actual outputs checked in ImageOperation.run_code and any
         errors will be chained here, then to input_list function where they're logged."""
         # default values for each image dimension if function is indifferent to shape in that dimension
@@ -184,34 +184,42 @@ class ImageOperationDirectory():
         input_images = {}
         input_parameters = {}
         #loops through input images
-        for key, value in function.input_image_metadata.items():
-            # gets dtype of input image
-            image_dtype = value.dtype
+        if not input_image_dictionary:
+            for key, value in function.input_image_metadata.items():
+                # gets dtype of input image
+                image_dtype = value.dtype
 
 
-            # calculates dimensions of shape for pixel_array based on input_image shape and image_map arguements
-            image_shape[value.image_map.c] = default_c if value.image_shape_constraints.c == -1 else value.image_shape_constraints.c
-            image_shape[value.image_map.z] = default_z if value.image_shape_constraints.z == -1 else value.image_shape_constraints.z
-            image_shape[value.image_map.y] = default_y if value.image_shape_constraints.y == -1 else value.image_shape_constraints.y
-            image_shape[value.image_map.x] = default_x if value.image_shape_constraints.x == -1 else value.image_shape_constraintse.x
+                # calculates dimensions of shape for pixel_array based on input_image shape and image_map arguements
+                image_shape[value.image_map.c] = default_c if value.image_shape_constraints.c == -1 else value.image_shape_constraints.c
+                image_shape[value.image_map.z] = default_z if value.image_shape_constraints.z == -1 else value.image_shape_constraints.z
+                image_shape[value.image_map.y] = default_y if value.image_shape_constraints.y == -1 else value.image_shape_constraints.y
+                image_shape[value.image_map.x] = default_x if value.image_shape_constraints.x == -1 else value.image_shape_constraintse.x
 
-            # uses type.sample_data to set pixel_array as an array of the correct shape and dtype of 0s
-            input_images[key] = sample_data(dtype=image_dtype,
-                                            shape = image_shape,
-                                            zero = True)
+                # uses type.sample_data to set pixel_array as an array of the correct shape and dtype of 0s
+                input_images[key] = sample_data(dtype=image_dtype,
+                                                shape = image_shape,
+                                                zero = True)
+        else:
+            input_images = input_image_dictionary
+
         setattr(function,"input_image",input_images)
 
         # similar process for each input_parameter
+        
         if function.input_parameter_metadata is not None:
-            for key, value in function.input_parameter_metadata.items():
-                # gets dtype and shape from parameter
-                parameter_dtype = value.dtype
-                parameter_shape = value.shape
+            if not input_parameter_dictionary:
+                for key, value in function.input_parameter_metadata.items():
+                    # gets dtype and shape from parameter
+                    parameter_dtype = value.dtype
+                    parameter_shape = value.shape
 
-                # sets value to 0/array of 0s of correct dtype and shape using type.sample_data
-                input_parameters[key] = sample_data(dtype = parameter_dtype,
-                                                    shape = parameter_shape,
-                                                    zero = True)
+                    # sets value to 0/array of 0s of correct dtype and shape using type.sample_data
+                    input_parameters[key] = sample_data(dtype = parameter_dtype,
+                                                        shape = parameter_shape,
+                                                        zero = True)
+            else:
+                input_parameters = input_parameter_dictionary
             setattr(function,"input_parameter",input_parameters)
         
         
