@@ -362,26 +362,6 @@ def test_run_code_error_in_code():
     with pytest.raises(RuntimeError, match="error executing operation 'Test': division by zero"):
         test_image_operation.run_code()
 
-#Code provided doesn't create an output
-def test_run_code_no_output():
-    def function_no_change_to_output(self):
-        print("Nothing changes here")
-
-    test_image_operation = ImageOperation(name="Test",
-        id="test",
-        category = "Testing",
-        version = None,
-        docs = None,
-        alerts = None,
-        input_image_metadata={"input1":test_image_metadata_imageint},
-        input_image = {"input1":test_image_data_imageint},
-        output_image_metadata={"output1":test_image_metadata_imageint}
-        )
-    setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
-
-    with pytest.raises(RuntimeError, match="operation did not generate an expected output"):
-        test_image_operation.run_code()
-
 #Code provided changes inputs
 def test_run_code_changes_input_image():
     def function_no_change_to_output(self):

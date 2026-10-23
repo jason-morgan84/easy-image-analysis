@@ -1,5 +1,5 @@
 import pytest
-from core.workflow import WorkFlow
+from core.workflow import WorkFlow, transpose
 from core.image_operation_directory import ImageOperationDirectory
 from core.image_operation import ImageOperation
 from core.constants import DataPolicy
@@ -1073,7 +1073,7 @@ def test_transpose_non_numpy_value():
     shape = Shape(c=0, z=1, y=2, x=3)
 
     with pytest.raises(TypeError, match = "expected value as np.array"):
-        workflow.transpose(value=value, current_shape=shape, new_shape=shape)
+        transpose(value=value, current_shape=shape, new_shape=shape)
 
 # send in new_shape not as Shape class 
 def test_transpose_non_shape_new_shape():
@@ -1087,7 +1087,7 @@ def test_transpose_non_shape_new_shape():
     right_shape = Shape(c=0, z=1, y=2, x=3)
 
     with pytest.raises(TypeError, match = "expected new_shape as Shape class"):
-        workflow.transpose(value=value, new_shape=wrong_shape, current_shape=right_shape)
+        transpose(value=value, new_shape=wrong_shape, current_shape=right_shape)
 
 # send in new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)
 def test_transpose_new_shape_incorrect_dimensions():
@@ -1101,12 +1101,12 @@ def test_transpose_new_shape_incorrect_dimensions():
     right_shape = Shape(c=0, z=1, y=2, x=3)
 
     with pytest.raises(ValueError, match = "new_shape shape dimensions out of range"):
-        workflow.transpose(value=value, new_shape=wrong_shape, current_shape=right_shape)
+        transpose(value=value, new_shape=wrong_shape, current_shape=right_shape)
 
     wrong_shape = Shape(c=0, z=1, y=-2, x=3)
 
     with pytest.raises(ValueError, match = "new_shape shape dimensions out of range"):
-        workflow.transpose(value=value, new_shape=wrong_shape, current_shape=right_shape)
+        transpose(value=value, new_shape=wrong_shape, current_shape=right_shape)
 
 # send in current_shape not as Shape class 
 def test_transpose_non_shape_current_shape():
@@ -1120,7 +1120,7 @@ def test_transpose_non_shape_current_shape():
     right_shape = Shape(c=0, z=1, y=2, x=3)
 
     with pytest.raises(TypeError, match = "expected current_shape as Shape class"):
-        workflow.transpose(value=value, new_shape=right_shape, current_shape=wrong_shape)
+        transpose(value=value, new_shape=right_shape, current_shape=wrong_shape)
 
 # send in new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)
 def test_transpose_current_shape_incorrect_dimensions():
@@ -1134,12 +1134,12 @@ def test_transpose_current_shape_incorrect_dimensions():
     right_shape = Shape(c=0, z=1, y=2, x=3)
 
     with pytest.raises(ValueError, match = "current_shape shape dimensions out of range"):
-        workflow.transpose(value=value, new_shape=right_shape, current_shape=wrong_shape)
+        transpose(value=value, new_shape=right_shape, current_shape=wrong_shape)
 
     wrong_shape = Shape(c=0, z=1, y=-2, x=3)
 
     with pytest.raises(ValueError, match = "current_shape shape dimensions out of range"):
-        workflow.transpose(value=value, new_shape=right_shape, current_shape=wrong_shape)
+        transpose(value=value, new_shape=right_shape, current_shape=wrong_shape)
 
 # Send in valid new_shape and value| output with expected shape |
 def test_transpose():
@@ -1152,14 +1152,14 @@ def test_transpose():
     new_shape = Shape(c=3, z=2, y=1, x=0)
     current_shape = Shape(c=0, z=1, y=2, x=3)
 
-    output_shape = workflow.transpose(value=value, new_shape=new_shape, current_shape=current_shape)
+    output_shape = transpose(value=value, new_shape=new_shape, current_shape=current_shape)
 
     assert output_shape.shape == (4,3,2,1)
     assert value[0][0][0][0] == output_shape[0][0][0][0]
     assert value[0][1][2][3] == output_shape[3][2][1][0]
 
     new_shape = Shape(c=1, z=0, y=3, x=2)
-    output_shape = workflow.transpose(value=value, new_shape=new_shape, current_shape=current_shape)
+    output_shape = transpose(value=value, new_shape=new_shape, current_shape=current_shape)
     assert output_shape.shape == (2,1,4,3)
     assert value[0][0][0][0] == output_shape[0][0][0][0]
     assert value[0][1][2][3] == output_shape[1][0][3][2]
