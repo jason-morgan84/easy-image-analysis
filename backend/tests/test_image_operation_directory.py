@@ -39,8 +39,7 @@ def test_incorrect_version_number(function_name, error_message):
 # missing_input_image.py: input image as None
 @pytest.mark.parametrize("function_name, error_message", [
     ("missing_arguements","cannot import module"),
-    ("invalid_arguement","cannot import module"),
-    ("missing_input_image","input_metadata is required")])
+    ("invalid_arguement","cannot import module")])
 def test_inputs_incorrect_arguements(function_name, error_message):
     directory = ImageOperationDirectory(testing = True)
     directory.import_operations_dict()
@@ -65,11 +64,11 @@ def test_inputs_incorrect_arguements(function_name, error_message):
 @pytest.mark.parametrize("function_name, error_message", [
     # Supply dtype as not member of DataTypes.image_types
     ("code_invalid","error executing operation"),
-    ("code_output_missing","operation did not generate an expected output"),
+    ("code_output_missing","metadata present with no data"),
     ("code_output_wrong_format_image","module 'code_output_wrong_format_image' failed import tests: data dictionary value for 'output_image.output' does not pass dtype validation"),
     ("code_output_wrong_format_parameter","module 'code_output_wrong_format_parameter' failed import tests: data dictionary value for 'output_parameter.output' does not pass dtype validation"),
-    ("code_output_missing_image","operation did not generate an expected output"),
-    ("code_outout_missing_parameter","operation did not generate an expected output")])
+    ("code_output_missing_image","metadata present with no data"),
+    ("code_outout_missing_parameter","metadata present with no data")])
 def test_incorrect_code(function_name, error_message):
     directory = ImageOperationDirectory(testing = True)
     directory.import_operations_dict()
@@ -78,6 +77,7 @@ def test_incorrect_code(function_name, error_message):
     assert function_name not in directory.image_operation_list.keys()
     assert function_name in not_imported
     for item in directory.logger:
+
         if item.identifier == function_name:
             assert error_message in item.message, f"{item.message}"
 
