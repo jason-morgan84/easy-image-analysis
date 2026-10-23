@@ -25,8 +25,9 @@ def test_add_node_not_image_operation():
     workflow.add_node("test")
 
     for item in log:
+        print(f"\nError: {item.message}")
         if item.class_name == "WorkFlow" and item.function_name == "add_node":
-            assert "new node requires ImageOperation class" in item.message 
+            assert "add_node requires ImageOperation class" in item.message 
 
 
 # call add_node(image_operation) function where dictionary key already exists
