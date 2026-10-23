@@ -20,6 +20,9 @@ def log(log, error, message, class_name, function_name, identifier = None):
     log.append(new_log_item)
     #return new_log_item
 
+def warn(message):
+    print("\n******WARNING********\n",message)
+
 class ConnectionError(Exception):
     """Exception raised when errors are found in WorkFlow connectivity"""
 
@@ -29,6 +32,28 @@ class ConnectionError(Exception):
 
 class ActivationError(Exception):
     """Exception raised when nodes are unable to activate"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+class MissingDataError(Exception):
+    """Exception raised when nodes required data is missing"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+class VersionError(Exception):
+    """Exception raised when incorrect version ImageOperations are imported"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+
+class GraphError(Exception):
+    """Exception raised when error in updating graph"""
 
     def __init__(self, message):
         self.message = message

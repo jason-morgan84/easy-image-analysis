@@ -105,6 +105,23 @@
 |01/10/26|0.16.5|Moved description of references to UI elements from Parameter to ParameterParcel class|
 |03/10/26|0.16.6|Updated description of error_handling.log to append log items to list rather than return them|
 |03/10/26|0.16.7|Added description of convert() function to Image and Parameter classes and unit testing|
+|06/10/26|0.17.0|Refactoring data transfer between nodes. Removed description of Image and Parameter classes|
+|06/10/26|0.17.1|Added description of MissingDataError in error_handling.py|
+|06/10/26|0.17.2|Refactoring data transfer between nodes. Updated description of classes and class interactions. |
+|06/10/26|0.17.4|Refactoring data transfer between nodes. Updated class structure diagram. | 
+|08/10/26|0.17.5|Refactoring: updated unit testing for ImageOperation | 
+|09/10/26|0.17.6|Added description of data_checks.py|
+|09/10/26|0.17.7|Added unit testing for data_checks.py|
+|10/10/26|0.17.8|Added is_input flag description to Ports class|
+|10/10/26|0.17.9|Refactoring: moved unit testing and description of transposition and conversion functions from Connection to WorkFlow classes|
+|12/10/26|0.17.10|Added documentation of warn function in error_handling.py|
+|12/10/25|0.17.11|Added plans for next development stage (1.5 - ImageOperation files)|
+|13/10/25|0.17.12|Added get_next_nodes to WorkFlow class description|
+|14/10/25|0.17.13|Updated WorkFlow unit testing|
+|14/10/25|0.17.14|Clarified description of shape checks carried out during add_connection|
+|16/10/25|0.17.15|Updated descriptions of type policies|
+|17/10/25|0.17.16|Updated get_previous_nodes unit testing and added GraphError description to error handling|
+|18/10/25|0.17.17|Planned unit testing for WorkFlow transpose and update_graph functions|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -140,16 +157,18 @@ Crucially, adding in a new function should not require messing with the UI or ba
 
 # 3. System Backend Architecture & Class Structure
 
-![System Class Structure](/docs/Structure.svg)
+![System Class Structure](/docs/class_structure.svg)
 
-The main image analysis workflow will be made up of a series of interconnected nodes, ports and connections. 
-Nodes take an input image, carry out a given ImageOperation on that image (based on the input data and any specific parameters provided by the user), and present the adjusted image.
+The main image analysis workflow will be made up of a graph of Nodes connected by Connections.
 
-Ports attach to nodes and provide a layer of separation between the functions manipulating the image and the Connections carrying the data between Nodes. In the future, if changes are made to how data is stored and transmitted, this should only require changes to a single Port class, not all the image analysis functions.
+Each Node will act as a hanger for code to act on the inputted image. The code will be defined in an ImageOperation class. The Node will contain a reference to the relevant ImageOperation along with input and output Ports, which cache the input and output data for each ImageOperation.
 
-Connections transmit images and other parameters between nodes (via ports). They carry out type- and shape-checking on transmitted images to ensure they match what is expected by the next input port, carry out simple shape and type conversions (where required) and prompt the user to adjust the workflow where simple conversions are not sufficient to fit the image to the next node.
+Each Port acts as an input or output for a single piece of data for a single ImageOperation. For example, if an ImageOperations requires two images and a parameter and delivers a single image, it will have three input ports and one output port. Each port has two attributes, the metadata and the data. The metadata holds the constraints and expectations of the data. For an image, this will be data type, constraints on shape (eg, is this image expected to be a single channel or a single z-slice, or does it not care), the shape mapping (which image dimensions are held in which data dimension). For a parameter, this will be the data type and any requirements for getting the parameter from the UI, if relevant. Metadata will be stored in ImageMetadata and ParameterMetadata classes. These are defined by the ImageOperation and are required on Port instantiation by a Node. Data will be passed along later, either from a Connection for an input Port or an ImageOperation for an output Port and which be checked against the metadata. Data is cached in the Port, not the connection or ImageOperation.
+
+A connection connects an output Port of one Node to an input Port of another Node. It carries out a number of checks on the data to check it meets the expectations of the connected Port (defined by the metadata). Where possible, simple changes (type conversion and shape transposition) will be carried out on the data. If more complex changes to the data are required, the user will be prompted.
 
 ImageOperations are the actual image analysis functions carried out by nodes. They can use existing image analysis libraries (such as scikit image) or custom functions. To allow easy expandability, each ImageOperation is held in its own file which are imported to an ImageOperationDirectory on startup. They also contain definitions of input/output data types and image shape.
+
 To allow consistent data transfer through the workflow, a number of classes are used to define the structure of the data. These include custom DataTypes, and classes defining the image and its shape, and input parameters to ImageOperations. These are used to streamline user input and data transmission, but are not used in actual image analysis, where standard NumPy data types are used.
 
 ## 3.1 Interaction between backend classes and frontend UI
@@ -160,92 +179,28 @@ Each node is associated with a given ImageOperation and the parameters of that o
 
 They can then draw connections between the nodes. A single node has a defined number of inputs (defined by the ImageOperation) but can output to as many other nodes as required. On drawing the connection, the WorkFlow class checks that the connection can provide an image/value in the proper data type and shape. If so, the ImageOperation is carried out allowing immediate feedback in one of the two image views. If not, and the connection cannot carry out simple shape or type conversions, the user is warned of the problem. Where possible, this warning will provide hints towards available ImageOperations that could be used to fix the problems with the data (for example, carry out a Z-projection to flatten the image). 
 
-## 3.2 Class Hierarchy
+## 3.2 Classes
 
-The classes are designed as a heirarchy. The base is a foundation layer which define custom data types and provide constraints on values (for example, an integer 8bit image should not contain values above 255 or below 0). These carry out deep checks of all data to make sure it fits that class type, after which higher layers can safely assume data passed to them is of an appropriate format.
+### 3.2.1 DataPolicy classes
 
-The next layer is the composition layer, the Image and Parameter class, which are made up of combinations of the foundation classes to safely define and constrain their values as they are passed through the WorkFlow graph.
+Data is passed through the WorkFlow as numpy data types. DataPolicy classes define constraints and characteristics of this data, allowing it to be transferred through the WorkFlow in a reliable and predictable way.
 
-The next two layers are both present in Nodes. The WorkFlow interface layer contains the Port class, which sits inside a Node and provides a buffer and translation between the WorkFlow graph and actual image analysis code. The Port layer takes an input from a member of the Composition layer, carries out a final check to ensure it matches the requiered data type, then outpus the data in a standard numpy format (defined by the original foundation data class).
+Policies are all based on a defined base class, BasePolicy. This defines the characteristics of a custom data type with the following variables:
 
-The final layer is the execution layer, which also stands slightly outside the other layers. This layer is purely involved in execution of image analysis code. As such, it doesn't receive or send data using data types from the other layers, but works in standard numpy data types. However, it does define the expectations for inputs and outputs in terms of foundation layer data classes, to safely manage communication with the DataFlow graph, via ports.
+* data_policy - this provides a reference to this policy in the DataPolicy enum in constant.py
+* numpy - the defines the required numpy data type (eg np.uint8, np.bool, np.float64)
 
-This heirachy does not explicitly define the roles of the Connection, Node and WorkFlow classes in defining the WorkFlow graph. This is described in more detail in the WorkFlow section.
-
-
-```mermaid
-graph TD
-    classDef found fill:#f9f9f9,stroke:#333,stroke-width:1px,color:#000000;
-    classDef comp fill:#e1f5fe,stroke:#0288d1,stroke-width:1px,color:#000000;
-    classDef iface fill:#fff3e0,stroke:#f57c00,stroke-width:1px,color:#000000;
-    classDef exec fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000000;
-    classDef exec fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#000000;
-
-    subgraph Foundation_Layer ["1. Foundation Data & Type Layer"]
-        Shape["<b>Shape</b><br>• Checks for ints<br>• Contains image min/max dimensions"]:::found
-        ImageType["<b>ImageType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
-        ValueType["<b>ValueType</b><br>• Checks for int/float<br>• Checks for 0 dimensionality"]:::found
-        ArrayType["<b>ArrayType</b><br>• Checks for int/float<br>• Checks for dimensionality"]:::found
-    end
-
-    subgraph Composition_Layer ["2. Structural Composition Layer"]
-        Image["<b>Image</b><br>• Check array_dtype is an ImageType<br>"]:::comp
-        Parameter["<b>Parameter</b><br>• Check dtype is a ValueType or ArrayType<br>• Check value matches dtype"]:::comp
-    end
-    subgraph Composition_layer ["Node"]
-        subgraph Interface_Layer ["3. WorkFlow Interface Layer"]
-            Port["<b>Port (Gatekeeper & Translator)</b><br>• Always associated with a node/operation<br>• Accepts Image or Parameter<br>• Outputs raw NumPy array or scalar<br>• Validates array_dtype & shape match ImageOperation requirements"]:::iface
-        end
-
-        subgraph Execution_Layer ["4. Execution Layer"]
-            ImageOperation["<b>ImageOperation</b><br>• Requires Image input (+ optional parameters)<br>• Final array type & size check<br>• Algorithm execution"]:::exec
-        end
-    end
-
-
-    Shape --> Image
-    ImageType --> Image
-    ValueType --> Parameter
-    ArrayType --> Parameter
-
-    Image --> Port
-    Parameter --> Port
-
-    Port --> ImageOperation
-```
-
-## 3.3 Foundation Classes
-
-### 3.3.1 DataType classes
-
-The aim of the DataType classes is to allow data to be transferred through the WorkFlow in a reliable and predictable way.
-
-Data can **only** be passed through the WorkFlow as a DataType class - equivalent types such as np.uint8 or np.float64 **will** result in type errors.
-
-This is a deliberate design choice to maintain control and consistency in how data moves through the WorkFlow.
-
-A distinction should be made between data transferred through the WorkFlow and data used for image manipulation in members of the ImageOperation class. Input and output data to ImageOperations will be in **defined** numpy equivalents to DataType classes. The conversion from DataType classes to their numpy equivalent will take place in the Port for each input and output. This means image analysis can be carried out using standard types and functions, and there is no requirement for data manipulation using the DataType classes. 
-
-While image manipulation is carried out using standard Numpy types, DataTypes are still used to define the format of expected inputs to and output from ImageOperations.
-
-The interaction between DataTypes, Ports and ImageOperations will be described in more detail in the Port and ImageOperation class descriptions.
-
-DataTypes are all based on a defined base class, BaseType. This defines the characteristics of a custom data type with the following variables. The first three variables are required - the class types will not function without them and will fail unit testing. The remaining four variables are optional:
-
-* data_type - this provides a reference to this DataType in the DataType enum in constant.py
-* numpy - the defines the equivalent numpy data type (eg np.uint8, np.bool, np.float64)
-* allowed_sub_types - a tuple of allowed data types (eg np.integers, bool, numbers.Number)
-
-* description - text description of class and what its for
+* description - text description of policy and what its for
 * min_value - if the value must be with a range, this defines a minimum value (default is None)
 * max_value - maximum allowed value, if defined (default is None)
-* is_array - type classes must define as either a 1d or multi-dimensional data type (default is False)
+* is_image - does this policy describe an image? 
+* is_array - does this policy describe an array (true) or scalar (false) value? An image is assumed to be mutli-dimensional, is_array should not be set to True.
 
-* permitted_conversions - these are the other DataType classes this is permitted to be be automatically converted into by WorkFlow (eg, between 8bit int and 8bit float)
-* warned_conversions - these are the DataType classes this can be converted into by WorkFlow, with a prompt to the user (ie, binary image to 8 bit image - this is possible, but will likely unbinarise the image)
+* permitted_conversions - these are the other policies this data is allowed to be be automatically converted into by WorkFlow (eg, between 8bit int and 8bit float)
+* warned_conversions - these are the policies classes this data can be converted into by WorkFlow, with a prompt to the user (ie, binary image to 8 bit image - this is possible, but will likely unbinarise the image)
 
 
-By default, seven custom data types are defined. Three are used to define images, two to define 1D variables and two to define non-image arrays:
+By default, seven data policies are defined. Three are used to define images, two to define 1D variables and two to define non-image arrays:
 
 * ImageInt - For images stored as integers in the range 0 ≤ int ≤ 255
 * ImageFloat - For images stored as floats in the range 0 ≤ float ≤ 1
@@ -257,23 +212,20 @@ By default, seven custom data types are defined. Three are used to define images
 * ArrayInt - for multi dimensional integer variables
 * ArrayFloat - for multi dimensional float variables
 
-Note again that these data types are for transferring data through the WorkFlow, for example an image threshold value may be transmitted from one node to the next as a ValueInt. They are not expected to be used in any code unrelated to data transfer.
+BasePolicy has three @classmethods:
+  - validate - this checks that an inputed value matches the policy definition
+  - to - this converts a passed value to a format compatible with another policy, for example, converting an 8bit integer image to a float image.
+  - _convert - this carries out the actual conversion - the default function will return an error when used, this needs to be coded for any new policy for the relevant conversions.
 
 For new DataTypes, conversion between types will result in a NotImplementedError. To fix this, implement a custom to(self, dtype) function in your custom class defining the possible conversions.
 
-By default, each ImageType can be converted to each other. Likewise ValueTypes and ArrayTypes can be converted to other members of the same type.
 
-Where the 'to' function has been implemented, conversions can be explicit (eg, by using ImageInt.to(DataType.ImageFloat)) or implicit (eg, by calling ImageFloat(x) where x is an ImageInt).
 
-Each Image type has __init__, value property and value.getter functions along with conversion functions for the other two image types and the relevant standard numpy type. For numpy conversion, this will be available as an explicit function (to_uint8 or to_float64) or as a generic function (to_numpy).
 
-The comparable numpy data type is stored in the numpy class variable. This is used in the to_numpy function and for type checking once the DataType class has been converted to a standard numpy class for image analysis in a Port.
 
-~~Each DataType includes a test_sample() function, which creates a variable of that type for testing and providing default values. This can be generated as random numbers (for testing) or 0s (for instantiating default input and output variables for ImageOperations, if zero = True - by default, zero = False).~~
+DataPolicies are wrapped in an Enum to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. For each policy, the data_type class variable must point to the relevant name in the Enum (stored in constants.py).
 
-All DataTypes will be wrapped in an Enum to help ensure type safety, to simplify access from other classes and to simplify refactoring if data types need to be changed in the future. Within the Enum, data types are specified into groups image_type and value_type. For each type, the data_type class variable **must** point to the relevant name in the Enum (stored in constants.py).
-
-### 3.3.2 Shape class
+### 3.2.2 Shape class
 
 This exists to hold data related to the shape of transmitted images. It will hold integer values for:
 * c (channels)
@@ -281,13 +233,16 @@ This exists to hold data related to the shape of transmitted images. It will hol
 * y (height)
 * x (width) 
 
-And contains class variables to define limits on image Shape:
-
-* max_image_dimensions - the max number of dimensions an image should have (4).
-
-* min_image_dimensions - the minimum number of dimensions an image should have. This is currently set at 4, the same as max, to allow for consistent expectations for image processing. Un-used dimensions should have size 1.
+The class attributes are defined in the class variable dimensions:
 
 * dimensions- the current dimensions and default order (c, z, y, x). This is in the form of a tuple defining the order, used in the __iter__ and __getitem__ dunders below.
+
+__init__ takes kwargs to initialise attributes. These attributes must include all the dimensions listed in dimensions and nothing else.
+
+It contains other class variables to define limits on image Shape:
+
+* max_image_dimensions - the max number of dimensions an image should have (4).
+* min_image_dimensions - the minimum number of dimensions an image should have. This is currently set at 4, the same as max, to allow for consistent expectations for image processing. Un-used dimensions should have size 1.
 
 Shape has __iter__ dunder to return values in the order defined above, __getitem__ and __setitem__ dunders to return and set values and __copy__ and copy() functions to allow copying. __getitem__ and __setitem__ accept and return values as either strings (c,z,y,x) or integer indices (0,1,2,3 - as defined by order in dimensions).
 
@@ -302,36 +257,7 @@ Shape will be used to hold shape related information in a number of classes and 
 * Node and Port classes – this will mirror the usage in ImageOperation classes
 * Connection class – this may be required to reshape the image from the shape given by the input port to the shape given by the output port.
 
-## 3.3 Composition classes
-### 3.3.1 Image Class
-
-This holds the image data as a multi-dimensional array, with max and min dimensions defined in the Shape class.
-
-The Image class exists to hold images for transit through the WorkFlow graph. Is is described with two instance variables:
-
-1.	pixel_array: Contains Image pixel data, in a multi-dimensional array of defined size and type.
-2.	image_map: Mapping from image dimensions (C, Z, Y, X) to image array dimensions (0,1,2,3) using Shape class.
-
-Other required information, such as the pixel_array data type and pixel_array shape, are properties of thet pixel_array data and are not stored separately.
-
-It contains two function:
-* __transpose__ takes an input of Shape class and transposes the Image so that each image dimension is in the given array dimension
-* convert converts the pixel_array to a given data type
-
-### 3.3.2 Parameters Class
-
-Contains non-image inputs/outputs for transport through WorkFlow.
-
-* Name – the name of the parameter
-* value – its value (initialised as correct data_type/shape (if required) by Port on instantiation therefore also defines required data type)
-
-Type checking is carried out on dtype, to ensure its a member of DataType.value_types or DataType.array_types.
-
-It contains one function:
-* convert converts the pixel_array to a given data type
-
-## 3.4 Execution Classes
-### 3.4.1 ImageOperation Class
+### 3.2.3 ImageOperation Class
 The ImageOperation class is responsible for carrying out functions that carry out analysis on images. A key aim of this project is expandability and to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class, containing all the information required to run the function and will be imported using imagelib. 
 
 The previous classes described have been primarily related to the flow of data through the WorkFlow graph and have defined custom class types to make sure this happens in a controlled manner. The ImageOperation sits slightly outside this class structure, as existing image analysis modules work in standard or numpy classes. To allow ImageOperations code to be designed and executed in a standard manner, inputs and outputs from ImageOperations are in standard Numpy data types (for conversion from custom DataTypes to Numpy, see Node and Port classes).
@@ -421,58 +347,40 @@ Note that, for now, inputs are provided as variables or arrays of 0s, to avoid s
 
 If testing is sucessful, files are added to a dictionary of ImageOperations with a key of the filename without py (**TODO: address potential failure with identical filenames**). The category and version number will be added to each ImageOperations based on file and folder parameters. 
 
-## 3.5 Interface Classes
+### 3.2.5 ImageMetadata
+Simple class holding metadata for image inputs and outputs in Ports. Contains:
+* dtype - set at instantiation based on ImageOperation code file.
+    - Type checks for member of DataType
+* image_shape_constraints - set at instatiation based on shape constraints defined in code file.
+    - Type checks for Shape class
+* image_map - set at instantiation based on relationship between image dimensions and array dimensions required/delivered by ImageOperation. 
 
-### 3.5.1 Connection Class
+### 3.2.6 ParameterMetadata
+Simple class holding data for non-image metadata for Ports. Includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
 
-Connections form the links between nodes and ports through which data travels through the WorkFlow. They have a defined direction, with an input and an output, and are created by the user. Before the instantiation of a connection, the WorkFlow class will check that input and output expect compatible type and shape (explained in more detail in WorkFlow class). Connections contain the following instance variables:
+Contains:
+* dtype - set at instantiation based on ImageOperation code file.
+    - Type checks for member of DataType.
+* shape - if dtype defines an array_type, contains a np.array defining shape of value.
+    - will accept a tuple, list or np.ndarray. Tuples and lists will be converted to np.ndarray.
+* user_input - boolean flag to say if value is expected via WorkFlow (False) or via (UI).
+* ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc) - setter checks this is present if user_input is True
+* ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
 
-* source_port - a reference to the preceeding Port
-* target_port - a reference to the next Port
-* connection_id - unique identifier of the connection
-* tranpose - default None, required for transposing an image from source_port to target_port
-* convert - default None, required for converting a DataType from source_port to target_port
+### 3.2.7 Port Class
 
-And the following property:
-* output_data: passes either the source_port.output_data or converted/tranposed/both source_port.output_data when requested.
-
-
-
-### 3.5.2 Port Class
-
-The port class acts as a buffer between a Node and an ImageOperation. It has two main roles: 
- * to convert between data types used for transmitting data through the WorkFlow and those used for image analysis.
- * to make sure that future changes can be made to the overall WorkFlow without impacting on the data sent to ImageOperations 
+The port class acts as a buffer between a Node and an ImageOperation. Its role is to hold metadata requirements of the ImageOperation and cache input or output data. There are two child Port classes:
+- InputPort holds input data.
+- OutputPort holds output data.
 
 Two lists of ports are created with each node, and ports do not exist independently of nodes. Each port has the instance variables:
-* is_input – flag for whether port is an input or output. Inputs only allow one connection, outputs allow multiple
 * node_id – unique identifier for connected node
 * port_id - id for port within the node (the name of the connected ImageOperation input/output)
-* input_connection – identifier for input Connection/ImageOperation
-* output_connection – identifier for output Connection/ImageOperation
-* input_data - reference to/cached input data
-* output_data - cached output data
+* is_input - flag for whether this is an input or output port
+* metadata - ImageMetadata or ParameterMetadata class, holding metadata defined by ImageOperation and created at instantiation. Must be present, cannot be None.
+* data - cached data. None at instantiation.
 
-There are key differences between input ports (is_input = True) and output ports (is_input = False).
-Output ports:
-    - cache their input (as an Package class)
-    - convert their input to a DataType
-    - cache their output.
-Input ports:
-    - input is a reference to where their data can be found (an output of an output node, via a Connection). 
-    - convert their input to a Package class containing a standard numpy data type.
-    - cache their output.
-
-Port has a single main function for data conversion:
-* convert()
-
-This function **only** converts the data types, it doesn't carry out any checks. 
-
-For an input, these checks are carried out by the DataFlow class on creating a connection and by the ImageOperation class on receiving the data.
-
-For an output, these checks are carried out by the ImageOperation class on creating an output and the DataFlow class on creating a connection.
-
-### 3.5.3 Node Class
+### 3.2.8 Node Class
 The Node class is a hanger for an ImageOperation and its associated inputs/outputs. It is responsible for positioning an ImageOperation in the WorkFlow. There can be multiple nodes containing the same ImageOperation. On instantiation, the Node creates Ports to provide inputs and outputs to the associated ImageOperation. Data travels through these Ports to the ImageOperation; the Node class itself does not handle any data. It contains the following instance variables:
 
 * node_id - unique identifier for this Node, created by WorkFlow on Node instantiation.
@@ -515,7 +423,17 @@ Things to test after activation:
 * does the output key referenced by port_name exist in ImageOperation outputs?
 * does ImageOperation output contain data (pixel_array and mapping for images, value for parameters)?
 
-## 3.6 WorkFlow Class
+### 3.2.9 Connection Class
+
+Connections form the links between nodes and ports through which data travels through the WorkFlow. They have a defined direction, with an input and an output, and are created by the user. Before the instantiation of a connection, the WorkFlow class will check that input and output expect compatible type and shape (explained in more detail in WorkFlow class). Connections contain the following instance variables:
+
+* source_port - a reference to the preceeding Port
+* target_port - a reference to the next Port
+* connection_id - unique identifier of the connection
+* tranpose - default None, required for transposing an image from source_port to target_port
+* convert - default None, required for converting a DataType from source_port to target_port
+
+## 3.2.10 WorkFlow Class
 
 The WorkFlow class does the bulk of the work in initiating, defining and checking the graph through which image data flows.
 
@@ -526,6 +444,8 @@ It contains lists of all existing nodes, connections and ports, contains functio
 On creation of new nodes, it interacts with the frontend to get node parameters.
 
 On creation of new connections, it checks the validity of those connections and, if necessary, gives feedback to the user.
+__Note__: Not all checks are done at this stage - shape checks for unambiguous mismatches are carried out here, for example, if connecting a port with image metadata defining c=4 to a port requiring an image with c=1, this will be rejected. However, if either input or output shape is undefined (-1) then further shape checks are carried out when the graph is updated (by update_graph function) when the shape of data flowing through the graph is fully defined.
+
 It defines the starting node in the graph, allowing it to generate upstream and downstream paths through the WorkFlow.
 It contains instance variables:
 
@@ -536,10 +456,15 @@ It contains instance variables:
 
 It also contains the following functions:
 * update_graph
-* node_create
-* node_remove
-* connection_create
-* connection_remove
+* add_node - adds a node to node dictionary "nodes"
+* delete_node - deletes a node from node dictionary along with associated connections
+* add_connection - adds a connection to connection dictionary "connections", uses other functions to carry out checks before creation:
+  - type_check - checks type of source metadata is compatible with target metadata
+  - shape_check - checks image shape of source metadata is compatible with target metadata
+  - structure_check - checks connection is appropriate for graph structure
+* remove_connection - removes a connection from connections dictionary
+* get_next_nodes - returns a list of node ids of node(s) immediately after an input Node, Port or Connection
+* get_downstream_nodes - returns a list of node ids of nodes downstream of a given Node, Port or Connection
 * ~~Transpose - tranposes pixel_arrays passing through the graph, given requirements of input and output Ports. Previously part of Image class./~~
 * ~~Squeeze/unsqueeze - changes array shape, as Tranpose.~~
 
@@ -619,29 +544,29 @@ __Stage 2__
 __Stage 3__
 * Once ImageOperation API is developed and key initial ImageOperations are implemented, add and test responses to incompatible connections suggesting an ImageOperation that might solve incompatibility.
 
-Unit testing list:
-* Passing non-ImageOperationDirectory to WorkFlow
-* call add_node with arguement that's not a valid ImageOperation - error should be chained up and logged
-* call add_node with a key thats not unique (if possible)
-* check add_node adds a node
-* call delete_node with an invalid key
-* check delete_node removes a node
-* check delete_node removes associated connections
-* call create_connection with invalid connections (invalid port_id, id of soemthign thats not a port, input to conenction also input to node etc) - check errors chained up and logged
-* call create_connection where a connection would fail structure checks (connecting input to input/output to output)
-* call create_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
-* call create_connection where a connection would fail structure checks(would result in loop)
-* call create_connection where a connection would fail shape checks(invalid shape input image)
-* call create_connection where a connection would fail shape checks(invalid type (eg 8 bit image to binarised input))
-* call create_connection where a connection would fail shape checks(invalid shape (eg needs flattened image but has z != 1))
-* call create_connection where a connection would fail type checks(invalid type (eg 8 bit image to binarised input))
-* call create_connection where a connection fails type checks but can be converted (eg 8 bit int to float input)
-  - check conversion properly made
-* call delete_connection with an invalid key
-* check delete_connection removes a connection
 
 
-## 3.7 Error Handling
+|transpose| transpose passed not as Shape class | Type error | transpose accepted|
+|convert| convert passed not as DataType class | Type error | convert accepted |
+| get_output | Use get_output when no data at source_port | ConnectionError| No error|
+| get_output | Use get_output when source_port contains image with no pixel_array| ConnectionError| No error|
+| get_output | Use get_output when source_port contains parameter with no value| ConnectionError| No error|
+| get_output | Test correct output given with no transpose or convert | Correct output given| Incorrect output|
+| get_output | Test correct output given with transpose but no convert | Correct output given| Incorrect output|
+| get_output | Test correct output given with convert but no transpose | Correct output given| Incorrect output|
+| get_output | Test correct output given with transpose and convert | Correct output given| Incorrect output|
+* note: both transpose and convert have previously been unit tested in Image and/or Parameter classes
+
+
+## 3.7 Data Checking
+Where checks on data are carried out repeatedly in the graph, these checks are kept in data_checking.py.
+
+Includes functions for checking data and metadata at various points in the workflow:
+    - check_metadata: checks that metadata is a dictionary with values of either ImageMetadata or ParameteMetadata types
+    - check_data_dictionaries: calls check_metadata, then also checks that data is a dictionary that have associated metadata with a matching key
+    - check_data: calls check_data_dictionarys, then also checks that data dictionary items match constraints of metadata
+
+## 3.8 Error Handling
 
 error handling.py holds functions and classes that allow reporting of errors to an external log (with the future potential to pass to a UI dialog).
 
@@ -653,7 +578,9 @@ It contains the LogItem class, which holds data for adding to the log. LogItem l
 - function_name: the function that logged the error
 - import_name: the imported ImageOperation file which caused the error. Defaults to None.
 
-It also contains a custom function, log() that reports errors and appends the associated LogItem describing the error to a list passed to the log function.
+It also contains function:
+* log: reports errors and appends the associated LogItem describing the error to a list passed to the log function
+* warn: prints a warning to terminal - will be associated with dialogue boxes to warn user in future
 
 Exception chaining will be used to log errors in the WorkFlow layer and ImageOperationDirectory, but not lower layer classes (see class heirarchy).
 
@@ -662,6 +589,8 @@ For now, error messages are simply printed. This will be developed to saving to 
 error_handling.py also includes custom exceptions:
 * ConnectionError - for errors in WorkFlow connectivity (eg, Connection with a loose end)
 * ActivationError - for errors in Node activation
+* MissingDataError - for errors where data is missing when passed to/from Ports
+* GraphError - Exception raised when error updating graph in WorkFlow
 
 # 4 ImageOperation files
 
@@ -740,6 +669,12 @@ Plugins to make:
 * Plan unit testing for Workflow class.
 * Implement Workflow class.
 * Test Workflow class.
+### Stage 1.5 - ImageOperation Files
+* Sample ImageOperation files
+* ImageOperation file documentation
+* ImageOperation file test harness
+* Hardcoded ImageOperations
+  - LoadImage (note: output image_shape_constraints must equal loaded image dimensions)
 ## Stage 2 - Frontend
 ### Stage 2.1 – Frontend Planning
 * Detailed plans for frontend from initial overview.
@@ -792,7 +727,9 @@ Plugins to make:
 ### 7.1.2 Shape
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|Type constraints	|Insert wrong type	|Type Error	| Type converted to correct type<br>Wrong type ignored|
+|init|Instantiate class with missing attribute|AttributeError: "Shape class instantiated with missing argument" | No error|
+|init|Instantiate class with unexpected attribute|AttributeError: "Shape class instantiated with unexpected arguement" | No error|
+|Type constraints	|Insert non integer data	|Type Error	| Type converted to correct type<br>Wrong type ignored|
 |Immutability|Input values based on variable then change variable |Values in DataType do not change|Values change|
 |Itterability|Test iteration|Iteration returns correct values|Iteration returns incorrect values|
 |get_item|Test getting items using either index or dimension string| returns correct values|Returns incorrect values|
@@ -823,35 +760,46 @@ Plugins to make:
 
 ## Stage 7.3 – Backend Excecution Classes
 
-### 7.3.1 ImageOperation
+### 7.3.1 data_checks.py
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
-|ImageParcel|Supply **dtype** as not member of DataTypes.image_types| Type Error | Incorrect data type accepted|
-|ImageParcel|Have **pixel_array** type not match dtype| Type Error | Incorrect data type accepted|
-|ImageParcel|Supply **shape** not as Shape class| Type Error | Incorrect data type accepted|
-|ImageParcel|Supply **mapping** not as Shape class| Type Error | Incorrect data type accepted|
-|ImageParcel Imutability|Pass value as variable then change variable| ImageParcel value remains the same | ImageParcel value changes|
-|check_data|Supply input_image/output_image/input_parameter/output_parameter not as a dictionary| Type Error | Incorrect data type ignored|
-|ParameterParcel|Supply **dtype** as not member of DataTypes.value_types or DataTypes.array_types| Type Error | Incorrect data type accepted|
-|ParameterParcel|If array is expected, have **value** not a list, tuple or ndarray| Type Error | Incorrect data type accepted|
-|ParameterParcel|Have **value** type not match dtype| Type Error | Incorrect data type accepted|
-|ParameterParcel Imutability|Pass value as variable then change variable| ParameterParcel value remains the same |ParameterParcel value changes|
-|run_code|Try to execute run_code with no compiled_code or compiled code in wrong format (not types.codetype)| Type Error |Proceeds without error|
-|run_code|Don't supply a value for input_image | Value Error | Code tries to continue|
-|run_code|Supply input_image with mising pixel array | Value Error | Incorrect pixel array accepted|
-|run_code|Supply input pixel_array with missing mapping or shape data| Value Error | Incorrect pixel array accepted|
-|run_code|Supply input pixel_array where shape does not match constraints in shape| Value Error | Incorrect pixel array accepted|
-|run_code|Supply input_parameter with mising value | Value Error | Incorrect pixel array accepted|
-|run_code|Supply parameter array where array does not match defined shape| Value Error | Incorrect value accepted|
-|run_code|Try to run with missing output definitions (shape for images or arrays, dtype for any output) | Value Error | runs code anyway|
-|run_code|Code provided creates an error|Error|No error passed on|
-|run_code|Code provided doesn't create an output|Runtime error|No error passed|
-|run_code|Code provided changes inputs|Runtime error|No error passed|
-|run_code|Code provided returns a pixel_array without mapping data| Value Error | Incorrect value accepted|
-|run_code|Code provided returns a pixel_array with shape that doesn't match mapping and shape constraint data|Value Error|Incorrect value accepted|
-|run_code|Code provided returns an array value without shape data| Value Error | Incorrect value accepted|
+|check_metadata| send metadata not as dictionary | TypeError: expected to be dictionary|No error|
+|check_metadata| send metadata as dictionary but not of ImageMetadata/ParameterMetadata classes| TypeError: for metadata {}, expected values of type|No error|
+|check_data_dictionaries|  data sent to function exists | ValueError: metadata present with no data: '{}'|No error|
+|check_data_dictionaries|  data sent to function is a dictionary | TypeError: expected image to be dictionary|No error|
+|check_data_dictionaries|  set data where resepective metadata not present | TypeError: data present with no metadata: '{}'|No error|
+|check_data_dictionaries|  set data where the key in data dictionary is not present in the dictionary of metadata | ValueError: key present in data dictionary '{}' but not in metadata|No error|
+|check_data\check_type|set data where the dtype does not match dtype defined in metadata|TypeError: dictionary value of incorrect type|No Error|
+|check_data\check_image_shape|set image where the shape does not match shape defined in metadata|ValueError: image shape does not match metadata| No Error|
+|check_data\check_parameter_shape|set parameter where shape does not exist in metadata|ValueError: no shape defined in metadata for array type parameter test.input|No Error|
+|check_data\check_parameter_shape|set parameter where the shape does not match shape defined in metadata|ValueError: array shape does not match shape metadata for test.input|No Error|
+### 7.3.2 ImageOperation
+|Component  | Test  | Expected Outcome  | Undesired Outcome |
+|:--        |:--    |:--                |:--                |  
+|input_image_metadata setter| check input_image_metadata exists (input_image_metadata) | ValueError: for ImageOperation, input_metadata is required| No error|
+|all metadata setters| input metadata where metadata isn't a dictionary| TypeError: expected {} to be dictionary|No TypeError given|.
+|all metadata setters| input metadata where metadata is a dictionary with values of wrong class| TypeError: for metadata dictionary '{}', expected values of type|No TypeError given|
+|reset_output| check outputs are set to None| outputs set to None| outputs not set to None|
+|reset_input| check inputs are set to None| inputs set to None| inputs not set to None|
+|run_code| call run_code with no code | RuntimeError: no code exists | No error given |
+|run_code| run_code with no input_image | ValueError: metadata present with no data | No error given |
+|run_code|run_code with input_parameter_metadata but no input_parameter| ValueError: metadata present with no data |No error given |
+|run_code|run_code with input_parameter but not input_parameter_metadata| ValueError: data present with no metadata|No error given |
+|run_code|run_code where input_image_data type doesn't match input_image_metadata|TypeError: dictionary value of incorrect type| No error given |
+|run_code|run_code where input_image shape deosn't match input_image_metadata|ValueError: image shape does not match metadata| No error given |
+|run_code|run_code where input_parameter_data type doesn't match input_parameter_metadata|TypeError: dictionary value of incorrect type| No error given |
+|run_code|run_code where input_parameter_data shape doesn't match input_parameter_metadata|ValueError: array shape does not match shape metadata| No error given |
+|run_code|run_code with no output metadata|RuntimeError: no defined outputs present for ImageOperation| No error given |
+|run_code|run_code with existing output data and check it changes|Output changes|Output doesn't change |
+|run_code|Code provided creates an error|RuntimeError: error executing operation |No error passed on|
+|run_code|Code provided doesn't create an output|Runtime error: operation did not generate an output|No error passed|
+|run_code|Code provided changes inputs|Runtime error: operation altered input values|No error passed|
+|run_code|Code provided returns an image with type that doesn't match metadata|TypeError:dictionary value of incorrect type| No error given |
+|run_code|Code provided returns an image with shape that doesn't match metadata|ValueError:image shape does not match metadata| No error given |
+|run_code|Code provided returns an parameter with array type that doesn't match metadata|TypeError:dictionary value of incorrect type| No error given |
+|run_code|Code provided returns an parameter with array shape that doesn't match metadata|ValueError: array shape does not match shape metadata| No error given |
 
-### 7.3.2 ImageOperationDirectory
+### 7.3.3 ImageOperationDirectory
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |ImportList|Import ImageOperation with correct category| Correct category saved to ImageOperation | Incorrect category|
@@ -878,31 +826,26 @@ Plugins to make:
 
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
-|is_node_input setter|Provide missign input flag|Type Error, expected type bool|No error| 
-|Convert|Provide incorrect image data (ImageParcel - numpy) data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide incorrect incorrect parameter data (ParameterParcel - numpy) data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide incorrect image data (Image of DataType) to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide incorrect paramter data (Parameter of DataType) to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide correct (ImageParcel - numpy) image data to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide correct (ImageParameter - numpy) parameter data to Node flagged as !node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide correct (Image - DataType) image data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
-|Convert|Provide correct (Parameter - DataType) parameter data to Node flagged as node_input| Type error: expects DataType| Accepts Data|
-
+|port_id setter |create port without port_id | ValueError: "port_id required for port instantiation" | No error|
+|node_id setter |create port without node_id | ValueError: "node_id required for port instantiation" | No error|
+|is_input setter |create port without is_input | ValueError: "is_input flag not set for port" | No error|
+|is_input setter |create port where is_input not boolean| TypeError: "is_input flag expected boolean" | No error|
+|metadata setter | Pass in value that is not ImageMetadata or ParameterMetadata class | TypeError: "meta data expected as ImageMetadata or ParameterMetadata class" |No error|
+| data setter | For scalar data, pass in data that is not of type metadata.dtype.numpy | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype}|No error|
+| data setter | For image or array data, pass in data that is not of type np.ndarray | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected np.ndarray | No Error|
+| data setter | For image or array data, pass in data that is not a ndarray of type metadata.dtype | TypeError: data passed to port with unexpected dtype; for port {self.port_id} expected {self.metadata.dtype.numpy}| No error|
+| data setter | For image data, pass in a Shape arguement that is not present in Shape.dimensions* | AttributeError: dimension present in Shape.dimensions that is not a Shape arguement | No error|
+| data setter | For image data, pass in data that doesn't match metadata.image_shape_constraints and metadata.image_map | ValueError: image_type passed to port with incorrect shape | No error|
+| data setter | For array data, pass in data that doesn't match metadata.shape | ValueError: array_type data passed to port with incorrect shape| No error|
+| data setter | Pass in data where metadata.dtype does not define dtype from DataTypes** | TypeError: port MetaData defines unexpected dtype| No error|
+* this error should be impossible to generate given current structure of Shape, it will give an error from Shape class instead. Leave in case of future changes to Shape class
+** This error should also be impossible to generate given current structure of Metadata classes, wil give an error from ImageMetadata or ParameterMetadata instead.
 ### 7.4.2 Connection Class
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
 | source_port     |source_port not Port class|Type error|source_port accepted|
 | target_port |target_port not Port class|Type error|target_port accepted|
-|transpose| transpose passed not as Shape class | Type error | transpose accepted|
-|convert| convert passed not as DataType class | Type error | convert accepted |
-| get_output | Use get_output when no data at source_port | ConnectionError| No error|
-| get_output | Use get_output when source_port contains image with no pixel_array| ConnectionError| No error|
-| get_output | Use get_output when source_port contains parameter with no value| ConnectionError| No error|
-| get_output | Test correct output given with no transpose or convert | Correct output given| Incorrect output|
-| get_output | Test correct output given with transpose but no convert | Correct output given| Incorrect output|
-| get_output | Test correct output given with convert but no transpose | Correct output given| Incorrect output|
-| get_output | Test correct output given with transpose and convert | Correct output given| Incorrect output|
-* note: both transpose and convert have previously been unit tested in Image and/or Parameter classes
+
 ### 7.4.2 Node Class
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
@@ -923,6 +866,108 @@ Plugins to make:
 | port activation <br> post-tests | ~~Activate node where an ImageOperation output_image does not contain pixel_array or mapping~~ | ActivationError | node activates|
 | port activation <br> post-tests | ~~Activate node where an ImageOperation output_parameter does not contain value ~~| ActivationError| node activates|
 * final two unit tests removed because this situation raises an error in ImageOperation which will result in it failing at the import stage
+
+## 7.5 WorkFlow Class
+
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|init | Pass arguement thats not mageOperationDirectory to WorkFlow | TypeError: expected ImageOperationDirectory class on WorkFlow instantiation|
+
+## 7.5.1 Node functions
+
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|add_node| call add_node with arguement that's not a valid ImageOperation | Logged TypeError: new node requires ImageOperation class  |
+|add_node| call add_node(image_operation) function where dictionary key already exists | Logged ValueError: new node key already in nodes dictionary  |
+|add_node| call add_node with proper parameters   | node added to nodes dictionary     |
+|add_node| call add_node twice with proper parameters   | nodes added to nodes dictionary with unique keys   |
+|delete_node | call delete_node with an invalid key    | Logged ValueError: id not in node list   |
+|delete_node | call delete_node with proper parameters   | node deleted from nodes dictionary   |
+|delete_node | call delete_node with proper parameters   | associated connections removed from connection dictionary |
+|edit_node | call edit_node with invalid input - not Node or string | Logs TypeError: edit_node requires input of Node class, or nodes dictionary key|
+|edit_node | call edit_node with invalid input - string not nodes key | Logs ValueError: for string inputs, edit_node expects a node dictionary key|
+|edit_node | call edit_node with invalid input - Node not nodes value | Logs ValueError: for node inputs, edit_node expects value from nodes dictionary|
+|edit_node | call edit_node with valid input | sets own "needs_update" flag to True |
+|edit_node | call edit_node with valid input | sets all downstream "needs_update" flags to True |
+
+## 7.5.2 Connection Functions
+
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|add_connection |  call add_connection where source is not a port    | Logged TypeError: expected source_port as Port    |
+|add_connection |  call add_connection where target is not a port    | Logged TypeError: expected target_port as Port    |
+|add_connection | check add_connection with proper arguements and graph structure creates a connection| Connection created |
+|type_checks | call add_connection where a connection would fail type checks | ConnectionError: connection not created (failed at type checks):invalid port data types |
+|type_checks | call add_connection where a connection fails type checks but can be converted with warning |Connection created<br> Logs warning: for connection between '{source_port.port_id}' and '{target_port.port_id}', data of type {source_port.metadata.dtype} converted to {target_port.metadata.dtype} <br> sets connection.convert to relevant DataType|
+|type_checks |call add_connection where a connection fails type checks but can be converted without warning |Connection created<br> connection.convert set to relevant DataType|
+|shape_checks|call add_connection where a connection would fail shape checks(invalid shape (eg needs flattened image but has z != 1)) |
+|shape_checks|call add_connection where a connection would pass shape checks but require transposition|Connection created<br> connection.transpose set to relevant value|
+|structure_checks|call add_connection where a connection would fail structure checks - connecting port to itself | Log ConnectionError: connection not created (failed at structure checks):invalid connection: source port is target port    |
+|structure_checks| call add_connection where a connection would fail structure checks - connecting input to input/output to output |Log ConnectionError: connection not created (failed at structure checks):invalid connection: source port is an input |
+| structure_checks| call add_connection where a connection would fail structure checks -connecting to input which already has connections | Log ConnectionError: invalid connection: target port already has an input connection|
+| structure_checks | call add_connection where a connection would fail structure checks - would result in loop | Log ConnectionError: invalid connection: connection results in a loop |
+|delete_connection | call delete_connection with an invalid key | ValueError: id not in node list |
+|delete_connection | call delete_connection with proper arguements | Connection deleted |
+
+
+## 7.5.3 Graph topography functions
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|get_next_nodes| call get_next_nodes from node with Node class input | get list of next nodes |
+|get_next_nodes| call get_next_nodes from node with nodes key string input | get list of next nodes |
+|get_next_nodes| call get_next_nodes from node with Connection class input | get list of next nodes |
+|get_next_nodes| call get_next_nodes from node with connections key string input | get list of next nodes |
+|get_next_nodes| call get_next_nodes from node with Port class input | get list of next nodes |
+|get_next_nodes| call get_next_nodes with non-string/Node/Connection/Port object | TypeError: get_next_nodes requires input of Port, Node or Connection class |
+|get_next_nodes| call get_next_nodes with string that is not nodes or connections dictionary key | ValueError: for string inputs, get_next_nodes expects a nodes or connections dictionary key |
+|get_next_nodes| call get_next_nodes with Node that is not nodes dictionary value | ValueError: for Node inputs, get_next_nodes expects value from nodes dictionary |
+|get_next_nodes| call get_next_nodes with Connection that is not connections dictionary value | ValueError: for Connection inputs, get_next_nodes expects value from connections dictionary |
+|get_next_nodes| call get_next_nodes with Port that is not in a Node that is a nodes dictionary value | ValueError: for Port inputs, get_next_nodes expects Port to me part of Node from nodes dictionary |
+|get_next_nodes| call get_next_node from input port | ValueError: get_next_nodes requires output port, not input port|
+|get_previous_nodes| call get_previous_nodes from node with Node class input | get list of previous nodes |
+|get_previous_nodes| call get_previous_nodes from node with no previous nodes | get empty list |
+|get_previous_nodes| call get_previous_nodes from node with nodes key string input | get list of previous nodes |
+|get_previous_nodes| call get_previous_nodes from node with Connection class input | get list of previous nodes |
+|get_previous_nodes| call get_previous_nodes from node with connections key string input | get list of previous nodes |
+|get_previous_nodes| call get_previous_nodes from node with Port class input | get list of previous nodes |
+|get_previous_nodes| call get_previous_nodes from node with port id string input | ValueError: for string inputs, get_previous_nodes expects a nodes or connections dictionary key |
+|get_previous_nodes| call get_previous_nodes with non-string/Node/Connection/Port object | TypeError: get_previous_nodes requires input of Port, Node or Connection class |
+|get_previous_nodes| call get_previous_nodes with string that is not nodes or connections dictionary key | ValueError: for string inputs, get_previous_nodes expects a nodes or connections dictionary key |
+|get_previous_nodes| call get_previous_nodes with Node that is not nodes dictionary value | ValueError: for Node inputs, get_previous_nodes expects value from nodes dictionary |
+|get_previous_nodes| call get_previous_nodes with Connection that is not connections dictionary value | ValueError: for Connection inputs, get_previous_nodes expects value from connections dictionary |
+|get_previous_nodes| call get_previous_nodes with Port that is not in a Node that is a nodes dictionary value | ValueError: for Port inputs, get_previous_nodes expects Port to me part of Node from nodes dictionary |
+|get_previous_nodes| call get_previous_nodes with output port | ValueError: get_previous_nodes requires input port, not output port|
+|get_downstream_nodes | call get_downstream_nodes with invalid input - not Node or string | Logs TypeError: get_downstream_nodes requires input of Node class, or nodes dictionary key|
+|get_downstream_nodes | call get_downstream_nodes with invalid input - string not nodes key | Logs ValueError: for string inputs, get_downstream_nodes expects a node dictionary key|
+|get_downstream_nodes | call get_downstream_nodes with invalid input - Node not nodes value | Logs ValueError: for node inputs, get_downstream_nodes expects value from nodes dictionary|
+|get_downstream_nodes | call get_downstream_nodes with valid Node | gives list of all downstream nodes |
+|get_downstream_nodes | call get_downstream_nodes with valid nodes dictionary key | gives list of all downstream nodes |
+|get_graph_map | call get_graph_map with invalid input - not Node or string | Logs TypeError: get_graph_map requires input of Node class, or nodes dictionary key|
+|get_graph_map | call get_graph_map with invalid input - string not nodes key | Logs ValueError: for string inputs, get_graph_map expects a node dictionary key|
+|get_graph_map | call get_graph_map with invalid input - Node not nodes value | Logs ValueError: for node inputs, get_graph_map expects value from nodes dictionary|
+
+## 7.5.4 Tranpose Function
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|tranpose | send in non nparray 'value' | TypeError: expected value as np.array|
+|tranpose | send in non new_shape not as Shape class | TypeError: expected new_shape as Shape class|
+|tranpose | send in non new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)| ValueError: new_shape shape dimensions out of range |
+|tranpose | Send in valid new_shape and value| output with expected shape |
+
+## 7.5.5 update_graph Function
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|start_node_list | Set io_image_operation.start_nodes | start_node_list properly updates|
+|start_node_list | Set io_image_operation.start_nodes to empty list | log GraphError: cannot update graph without defined start nodes|
+|get_node_list | Remove start_node from nodes dictionary before calling update_graph | GraphError: error generating graph map for start node|
+|node input_port check | Node in graph with 1 input port connected and ready, 1 not connected | Node not activated |
+|node ready_state check | Node in graph with where all ports connected but not all previous nodes is_ready flagged as True | Node not activated |
+|node needs_update check | Node in graph with where all ports connected and ready but needs_update set to False| Node not activated |
+|data transposition | Set transpose attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error transposing data for port{} <br> Node not activated |
+|data conversion | Set convert attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error converting data for port{} <br> Node not activated |
+|node activation | Find some way of causing an error on node activation?| log GraphError: error activating node<br> Node not activated |
+|update_graph | create graph with single source, correct input data and connections | all nodes run<br> all nodes needs_update flag set to False <br> all nodes is_ready set to True |
+|update_graph | create graph with two sources, correct connections and input_data from one source | all expected nodes run<br> all run nodes needs_update flag set to False <br> all run nodes is_ready flag set to True |
 
 # 8 Versioning
 

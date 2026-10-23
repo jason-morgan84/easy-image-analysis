@@ -1,9 +1,10 @@
 from core.image_operation import ImageOperation
+import core.io_image_operations
 import importlib
 import pkgutil
 import os
-from core.error_handling import log
-from core.type import sample_data
+from core.error_handling import log, VersionError
+from core.data_checks import sample_data, check_metadata_dictionary
 import ast
 import inspect
 
@@ -13,14 +14,15 @@ class ImageOperationDirectory():
     backend_path = ".\\backend\\" # defines path of backend
     permitted_imports = {"core",
                          "math", 
-                         "numpy", 
+                         "numpy",
                          "pillow"} # defines permitted imports in ImageOperations
  
 
     def __init__(self, logger = None, testing = False):
         self.image_operation_list = {}
         self.testing = testing
-        self.version_image_map = {"0": lambda attr: self.import_0(attr)}
+        self.version_image_map = {"0": lambda attr: self.import_0(attr),
+                                  "1": lambda attr: self.import_1(attr)}
         self.logger = logger if logger else []
         self.disallowed_modules = set()
 
@@ -50,69 +52,91 @@ class ImageOperationDirectory():
                 for _, name, ispkg in pkgutil.iter_modules(package.__path__):
                     # checks its not another package
                     if not ispkg:
-                        # imports individual file
-                        sub_module = importlib.import_module(".".join((self.package_folder, folder, name)))
-                        """Before running the code, check for only allowed imports"""
-                        try:
-                            imported_modules = self.check_imports(inspect.getsource(sub_module))
-                        except Exception as e:
-                            log(self.logger, ImportError, f"unable to check for permitted module imports in {name}: {e}","ImageOperationDirectory","import_operations_dict", name)
-                            continue
-
-                        self.disallowed_modules = imported_modules - self.permitted_imports
-                        if self.disallowed_modules:
-                            log(self.logger, ImportError, f"non-permitted imports found in module {name}: {self.disallowed_modules}","ImageOperationDirectory","import_operations_dict", name)
-                            continue
-
-                        """Next, check version is acceptable"""
-                        try:
-                            version = getattr(sub_module, "version")
-                        except Exception as e:
-                            log(self.logger,ImportError,f"version number expected for module {name}: {e}","ImageOperationDirectory","import_operations_dict",name)
-                            continue
-
-                        try: 
-                            major, _, _ = version.split(".")
-                        except Exception as e:
-                            log(self.logger,ImportError,f"incorrect version format in {name}: {e}","ImageOperationDirectory","import_operations_dict",name)
-                            continue
-
-                        """ Once imports and version are checked, get actual ImageOperation class"""
-                        # iterates through each attribute in module
-                        for attribute_name in dir(sub_module):
-                            attribute = getattr(sub_module, attribute_name)
-                            # if its a class that is a subclass of ImageOperation, but not ImageOperation itself (which should never be in that folder anyway)
-                            if isinstance(attribute, type) and issubclass(attribute,ImageOperation) and attribute is not ImageOperation:
-                                """ Use major version number and version_image_map dictionary to import new dictionary item 
-                                # with key "name" and value based on return from relevant import function"""
-                                try:
-                                    imported_function = self.version_image_map[major](attribute)
-                                except Exception as e:
-                                    log(self.logger,ImportError,f"cannot import module {name}: {e}","ImageOperationDirectory","import_operations_dict",name)
-                                    continue                                                              
+                        imported_function = self.import_file(folder = folder, name = name, logger = self.logger)
+                        if imported_function:
+                            operations_dict[name] = imported_function
+                            operations_dict[name].id = name
+                            operations_dict[name].category = current_category
                                 
-                                """test code to ensure it runs and gives expected output given sample input"""
-                                try:
-                                    self.test_function(imported_function)
-                                except Exception as e:
-                                    log(self.logger,ImportError,f"module {name} failed import tests: {e}","ImageOperationDirectory","import_operations_dict", name)
-                                    continue
-
-                                """if code passes these tests, add to dictionary of operations"""
-                                operations_dict[name] = imported_function
-                                operations_dict[name].id = name
-                                operations_dict[name].category = current_category
-                                operations_dict[name].version = version
-
-
+                                
         self.image_operation_list = operations_dict
+        self.image_operation_list.update(core.io_image_operations.io_imageoperations)
+
+    def import_file(self, folder, name, logger):
+        # imports individual file
+        try:
+            sub_module = importlib.import_module(".".join((self.package_folder, folder, name)))
+        except Exception as e:
+            log(logger,ImportError, f"unable to import module '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
+            return
+
+        """Before running the code, check for only allowed imports"""
+        try:
+            imported_modules = self.check_imports(inspect.getsource(sub_module))
+        except Exception as e:
+            log(logger, ImportError, f"unable to check for permitted module imports in '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
+            return
+
+        self.disallowed_modules = imported_modules - self.permitted_imports
+        if self.disallowed_modules:
+            log(logger, ImportError, f"non-permitted imports found in module '{name}': {self.disallowed_modules}","ImageOperationDirectory","import_operations_dict", name)
+            return
+
+        """Next, check version is acceptable"""
+        try:
+            version = getattr(sub_module, "version")
+        except Exception as e:
+            log(logger,ImportError,f"version number expected for module '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
+            return
+
+        try: 
+            major, _, _ = version.split(".")
+        except Exception as e:
+            log(logger,ImportError,f"incorrect version format in '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
+            return
+
+        """ Once imports and version are checked, get actual ImageOperation class"""
+        # iterates through each attribute in module
+        for attribute_name in dir(sub_module):
+            item = getattr(sub_module, attribute_name)
+            # if its a class that is a subclass of ImageOperation, but not ImageOperation itself (which should never be in that folder anyway)
+            if isinstance(item, type) and issubclass(item, ImageOperation) and item is not ImageOperation:
+                """ Use major version number and version_image_map dictionary to import new dictionary item 
+                # with key "name" and value based on return from relevant import function"""
+                try:
+                    imported_function = self.version_image_map[major](item)
+                except Exception as e:
+                    log(logger,ImportError,f"cannot import module '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
+                    return          
+
+
+                """check code has required inputs and outputs"""
+                try:
+                    self.check_inputs_outputs(imported_function)
+                except Exception as e:
+                    log(logger,ImportError,f"module '{name}' has incorrect inputs/outputs: {e}","ImageOperationDirectory","import_operations_dict", name)
+                    return
+
+                """test code to ensure it runs and gives expected output given sample input"""
+                try:
+                    self.test_function(imported_function)
+                except Exception as e:
+                    log(logger,ImportError,f"module '{name}' failed import tests: {e}","ImageOperationDirectory","import_operations_dict", name)
+                    return
+                
+                imported_function.version = version
+                return imported_function
     
     def import_0(self, attribute):
         """imports functions where major version is 0"""
-        imported_function = attribute()
-    
-        return imported_function
+        raise VersionError(f"ImportOperationDirectory not back compatible to major version 0, cannot import '{attribute}'")
 
+
+    def import_1(self, image_op):
+        """imports functions where major version is 1"""
+        imported_image_op = image_op()
+        return imported_image_op
+    
     def check_imports(self, function):
         """gets a list of all modules imported into 'function' and 
         checks them against permitted module names"""
@@ -125,7 +149,6 @@ class ImageOperationDirectory():
         # Where it finds them, adds the relevant module name to modules set
         for node in ast.walk(ast_code): 
             if isinstance (node, ast.Import):
-                print(node.names)
                 for alias in node.names:
                     imported_modules.add(alias.name.split('.')[0])
             elif isinstance (node, ast.ImportFrom):
@@ -135,9 +158,20 @@ class ImageOperationDirectory():
         # permitted imports from imported modules
         return imported_modules
 
+    def check_inputs_outputs(self, function):
+        # to import an ImageOperation, it must define an input image (through input_image_metadata dictionary) and an output 
+        # (through either output_image_metadata or output_parameter_metadata dictionaries)
+        if not function.input_image_metadata:
+            raise AttributeError(f"imported ImageOperations require input_image_metadata")
+              
+        if not function.output_image_metadata and not function.output_parameter_metadata:
+            raise AttributeError(f"imported ImageOperations require output_image_metadata or output_parameter_metadata")
 
+        # if dictionaries exist, their format will have been checked by ImageOperation clas
 
-    def test_function(self, function):
+        
+
+    def test_function(self, function, input_image_dictionary = None, input_parameter_dictionary = None):
         """tests functions by providing sample inputs (given requested input dtype, shape etc). Actual outputs checked in ImageOperation.run_code and any
         errors will be chained here, then to input_list function where they're logged."""
         # default values for each image dimension if function is indifferent to shape in that dimension
@@ -145,35 +179,50 @@ class ImageOperationDirectory():
         default_z = 4
         default_y = 50
         default_x = 50
-        item_shape = [0,0,0,0]
+        image_shape = [0,0,0,0]
 
+        input_images = {}
+        input_parameters = {}
         #loops through input images
-        for item in function.input_image.keys():
-            # gets dtype of input image
-            item_dtype = function.input_image[item].dtype
+        if not input_image_dictionary:
+            for key, value in function.input_image_metadata.items():
+                # gets dtype of input image
+                image_dtype = value.dtype
 
-            # calculates dimensions of shape for pixel_array based on input_image shape and image_map arguements
-            item_shape[function.input_image[item].image_map.c] = default_c if function.input_image[item].shape.c == -1 else function.input_image[item].shape.c
-            item_shape[function.input_image[item].image_map.z] = default_z if function.input_image[item].shape.z == -1 else function.input_image[item].shape.z
-            item_shape[function.input_image[item].image_map.y] = default_y if function.input_image[item].shape.y == -1 else function.input_image[item].shape.y
-            item_shape[function.input_image[item].image_map.x] = default_x if function.input_image[item].shape.x == -1 else function.input_image[item].shape.x
 
-            # uses type.sample_data to set pixel_array as an array of the correct shape and dtype of 0s
-            function.input_image[item].pixel_array = item_dtype.to_numpy(sample_data(dtype = item_dtype,
-                                                                 shape = item_shape,
-                                                                 zero = True))
+                # calculates dimensions of shape for pixel_array based on input_image shape and image_map arguements
+                image_shape[value.image_map.c] = default_c if value.image_shape_constraints.c == -1 else value.image_shape_constraints.c
+                image_shape[value.image_map.z] = default_z if value.image_shape_constraints.z == -1 else value.image_shape_constraints.z
+                image_shape[value.image_map.y] = default_y if value.image_shape_constraints.y == -1 else value.image_shape_constraints.y
+                image_shape[value.image_map.x] = default_x if value.image_shape_constraints.x == -1 else value.image_shape_constraintse.x
+
+                # uses type.sample_data to set pixel_array as an array of the correct shape and dtype of 0s
+                input_images[key] = sample_data(dtype=image_dtype,
+                                                shape = image_shape,
+                                                zero = True)
+        else:
+            input_images = input_image_dictionary
+
+        setattr(function,"input_image",input_images)
 
         # similar process for each input_parameter
-        for item in function.input_parameter.keys():
-            # gets dtype and shape from parameter
-            item_dtype = function.input_parameter[item].dtype
-            item_shape = function.input_parameter[item].shape
+        
+        if function.input_parameter_metadata is not None:
+            if not input_parameter_dictionary:
+                for key, value in function.input_parameter_metadata.items():
+                    # gets dtype and shape from parameter
+                    parameter_dtype = value.dtype
+                    parameter_shape = value.shape
 
-            # sets value to 0/array of 0s of correct dtype and shape using type.sample_data
-            function.input_image[item].value = sample_data(dtype = item_dtype,
-                                                           shape = item_shape,
-                                                           zero = True)
-
+                    # sets value to 0/array of 0s of correct dtype and shape using type.sample_data
+                    input_parameters[key] = sample_data(dtype = parameter_dtype,
+                                                        shape = parameter_shape,
+                                                        zero = True)
+            else:
+                input_parameters = input_parameter_dictionary
+            setattr(function,"input_parameter",input_parameters)
+        
+        
         function.run_code()
 
 

@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="207.18549mm"
+   height="150.87694mm"
+   viewBox="0 0 207.18549 150.87694"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   sodipodi:docname="image_operation_checking.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showborder="false"
+     inkscape:zoom="1.4378368"
+     inkscape:cx="322.70701"
+     inkscape:cy="311.23144"
+     inkscape:window-width="2560"
+     inkscape:window-height="1351"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="3"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Triangle-7"
+       refX="3"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135-6" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Triangle-21"
+       refX="3"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135-68" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-46.782214,-37.232692)">
+    <rect
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.352777;-inkscape-stroke:none"
+       id="rect22"
+       width="206.8327"
+       height="150.52415"
+       x="46.958603"
+       y="37.409081" />
+    <rect
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529166;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       id="rect2-0"
+       width="123.51678"
+       height="59.672199"
+       x="91.495949"
+       y="61.18618" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:113.839;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="96.956718"
+       y="67.259056"
+       id="text8-4-1"><tspan
+         x="96.956718"
+         y="67.259056"
+         id="tspan4"><tspan
+   style="font-weight:bold"
+   id="tspan3">Data setter:</tspan>
+</tspan><tspan
+         x="96.956718"
+         y="70.786832"
+         id="tspan5">    - checks that corresponding metadata exists
+</tspan><tspan
+         x="96.956718"
+         y="74.314611"
+         id="tspan6">    - checks that data is a dictionary
+</tspan><tspan
+         x="96.956718"
+         y="77.84239"
+         id="tspan7">    - checks that dictionary key is present in metadat dictionary
+</tspan><tspan
+         x="96.956718"
+         y="81.370168"
+         id="tspan8">
+</tspan><tspan
+         x="96.956718"
+         y="84.897947"
+         id="tspan10"><tspan
+   style="font-weight:bold"
+   id="tspan9">Metadata setter:</tspan>
+</tspan><tspan
+         x="96.956718"
+         y="88.425726"
+         id="tspan11">    - checks that metadata is a dictionary
+</tspan><tspan
+         x="96.956718"
+         y="91.953504"
+         id="tspan12">    - checks that dictionary values are of ImageMetadata or ParameterMetadata classes
+</tspan><tspan
+         x="96.956718"
+         y="95.481283"
+         id="tspan13">
+</tspan><tspan
+         x="96.956718"
+         y="99.009061"
+         id="tspan15"><tspan
+   style="font-weight:bold"
+   id="tspan14">run_code:</tspan>
+</tspan><tspan
+         x="96.956718"
+         y="102.53684"
+         id="tspan23">    - if input metadata values exist, check corresponding data values exist and are of the </tspan><tspan
+         x="96.956718"
+         y="106.06462"
+         id="tspan24">expected data type
+</tspan><tspan
+         x="96.956718"
+         y="109.5924"
+         id="tspan26">    - if output metadata values exist, check corresponding data values exist and are of the </tspan><tspan
+         x="96.956718"
+         y="113.12018"
+         id="tspan27">expected data type 
+</tspan><tspan
+         x="96.956718"
+         y="116.64795"
+         id="tspan28">    
+</tspan><tspan
+         x="96.956718"
+         y="120.17573"
+         id="tspan29">
+</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:46.3053;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="96.956718"
+       y="67.259056"
+       id="text8-4-1-4"
+       transform="translate(-1.596778,74.667214)"><tspan
+         x="96.956718"
+         y="67.259056"
+         id="tspan31"><tspan
+   style="font-weight:bold"
+   id="tspan30">import_operations_dict:</tspan>
+</tspan><tspan
+         x="96.956718"
+         y="70.786832"
+         id="tspan32">    - check module has correct </tspan><tspan
+         x="96.956718"
+         y="74.314611"
+         id="tspan33">version format
+</tspan><tspan
+         x="96.956718"
+         y="77.84239"
+         id="tspan34">    - check module only has permitted </tspan><tspan
+         x="96.956718"
+         y="81.370168"
+         id="tspan35">imports
+</tspan><tspan
+         x="96.956718"
+         y="84.897947"
+         id="tspan36">    - check module has at least one </tspan><tspan
+         x="96.956718"
+         y="88.425726"
+         id="tspan37">image input
+</tspan><tspan
+         x="96.956718"
+         y="91.953504"
+         id="tspan38">    - check module has at lease one </tspan><tspan
+         x="96.956718"
+         y="95.481283"
+         id="tspan39">image or paramter output
+</tspan><tspan
+         x="96.956718"
+         y="99.009061"
+         id="tspan40">    - check sample data passed to </tspan><tspan
+         x="96.956718"
+         y="102.53684"
+         id="tspan41">module gives expected ouput
+</tspan><tspan
+         x="96.956718"
+         y="106.06462"
+         id="tspan42">    
+</tspan><tspan
+         x="96.956718"
+         y="109.5924"
+         id="tspan43">
+</tspan></text>
+    <path
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#1a1a1a;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#Triangle);stop-color:#000000;stop-opacity:1"
+       d="m 118.42453,49.645364 v 9.754233"
+       id="path10-9"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#1a1a1a;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#Triangle-21);stop-color:#000000"
+       d="m 118.42453,123.29324 v 9.75423"
+       id="path10-9-6"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.52778px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:end;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:end;white-space:pre;inline-size:28.0077;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="103.13455"
+       y="66.207077"
+       id="text18"
+       transform="translate(-13.24907,-1.8401486)"><tspan
+         x="103.13455"
+         y="66.207077"
+         id="tspan44">ImageOperation<tspan
+   y="66.207077"
+   id="tspan45"> </tspan></tspan><tspan
+         x="103.13455"
+         y="70.616804"
+         id="tspan46">Class checks</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.52778px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:end;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:end;white-space:pre;inline-size:40.3367;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="103.13455"
+       y="66.207077"
+       id="text18-9"
+       transform="translate(-13.24908,71.677942)"><tspan
+         x="103.13455"
+         y="66.207077"
+         id="tspan47">ImageOperationDirectory<tspan
+   y="66.207077"
+   id="tspan48"> </tspan></tspan><tspan
+         x="103.13455"
+         y="70.616804"
+         id="tspan49">Class checks</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.52778px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;text-anchor:start;white-space:pre;inline-size:37.3925;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="70.616272"
+       y="66.207077"
+       id="text18-9-7"
+       transform="translate(146.05743,71.633156)"><tspan
+         x="70.616272"
+         y="66.207077"
+         id="tspan50">io_image_operations </tspan><tspan
+         x="70.616272"
+         y="70.616804"
+         id="tspan51">unit tests</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.52778px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="118.38147"
+       y="43.079998"
+       id="text19"><tspan
+         sodipodi:role="line"
+         id="tspan19"
+         style="font-size:3.52778px;text-align:center;text-anchor:middle;stroke-width:0.189093"
+         x="118.38147"
+         y="43.079998">Hard coded </tspan><tspan
+         sodipodi:role="line"
+         style="font-size:3.52778px;text-align:center;text-anchor:middle;stroke-width:0.189093"
+         x="118.38147"
+         y="47.489723"
+         id="tspan1">ImageOperation</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.52778px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="188.04108"
+       y="43.079998"
+       id="text19-8"><tspan
+         sodipodi:role="line"
+         id="tspan19-2"
+         style="font-size:3.52778px;text-align:center;text-anchor:middle;stroke-width:0.189093"
+         x="188.04108"
+         y="43.079998">Imported </tspan><tspan
+         sodipodi:role="line"
+         style="font-size:3.52778px;text-align:center;text-anchor:middle;stroke-width:0.189093"
+         x="188.04108"
+         y="47.489723"
+         id="tspan1-4">ImageOperation</tspan></text>
+    <path
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#1a1a1a;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#Triangle);stop-color:#000000;stop-opacity:1"
+       d="m 188.08414,49.645364 v 9.754233"
+       id="path13"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;stroke:#1a1a1a;stroke-width:0.352777;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;marker-end:url(#Triangle-7);stop-color:#000000"
+       d="m 188.08414,123.29324 v 9.75423"
+       id="path13-2"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529166;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       id="rect15"
+       width="53.857185"
+       height="45.687069"
+       x="91.495941"
+       y="135.57956" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.82222px;line-height:normal;font-family:Arial;-inkscape-font-specification:Arial;text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;white-space:pre;inline-size:46.3053;fill:#000000;stroke-width:0.189093;-inkscape-stroke:none;stop-color:#000000"
+       x="96.956718"
+       y="67.259056"
+       id="text8-4-1-4-6"
+       transform="translate(68.06282,74.667208)"><tspan
+         x="96.956718"
+         y="67.259056"
+         id="tspan53"><tspan
+   style="font-weight:bold"
+   id="tspan52">test_io_image_operations.py</tspan>
+</tspan><tspan
+         x="96.956718"
+         y="70.786832"
+         id="tspan54">    - test module reacts to incorrect </tspan><tspan
+         x="96.956718"
+         y="74.314611"
+         id="tspan55">input properly
+</tspan><tspan
+         x="96.956718"
+         y="77.84239"
+         id="tspan56">    - test module provides expected </tspan><tspan
+         x="96.956718"
+         y="81.370168"
+         id="tspan57">output
+</tspan><tspan
+         x="96.956718"
+         y="84.897947"
+         id="tspan58">    
+</tspan><tspan
+         x="96.956718"
+         y="88.425726"
+         id="tspan59">
+</tspan></text>
+    <rect
+       style="font-variation-settings:normal;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.529166;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       id="rect15-2"
+       width="53.857185"
+       height="26.549524"
+       x="161.15555"
+       y="135.57956" />
+  </g>
+</svg>

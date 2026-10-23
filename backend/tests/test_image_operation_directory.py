@@ -8,7 +8,7 @@ def test_import_category():
 
     log_output = [str(item) for item in directory.logger]
 
-    assert "same_image" in directory.image_operation_list.keys(), f"{log_output}"
+    assert "same_image" in directory.image_operation_list.keys(), f"log: {log_output} Length dictionary: {len(directory.image_operation_list)}"
     assert directory.image_operation_list["same_image"].category == "Testing"
     assert directory["same_image"].category == "Testing"
 
@@ -39,8 +39,7 @@ def test_incorrect_version_number(function_name, error_message):
 # missing_input_image.py: input image as None
 @pytest.mark.parametrize("function_name, error_message", [
     ("missing_arguements","cannot import module"),
-    ("invalid_arguement","cannot import module"),
-    ("missing_input_image","input_image expected")])
+    ("invalid_arguement","cannot import module")])
 def test_inputs_incorrect_arguements(function_name, error_message):
     directory = ImageOperationDirectory(testing = True)
     directory.import_operations_dict()
@@ -65,13 +64,11 @@ def test_inputs_incorrect_arguements(function_name, error_message):
 @pytest.mark.parametrize("function_name, error_message", [
     # Supply dtype as not member of DataTypes.image_types
     ("code_invalid","error executing operation"),
-    ("code_output_missing","operation did not generate an output"),
-    ("code_output_wrong_format_image","Expected output to be dictionary of ImageParcel"),
-    ("code_output_wrong_format_parameter","Expected output to be dictionary of ParameterParcel"),
-    ("code_outout_missing_arguement_image_pixel_array","No image pixel array given for"),
-    ("code_output_missing_arguement_image_image_map","No image image_map data given for"),
-    ("code_outout_missing_arguement_parameter_value","No value given for parameter output"),
-    ("code_outout_incorrect_arguements_image_shape","For output image output, pixel_array dimension")])
+    ("code_output_missing","metadata present with no data"),
+    ("code_output_wrong_format_image","module 'code_output_wrong_format_image' failed import tests: data dictionary value for 'output_image.output' does not pass dtype validation"),
+    ("code_output_wrong_format_parameter","module 'code_output_wrong_format_parameter' failed import tests: data dictionary value for 'output_parameter.output' does not pass dtype validation"),
+    ("code_output_missing_image","metadata present with no data"),
+    ("code_outout_missing_parameter","metadata present with no data")])
 def test_incorrect_code(function_name, error_message):
     directory = ImageOperationDirectory(testing = True)
     directory.import_operations_dict()
@@ -80,6 +77,7 @@ def test_incorrect_code(function_name, error_message):
     assert function_name not in directory.image_operation_list.keys()
     assert function_name in not_imported
     for item in directory.logger:
+
         if item.identifier == function_name:
             assert error_message in item.message, f"{item.message}"
 
