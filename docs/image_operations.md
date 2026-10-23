@@ -210,9 +210,14 @@ In general, as long as the code only uses the permitted imports, doesn't generat
 
 ## Testing ImageOperations
 
+
+WHERE SHOULD THE FUNCTION BE SAVED?
+
 New ImageOperations can be tested by running .... in terminal.
 
-This will carry out the same checks made during ImageOperation import by ImageOperationDirectory. A text file will be provided ... describing which of these tests were passed and which were failed.
+This test function will test the ImageOperation on sample biological data transformed to match input_image_metadata. To use the test function if input parameters are required, a dictionary of test inputs should be added to the ImageOperation as instance variable test_input_parameters.
+
+The test function will carry out the same checks made during ImageOperation import by ImageOperationDirectory. A text file will be provided ... describing which of these tests were passed and which were failed.
 
 These tests a randomised data set is provided to the ImageOperation to tests its function and outputs as well as real sample image adjust to match your input image metadata. The outputted image can be found at ......
 
