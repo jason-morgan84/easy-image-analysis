@@ -303,7 +303,30 @@ Finally, following code execution checks are carried out to ensure that the outp
 
 **NOTE: At this point, any ImageOperation requires (at least) one image as an input. This is a design decision to prevent creep and bloat, based on the idea that as soon as only non-image variables are accepted this software is moving into data analysis rather than image analysis. This is checkedby the run_code function in ImageOperation and will therefore also affect other classes interacting with ImageOperations (Nodes and WorkFlow).**
 
-### 3.2.4 ImageOperationDirectory Class
+### 3.4.2 ImagePackage
+Simple class holding data for image inputs and outputs from ImageOperation. Contains:
+* dtype - set at instantiation based on ImageOperation code file.
+    - Type checks for member of DataType
+* shape - set at instatiation based on shape constrains defined in code file. **NOTE: this is not the shape of the array (which is defined by the array) - it is the <u>constraints</u> on the shape of the image.**
+    - Type checks for Shape class
+* pixel_array - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain ndarray of dtype.numpy.
+    - Type checks for Shape class
+* image_map - The required mapping of any supplied image as a member of Shape class. Defines how an ImageOperation wants a pixel array delivered (eg, CZYX v ZCYX) and how it outputs it.
+
+### 3.4.3 ParameterPackage
+Simple class holding data for non-image inputs and outputs from ImageOperation. Includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
+
+Contains:
+* dtype - set at instantiation based on ImageOperation code file.
+    - Type checks for member of DataType.
+* value - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain value of dtype.numpy.
+* shape - if dtype defines an array_type, contains a np.array defining shape of value.
+    - will accept a tuple, list or np.ndarray. Tuples and lists will be converted to np.ndarray.
+* user_input - boolean flag to say if value is expected via WorkFlow (False) or via (UI).
+* ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc) - setter checks this is present if user_input is True
+* ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
+
+### 3.4.4 ImageOperationDirectory Class
 This class holds for a list of all ImageOperation classes, along with the code required to import them.
 
 ImageOperations are imported from a directory defined in the ImageOperationDirectory class, currently .\backend\image_operations. 
@@ -449,6 +472,24 @@ On creation of a new connection, it will check for structure, shape or type viol
 
 <img src="./workflow_error_checking.svg" width="100%" height = "100%" alt="Node Graph Set-Up checks" />
 
+### Shape propagation
+
+* carry out checks at the WorkFlow level.
+
+* ImageOperations already include data on the required input shape and delivered output shape (-1 for don't care, specific values for defined input/output dimension size)
+
+* on instantiation of a Node, the input constraints are propagated to the input Port and the output Port for visibility to Connections.
+
+* when a user tries to create a Connection, shape constraints on the source and target Ports are checked for compatibility.
+
+* if compatible, the Connection is created.
+
+* on creation, the graph is updated. This includes a step of propagating any Shape constraints through the graph.
+
+* the output Port of the newly connected Node has its shape constraints updated based on the upstream graph, for checking by future connections.
+
+* Only -1 (don't care values) are changed - if a Node has an ImageOperation that's indifferent to shape, but the input is always c = 1, the output will become c = 1. If a Node has a defined output, that is constant. This is the point where the proper coding of the ImageOperation, particularly its output image shape constraints, has to be trusted.
+
 ### 3.6.1 Workflow Implementation
 
 __Stage 0__
@@ -552,6 +593,10 @@ error_handling.py also includes custom exceptions:
 * GraphError - Exception raised when error updating graph in WorkFlow
 
 # 4 ImageOperation files
+
+## 4.1 Test Harness
+
+Includes testing for outputs - if an image output shape is given as (-1,-1,-1,-1) but it doesn't pass through all dimension sizes, then flag this as an error (if left, it will break image shape propagation through the graph).
 
 ## 4.2 Special cases - input and output
 
