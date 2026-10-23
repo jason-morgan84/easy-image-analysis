@@ -22,26 +22,39 @@ class LoadImage(ImageOperation):
                                                      image_map=Shape(c=0, z=1, y=2, x=3))}, 
             )
     def execute(self):
-        path = self.input_parameter["path"]
+        path = self.input_parameter_metadata["path"]
 
         try:
             imported_image = tifffile.imread(path)
-        except:
-            raise ImportError(f"failed to import image from tiff file")
+        except Exception as e:
+            raise ImportError(f"failed to import image from tiff file: {e}")
 
         try:
             imported_image = self.output_image_metadata["output"].dtype.numpy(imported_image)
-        except:
-            raise ImportError(f"failed to convert imported image into defined dtype")
-        
-        shape = self.input_parameter["shape"]
+        except Exception as e:
+            raise ImportError(f"failed to convert imported image into defined dtype: {e}")
+
+        # check for missing dimensions and add to front 
+        shape = self.input_parameter_metadata["shape"]
         if shape:
             if len(shape) != len(Shape.dimensions):
                 raise ValueError(f"for load image, shape parameter has incorrect length")
 
-            imported_image.transpose(self.input_parameter["shape"])
+            imported_image.transpose(self.input_parameter_metadata["shape"])
 
         self.output_image={"output":imported_image}
+    
+    def load_image(self, path, shape):
+        self.input_parameter_metadata["path"] = path
+        self.input_parameter_metadata["shape"] = shape
+        try:
+            self.execute()
+            return self.output_image["output"]
+        except Exception as e:
+            raise ImportError(f"failed to load image {path}: {e}")
+
+
+
 
 
 class TestLoadImage(ImageOperation):
