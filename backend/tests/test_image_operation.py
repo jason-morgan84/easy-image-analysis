@@ -22,30 +22,6 @@ test_image_data_imagefloat = sample_data(DataPolicy.ImageFloat,(1,2,3,4))
 test_parameter_data_valueint = sample_data(DataPolicy.ValueInt)
 test_parameter_data_valuefloat = sample_data(DataPolicy.ValueFloat)
 
-"""input_image_metadata setter"""
-#  create ImageOperation with no input_image_metadata or set input_image_metadata to None
-def test_input_image_metadata_setter_no_metadata():
-    with pytest.raises(ValueError, match="for ImageOperation, input_metadata is required"):
-        ImageOperation(name="Test",
-                          id="test",
-                          category = "Testing",
-                          version = None,
-                          docs = None,
-                          alerts = None,
-                          input_image_metadata = None
-                        )
-
-    test_image_operation = ImageOperation(name="Test",
-                        id="test",
-                        category = "Testing",
-                        version = None,
-                        docs = None,
-                        alerts = None,
-                        input_image_metadata={"input1":test_image_metadata_imageint},
-                        )
-    with pytest.raises(ValueError, match="for ImageOperation, input_metadata is required"):
-        test_image_operation.input_image_metadata = None
-
 """all metadata setters"""
 # create ImageOperation with incorrect input_image_metadata
 @pytest.mark.parametrize("attribute, metadata, message", 

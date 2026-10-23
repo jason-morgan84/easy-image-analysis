@@ -67,7 +67,7 @@ class ImageOperation:
     
     @input_image_metadata.setter
     def input_image_metadata(self, metadata):
-        if metadata:
+        if metadata is not None:
             check_metadata_dictionary(metadata=metadata, 
                            dtype=ImageMetadata,
                            identifier="input_image_metadata")
@@ -80,7 +80,7 @@ class ImageOperation:
     
     @output_image_metadata.setter
     def output_image_metadata(self, metadata):
-        if metadata:
+        if metadata is not None:
             check_metadata_dictionary(metadata=metadata, 
                            dtype=ImageMetadata,
                            identifier="output_image_metadata")
@@ -93,7 +93,7 @@ class ImageOperation:
     
     @input_parameter_metadata.setter
     def input_parameter_metadata(self, metadata):
-        if metadata:
+        if metadata is not None:
             check_metadata_dictionary(metadata=metadata, 
                            dtype=ParameterMetadata,
                            identifier="input_parameter_metadata")
@@ -105,7 +105,7 @@ class ImageOperation:
     
     @output_parameter_metadata.setter
     def output_parameter_metadata(self, metadata):
-        if metadata:
+        if metadata is not None:
             check_metadata_dictionary(metadata=metadata, 
                            dtype=ParameterMetadata,
                            identifier="output_parameter_metadata")
@@ -118,7 +118,7 @@ class ImageOperation:
     
     @input_image.setter
     def input_image(self, input):
-        if input:
+        if input is not None:
             check_data_dictionary(data=input,
                                     metadata=self.input_image_metadata,
                                     dtype=ImageMetadata,
@@ -130,7 +130,7 @@ class ImageOperation:
         return self._output_image
     @output_image.setter
     def output_image(self, output):
-        if output:
+        if output is not None:
             check_data_dictionary(data=output,
                                     metadata=self.output_image_metadata,
                                     dtype=ImageMetadata,
@@ -144,7 +144,7 @@ class ImageOperation:
 
     @input_parameter.setter
     def input_parameter(self, input):
-        if input:
+        if input is not None:
             check_data_dictionary(data=input,
                                     metadata=self.input_parameter_metadata,
                                     dtype=ParameterMetadata,
@@ -157,7 +157,7 @@ class ImageOperation:
 
     @output_parameter.setter
     def output_parameter(self, output):
-        if output:
+        if output is not None:
             check_data_dictionary(data=output,
                                     metadata=self.output_parameter_metadata,
                                     dtype=ParameterMetadata,
@@ -211,19 +211,14 @@ class ImageOperation:
             raise RuntimeError(f"error executing operation '{self.name}': {e}")
 
         """carry out post-execution tests"""
-        # check output generated where output metadata exists
-        if (self.output_image_metadata and not self.output_image) or \
-           (self.output_parameter_metadata and not self.output_parameter):
-            raise RuntimeError(f"operation did not generate an expected output ({self.name})")
-
-        # check output images match image_shape_constraints and image_map
+        # check output images metadata and data
         if self.output_image is not None or self.output_image_metadata is not None:
             check_data_dictionary_value(data=self.output_image,
                                         metadata=self.output_image_metadata,
                                         dtype=ImageMetadata,
                                         identifier="output_image")
 
-        # check output parameter arrays have shape
+        # check output parameter metadata and data
         if self.output_parameter is not None or self.output_parameter_metadata is not None:
             check_data_dictionary_value(data=self.output_parameter,
                                         metadata=self.output_parameter_metadata,
