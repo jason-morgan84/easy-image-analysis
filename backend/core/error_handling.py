@@ -58,3 +58,10 @@ class GraphError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
+
+class ExportError(Exception):
+    """Exception raised when error saving an image to file"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
