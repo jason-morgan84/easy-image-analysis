@@ -1,7 +1,11 @@
 import pytest
 import numpy as np
-from core.shape import Shape
+from core.shape import Shape, transpose
+from core.constants import DataPolicy
+from core.data_checks import sample_data
 
+
+"""test Shape class"""
 # test shape with missing attribute:
 def test_shape_missing_attribute():
     with pytest.raises(AttributeError,match = "Shape class instantiated with missing arguement"):
@@ -86,3 +90,80 @@ def test_set_values():
     assert test_shape["z"] == 16
 
 
+"""test tranpose function"""
+
+# send in non nparray 'value' 
+def test_transpose_non_numpy_value():
+
+    value = [[[[1,2,3],[1,2,3]],[[4,5,6],[4,5,6]]],[[[1,2,3],[1,2,3]],[[4,5,6],[4,5,6]]]]
+    shape = Shape(c=0, z=1, y=2, x=3)
+
+    with pytest.raises(TypeError, match = "expected value as np.array"):
+        transpose(value=value, current_shape=shape, new_shape=shape)
+
+# send in new_shape not as Shape class 
+def test_transpose_non_shape_new_shape():
+    value = sample_data(dtype=DataPolicy.ImageInt,shape=(1,2,3,4))
+    wrong_shape = [0,1,2,3]
+    right_shape = Shape(c=0, z=1, y=2, x=3)
+
+    with pytest.raises(TypeError, match = "expected new_shape as Shape class"):
+        transpose(value=value, new_shape=wrong_shape, current_shape=right_shape)
+
+# send in new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)
+def test_transpose_new_shape_incorrect_dimensions():
+    value = sample_data(dtype=DataPolicy.ImageInt,shape=(1,2,3,4))
+    wrong_shape = Shape(c=5, z=1, y=2, x=3)
+    right_shape = Shape(c=0, z=1, y=2, x=3)
+
+    with pytest.raises(ValueError, match = "new_shape shape dimensions out of range"):
+        transpose(value=value, new_shape=wrong_shape, current_shape=right_shape)
+
+    wrong_shape = Shape(c=0, z=1, y=-2, x=3)
+
+    with pytest.raises(ValueError, match = "new_shape shape dimensions out of range"):
+        transpose(value=value, new_shape=wrong_shape, current_shape=right_shape)
+
+# send in current_shape not as Shape class 
+def test_transpose_non_shape_current_shape():
+
+    value = sample_data(dtype=DataPolicy.ImageInt,shape=(1,2,3,4))
+    wrong_shape = [0,1,2,3]
+    right_shape = Shape(c=0, z=1, y=2, x=3)
+
+    with pytest.raises(TypeError, match = "expected current_shape as Shape class"):
+        transpose(value=value, new_shape=right_shape, current_shape=wrong_shape)
+
+# send in new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)
+def test_transpose_current_shape_incorrect_dimensions():
+
+    value = sample_data(dtype=DataPolicy.ImageInt,shape=(1,2,3,4))
+    wrong_shape = Shape(c=5, z=1, y=2, x=3)
+    right_shape = Shape(c=0, z=1, y=2, x=3)
+
+    with pytest.raises(ValueError, match = "current_shape shape dimensions out of range"):
+        transpose(value=value, new_shape=right_shape, current_shape=wrong_shape)
+
+    wrong_shape = Shape(c=0, z=1, y=-2, x=3)
+
+    with pytest.raises(ValueError, match = "current_shape shape dimensions out of range"):
+        transpose(value=value, new_shape=right_shape, current_shape=wrong_shape)
+
+# Send in valid new_shape and value| output with expected shape |
+def test_transpose():
+
+    value = sample_data(dtype=DataPolicy.ImageInt,shape=(1,2,3,4))
+    new_shape = Shape(c=3, z=2, y=1, x=0)
+    current_shape = Shape(c=0, z=1, y=2, x=3)
+
+    output_shape = transpose(value=value, new_shape=new_shape, current_shape=current_shape)
+
+    assert output_shape.shape == (4,3,2,1)
+    assert value[0][0][0][0] == output_shape[0][0][0][0]
+    assert value[0][1][2][3] == output_shape[3][2][1][0]
+
+    new_shape = Shape(c=1, z=0, y=3, x=2)
+    output_shape = transpose(value=value, new_shape=new_shape, current_shape=current_shape)
+    assert output_shape.shape == (2,1,4,3)
+    assert value[0][0][0][0] == output_shape[0][0][0][0]
+    assert value[0][1][2][3] == output_shape[1][0][3][2]
