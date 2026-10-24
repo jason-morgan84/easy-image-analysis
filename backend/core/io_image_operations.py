@@ -43,6 +43,8 @@ class LoadImage(ImageOperation):
             # validate image meets type definition
             self.output_image_metadata["output"].dtype.validate(imported_image)
             imported_image = self.output_image_metadata["output"].dtype.numpy(imported_image)
+            
+            
         except Exception as e:
             raise ImportError(f"failed to convert imported image into defined dtype: {e}")
 
@@ -153,12 +155,17 @@ class SaveImage(ImageOperation):
             path = self.input_parameter["path"]
             image = self.input_image["input"]
 
-        # check file type
+            # check file type
             _, file_type = os.path.splitext(path)
             if file_type != ".tif":
                 raise ImportError(f"saving non .tif files not currently implemented")
 
+            # transpose to correct output order for imagej output
+            output_image = transpose(value=image,
+                                     current_shape=Shape(c=0, z=1, y=2, x=3),
+                                     new_shape=Shape(c=1, z=0, y=2, x=3))
+            
             try:
-                tifffile.imwrite(path, image, metadata={'axes': 'CZYX'},imagej=True)
+                tifffile.imwrite(path, output_image, metadata={'axes': 'ZCYX'},imagej=True)
             except Exception as e:
                 raise ExportError(f"failed saving image: {e}")
