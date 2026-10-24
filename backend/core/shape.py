@@ -111,7 +111,31 @@ class Shape:
                raise TypeError (f"for Shape class, expected integer for 'x', got {type(x)}")
           self._x = x
 
+def transpose(value, current_shape, new_shape):    
+    # check value is a np.ndarray
+    if not isinstance(value, np.ndarray):
+        raise TypeError(f"expected value as np.array, got {type(value)}")
+    
+    # check new_shape is Shape class with dimension values between 0 and max_image_dimensions
+    if not isinstance(new_shape, Shape):
+        raise TypeError (f"expected new_shape as Shape class, got {type(new_shape)}")
+    for item in new_shape:
+        if item < 0 or item > Shape.max_image_dimensions:
+            raise ValueError (f"new_shape shape dimensions out of range, must be 0-{Shape.max_image_dimensions}")
+        
+    # check current_shape is Shape class with dimension values between 0 and max_image_dimensions
+    if not isinstance(current_shape, Shape):
+        raise TypeError (f"expected current_shape as Shape class, got {type(current_shape)}")
+    for item in current_shape:
+        if item < 0 or item > Shape.max_image_dimensions:
+            raise ValueError (f"current_shape shape dimensions out of range, must be 0-{Shape.max_image_dimensions}")
+        
+    # new_shape is Shape class with new dimensions indices of each array (c,z,y,x)
+    # needs to create transpose list with values new_c, new_z, new_y, new_x in order of old_c, old_z, old_y, old_x
+    transpose = [current_shape[item] for item in new_shape]       
+    transposed_array = np.transpose(value, transpose)
 
+    return transposed_array
 
 
 

@@ -2,10 +2,11 @@ from core.image_operation_directory import ImageOperationDirectory
 from core.image_operation import ImageOperation
 from core.interface_classes import Node, Connection, Port
 from core.error_handling import ConnectionError, log, warn, GraphError
-from core.shape import Shape
+from core.shape import Shape, transpose
 from core.constants import DataPolicy
 import core.io_image_operations
 import numpy as np
+
 class WorkFlow:
     def __init__(self, logger, image_operation_directiory):
         self.image_operation_directiory = image_operation_directiory
@@ -526,30 +527,6 @@ class WorkFlow:
                 if test is True: log(self.workflow_logger, None, f"node activated sucessfully","WorkFlow","update_graph",node_id)
         
                 
-def transpose( value, current_shape, new_shape):    
-    # check value is a np.ndarray
-    if not isinstance(value, np.ndarray):
-        raise TypeError(f"expected value as np.array, got {type(value)}")
-    
-    # check new_shape is Shape class with dimension values between 0 and max_image_dimensions
-    if not isinstance(new_shape, Shape):
-        raise TypeError (f"expected new_shape as Shape class, got {type(new_shape)}")
-    for item in new_shape:
-        if item < 0 or item > Shape.max_image_dimensions:
-            raise ValueError (f"new_shape shape dimensions out of range, must be 0-{Shape.max_image_dimensions}")
-        
-    # check current_shape is Shape class with dimension values between 0 and max_image_dimensions
-    if not isinstance(current_shape, Shape):
-        raise TypeError (f"expected current_shape as Shape class, got {type(current_shape)}")
-    for item in current_shape:
-        if item < 0 or item > Shape.max_image_dimensions:
-            raise ValueError (f"current_shape shape dimensions out of range, must be 0-{Shape.max_image_dimensions}")
-        
-    # new_shape is Shape class with new dimensions indices of each array (c,z,y,x)
-    # needs to create transpose list with values new_c, new_z, new_y, new_x in order of old_c, old_z, old_y, old_x
-    transpose = [current_shape[item] for item in new_shape]       
-    transposed_array = np.transpose(value, transpose)
 
-    return transposed_array
     
 
