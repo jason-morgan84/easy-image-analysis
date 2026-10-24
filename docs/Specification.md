@@ -125,6 +125,8 @@
 |24/10/25|0.18.0|planned unit testing for LoadImage|
 |24/10/25|0.18.1|moved tranpose unit testing out of workflow section|
 |24/10/25|0.18.2|planned unit testing for SaveImage|
+|24/10/25|0.18.3|added description of ExportError to Error Handling section|
+
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -594,6 +596,7 @@ error_handling.py also includes custom exceptions:
 * ActivationError - for errors in Node activation
 * MissingDataError - for errors where data is missing when passed to/from Ports
 * GraphError - Exception raised when error updating graph in WorkFlow
+* ExportError - Exception raised when error saving an image to file
 
 # 4 ImageOperation files
 
