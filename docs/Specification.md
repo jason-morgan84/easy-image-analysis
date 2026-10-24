@@ -124,6 +124,7 @@
 |18/10/25|0.17.17|Planned unit testing for WorkFlow transpose and update_graph functions|
 |24/10/25|0.18.0|planned unit testing for LoadImage|
 |24/10/25|0.18.1|moved tranpose unit testing out of workflow section|
+|24/10/25|0.18.2|planned unit testing for SaveImage|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -980,9 +981,17 @@ Plugins to make:
 |type conversion|try to import 16bit tif|ImportError: failed to convert imported image into defined dtype|
 |shape checking|import with shape parameter which doesn't match number of dimensions in image|ValueError:number of dimensions in image pixel array {(len(imported_image.size))} does not match expected shape {shape}|
 |shape checking|import with shape with unexpected dimension identifiers|ValueError: when loading image, shape includes unexpected dimension identifier|
+|shape checking|import with shape with duplicate dimension idenfitiers|ValueError: when loading image, shape includes duplicated dimension identifier
 |shape checking|import image with less than 4 dimensions|output image has 4 dimensions with missing dimensions as size 1|
 |shape checking|import image with dimensions not in order CZYX| output image has dimensions in order CZYX|
 |output image|import image that should work|output image matches image expectations|
+
+### 7.6.2 SaveImage
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|check path |Non-tif save path| ExportError: saving of non .tif files not currently implemented|
+|check path |invalid save path| ExportError: failed saving image|
+|save image|try to save valid image to valid path|image saved as expected|
 
 # 8 Versioning
 
