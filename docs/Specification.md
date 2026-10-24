@@ -123,6 +123,7 @@
 |17/10/25|0.17.16|Updated get_previous_nodes unit testing and added GraphError description to error handling|
 |18/10/25|0.17.17|Planned unit testing for WorkFlow transpose and update_graph functions|
 |24/10/25|0.18.0|planned unit testing for LoadImage|
+|24/10/25|0.18.1|moved tranpose unit testing out of workflow section|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -736,6 +737,14 @@ Plugins to make:
 |get_item|Test getting items using either index or dimension string| returns correct values|Returns incorrect values|
 |set_item|Test setting items using either index or dimension string| Sets correct values|Sets incorrect values|
 
+### 7.1.3 Tranpose Function
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|tranpose | send in non nparray 'value' | TypeError: expected value as np.array|
+|tranpose | send in non new_shape not as Shape class | TypeError: expected new_shape as Shape class|
+|tranpose | send in non new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)| ValueError: new_shape shape dimensions out of range |
+|tranpose | Send in valid new_shape and value| output with expected shape |
+
 ## 7.2 – Backend Composition Classes
 
 ### 7.2.1 Image
@@ -946,14 +955,6 @@ Plugins to make:
 |get_graph_map | call get_graph_map with invalid input - not Node or string | Logs TypeError: get_graph_map requires input of Node class, or nodes dictionary key|
 |get_graph_map | call get_graph_map with invalid input - string not nodes key | Logs ValueError: for string inputs, get_graph_map expects a node dictionary key|
 |get_graph_map | call get_graph_map with invalid input - Node not nodes value | Logs ValueError: for node inputs, get_graph_map expects value from nodes dictionary|
-
-### 7.5.4 Tranpose Function
-|Component  | Test  | Expected Outcome  | 
-|:--        |:--    |:--                |
-|tranpose | send in non nparray 'value' | TypeError: expected value as np.array|
-|tranpose | send in non new_shape not as Shape class | TypeError: expected new_shape as Shape class|
-|tranpose | send in non new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)| ValueError: new_shape shape dimensions out of range |
-|tranpose | Send in valid new_shape and value| output with expected shape |
 
 ### 7.5.5 update_graph Function
 |Component  | Test  | Expected Outcome  | 
