@@ -122,6 +122,7 @@
 |16/10/25|0.17.15|Updated descriptions of type policies|
 |17/10/25|0.17.16|Updated get_previous_nodes unit testing and added GraphError description to error handling|
 |18/10/25|0.17.17|Planned unit testing for WorkFlow transpose and update_graph functions|
+|24/10/25|0.18.0|planned unit testing for LoadImage|
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
 1.	It’s hard to compare the output to the input, particularly when stringing together multiple steps.
@@ -873,7 +874,7 @@ Plugins to make:
 |:--        |:--    |:--                |
 |init | Pass arguement thats not mageOperationDirectory to WorkFlow | TypeError: expected ImageOperationDirectory class on WorkFlow instantiation|
 
-## 7.5.1 Node functions
+### 7.5.1 Node functions
 
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
@@ -890,7 +891,7 @@ Plugins to make:
 |edit_node | call edit_node with valid input | sets own "needs_update" flag to True |
 |edit_node | call edit_node with valid input | sets all downstream "needs_update" flags to True |
 
-## 7.5.2 Connection Functions
+### 7.5.2 Connection Functions
 
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
@@ -910,7 +911,7 @@ Plugins to make:
 |delete_connection | call delete_connection with proper arguements | Connection deleted |
 
 
-## 7.5.3 Graph topography functions
+### 7.5.3 Graph topography functions
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
 |get_next_nodes| call get_next_nodes from node with Node class input | get list of next nodes |
@@ -946,7 +947,7 @@ Plugins to make:
 |get_graph_map | call get_graph_map with invalid input - string not nodes key | Logs ValueError: for string inputs, get_graph_map expects a node dictionary key|
 |get_graph_map | call get_graph_map with invalid input - Node not nodes value | Logs ValueError: for node inputs, get_graph_map expects value from nodes dictionary|
 
-## 7.5.4 Tranpose Function
+### 7.5.4 Tranpose Function
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
 |tranpose | send in non nparray 'value' | TypeError: expected value as np.array|
@@ -954,7 +955,7 @@ Plugins to make:
 |tranpose | send in non new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)| ValueError: new_shape shape dimensions out of range |
 |tranpose | Send in valid new_shape and value| output with expected shape |
 
-## 7.5.5 update_graph Function
+### 7.5.5 update_graph Function
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
 |start_node_list | Set io_image_operation.start_nodes | start_node_list properly updates|
@@ -968,6 +969,19 @@ Plugins to make:
 |node activation | Find some way of causing an error on node activation?| log GraphError: error activating node<br> Node not activated |
 |update_graph | create graph with single source, correct input data and connections | all nodes run<br> all nodes needs_update flag set to False <br> all nodes is_ready set to True |
 |update_graph | create graph with two sources, correct connections and input_data from one source | all expected nodes run<br> all run nodes needs_update flag set to False <br> all run nodes is_ready flag set to True |
+
+## 7.6 Hardcoded ImageOperations
+### 7.6.1 LoadImage
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|import image|non-tif path|ImportError: loading of non .tif files not currently implemented|
+|import image|invalid path|ImportError: failed to import image from tiff file|
+|type conversion|try to import 16bit tif|ImportError: failed to convert imported image into defined dtype|
+|shape checking|import with shape parameter which doesn't match number of dimensions in image|ValueError:number of dimensions in image pixel array {(len(imported_image.size))} does not match expected shape {shape}|
+|shape checking|import with shape with unexpected dimension identifiers|ValueError: when loading image, shape includes unexpected dimension identifier|
+|shape checking|import image with less than 4 dimensions|output image has 4 dimensions with missing dimensions as size 1|
+|shape checking|import image with dimensions not in order CZYX| output image has dimensions in order CZYX|
+|output image|import image that should work|output image matches image expectations|
 
 # 8 Versioning
 
