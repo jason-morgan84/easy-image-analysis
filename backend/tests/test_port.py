@@ -118,17 +118,6 @@ def test_image_incorrect_shape():
     with pytest.raises(ValueError, match = "port 'test.test' set to image that does not match metadata shape constraints"):
         test_port.data = sample_data(DataPolicy.ImageInt, shape = (2,3,1,4))
 
-# For array data, pass in data that doesn't match metadata.shape | ValueError: array_type data passed to port with incorrect shape
-def test_array_incorrect_shape():
-
-    test_port = Port (port_id = "test",
-                      node_id = "test",
-                      is_input=True,
-                      metadata = ParameterMetadata(dtype = DataPolicy.ArrayInt,
-                                                shape = (1,2)))
-    with pytest.raises(ValueError, match = "port 'test.test' set to array that does not match metadata shape constraints"):
-        test_port.data = np.array([0,1,2],DataPolicy.ArrayInt.numpy)
-
 # Pass in data where metadata.dtype does not define dtype from DataTypes** | TypeError: port MetaData defines unexpected dtype
 # (this error should also be impossible to generate given current structure of Metadata classes, wil give an error from ImageMetadata or ParameterMetadata instead)
 def test_incorrect_metadata_dtype():

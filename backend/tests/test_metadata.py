@@ -22,16 +22,15 @@ def test_ImageMetadata(dtype, image_shape_constraints, image_map, message):
 
 """Test ParameterParcel Class"""
 # test valid inputs
-@pytest.mark.parametrize("dtype, shape, message", [
+@pytest.mark.parametrize("dtype, message", [
     # Supply dtype as not member of DataTypes.image_types
-    (np.uint8, None, "expected ParameterMetadata dtype from DataType.types"),
-    (DataPolicy.ImageInt, None, "expected ParameterMetadata dtype to have is_image flag set to False")
+    (np.uint8,  "expected ParameterMetadata dtype from DataType.types"),
+    (DataPolicy.ImageInt,  "expected ParameterMetadata dtype to have is_image flag set to False")
 ])
-def test_parameter_metadata(dtype, shape, message):
+def test_parameter_metadata(dtype,  message):
 
     with pytest.raises(TypeError, match = message):
-        ParameterMetadata(dtype = dtype, 
-                    shape = shape)
+        ParameterMetadata(dtype = dtype)
 
 # test user_input flag as not boolean
 def test_ParameterParcel_user_input_flag_boolean():

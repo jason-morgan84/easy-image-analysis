@@ -52,7 +52,12 @@ class ImageOperationDirectory():
                 for _, name, ispkg in pkgutil.iter_modules(package.__path__):
                     # checks its not another package
                     if not ispkg:
-                        imported_function = self.import_file(folder = folder, name = name, logger = self.logger)
+                        try:
+                            imported_function = self.import_file(folder = folder, name = name, logger = self.logger)
+                        except Exception as e:
+                            log(self.logger,ImportError, f"module failed to import '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
+                            continue
+                            
                         if imported_function:
                             operations_dict[name] = imported_function
                             operations_dict[name].id = name
@@ -67,33 +72,28 @@ class ImageOperationDirectory():
         try:
             sub_module = importlib.import_module(".".join((self.package_folder, folder, name)))
         except Exception as e:
-            log(logger,ImportError, f"unable to import module '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
-            return
+            raise ImportError(f"compatible module not found: {e}")
 
         """Before running the code, check for only allowed imports"""
         try:
             imported_modules = self.check_imports(inspect.getsource(sub_module))
         except Exception as e:
-            log(logger, ImportError, f"unable to check for permitted module imports in '{name}': {e}","ImageOperationDirectory","import_operations_dict", name)
-            return
-
+            raise ImportError(f"error checking module imports: {e}")
+            
         self.disallowed_modules = imported_modules - self.permitted_imports
         if self.disallowed_modules:
-            log(logger, ImportError, f"non-permitted imports found in module '{name}': {self.disallowed_modules}","ImageOperationDirectory","import_operations_dict", name)
-            return
+            raise ImportError(f"non-permitted module imports found: {self.disallowed_modules}")
 
         """Next, check version is acceptable"""
         try:
             version = getattr(sub_module, "version")
         except Exception as e:
-            log(logger,ImportError,f"version number expected for module '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
-            return
+            raise AttributeError(f"no version number found: {e}")
 
         try: 
             major, _, _ = version.split(".")
         except Exception as e:
-            log(logger,ImportError,f"incorrect version format in '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
-            return
+            raise ValueError(f"incorrect version number format: {e}")
 
         """ Once imports and version are checked, get actual ImageOperation class"""
         # iterates through each attribute in module
@@ -106,23 +106,20 @@ class ImageOperationDirectory():
                 try:
                     imported_function = self.version_image_map[major](item)
                 except Exception as e:
-                    log(logger,ImportError,f"cannot import module '{name}': {e}","ImageOperationDirectory","import_operations_dict",name)
-                    return          
-
+                    raise ImportError(f"failed to import module: {e}")
 
                 """check code has required inputs and outputs"""
                 try:
                     self.check_inputs_outputs(imported_function)
                 except Exception as e:
-                    log(logger,ImportError,f"module '{name}' has incorrect inputs/outputs: {e}","ImageOperationDirectory","import_operations_dict", name)
-                    return
+                    raise AttributeError(f"failed input/output checks: {e}")
+
 
                 """test code to ensure it runs and gives expected output given sample input"""
                 try:
                     self.test_function(imported_function)
                 except Exception as e:
-                    log(logger,ImportError,f"module '{name}' failed import tests: {e}","ImageOperationDirectory","import_operations_dict", name)
-                    return
+                    raise ImportError(f"failed module testing: {e}")
                 
                 imported_function.version = version
                 return imported_function
@@ -167,12 +164,10 @@ class ImageOperationDirectory():
         if not function.output_image_metadata and not function.output_parameter_metadata:
             raise AttributeError(f"imported ImageOperations require output_image_metadata or output_parameter_metadata")
 
-        # if dictionaries exist, their format will have been checked by ImageOperation clas
-
-        
+        # if dictionaries exist, their format will have been checked by ImageOperation clas      
 
     def test_function(self, function, input_image_dictionary = None, input_parameter_dictionary = None):
-        """tests functions by providing sample inputs (given requested input dtype, shape etc). Actual outputs checked in ImageOperation.run_code and any
+        """tests functions by providing sample inputs (given requested input dtype, shape etc). Actual outputs are checked in ImageOperation.run_code and any
         errors will be chained here, then to input_list function where they're logged."""
         # default values for each image dimension if function is indifferent to shape in that dimension
         default_c = 3
@@ -203,7 +198,7 @@ class ImageOperationDirectory():
         else:
             input_images = input_image_dictionary
 
-        setattr(function,"input_image",input_images)
+        setattr(function,"input_image", input_images)
 
         # similar process for each input_parameter
         
@@ -224,6 +219,7 @@ class ImageOperationDirectory():
         
         
         function.run_code()
+        return function.output_image, function.output_parameter
 
 
 

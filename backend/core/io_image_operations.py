@@ -90,10 +90,9 @@ class LoadImage(ImageOperation):
         self.output_image={"output":imported_image}
     
     def load_image(self, path, shape):
-        self.input_parameter_metadata["path"] = path
-        self.input_parameter_metadata["shape"] = shape
+        self.input_parameter = {"path": path, "shape": shape}
         try:
-            self.execute()
+            self.run_code()
             return self.output_image["output"]
         except Exception as e:
             raise ImportError(f"failed to load image {path}: {e}")
@@ -110,7 +109,7 @@ class TestLoadImage(ImageOperation):
             alerts=None,
             input_image_metadata={},
             input_parameter_metadata={"dtype": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True, ui_element="load"), 
-                                      "shape": ParameterMetadata(dtype=DataPolicy.ArrayInt, shape=[4], user_input=True,ui_element = "text")},
+                                      "shape": ParameterMetadata(dtype=DataPolicy.ArrayInt, user_input=True, ui_element = "text")},
             output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))}, 
@@ -132,9 +131,7 @@ class TestLoadImage(ImageOperation):
             self.output_image={"output": sample_data(dtype=DataPolicy.ImageInt,shape=(1,2,3,4))}
 
 
-start_nodes = ["load_image","test_load_image"]
 
-io_imageoperations = {"load_image": LoadImage(),"test_load_image":TestLoadImage()}
 
 class SaveImage(ImageOperation):
         def __init__(self):
@@ -169,3 +166,15 @@ class SaveImage(ImageOperation):
                 tifffile.imwrite(path, output_image, metadata={'axes': 'ZCYX'},imagej=True)
             except Exception as e:
                 raise ExportError(f"failed saving image: {e}")
+            
+        def save_image(self, image, path):
+            self.input_parameter = {"path": path}
+            self.input_image = {"input": image}
+            try:
+                self.run_code()
+            except Exception as e:
+                raise ImportError(f"failed to save image {path}: {e}")
+
+start_nodes = ["load_image","test_load_image"]
+
+io_imageoperations = {"load_image": LoadImage(),"test_load_image":TestLoadImage(), "save_image": SaveImage()}

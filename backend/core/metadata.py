@@ -44,9 +44,8 @@ class ImageMetadata:
 
 # simple class to hold parameter inputs and outputs
 class ParameterMetadata:
-    def __init__(self, dtype, shape = None, user_input = False, ui_element = None, ui_element_options = None):
+    def __init__(self, dtype, user_input = False, ui_element = None, ui_element_options = None):
         self.dtype = dtype
-        self.shape = shape                              # array shape where dtype is an array_type
         self.user_input = user_input                    # flag for user input - if True, expect parameter via UI not through graph input
         self.ui_element = ui_element                    # definition of UI element required for user input, if relevant
         self.ui_element_options = ui_element_options    # any options associated with that UI element (such as min/max values for sliders, list options for lists)        
@@ -64,20 +63,6 @@ class ParameterMetadata:
         if typ.is_image is True:
             raise TypeError(f"expected ParameterMetadata dtype to have is_image flag set to False")
         self._dtype = typ
-
-    @property
-    def shape(self):
-        return self._shape
-    @shape.setter
-    def shape(self, shp):
-        if not isinstance(shp, (np.ndarray,list,tuple)) and shp is not None:
-            raise TypeError(f"expected ParameterMetadata shape as tuple, list or np.ndarray, got {type(shp)}")
-
-        #if shape is a np array, set as copy of array, else convert to np array
-        if shp is not None:
-            self._shape = shp.copy() if isinstance(shp, np.ndarray) else np.array(shp).copy()
-        else:
-            self._shape = None
 
     @property
     def user_input(self):

@@ -22,8 +22,8 @@ sample_parameter_float = DataPolicy.ValueFloat.numpy(2)
 """check_metadata"""
 # send metadata not as dictionary
 @pytest.mark.parametrize("metadata, dtype, identifier, message", 
-                         [(test_image_metadata,ImageMetadata,"image","expected 'image' to be dictionary"),
-                          (test_parameter_metadata,ParameterMetadata,"parameter","expected 'parameter' to be dictionary"),
+                         [(test_image_metadata,ImageMetadata,"image","expected metadata 'image' to be dictionary"),
+                          (test_parameter_metadata,ParameterMetadata,"parameter","expected metadata 'parameter' to be dictionary"),
                          ])
 def test_check_metadata_not_dictionary(metadata, dtype, identifier, message):
     with pytest.raises(TypeError, match = message):
@@ -53,8 +53,8 @@ def test_check_data_no_data(data, metadata, dtype, identifier, message):
 
 # data sent to function is a dictionary 
 @pytest.mark.parametrize("data, metadata, dtype, identifier, message", 
-                         [(sample_image,{"input1":test_image_metadata},ImageMetadata,"image","expected 'image' to be dictionary, not"),
-                          (sample_parameter,{"input2": test_parameter_metadata},ParameterMetadata,"parameter","expected 'parameter' to be dictionary, not"),
+                         [(sample_image,{"input1":test_image_metadata},ImageMetadata,"image","expected data 'image' to be dictionary, not"),
+                          (sample_parameter,{"input2": test_parameter_metadata},ParameterMetadata,"parameter","expected data 'parameter' to be dictionary, not"),
                          ])
 def test_check_data_dictionaries_not_dictionary(data, metadata, dtype, identifier, message):
     with pytest.raises(TypeError, match = message):
@@ -117,25 +117,7 @@ def test_check_data_image_shape(data, metadata, dtype, identifier, message):
     with pytest.raises(ValueError, match = message):
         check_image_shape(data=data, metadata=metadata, identifier=identifier)
 
-"""check_parameter_shape"""
-# set parameter where shape does not exist in metadata
-def test_check_data_parameter_no_shape():
-    test_parameter_metadata = ParameterMetadata(dtype=DataPolicy.ArrayInt)
-    sample_parameter = sample_data(dtype=DataPolicy.ArrayInt, shape=(1,2))
-    with pytest.raises(ValueError, match = "no shape defined in metadata for array type parameter 'test'"):
-        check_parameter_shape(data=sample_parameter, metadata=test_parameter_metadata, identifier="test")
-
-    
-
-# set parameter where the shape does not match shape defined in metadata
-def test_check_data_parameter_shape():
-    test_parameter_metadata = ParameterMetadata(dtype=DataPolicy.ArrayInt, shape = (2,1))
-    sample_parameter = sample_data(dtype=DataPolicy.ArrayInt, shape=(1,2))
-    with pytest.raises(ValueError, match = "array shape does not match shape metadata for 'test'"):
-        check_parameter_shape(data=sample_parameter, metadata=test_parameter_metadata, identifier="test")
-
-    
-
+ 
 """test sample_data"""
 # test shape checks - input value where shape is required but not passed
 @pytest.mark.parametrize("dtype, message", [

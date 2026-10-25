@@ -3,7 +3,7 @@ from core.error_handling import ConnectionError, ActivationError, MissingDataErr
 from core.metadata import ImageMetadata, ParameterMetadata
 from core.constants import DataPolicy
 from core.image_operation import ImageOperation
-from core.data_checks import check_image_shape, check_parameter_shape
+from core.data_checks import check_image_shape
 from core.shape import Shape
 
 class Connection:
@@ -138,12 +138,7 @@ class Port:
                 except Exception as e:
                     raise ValueError(f"port '{self.node_id}.{self._port_id}' set to image that does not match metadata shape constraints: {e}")
             
-            elif self.metadata.dtype.is_array is True:
-                # check array matches shape constraints for metadata
-                try: 
-                    check_parameter_shape(data=value, metadata=self.metadata, identifier=".".join([self.node_id,self.port_id]))
-                except Exception as e:
-                    raise ValueError(f"port '{self.node_id}.{self._port_id}' set to array that does not match metadata shape constraints: {e}")
+
 
         self._data = value
    
@@ -211,8 +206,7 @@ class Node:
         if self.image_operation.output_parameter_metadata is not None:
             for key, value in self.image_operation.output_parameter_metadata.items():
                 port_id = "parameter." + str(key)
-                output_metadata = ParameterMetadata(dtype=value.dtype,
-                                                    shape=value.shape)
+                output_metadata = ParameterMetadata(dtype=value.dtype)
                 self.output_ports[port_id] = Port(is_input = False,
                                                   metadata=output_metadata,
                                                   port_id = port_id,

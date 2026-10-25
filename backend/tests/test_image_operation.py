@@ -6,7 +6,6 @@ from core.image_operation import ImageOperation
 from core.metadata import ImageMetadata, ParameterMetadata
 from core.data_checks import sample_data
 import types
-import copy
 
 
 test_image_metadata_imageint = ImageMetadata(dtype=DataPolicy.ImageInt,
@@ -15,7 +14,7 @@ test_image_metadata_imageint = ImageMetadata(dtype=DataPolicy.ImageInt,
                                     )
 
 test_parameter_metadata_valueint = ParameterMetadata(dtype=DataPolicy.ValueInt)
-test_parameter_metadata_arrayint = ParameterMetadata(dtype=DataPolicy.ArrayInt, shape=(1,2))
+test_parameter_metadata_arrayint = ParameterMetadata(dtype=DataPolicy.ArrayInt)
 
 test_image_data_imageint = sample_data(DataPolicy.ImageInt,(1,2,3,4))
 test_image_data_imagefloat = sample_data(DataPolicy.ImageFloat,(1,2,3,4))
@@ -26,13 +25,13 @@ test_parameter_data_valuefloat = sample_data(DataPolicy.ValueFloat)
 # create ImageOperation with incorrect input_image_metadata
 @pytest.mark.parametrize("attribute, metadata, message", 
                          [
-                            ("input_image_metadata","not a dictionary","expected 'input_image_metadata' to be dictionary"),
+                            ("input_image_metadata","not a dictionary","expected metadata 'input_image_metadata' to be dictionary"),
                             ("input_image_metadata",{"dictionary not": "right class"},"for metadata dictionary 'input_image_metadata', expected values of type"),
-                            ("output_image_metadata","not a dictionary","expected 'output_image_metadata' to be dictionary"),
+                            ("output_image_metadata","not a dictionary","expected metadata 'output_image_metadata' to be dictionary"),
                             ("output_image_metadata",{"dictionary not": "right class"},"for metadata dictionary 'output_image_metadata', expected values of type"),
-                            ("input_parameter_metadata","not a dictionary","expected 'input_parameter_metadata' to be dictionary"),
+                            ("input_parameter_metadata","not a dictionary","expected metadata 'input_parameter_metadata' to be dictionary"),
                             ("input_parameter_metadata",{"dictionary not": "right class"},"for metadata dictionary 'input_parameter_metadata', expected values of type"),
-                            ("output_parameter_metadata","not a dictionary","expected 'output_parameter_metadata' to be dictionary"),
+                            ("output_parameter_metadata","not a dictionary","expected metadata 'output_parameter_metadata' to be dictionary"),
                             ("output_parameter_metadata",{"dictionary not": "right class"},"for metadata dictionary 'output_parameter_metadata', expected values of type"),
                             ])
 
@@ -53,10 +52,10 @@ def test_metadata_setters_wrong_metadata(attribute,metadata, message):
 # pass data to ImageOperation not as a dictionary
 @pytest.mark.parametrize("data_attribute, data, metadata_attribute, metadata, message", 
                          [
-                             ("input_image",test_image_data_imageint,"input_image_metadata",{"input1": test_image_metadata_imageint},"expected 'input_image' to be dictionary"),
-                             ("output_image",test_image_data_imageint,"output_image_metadata",{"output1": test_image_metadata_imageint},"expected 'output_image' to be dictionary" ),
-                             ("input_parameter",test_parameter_data_valueint,"input_parameter_metadata",{"input2":test_parameter_metadata_valueint},"expected 'input_parameter' to be dictionary"),
-                             ("output_parameter",test_parameter_data_valueint,"output_parameter_metadata",{"output2":test_parameter_metadata_valueint},"expected 'output_parameter' to be dictionary")
+                             ("input_image",test_image_data_imageint,"input_image_metadata",{"input1": test_image_metadata_imageint},"expected data 'input_image' to be dictionary"),
+                             ("output_image",test_image_data_imageint,"output_image_metadata",{"output1": test_image_metadata_imageint},"expected data 'output_image' to be dictionary" ),
+                             ("input_parameter",test_parameter_data_valueint,"input_parameter_metadata",{"input2":test_parameter_metadata_valueint},"expected data 'input_parameter' to be dictionary"),
+                             ("output_parameter",test_parameter_data_valueint,"output_parameter_metadata",{"output2":test_parameter_metadata_valueint},"expected data 'output_parameter' to be dictionary")
                          ])
 def test_data_setters_not_dictionary(data_attribute, data, metadata_attribute, metadata, message):
     test_image_operation = ImageOperation(name="Test",
@@ -279,24 +278,6 @@ def test_run_code_input_parameter_data_wrong_type():
     with pytest.raises(TypeError, match="data dictionary value for 'input_parameter.input2' does not pass dtype validation"):
         test_image_operation.run_code()
 
-#run_code where input_parameter_data shape doesn't match input_parameter_metadata
-def test_run_code_input_parameter_wrong_shape():
-    test_image_operation = ImageOperation(name="Test",
-        id="test",
-        category = "Testing",
-        version = None,
-        docs = None,
-        alerts = None,
-        input_image_metadata={"input1":test_image_metadata_imageint},
-        input_image = {"input1":test_image_data_imageint},
-        input_parameter_metadata={"input2":ParameterMetadata(dtype=DataPolicy.ArrayInt, shape=(1,2))},
-        input_parameter = {"input2":sample_data(dtype = DataPolicy.ArrayInt, shape = (2,1))}
-        )
-    setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
-
-    with pytest.raises(ValueError, match="array shape does not match shape metadata"):
-        test_image_operation.run_code()
-
 #run_code with output but no output metadata
 def test_run_code_no_output_metadata():
     test_image_operation = ImageOperation(name="Test",
@@ -494,28 +475,6 @@ def test_run_code_parameter_output_wrong_type():
     with pytest.raises(TypeError,match="data dictionary value for 'output_parameter.output2' does not pass dtype validation"):
         test_image_operation.run_code()
 
-#Code provided returns an parameter with array shape that doesn't match metadata
-def test_run_code_parameter_output_wrong_shape():
-    def function_no_change_to_output(self):
-        self.output_image = {"output1": sample_data(dtype=DataPolicy.ImageInt, shape=(1,2,3,4))}
-        self.output_parameter = {"output2": sample_data(dtype=DataPolicy.ArrayInt, shape = (2,1))}
-
-    test_image_operation = ImageOperation(name="Test",
-        id="test",
-        category = "Testing",
-        version = None,
-        docs = None,
-        alerts = None,
-        input_image_metadata={"input1":test_image_metadata_imageint},
-        input_image = {"input1":test_image_data_imageint},
-        output_image_metadata={"output1":test_image_metadata_imageint},
-        output_parameter_metadata={"output2": ParameterMetadata(dtype=DataPolicy.ArrayInt, shape = (1,2))}
-        )
-
-    setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
-
-    with pytest.raises(ValueError,match="array shape does not match shape metadata for 'output_parameter.output2'"):
-        test_image_operation.run_code()
 
 """
 # Code provided creates an error
