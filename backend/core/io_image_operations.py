@@ -19,7 +19,7 @@ class LoadImage(ImageOperation):
             alerts=None,
             input_image_metadata={},
             input_parameter_metadata={"path": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True, ui_element="load"), 
-                                      "shape": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True,ui_element = "text")},
+                                      "shape": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True,ui_element = "text"),},
             output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))}, 
@@ -40,9 +40,14 @@ class LoadImage(ImageOperation):
 
         # convert image file to correct dtype
         try:
-            # validate image meets type definition
-            self.output_image_metadata["output"].dtype.validate(imported_image)
-            imported_image = self.output_image_metadata["output"].dtype.numpy(imported_image)
+            # imread imports as 8 bit 0-255 data, so validate as ImageInt type first
+            DataPolicy.ImageInt.validate(imported_image)
+
+            # then convert to output metadata dtype
+            imported_image = DataPolicy.ImageInt._convert(dtype=self.output_image_metadata["output"].dtype, value=imported_image)
+            
+            #self.output_image_metadata["output"].dtype.validate(imported_image)
+            #imported_image = self.output_image_metadata["output"].dtype.numpy(imported_image)
             
             
         except Exception as e:
@@ -96,6 +101,23 @@ class LoadImage(ImageOperation):
             return self.output_image["output"]
         except Exception as e:
             raise ImportError(f"failed to load image {path}: {e}")
+
+class LoadImageBinary(LoadImage):
+    def __init__(self):
+        super().__init__()
+        self.name="Load binary Image"
+        self.id="load_image_binary"
+        self.category="Input/Output"
+        self.version="1.0.0"
+        self.docs="Loads a binary image given a path (as string) and shape as array of integers defining array dimensions of c, z, y and x in order"
+        self.alerts=None
+        self.input_image_metadata={}
+        self.input_parameter_metadata={"path": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True, ui_element="load"), 
+                                      "shape": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True,ui_element = "text"),}
+        self.output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageBinary,
+                                                     image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
+                                                     image_map=Shape(c=0, z=1, y=2, x=3))}
+            
 
 
 class TestLoadImage(ImageOperation):
@@ -177,4 +199,4 @@ class SaveImage(ImageOperation):
 
 start_nodes = ["load_image","test_load_image"]
 
-io_imageoperations = {"load_image": LoadImage(),"test_load_image":TestLoadImage(), "save_image": SaveImage()}
+io_imageoperations = {"load_image": LoadImage(),"test_load_image":TestLoadImage(), "save_image": SaveImage(), "load_image_binary": LoadImageBinary()}

@@ -23,6 +23,6 @@ class SameImage(ImageOperation):
             )
     def execute(self):
         input_image_array = self.input_image["input"]
-        output = input_image_array.copy()
+        output = DataPolicy.ImageBinary._convert(value=input_image_array,dtype=DataPolicy.ImageInt)
         self.output_image={"output":output}
 

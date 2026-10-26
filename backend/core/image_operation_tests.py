@@ -1,7 +1,7 @@
 from core.image_operation_directory import ImageOperationDirectory
 from core.data_checks import check_data_dictionary_value, check_metadata_dictionary, check_data_dictionary
 from core.metadata import ImageMetadata, ParameterMetadata
-from core.io_image_operations import LoadImage, SaveImage
+from core.io_image_operations import LoadImage, SaveImage, LoadImageBinary
 from core.constants import DataPolicy
 from core.shape import Shape
 from core.workflow import transpose
@@ -10,23 +10,26 @@ import os
 import traceback
 
 class TestItem():
-    def __init__(self, text, error = None, results = "N\\A"):
+    def __init__(self, text, error = None, results = "N\\A", test_file = ""):
         self.text = text
         self.error = error
         self.results = results
 
 def test_image_operation(image_operation_folder, image_operation_name, sample_image=None):
 
+
+
+    # carry out pre-import tests:
     import_function_errors = [TestItem("Compatible function found","compatible module not found", "N\\A"),
             TestItem("Permitted import checks","module imports", "N\\A"),
             TestItem("Version number checks","version number", "N\\A"),
-            TestItem("Function imported","error importing module", "N\\A"),
+            TestItem("Function imported","no valid import function found", "N\\A"),
             TestItem("Metadata for input image present","require input_image_metadata", "N\\A"),
             TestItem("Metadata for output image or parameter present", "require output_image_metadata", "N\\A"),
-            TestItem("Metadata for input image is a dictionary", "expected metadata 'input_image' to be dictionary", "N\\A"),
-            TestItem("Metadata for input image is a dictionary of ImageMetadata", "for metadata dictionary 'input_image', expected values of type", "N\\A"),
-            TestItem("Metadata for input parameters (where present) is a dictionary", "expected metadata 'input_parameter' to be dictionary", "N\\A"),
-            TestItem("Metadata for input parameters (where present) is a dictionary of ParameterMetadata", "for metadata dictionary 'input_parameter', expected values of type", "N\\A"),
+            TestItem("Metadata for input image is a dictionary", "expected metadata 'input_image_metadata' to be dictionary", "N\\A"),
+            TestItem("Metadata for input image is a dictionary of ImageMetadata", "for metadata dictionary 'input_image_metadata', expected values of type", "N\\A"),
+            TestItem("Metadata for input parameters (where present) is a dictionary", "expected metadata 'input_parameter_metadata' to be dictionary", "N\\A"),
+            TestItem("Metadata for input parameters (where present) is a dictionary of ParameterMetadata", "for metadata dictionary 'input_parameter_metadata', expected values of type", "N\\A"),
             TestItem("Function executes", "error executing operation","N\\A"),
             TestItem("Metadata for output images (where present) is a dictionary", "expected metadata 'output_image' to be dictionary","N\\A"),
             TestItem("Metadata for output images (where present) is a dictionary of ImageMetadata", "for metadata dictionary 'output_image', expected values of type","N\\A"),
@@ -46,8 +49,6 @@ def test_image_operation(image_operation_folder, image_operation_name, sample_im
             TestItem("Function does not alter input values", "operation altered input values", "N\\A"),
             TestItem("Function failed testing with randomised data","failed module testing", "N\\A"),
             TestItem("Module can be imported to directory", "module failed to import", "N\\A")]
-
-    # carry out pre-import tests:
 
     # import function
     error_text = None
@@ -136,11 +137,11 @@ def test_sample_data(imported_function):
         for key, value in imported_function.input_image_metadata.items():
             # load input image(s) that matches image_type (binarised or non-binarised) and adjust to image dtype
             if value.dtype == DataPolicy.ImageBinary:
-                image = LoadImage().load_image(".\\backend\\tests\\test_images\\test_image_binary.tif", shape = "ZCYX")
+                image = LoadImageBinary().load_image(".\\backend\\tests\\test_images\\test_image_binary.tif", shape = "ZYX")
             else:
                 image = LoadImage().load_image(path = ".\\backend\\tests\\test_images\\test_image_8bit.tif", shape = "ZCYX")
                 if value.dtype == DataPolicy.ImageFloat:
-                    image = DataPolicy.ImageInt.to(DataPolicy.ImageFloat, image)
+                    image = DataPolicy.ImageInt.to(dtype=DataPolicy.ImageFloat, value=image)
 
             # adjust to shape
             shape = {}
@@ -193,6 +194,8 @@ def test_sample_data(imported_function):
         # save output image
         try:
             for key, value in output_image.items():
-                SaveImage().save_image(image = value, path = os.path.join(".\\backend\\tests\\image_operation_test_output",imported_function.id +"_"+ key + "_output.tif"))
+                
+                SaveImage().save_image(image = imported_function.output_image_metadata[key].dtype._convert(value = value, dtype=DataPolicy.ImageInt), 
+                                       path = os.path.join(".\\backend\\tests\\image_operation_test_output", imported_function.id +"_"+ key + "_output.tif"))
         except Exception as e:
             raise(ExportError(f"error saving image '{key}': {e}"))

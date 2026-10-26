@@ -15,13 +15,13 @@ class MissingInputImage(ImageOperation):
             docs="Contains no input_image",
             alerts=None,
             input_image_metadata=None, # this is required
-            output_image={ "output": ImageMetadata(dtype = DataPolicy.ImageInt,
+            output_image_metadata={"output": ImageMetadata(dtype = DataPolicy.ImageInt,
                                                      image_shape_constraints = Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map = Shape(c=0, z=1, y=2, x=3))}, 
             )
     def execute(self):
         input_image_array = self.input_image["input"]
-        
+       
         output = input_image_array.copy()
 
         self.output_image={"output":output}

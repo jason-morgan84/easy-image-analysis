@@ -5,24 +5,6 @@ import copy
 import inspect
 
 
-"""Note for types: For input type checking, ImageOperation will be a part of a Node. Data will flow into the Node through a Port, which will transmit the data
-to the ImageOperation class. 
-
-Ports will carry out type conversions of any inputted data from custom DataTypes used to manage types in data transmission to standard numpy data types
-used in actual image analysis.
-
-This means that while input["input_name"].dtype will be of a DataType class, the actual input data will be off DataType.numpy type, and should be checked against
-that data type"""
-
-"""Note for shapes: For inputs to ImageOperations, the actual image shape is not strictly defined.
-
-This means that input["input_name"].shape does not give array dimensions, but desired array dimensions - a specific value if a strict size is needed for that
-dimension, or -1 if the analysis function is indifferent to size in that dimension."""
-
-# simple class to hold image inputs and outputs
-
-
-
 class ImageOperation:
     def __init__(self, 
                  name,

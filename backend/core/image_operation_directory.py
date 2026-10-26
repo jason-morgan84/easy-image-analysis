@@ -104,7 +104,12 @@ class ImageOperationDirectory():
                 """ Use major version number and version_image_map dictionary to import new dictionary item 
                 # with key "name" and value based on return from relevant import function"""
                 try:
-                    imported_function = self.version_image_map[major](item)
+                    import_function = self.version_image_map[major]
+                except Exception as e:
+                    raise ImportError(f"no valid import function found: {e}")
+                
+                try:
+                    imported_function = import_function(item)
                 except Exception as e:
                     raise ImportError(f"failed to import module: {e}")
 

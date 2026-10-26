@@ -1,5 +1,5 @@
 import numpy as np
-import numbers
+import math
 from core.constants import DataPolicy
 
 
@@ -99,7 +99,7 @@ class ImageInt(BasePolicy):
         if dtype == DataPolicy.ImageFloat:
             return dtype.numpy(value/255).copy()
         elif dtype == DataPolicy.ImageBinary:
-            return dtype.numpy(value).copy()
+            return dtype.numpy(np.round((value/255))).copy()
         elif dtype == DataPolicy.ImageInt and dtype == cls.data_type:
             return value.copy()
         else:
@@ -139,9 +139,9 @@ class ImageBinary(BasePolicy):
     @classmethod
     def _convert(cls, value, dtype):
         if dtype == DataPolicy.ImageFloat:
-            return dtype.numpy(value).copy()
+            return dtype.numpy(value*255).copy()
         elif dtype == DataPolicy.ImageInt:
-            return dtype.numpy(value).copy()
+            return dtype.numpy(value*255).copy()
         elif dtype == DataPolicy.ImageBinary:
             return value.copy()
         else:

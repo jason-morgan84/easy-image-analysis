@@ -45,7 +45,7 @@ class DataPolicy(Enum):
     def __getattr__(self, name):
         
        # Prevents infinite recursion during Enum initialization
-        if name.startswith("_"):
+        if name.startswith("_") and name.endswith("_"):
             raise AttributeError(name)
 
         # returns attribute if it exists
