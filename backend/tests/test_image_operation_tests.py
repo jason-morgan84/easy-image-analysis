@@ -62,17 +62,18 @@ ErrorFiles("Output image metadata dictionary* has output image dictionary",  "co
 ErrorFiles("Each output image* has a key-matched metadata description",  "code_output_image_data_with_no_metadata_key"),
 ErrorFiles("Output images* have expected data type",  "code_output_image_data_wrong_type"),
 ErrorFiles("Output images* have expected shape",  "code_output_image_data_wrong_shape"),
-ErrorFiles("Metadata for output parameters* is a dictionary",  ""),
-ErrorFiles("Metadata for output parameters* is a dictionary of ParameterMetadata",  ""),
-ErrorFiles("Output parameter* is a dictionary",  ""),
-ErrorFiles("Function has metadata to describe output parameters*",  ""),
-ErrorFiles("Function outputs parameters as expected given metadata",  ""),
-ErrorFiles("All output parameters* have matching metadata description",  ""),
-ErrorFiles("Output parameters* have expected data type",  ""),
+ErrorFiles("Metadata for output parameters* is a dictionary",  "code_output_parameter_metadata_not_dictionary"),
+ErrorFiles("Metadata for output parameters* is a dictionary of ParameterMetadata",  "code_output_parameter_metadata_not_dictionary_parametermetadata"),
+ErrorFiles("Output parameter* is a dictionary",  "code_output_parameter_not_dictionary"),
+ErrorFiles("Output parameter dictionary* has output parameter metadata dictionary",  "code_output_parameter_no_metadata"),
+ErrorFiles("Output parameter metadata dictionary* has output parameter dictionary",  "code_output_parameter_metadata_with_no_data"),
+ErrorFiles("Each output parameter* has a key-matched metadata description",  "code_output_parameter_data_with_no_metadata_key"),
+ErrorFiles("Output parameters* have expected data type",  "code_output_parameter_data_wrong_type"),
 ErrorFiles("Function executes",  "code_invalid"),
-ErrorFiles("Function does not alter input values",  ""),
-ErrorFiles("Function failed testing with randomised data",  ""),
-ErrorFiles("Module can be imported to directory",  "")
+ErrorFiles("Function does not alter input values",  "code_alters_input"),
+# Both following tests removed because can't provide code to break this without also causing a previous error
+#ErrorFiles("Function failed testing with randomised data",  "code_fails_random_testing"),
+#ErrorFiles("Module can be imported to directory",  "")
 ]
 
 def test_test_image_operation_all():

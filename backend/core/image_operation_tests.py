@@ -38,11 +38,11 @@ def test_image_operation(image_operation_folder, image_operation_name, sample_im
             TestItem("Each output image* has a key-matched metadata description","key present in data dictionary 'output_image'","N\\A"),
             TestItem("Output images* have expected data type", "data dictionary value for 'output_image' does not pass dtype validation","N\\A"),
             TestItem("Output images* have expected shape", "image shape for 'output_image' does not match metadata","N\\A"),
-            TestItem("Metadata for output parameters* is a dictionary", "expected metadata 'output_parameter' to be dictionary","N\\A"),
-            TestItem("Metadata for output parameters* is a dictionary of ParameterMetadata", "for metadata dictionary 'output_parameter', expected values of type","N\\A"),
+            TestItem("Metadata for output parameters* is a dictionary", "expected metadata 'output_parameter_metadata' to be dictionary","N\\A"),
+            TestItem("Metadata for output parameters* is a dictionary of ParameterMetadata", "for metadata dictionary 'output_parameter_metadata', expected values of type","N\\A"),
             TestItem("Output parameter* is a dictionary","expected data 'output_parameter' to be dictionary","N\\A"),
-            TestItem("Function has metadata to describe output parameters*", "data present with no metadata: 'output_parameter'","N\\A"),
-            TestItem("Function outputs parameters as expected given metadata", "metadata present with no data: 'output_parameter'","N\\A"),
+            TestItem("Output parameter dictionary* has output parameter metadata dictionary", "data present with no metadata: 'output_parameter'","N\\A"),
+            TestItem("Output parameter metadata dictionary* has output parameter dictionary", "metadata present with no data: 'output_parameter'","N\\A"),
             TestItem("Each output parameter* has a key-matched metadata description","key present in data dictionary 'output_parameter'","N\\A"),
             TestItem("Output parameters* have expected data type", "data dictionary value for 'output_parameter' does not pass dtype validation","N\\A"),
             TestItem("Function executes", "error executing operation","N\\A"),
@@ -110,7 +110,7 @@ def test_image_operation(image_operation_folder, image_operation_name, sample_im
         if test_results.results == "Pass":
             if imported_function.output_image:
                 for key in imported_function.output_image.keys():
-                    lines.append(f"\nOutput image '{key}' saved to {os.path.join(".\\backend\\tests\\image_operation_test_output",imported_function.id +"_"+ key + "_output.tif")}")
+                    lines.append(f"\nOutput image '{key}' saved to {os.path.join(".\\backend\\image_operations\\image_operation_test_output",imported_function.id +"_"+ key + "_output.tif")}")
             if imported_function.output_parameter:
                 for key, value in imported_function.output_parameter.items():
                     if imported_function.output_parameter_metadata[key].dtype.is_array is False:
@@ -121,7 +121,7 @@ def test_image_operation(image_operation_folder, image_operation_name, sample_im
                             lines.append(f"\n{item}")
 
 
-    with open(".\\backend\\tests\\image_operation_test_output\\test_"+image_operation_name+".txt", "w") as file:
+    with open(".\\backend\\image_operations\\image_operation_test_output\\test_"+image_operation_name+".txt", "w") as file:
         file.writelines(lines)
 
     return import_function_errors
@@ -197,6 +197,6 @@ def test_sample_data(imported_function):
             for key, value in output_image.items():
                 
                 SaveImage().save_image(image = imported_function.output_image_metadata[key].dtype._convert(value = value, dtype=DataPolicy.ImageInt), 
-                                       path = os.path.join(".\\backend\\tests\\image_operation_test_output", imported_function.id +"_"+ key + "_output.tif"))
+                                       path = os.path.join(".\\backend\\image_operations\\image_operation_test_output", imported_function.id +"_"+ key + "_output.tif"))
         except Exception as e:
             raise(ExportError(f"error saving image '{key}': {e}"))
