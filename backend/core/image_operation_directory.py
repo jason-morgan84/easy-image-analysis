@@ -41,7 +41,18 @@ class ImageOperationDirectory():
         for folder in folders:
             # for each folder, imports package
             package = importlib.import_module(self.package_folder + "." + folder)
+
+            # checks if folder should be ignored
+            try:
+                package_ignore = getattr(package, "ignore")
+            except:
+                package_ignore = False
+
+            if package_ignore == True:
+                continue
+
             current_category = getattr(package,"category")
+
             # compares whether package has test flag set to True, with ImageOperationDirectory test flag
             try:
                 package_test = getattr(package, "test")
