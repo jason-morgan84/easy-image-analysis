@@ -65,9 +65,9 @@ def test_inputs_incorrect_arguements(function_name, error_message):
     # Supply dtype as not member of DataTypes.image_types
     ("code_invalid","error executing operation"),
     ("code_output_missing","metadata present with no data"),
-    ("code_output_wrong_format_image","does not pass dtype validation"),
+    ("code_output_image_data_wrong_type","does not pass dtype validation"),
     ("code_output_wrong_format_parameter","does not pass dtype validation"),
-    ("code_output_missing_image","metadata present with no data"),
+    ("code_output_image_metadata_with_no_data","metadata present with no data"),
     ("code_outout_missing_parameter","metadata present with no data")])
 def test_incorrect_code(function_name, error_message):
     directory = ImageOperationDirectory(testing = True)

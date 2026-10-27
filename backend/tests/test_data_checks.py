@@ -83,8 +83,8 @@ def test_check_data_dictionaries_no_matching_metadata(data, metadata, dtype, ide
 """check_type"""
 # set data where the dtype does not match dtype defined in metadata
 @pytest.mark.parametrize("data, metadata, identifier, message", 
-                         [({"image":sample_image_float},{"image":test_image_metadata},"image","data dictionary value for 'image' does not pass dtype validation: 'dict' object has no attribute 'dtype'"),
-                          ({"parameter":sample_parameter_float},{"parameter":test_parameter_metadata},"parameter","data dictionary value for 'parameter' does not pass dtype validation: 'dict' object has no attribute 'dtype'"),
+                         [({"image":sample_image_float},{"image":test_image_metadata},"image","unexpected dtype for"),
+                          ({"parameter":sample_parameter_float},{"parameter":test_parameter_metadata},"parameter","unexpected dtype for"),
                          ])
 def test_check_data_type_wrong_type(data, metadata, identifier, message):
     with pytest.raises(TypeError, match = message):
@@ -108,10 +108,10 @@ sample_image_shape_y= sample_data(dtype=DataPolicy.ImageInt,
 sample_image_shape_x= sample_data(dtype=DataPolicy.ImageInt,
                            shape=(4,4,4,1))
 @pytest.mark.parametrize("data, metadata, dtype, identifier, message", 
-                         [(sample_image_shape_c,test_image_metadata_shape,ImageMetadata,"imagec","image shape does not match metadata; for 'imagec', expected c=4, got c=1"),
-                          (sample_image_shape_z,test_image_metadata_shape,ImageMetadata,"imagez","image shape does not match metadata; for 'imagez', expected z=4, got z=1"),
-                          (sample_image_shape_y,test_image_metadata_shape,ImageMetadata,"imagey","image shape does not match metadata; for 'imagey', expected y=4, got y=1"),
-                          (sample_image_shape_x,test_image_metadata_shape,ImageMetadata,"imagex","image shape does not match metadata; for 'imagex', expected x=4, got x=1"),
+                         [(sample_image_shape_c,test_image_metadata_shape,ImageMetadata,"imagec","for 'imagec', expected c=4, got c=1"),
+                          (sample_image_shape_z,test_image_metadata_shape,ImageMetadata,"imagez","for 'imagez', expected z=4, got z=1"),
+                          (sample_image_shape_y,test_image_metadata_shape,ImageMetadata,"imagey","for 'imagey', expected y=4, got y=1"),
+                          (sample_image_shape_x,test_image_metadata_shape,ImageMetadata,"imagex","for 'imagex', expected x=4, got x=1"),
                          ])
 def test_check_data_image_shape(data, metadata, dtype, identifier, message):
     with pytest.raises(ValueError, match = message):

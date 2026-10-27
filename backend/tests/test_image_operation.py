@@ -232,7 +232,7 @@ def test_run_code_input_image_data_wrong_type():
     setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
 
     setattr(test_image_operation,"input_image",{"input1":test_image_data_imagefloat})
-    with pytest.raises(TypeError, match="data dictionary value for 'input_image.input1' does not pass dtype validation"):
+    with pytest.raises(TypeError, match="data dictionary value for 'input_image' does not pass dtype validation"):
         test_image_operation.run_code()
 
 #run_code where input_image shape deosn't match input_image_metadata
@@ -257,7 +257,7 @@ def test_run_code_input_image_data_wrong_shape():
     setattr(test_image_operation,"input_image",{"input1":sample_data(DataPolicy.ImageInt,(1,2,3,4))})
     # set input_image_metadata to have shape constraints for input1 as c = 2
     test_image_operation.input_image_metadata["input1"].image_shape_constraints.c = 2
-    with pytest.raises(ValueError, match="image shape does not match metadata"):
+    with pytest.raises(ValueError, match="image shape for"):
         test_image_operation.run_code()
 
 #run_code where input_parameter_data type doesn't match input_parameter_metadata
@@ -275,7 +275,7 @@ def test_run_code_input_parameter_data_wrong_type():
         )
 
     setattr(test_image_operation, "execute", types.MethodType(function_for_testing, test_image_operation))
-    with pytest.raises(TypeError, match="data dictionary value for 'input_parameter.input2' does not pass dtype validation"):
+    with pytest.raises(TypeError, match="data dictionary value for 'input_parameter' does not pass dtype validation"):
         test_image_operation.run_code()
 
 #run_code with output but no output metadata
@@ -426,7 +426,7 @@ def test_run_code_image_output_wrong_type():
 
     setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
 
-    with pytest.raises(TypeError,match="data dictionary value for 'output_image.output1' does not pass dtype validation"):
+    with pytest.raises(TypeError,match="data dictionary value for 'output_image' does not pass dtype validation"):
         test_image_operation.run_code()
 
 #Code provided returns an image with shape that doesn't match metadata
@@ -449,7 +449,7 @@ def test_run_code_output_wrong_shape():
     setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
 
 
-    with pytest.raises(ValueError,match="image shape does not match metadata"):
+    with pytest.raises(ValueError,match="image shape for"):
         test_image_operation.run_code()
 
 #Code provided returns an parameter with array type that doesn't match metadata
@@ -472,7 +472,7 @@ def test_run_code_parameter_output_wrong_type():
 
     setattr(test_image_operation, "execute", types.MethodType(function_no_change_to_output, test_image_operation))
 
-    with pytest.raises(TypeError,match="data dictionary value for 'output_parameter.output2' does not pass dtype validation"):
+    with pytest.raises(TypeError,match="data dictionary value for 'output_parameter' does not pass dtype validation"):
         test_image_operation.run_code()
 
 
