@@ -80,8 +80,9 @@ class ImageOperationDirectory():
 
     def import_file(self, folder, name, logger):
         # imports individual file
+        location = ".".join((self.package_folder, folder, name)) if folder else ".".join((self.package_folder, name))
         try:
-            sub_module = importlib.import_module(".".join((self.package_folder, folder, name)))
+            sub_module = importlib.import_module(location)
         except Exception as e:
             raise ImportError(f"compatible module not found: {e}")
 
