@@ -210,16 +210,16 @@ In general, as long as the code only uses the permitted imports, doesn't generat
 
 ## Testing ImageOperations
 
-
-WHERE SHOULD THE FUNCTION BE SAVED?
-
-New ImageOperations can be tested by running .... in terminal.
+To test your a new function, save it to the ImageOperations folder or a subfolder (note, folders for ImageOperations should not be nested more than a single folder deep). Then run in terminal (leaving function_folder blank if ImageOperation is not in a subfolder):
+```
+python backend/core/image_operation_tests.py function_name function_folder
+```
 
 This test function will test the ImageOperation on sample biological data transformed to match input_image_metadata. To use the test function if input parameters are required, a dictionary of test inputs should be added to the ImageOperation as instance variable test_input_parameters.
 
-The test function will carry out the same checks made during ImageOperation import by ImageOperationDirectory. A text file will be provided ... describing which of these tests were passed and which were failed.
+The test function will carry out the same checks made during ImageOperation import by ImageOperationDirectory. A text file will be provided in image_operations/image_operation_test_output describing which of these tests were passed and which were failed.
 
-These tests a randomised data set is provided to the ImageOperation to tests its function and outputs as well as real sample image adjust to match your input image metadata. The outputted image can be found at ......
+In these tests, a randomised data set is provided to the ImageOperation to test its function and output, followed by a real sample image adjusted to match your input image metadata. The outputted image(s) can be found in image_operations/image_operation_test_output.
 
 
 ## ImageOperation failure
