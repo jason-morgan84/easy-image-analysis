@@ -1,3 +1,9 @@
+from pathlib import Path
+import sys
+
+# Ensures the 'backend' folder is always on Python's search path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from core.image_operation_directory import ImageOperationDirectory
 from core.data_checks import check_data_dictionary_value, check_metadata_dictionary, check_data_dictionary
 from core.metadata import ImageMetadata, ParameterMetadata
@@ -50,7 +56,7 @@ import_function_errors = [TestItem("Compatible function found","compatible modul
         ]
 
 
-def test_image_operation(image_operation_folder, image_operation_name, sample_image=None):
+def test_image_operation(image_operation_name, image_operation_folder, sample_image=None):
     global import_function_errors
     # carry out pre-import tests:
     import_function_errors = copy.copy(import_function_errors)
@@ -124,7 +130,6 @@ def test_image_operation(image_operation_folder, image_operation_name, sample_im
                         lines.append(f"\nOutput parameter '{key}':")
                         for item in value:
                             lines.append(f"\n{item}")
-
 
     with open(".\\backend\\image_operations\\image_operation_test_output\\test_"+image_operation_name+".txt", "w") as file:
         file.writelines(lines)
@@ -205,3 +210,12 @@ def test_sample_data(imported_function):
                                        path = os.path.join(".\\backend\\image_operations\\image_operation_test_output", imported_function.id +"_"+ key + "_output.tif"))
         except Exception as e:
             raise(ExportError(f"error saving image '{key}': {e}"))
+
+if __name__ == "__main__":
+    import sys
+
+    name = sys.argv[1] if len(sys.argv) > 1 else "sample_operation"
+    folder = sys.argv[2] if len(sys.argv) > 2 else ""
+    print(f"Testing {folder}\\{name}")
+    results = test_image_operation(name, folder)
+    print(f"Test complete for '{name}'. Output report generated.")
