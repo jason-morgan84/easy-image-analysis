@@ -126,6 +126,7 @@
 |24/10/25|0.18.1|moved tranpose unit testing out of workflow section|
 |24/10/25|0.18.2|planned unit testing for SaveImage|
 |24/10/25|0.18.3|added description of ExportError to Error Handling section|
+|27/10/25|0.18.4|added description of ignore for folders in ImageOperationDirectory|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -335,7 +336,7 @@ Contains:
 This class holds for a list of all ImageOperation classes, along with the code required to import them.
 
 ImageOperations are imported from a directory defined in the ImageOperationDirectory class, currently .\backend\image_operations. 
-Modules in child folders of image_operations are imported, but not at greater depth. Child folders define the category of contained ImageOperations. The category name should be saved in __init__.py as category = "string".
+Modules in child folders of image_operations are imported, but not at greater depth. Child folders define the category of contained ImageOperations. The category name should be saved in __init__.py as category = "string". For a child folder to be ignored for imports, __init__,py should have 'ignore = True'.
 
 ImageOperationsDirectory can be passed two arguements. Log provides a list of LogItem class from error_handling.py and makes up a log of error messages. If this is not passed, a new list will be created. Test (default = false) is a flag for testing ImageOperationsDirectory. If test == true, only files within image_operations/testing folder will be imported. If testing == false, files within image_operations/testing folder will not be imported.
 
