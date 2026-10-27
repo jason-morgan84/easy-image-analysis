@@ -15,6 +15,8 @@ class ImageOperationDirectory():
     permitted_imports = {"core",
                          "math", 
                          "numpy",
+                         "scipy",
+                         "ndimage",
                          "pillow"} # defines permitted imports in ImageOperations
  
 
@@ -224,16 +226,14 @@ class ImageOperationDirectory():
                 for key, value in function.input_parameter_metadata.items():
                     # gets dtype and shape from parameter
                     parameter_dtype = value.dtype
-                    parameter_shape = value.shape
 
                     # sets value to 0/array of 0s of correct dtype and shape using type.sample_data
                     input_parameters[key] = sample_data(dtype = parameter_dtype,
-                                                        shape = parameter_shape,
                                                         zero = True)
             else:
                 input_parameters = input_parameter_dictionary
             setattr(function,"input_parameter",input_parameters)
-        
+       
         
         function.run_code()
         return function.output_image, function.output_parameter
