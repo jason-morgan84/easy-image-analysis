@@ -128,6 +128,7 @@
 |24/10/26|0.18.3|added description of ExportError to Error Handling section|
 |27/10/26|0.18.4|added description of ignore for folders in ImageOperationDirectory|
 |27/10/26|0.18.5|Updated specification for ImageOperations and Metadata|
+|27/10/27|0.18.6|Update Specification description of WorkFlow class and how this defines and checks data flow through graph|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -418,9 +419,9 @@ Connections form the links between nodes and ports through which data travels th
 
 ## 3.2.10 WorkFlow Class
 
-The WorkFlow class does the bulk of the work in initiating, defining and checking the graph through which image data flows.
+The WorkFlow class initiates, defines and checks the graph through which image data flows.
 
-It contains lists of all existing nodes, connections and ports, contains functions to safely add, edit and remove new nodes, ports and connections.
+It contains lists of all existing nodes and connections, along with functions to safely add, edit and remove new nodes and connections.
 
 ![System Class Structure](/docs/data_flow_diagram.svg)
 
@@ -429,16 +430,15 @@ On creation of new nodes, it interacts with the frontend to get node parameters.
 On creation of new connections, it checks the validity of those connections and, if necessary, gives feedback to the user.
 __Note__: Not all checks are done at this stage - shape checks for unambiguous mismatches are carried out here, for example, if connecting a port with image metadata defining c=4 to a port requiring an image with c=1, this will be rejected. However, if either input or output shape is undefined (-1) then further shape checks are carried out when the graph is updated (by update_graph function) when the shape of data flowing through the graph is fully defined.
 
-It defines the starting node in the graph, allowing it to generate upstream and downstream paths through the WorkFlow.
+It defines starting nodes in the graph, based on a list of source nodes in io_image_operations.py, allowing it to generate paths through the WorkFlow.
+
 It contains instance variables:
 
 * nodes – dictionary of all extant nodes by unique ID
 * connections – dictionary of all connections by unique ID
-* starting_node – ID of starting node
 * max_id - current max integer ID for node/connections dictionary keys - considered uuid for this but in a centrally controlled graph like this, with only two data classes to be kept track of, integers are easily managed and result in a more human-readable dictionary for testing and error reporting purporses. 
 
 It also contains the following functions:
-* update_graph
 * add_node - adds a node to node dictionary "nodes"
 * delete_node - deletes a node from node dictionary along with associated connections
 * add_connection - adds a connection to connection dictionary "connections", uses other functions to carry out checks before creation:
@@ -447,31 +447,27 @@ It also contains the following functions:
   - structure_check - checks connection is appropriate for graph structure
 * remove_connection - removes a connection from connections dictionary
 * get_next_nodes - returns a list of node ids of node(s) immediately after an input Node, Port or Connection
+* get_previous_nodes - returns a list of node ids of node(s) immediately before an input Node, Port or Connection
 * get_downstream_nodes - returns a list of node ids of nodes downstream of a given Node, Port or Connection
-* ~~Transpose - tranposes pixel_arrays passing through the graph, given requirements of input and output Ports. Previously part of Image class./~~
-* ~~Squeeze/unsqueeze - changes array shape, as Tranpose.~~
+* get_graph_map - gets an ordered list of nodes to check, starting from source nodes and moving through the graph
+* update_graph - updates the graph on any changes to nodes or connections. Does the following:
+    1. Generates and ordered node list using get_graph_map
+    2. Iterates through the list of nodes
+    3. Checks if that node has all connections made
+    4. If so, checks if all previous nodes have is_ready flag True
+    5. If so, set this Nodes is_ready flag to True
+    6. Checks this Nodes needs_update flag
+    7. If true, prepares to copy data from previous Nodes.
+    8. Carries out pre-checks on Shape and Types
+    9. If shapes and types can be adjusted, carries out conversions and transpositions.
+    10. If shapes not compatible, stops running this Node, sets is_ready to false and warns user
+    11. Activates node
+
 
 On creation of a new connection, it will check for structure, shape or type violations. Where these can be fixed through image type or shape changes, it will do so, otherwise it will prompt the user to adjust the WorkFlow. 
 
 <img src="./workflow_error_checking.svg" width="100%" height = "100%" alt="Node Graph Set-Up checks" />
 
-### Shape propagation
-
-* carry out checks at the WorkFlow level.
-
-* ImageOperations already include data on the required input shape and delivered output shape (-1 for don't care, specific values for defined input/output dimension size)
-
-* on instantiation of a Node, the input constraints are propagated to the input Port and the output Port for visibility to Connections.
-
-* when a user tries to create a Connection, shape constraints on the source and target Ports are checked for compatibility.
-
-* if compatible, the Connection is created.
-
-* on creation, the graph is updated. This includes a step of propagating any Shape constraints through the graph.
-
-* the output Port of the newly connected Node has its shape constraints updated based on the upstream graph, for checking by future connections.
-
-* Only -1 (don't care values) are changed - if a Node has an ImageOperation that's indifferent to shape, but the input is always c = 1, the output will become c = 1. If a Node has a defined output, that is constant. This is the point where the proper coding of the ImageOperation, particularly its output image shape constraints, has to be trusted.
 
 ### 3.6.1 Workflow Implementation
 
@@ -528,19 +524,6 @@ __Stage 3__
 * Once ImageOperation API is developed and key initial ImageOperations are implemented, add and test responses to incompatible connections suggesting an ImageOperation that might solve incompatibility.
 
 
-
-|transpose| transpose passed not as Shape class | Type error | transpose accepted|
-|convert| convert passed not as DataType class | Type error | convert accepted |
-| get_output | Use get_output when no data at source_port | ConnectionError| No error|
-| get_output | Use get_output when source_port contains image with no pixel_array| ConnectionError| No error|
-| get_output | Use get_output when source_port contains parameter with no value| ConnectionError| No error|
-| get_output | Test correct output given with no transpose or convert | Correct output given| Incorrect output|
-| get_output | Test correct output given with transpose but no convert | Correct output given| Incorrect output|
-| get_output | Test correct output given with convert but no transpose | Correct output given| Incorrect output|
-| get_output | Test correct output given with transpose and convert | Correct output given| Incorrect output|
-* note: both transpose and convert have previously been unit tested in Image and/or Parameter classes
-
-
 ## 3.7 Data Checking
 Where checks on data are carried out repeatedly in the graph, these checks are kept in data_checking.py.
 
@@ -578,9 +561,15 @@ error_handling.py also includes custom exceptions:
 
 # 4 ImageOperation files
 
-## 4.1 Test Harness
+The requirements for writing an ImageOperation file are described in more detail in image_operation.md.
 
-Includes testing for outputs - if an image output shape is given as (-1,-1,-1,-1) but it doesn't pass through all dimension sizes, then flag this as an error (if left, it will break image shape propagation through the graph).
+A function to test new ImageOperations can be found in image_operation_test.py.
+
+A commented, sample ImageOperation can be found in docs/sample_image_operation.py.
+
+## 4.1 Test Function
+
+A test function is included to test that an ImageOperation passes all checks as part of importing and running, which provides sample image data to test its functioning as expected. For more details, see image_operation.md.
 
 ## 4.2 Special cases - input and output
 

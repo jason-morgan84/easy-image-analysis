@@ -17,7 +17,6 @@ class WorkFlow:
         self.update_on_change = True # if True, updates whole graph every time theres a change. If False, waits for update call
         
         self.max_id = 0 # highest used ID value for new nodes/connections
-        self.starting_node = self.initialise_start_node() # creates a load_image node as graph start point and returns node id
 
         self.workflow_logger = logger
     
@@ -31,10 +30,7 @@ class WorkFlow:
             raise TypeError (f"expected ImageOperationDirectory class on WorkFlow instantiation, got {type(directory)}")
         self._image_operation_directory = directory
 
-    # creates a load_image node as graph start point
-    def initialise_start_node(self):
-        return None
-    
+   
     """
     add_node(ImageOperation) function adds a key/value pair to nodes dictionary where dictionary key is node.ImageOperation.UniqueID
     """
@@ -413,9 +409,6 @@ class WorkFlow:
 
     def update_graph(self, test = False):
 
-        #TODO#######################################################
-        # Did I ever add checks of image/array shape data when passing data through the graph?
-
 
         """1. Generate ordered node list"""
         # get list of start nodes by comparing nodes dictionary value to start_nodes list from io_image_operations.py
@@ -488,6 +481,9 @@ class WorkFlow:
                             continue
 
                         incoming_data = connection.source_port.data
+                        #TODO: CARRY OUT SHAPE CHECKS HERE - DOES THE DATA COMING IN MATCH CONSTRAINTS WHERE THE OUTPUT FROM THE PREVIOUS NODE
+                        # WAS UNDEFINED
+
                         # tranpose data if transposition required
                         if connection.transpose is not None:
                             try:
