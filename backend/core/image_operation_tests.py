@@ -131,7 +131,7 @@ def test_image_operation(image_operation_name, image_operation_folder, sample_im
                         for item in value:
                             lines.append(f"\n{item}")
 
-    with open(".\\backend\\image_operations\\image_operation_test_output\\test_"+image_operation_name+".txt", "w") as file:
+    with open(".\\backend\\image_operations\\image_operation_test_output\\test_"+image_operation_name+".txt", "w", encoding="utf-8") as file:
         file.writelines(lines)
 
     return import_function_errors
@@ -157,9 +157,12 @@ def test_sample_data(imported_function):
             # adjust to shape
             shape = {}
             shape["c"], shape["z"], shape["y"], shape["x"] = image.shape
+            
             for dimension in Shape.dimensions:
                 if value.image_shape_constraints[dimension] != -1:
                     shape[dimension] = value.image_shape_constraints[dimension]
+
+
             image = image[0:shape["c"], 0:shape["z"], 0:shape["y"], 0:shape["x"]]
             image = transpose(value=image,
                               current_shape=Shape(c=0,z=1,y=2,x=3),
