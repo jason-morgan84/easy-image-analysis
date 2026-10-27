@@ -115,18 +115,19 @@
 |10/10/26|0.17.8|Added is_input flag description to Ports class|
 |10/10/26|0.17.9|Refactoring: moved unit testing and description of transposition and conversion functions from Connection to WorkFlow classes|
 |12/10/26|0.17.10|Added documentation of warn function in error_handling.py|
-|12/10/25|0.17.11|Added plans for next development stage (1.5 - ImageOperation files)|
-|13/10/25|0.17.12|Added get_next_nodes to WorkFlow class description|
-|14/10/25|0.17.13|Updated WorkFlow unit testing|
-|14/10/25|0.17.14|Clarified description of shape checks carried out during add_connection|
-|16/10/25|0.17.15|Updated descriptions of type policies|
-|17/10/25|0.17.16|Updated get_previous_nodes unit testing and added GraphError description to error handling|
-|18/10/25|0.17.17|Planned unit testing for WorkFlow transpose and update_graph functions|
-|24/10/25|0.18.0|planned unit testing for LoadImage|
-|24/10/25|0.18.1|moved tranpose unit testing out of workflow section|
-|24/10/25|0.18.2|planned unit testing for SaveImage|
-|24/10/25|0.18.3|added description of ExportError to Error Handling section|
-|27/10/25|0.18.4|added description of ignore for folders in ImageOperationDirectory|
+|12/10/26|0.17.11|Added plans for next development stage (1.5 - ImageOperation files)|
+|13/10/26|0.17.12|Added get_next_nodes to WorkFlow class description|
+|14/10/26|0.17.13|Updated WorkFlow unit testing|
+|14/10/26|0.17.14|Clarified description of shape checks carried out during add_connection|
+|16/10/26|0.17.15|Updated descriptions of type policies|
+|17/10/26|0.17.16|Updated get_previous_nodes unit testing and added GraphError description to error handling|
+|18/10/26|0.17.17|Planned unit testing for WorkFlow transpose and update_graph functions|
+|24/10/26|0.18.0|planned unit testing for LoadImage|
+|24/10/26|0.18.1|moved tranpose unit testing out of workflow section|
+|24/10/26|0.18.2|planned unit testing for SaveImage|
+|24/10/26|0.18.3|added description of ExportError to Error Handling section|
+|27/10/26|0.18.4|added description of ignore for folders in ImageOperationDirectory|
+|27/10/26|0.18.5|Updated specification for ImageOperations and Metadata|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -266,9 +267,7 @@ Shape will be used to hold shape related information in a number of classes and 
 ### 3.2.3 ImageOperation Class
 The ImageOperation class is responsible for carrying out functions that carry out analysis on images. A key aim of this project is expandability and to allow the inclusion of new image analysis functions with no need to edit the base code. To achieve this, each image analysis function will be a separate file written as an instance of the ImageOperation class, containing all the information required to run the function and will be imported using imagelib. 
 
-The previous classes described have been primarily related to the flow of data through the WorkFlow graph and have defined custom class types to make sure this happens in a controlled manner. The ImageOperation sits slightly outside this class structure, as existing image analysis modules work in standard or numpy classes. To allow ImageOperations code to be designed and executed in a standard manner, inputs and outputs from ImageOperations are in standard Numpy data types (for conversion from custom DataTypes to Numpy, see Node and Port classes).
-
-The expected inputs and outputs will still be described in terms of DataType classes, as these classes also define their own Numpy equivalents.
+ImageOperations will sit within Nodes, where they will be provided with data through the UI or WorkFlow based on defined DataPolicy's.
 
 The ImageOperation class will contain the following variables:
 
@@ -276,58 +275,36 @@ The ImageOperation class will contain the following variables:
 * id: id of ImageOperation for use in code (imported based on module name)
 * category: logical category (“Threshold”, “Filter” etc) - defined by folder location of file
 * input and output dictionaries (note: each of these variables will be instantiated as a dictionary, either of a Package class or empty if None is passed):
-    - input_image: input images as dictionary of ImagePackage class
-    - input_parameter: other inputs as dictionary of ParameterPackage class         
-    - output_image: Output images as dictionary of ImagePackage class
-    - output_parameter: other outputs as dictionary of ParameterPackage class 
+    - input_image: input images as dictionary of ImageMetadata class
+    - input_parameter: other inputs as dictionary of ParameterMetadata class         
+    - output_image: Output images as dictionary of ImageMetadata class
+    - output_parameter: other outputs as dictionary of ParameterMetadata class 
 * docs – documentation to explain function, effects, parameters etc
 * alerts – any warnings to user (e.g, “Background subtraction with a large radius is a very slow process”)
 * version – version of software code ImageOperation was written for. This is to future proof code, so changes to base code that affect ImageOperations don’t mean all existing ImageOperations need to be rewritten. 
 * execute – function with compiled code to execute - gathered from input .py files by ImageOperationDirectory
 
-Because this class takes input directly from external files there are a number of checks made on that data:
+And the following functions:
+* execute - function with code to be executed on inputs to provide outputs - this changes for each ImageOperation
+* run_code - this should not be changed between ImageOperations - it provides the code to carry out pre-execution checks, execute the code, carry out post-execution checks and provide feedback where code has not been sucessfully completed.
 
-```mermaid
-graph LR
-Node2["Package class: Type checks arguements"]
-Node3["ImageOperation. check_dict: Checks Input/Outputs are dictionaries of Package classes"]
-Node4["ImageOperation. pre_execution: Checks inputs are complete, outputs are ready"]
-Node5["ImageOperation. post_execution: Checks output are complete"]
+Various checks are carried out on ImageOperations during their execution and during their import. These are described in more detail in image_operation.md, along with necessary information for writing ImageOperations, description of the testing functions and sample code.
 
-
-Node2-->Node3
-Node3-->Node4
-Node4-->Node5
-```
-Firstly, data on expected inputs and outputs are entered into a PackageClass, either ImagePackage for images or ParameterPackage for other input/output values. This requires a defined data type for that variable from the DataType enum. Where other parameters (the value itself, any shape parameters to define it) it will also check their type, but these aren't required until a later stage. Note that, on instantiation, the inputs and outputs will have defined data types but no actual data.
-
-Next, ImageOperation, the setters for InputImage, InputParameter, OutputImage and OutputParameter run check_dict() which checks that each arguement is a dictionary of the relevant package class.
-
-The bulk of the checks are carried out when run_code is called to execute the code, which calls the pre_execution function. This checks that all inputs are present and correct (eg, input image pixel array matches defined shape) and that the required output arguements are present to describe the outputs (dtype and shape).
-
-Finally, following code execution checks are carried out to ensure that the output is complete and correct.
-
-**NOTE: At this point, any ImageOperation requires (at least) one image as an input. This is a design decision to prevent creep and bloat, based on the idea that as soon as only non-image variables are accepted this software is moving into data analysis rather than image analysis. This is checkedby the run_code function in ImageOperation and will therefore also affect other classes interacting with ImageOperations (Nodes and WorkFlow).**
-
-### 3.4.2 ImagePackage
-Simple class holding data for image inputs and outputs from ImageOperation. Contains:
-* dtype - set at instantiation based on ImageOperation code file.
-    - Type checks for member of DataType
-* shape - set at instatiation based on shape constrains defined in code file. **NOTE: this is not the shape of the array (which is defined by the array) - it is the <u>constraints</u> on the shape of the image.**
+### 3.4.2 ImageMetadata
+Simple class holding metadata for image inputs and outputs from ImageOperation. Contains:
+* dtype - set at instantiation based on ImageOperation code file. DataPolicy based on DataPolicy enum in constants.py.
+    - Type checks for member of DataPolicy
+* image_shape_constraints - set at instatiation based on shape constraints defined in code file. **NOTE: this is not the shape of the array (which is defined by the array) - it is the <u>constraints</u> on the shape of the image.**. Must be of Shape class. For example, where an image must be single channel, this would be Shape(c=1, z=-1, y=-1, x=-1), where c=1 defines a constraint on the size of that image dimension and z=-1, y=-1 and x=-1 describe no constraints.
     - Type checks for Shape class
-* pixel_array - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain ndarray of dtype.numpy.
+* image_map - The required mapping of any image dimensions to pixel array dimensions a member of Shape class. Defines how an ImageOperation wants a pixel array delivered (eg, CZYX v ZCYX) and how it outputs it.
     - Type checks for Shape class
-* image_map - The required mapping of any supplied image as a member of Shape class. Defines how an ImageOperation wants a pixel array delivered (eg, CZYX v ZCYX) and how it outputs it.
 
-### 3.4.3 ParameterPackage
-Simple class holding data for non-image inputs and outputs from ImageOperation. Includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
+### 3.4.3 ParameterMetadata
+Simple class holding metadata for non-image inputs and outputs from ImageOperation. Includes the option to specify UI elements to fetch parameter values from the user. The aim is, where user input is required, to have the necessary information for the frontend to automatically create a dialogue box for the user to enter values, without each ImageOperation requiring its own hardcoded UI elements.
 
 Contains:
 * dtype - set at instantiation based on ImageOperation code file.
-    - Type checks for member of DataType.
-* value - set to None at instantiation, given value as relevant for WorkFlow. Expected to contain value of dtype.numpy.
-* shape - if dtype defines an array_type, contains a np.array defining shape of value.
-    - will accept a tuple, list or np.ndarray. Tuples and lists will be converted to np.ndarray.
+    - Type checks for member of DataPolicy.
 * user_input - boolean flag to say if value is expected via WorkFlow (False) or via (UI).
 * ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc) - setter checks this is present if user_input is True
 * ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
