@@ -28,23 +28,23 @@ def test_image_operation(image_operation_folder, image_operation_name, sample_im
             TestItem("Metadata for output image or parameter present", "require output_image_metadata", "N\\A"),
             TestItem("Metadata for input image is a dictionary", "expected metadata 'input_image_metadata' to be dictionary", "N\\A"),
             TestItem("Metadata for input image is a dictionary of ImageMetadata", "for metadata dictionary 'input_image_metadata', expected values of type", "N\\A"),
-            TestItem("Metadata for input parameters (where present) is a dictionary", "expected metadata 'input_parameter_metadata' to be dictionary", "N\\A"),
-            TestItem("Metadata for input parameters (where present) is a dictionary of ParameterMetadata", "for metadata dictionary 'input_parameter_metadata', expected values of type", "N\\A"),
-            TestItem("Metadata for output images (where present) is a dictionary", "expected metadata 'output_image_metadata' to be dictionary","N\\A"),
-            TestItem("Metadata for output images (where present) is a dictionary of ImageMetadata", "for metadata dictionary 'output_image_metadata', expected values of type","N\\A"),
-            TestItem("Output image (where present) is a dictionary","expected data 'output_image' to be dictionary","N\\A"),
-            TestItem("Function has metadata to describe output images (where present)", "data present with no metadata: 'output_image'","N\\A"),
-            TestItem("Function outputs images as expected given metadata", "metadata present with no data: 'output_image'","N\\A"),
-            TestItem("All output images (where present) have matching metadata description","key present in data dictionary 'output_image'","N\\A"),
-            TestItem("Output images (where present) have expected data type", "data dictionary value for 'output_image' does not pass dtype validation","N\\A"),
-            TestItem("Output images (where present) have expected shape", "image shape does not match metadata; for 'output_image'","N\\A"),
-            TestItem("Metadata for output parameters (where present) is a dictionary", "expected metadata 'output_parameter' to be dictionary","N\\A"),
-            TestItem("Metadata for output parameters (where present) is a dictionary of ParameterMetadata", "for metadata dictionary 'output_parameter', expected values of type","N\\A"),
-            TestItem("Output parameter (where present) is a dictionary","expected data 'output_parameter' to be dictionary","N\\A"),
-            TestItem("Function has metadata to describe output parameters (where present)", "data present with no metadata: 'output_parameter'","N\\A"),
+            TestItem("Metadata for input parameters* is a dictionary", "expected metadata 'input_parameter_metadata' to be dictionary", "N\\A"),
+            TestItem("Metadata for input parameters* is a dictionary of ParameterMetadata", "for metadata dictionary 'input_parameter_metadata', expected values of type", "N\\A"),
+            TestItem("Metadata for output images* is a dictionary", "expected metadata 'output_image_metadata' to be dictionary","N\\A"),
+            TestItem("Metadata for output images* is a dictionary of ImageMetadata", "for metadata dictionary 'output_image_metadata', expected values of type","N\\A"),
+            TestItem("Output image* is a dictionary","expected data 'output_image' to be dictionary","N\\A"),
+            TestItem("Output image dictionary* has output image metadata dictionary", "data present with no metadata: 'output_image'","N\\A"),
+            TestItem("Output image metadata dictionary* has output image dictionary", "metadata present with no data: 'output_image'","N\\A"),
+            TestItem("Each output image* has a key-matched metadata description","key present in data dictionary 'output_image'","N\\A"),
+            TestItem("Output images* have expected data type", "data dictionary value for 'output_image' does not pass dtype validation","N\\A"),
+            TestItem("Output images* have expected shape", "image shape for 'output_image' does not match metadata","N\\A"),
+            TestItem("Metadata for output parameters* is a dictionary", "expected metadata 'output_parameter' to be dictionary","N\\A"),
+            TestItem("Metadata for output parameters* is a dictionary of ParameterMetadata", "for metadata dictionary 'output_parameter', expected values of type","N\\A"),
+            TestItem("Output parameter* is a dictionary","expected data 'output_parameter' to be dictionary","N\\A"),
+            TestItem("Function has metadata to describe output parameters*", "data present with no metadata: 'output_parameter'","N\\A"),
             TestItem("Function outputs parameters as expected given metadata", "metadata present with no data: 'output_parameter'","N\\A"),
-            TestItem("All output parameters (where present) have matching metadata description","key present in data dictionary 'output_parameter'","N\\A"),
-            TestItem("Output parameters (where present) have expected data type", "data dictionary value for 'output_parameter' does not pass dtype validation","N\\A"),
+            TestItem("Each output parameter* has a key-matched metadata description","key present in data dictionary 'output_parameter'","N\\A"),
+            TestItem("Output parameters* have expected data type", "data dictionary value for 'output_parameter' does not pass dtype validation","N\\A"),
             TestItem("Function executes", "error executing operation","N\\A"),
             TestItem("Function does not alter input values", "operation altered input values", "N\\A"),
             TestItem("Function failed testing with randomised data","failed module testing", "N\\A"),
@@ -102,7 +102,8 @@ def test_image_operation(image_operation_folder, image_operation_name, sample_im
             error_message = item.results.split(": ")
             for n, section in enumerate(error_message):
                 lines.append(f"{"\t"*n}└─> {section}\n")
-                lines.append("\n") 
+                lines.append("\n")
+    lines.append("* where present")
 
     # give path to saved output image/give output parameter data for test image
     if test_results:

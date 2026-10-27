@@ -51,11 +51,21 @@ def check_data_dictionary_value(data, metadata, dtype, identifier):
 
     if dtype == ImageMetadata:
         for key, value in metadata.items():
-            check_data_type(data=data[key], metadata=value, identifier=".".join([identifier, key]))
-            check_image_shape(data=data[key], metadata=value, identifier=".".join([identifier, key]))
+            try:
+                check_data_type(data=data[key], metadata=value, identifier=key)
+            except Exception as e:
+                raise TypeError(f"data dictionary value for '{identifier}' does not pass dtype validation:{e}")
+            try:
+                check_image_shape(data=data[key], metadata=value, identifier=key)
+            except Exception as e:
+                raise ValueError(f"image shape for '{identifier}' does not match metadata: {e}")
+
     elif dtype == ParameterMetadata:
         for key, value in metadata.items():
-            check_data_type(data=data[key], metadata=value, identifier=".".join([identifier, key]))
+            try:
+                check_data_type(data=data[key], metadata=value, identifier=key)
+            except Exception as e:
+                raise TypeError(f"data dictionary value for '{identifier}' does not pass dtype validation:{e}")
     else:
         raise NotImplementedError(f"data checking not implemented for data type {dtype}")
 
@@ -65,7 +75,7 @@ def check_data_type(data, metadata, identifier):
     try:
         metadata.dtype.validate(data)
     except Exception as e:
-        raise TypeError(f"data dictionary value for '{identifier}' does not pass dtype validation: {e}")
+        raise TypeError(f"unexpected dtype for '{identifier}': {e}")
        
 
 def check_image_shape(data, metadata, identifier):
@@ -73,7 +83,7 @@ def check_image_shape(data, metadata, identifier):
     for dimension in Shape.dimensions:
         if metadata.image_shape_constraints[dimension] != -1:
             if data.shape[metadata.image_map[dimension]] != metadata.image_shape_constraints[dimension]:
-                raise ValueError(f"image shape does not match metadata; for '{identifier}', expected {dimension}={metadata.image_shape_constraints[dimension]}, got {dimension}={data.shape[metadata.image_map[dimension]]}")
+                raise ValueError(f"for '{identifier}', expected {dimension}={metadata.image_shape_constraints[dimension]}, got {dimension}={data.shape[metadata.image_map[dimension]]}")
 
 
 def sample_data(dtype, shape = None, zero = False):
