@@ -57,7 +57,7 @@ class Connection:
     def convert(self, convert_type):
         
         if convert_type and convert_type not in DataPolicy.policies():
-            raise TypeError(f"datatype class expected for transpose, not {type(convert_type)}")
+            raise TypeError(f"datatype class expected for convert, not {type(convert_type)}")
         self._convert = convert_type
     
 class Port:
@@ -154,7 +154,7 @@ class Node:
     def __init__(self, image_operation, node_id):
         self.node_id = node_id
         self.image_operation = image_operation
-        self.is_ready = False
+        self.is_ready = False # true when connections in place, data still needs to be checked
         self.needs_update = True
 
         self.input_ports = {}
