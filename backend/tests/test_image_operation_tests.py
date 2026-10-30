@@ -11,7 +11,7 @@ from core.error_handling import VersionError
 def test_image_operation_invalid_operation():
     
 
-    errors = check_image_operation("testing", "doesnt_exist")
+    errors = check_image_operation(image_operation_name="doesnt_exist", image_operation_folder="testing")
 
     for error in errors:
         if error.feedback_text == "Compatible function found":
@@ -20,8 +20,7 @@ def test_image_operation_invalid_operation():
 
 # test with 8bit input
 def test_test_image_operation_8bit():
-    
-    errors = check_image_operation("testing", "same_image")
+    errors = check_image_operation(image_operation_name="same_image", image_operation_folder="testing")
 
     for error in errors:
         if error.feedback_text == "Module can be imported to directory":
@@ -31,8 +30,7 @@ def test_test_image_operation_8bit():
 
 # test with binary input
 def test_test_image_operation_binary():
-    
-    errors = check_image_operation("testing", "binarised_input")
+    errors = check_image_operation(image_operation_name="binarised_input", image_operation_folder="testing")
 
     for error in errors:
         if error.feedback_text == "Module can be imported to directory":
@@ -47,7 +45,7 @@ def test_test_image_operation_all():
         # where a test_file is present
         if test.test_file != "" and n > 0:
             print(f"\n{n}: {test.feedback_text} using {test.test_file}")
-            output_errors = check_image_operation("testing", test.test_file)
+            output_errors = check_image_operation(image_operation_name=test.test_file, image_operation_folder="testing")
             # loops through all error messages
             for error in output_errors:
             # checks to make sure previous test was passed

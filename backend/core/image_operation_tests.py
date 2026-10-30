@@ -61,11 +61,12 @@ def test_image_operation(image_operation_name, image_operation_folder, sample_im
     # carry out pre-import tests:
     import_function_errors = copy.copy(import_function_errors)
 
-    # import function
+    
     error_text = None
     imported_function = None
     test_results = None
-
+    
+    # import function
     try:
         imported_function = ImageOperationDirectory().import_file(folder = image_operation_folder, name = image_operation_name, logger =[])
     except Exception as import_exception:
