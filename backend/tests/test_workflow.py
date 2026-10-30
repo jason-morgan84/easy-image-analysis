@@ -151,7 +151,7 @@ def test_connection_add_invalid_types():
     for item in log:
         if item.class_name == "WorkFlow" and item.function_name == "add_connection":
             assert item.identifier == "image.output.image.input"
-            assert "connection not created (failed at type checks):invalid port data types" in item.message 
+            assert "connection not created (failed at type checks): invalid port data types" in item.message 
 
 # call add_connection where a connection fails type checks but can be converted with warning (eg binarised to 8 bit int)
 def test_connection_add_conversion_with_warning():
@@ -202,7 +202,7 @@ def test_connection_wrong_shape():
     for item in log:
         if item.class_name == "WorkFlow" and item.function_name == "add_connection":
             assert item.identifier == "image.output.image.input"
-            assert "connection not created (failed at shape checks):invalid image shapes: target port 'image.input' requires c=1, for source_port 'image.output', c=4" in item.message 
+            assert "connection not created (failed at shape checks): target port 'image.input' requires c=1, for source_port 'image.output', c=4" in item.message 
 
 # call add_connection where a connection would pass shape checks but require transposition
 def test_connection_add_with_transposition():
@@ -236,7 +236,7 @@ def test_structure_check_add_connection_same_node():
     for item in log:
         print(item.message)
         if item.class_name == "WorkFlow" and item.function_name == "add_connection":
-            assert "connection not created (failed at structure checks):invalid connection: source port is target port" in item.message
+            assert "connection not created (failed at structure checks): invalid connection: source port is target port" in item.message
 
 # call add_connection where a connection would fail structure checks (connecting input to input/output to output)
 def test_structure_check_add_connection_source_input():
@@ -252,7 +252,7 @@ def test_structure_check_add_connection_source_input():
     for item in log:
         print(item.message)
         if item.class_name == "WorkFlow" and item.function_name == "add_connection":
-            assert "connection not created (failed at structure checks):invalid connection: source port is an input" in item.message
+            assert "connection not created (failed at structure checks): invalid connection: source port is an input" in item.message
 
 # call add_connection where a connection would fail structure checks(connecting to input which already has connections - NB - inputs allow 1 connection, outputs allow many connections)
 def test_structure_check_add_connection_already_present():
@@ -1086,6 +1086,7 @@ def test_update_graph_start_node_list():
 # Set io_image_operation.start_nodes to empty list | log GraphError: cannot update graph without defined start nodes|
 def test_update_graph_start_node_list_no_list():
 
+    old_start_nodes = core.io_image_operations.start_nodes
     core.io_image_operations.start_nodes = []
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
@@ -1096,6 +1097,7 @@ def test_update_graph_start_node_list_no_list():
     workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.2
 
     workflow.update_graph(test=True)
+    core.io_image_operations.start_nodes = old_start_nodes
     assert log[1].message == "cannot update graph without defined start nodes"
 
 # node input_port check 
@@ -1123,6 +1125,7 @@ def test_update_graph_previous_input_port_not_connected():
 
     workflow.update_graph(test=True)
 
+    assert "node.same_image_two_inputs.0" in [item.identifier for item in workflow.workflow_logger]
     for item in workflow.workflow_logger:
         if item.identifier == "node.same_image_two_inputs.0":
             assert "missing connections" in item.message
@@ -1155,6 +1158,7 @@ def test_update_graph_previous_input_port_not_ready():
 
     workflow.add_connection(source_port = workflow.nodes["node.same_image.2"].output_ports["image.output"],
                             target_port = workflow.nodes["node.same_image_two_inputs.0"].input_ports["image.input2"])
+
     workflow.update_graph(test=True)
 
     assert workflow.nodes["node.load_image.1"].is_ready == True
@@ -1200,9 +1204,9 @@ def test_update_graph_connected_but_needs_update_false():
     for item in workflow.workflow_logger:
         if item.identifier == "node.same_image_two_inputs.0":
             assert "node activated sucessfully" not in item.message
-# data transposition 
-# Set transpose attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error transposing data for port{} <br> Node not activated |
-def test_update_graph_tranpose_improper_value():
+
+# data present
+def test_update_graph_data_not_present():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
@@ -1210,7 +1214,7 @@ def test_update_graph_tranpose_improper_value():
 
 
     workflow.add_node(directory["same_image"])  # node0: node.same_images.0
-    workflow.add_node(directory["load_image"]) # node1: node.load_image.1            
+    workflow.add_node(directory["test_load_image_int"]) # node1: node.test_load_image_int.1            
 
 
     # create the following structure:
@@ -1220,22 +1224,53 @@ def test_update_graph_tranpose_improper_value():
     # node0 
 
     
-    workflow.nodes["node.load_image.1"].output_ports["image.output"].data = sample_data(dtype = DataPolicy.ImageInt, shape = (4,3,2,1))
-    workflow.nodes["node.load_image.1"].output_ports["image.output"].metadata.image_map = Shape(c=4, z=3, y=2, x=1)
+    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([4,3,2,1], np.uint8)
 
-    workflow.nodes["node.same_image.0"].input_ports["image.input"].metadata.image_map = Shape(c=1, z=2, y=3, x=4)
-
-    workflow.add_connection(source_port = workflow.nodes["node.load_image.1"].output_ports["image.output"],
+    workflow.add_connection(source_port = workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"],
                             target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
 
-    assert workflow.connections["connection.2"].transpose.c == 1
-    assert workflow.connections["connection.2"].transpose.z == 2
-    assert workflow.connections["connection.2"].transpose.y == 3
-    assert workflow.connections["connection.2"].transpose.x == 4
+    
+    workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"].data = None
+    workflow.nodes["node.same_image.0"].needs_update = True
+    workflow.update_graph(test=True)
+
+    assert "node.same_image.0" in [item.identifier for item in workflow.workflow_logger]
+
+    for item in workflow.workflow_logger:
+        if item.identifier == "node.same_image.0":
+            assert "no data present for port" in item.message
+
+# data shape 
+# Set transpose attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error transposing data for port{} <br> Node not activated |
+def test_update_graph_tranpose_improper_value():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+
+    workflow.add_node(directory["same_image"])  # node0: node.same_images.0
+    workflow.add_node(directory["test_load_image_int"]) # node1: node.test_load_image_int.1             
+
+
+    # create the following structure:
+    # node1         
+    #   |             
+    #   v             
+    # node0 
+
+    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.uint8)
+    workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"].metadata.image_map = Shape(c=3, z=2, y=1, x=0)
+
+    workflow.add_connection(source_port = workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
 
     workflow.connections["connection.2"].transpose = Shape(c=5,z=4,y=1,x=-1)
-    
+    workflow.nodes["node.same_image.0"].needs_update = True
+
     workflow.update_graph(test=True)
+
+    assert "node.same_image.0" in [item.identifier for item in workflow.workflow_logger]
 
     for item in workflow.workflow_logger:
         if item.identifier == "node.same_image.0":
@@ -1250,7 +1285,7 @@ def test_update_graph_tranpose():
 
 
     workflow.add_node(directory["same_image"])  # node0: node.same_images.0
-    workflow.add_node(directory["test_load_image"]) # node1: node.test_load_image.1            
+    workflow.add_node(directory["test_load_image_int"]) # node1: node.test_load_image_int.1            
 
 
     # create the following structure:
@@ -1260,30 +1295,136 @@ def test_update_graph_tranpose():
     # node0 
 
     
-    workflow.nodes["node.test_load_image.1"].input_ports["parameter.dtype"].data = "DataPolicy.ImageInt"
-    workflow.nodes["node.test_load_image.1"].input_ports["parameter.shape"].data = np.array([1,2,3,4], np.uint8)
+    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([4,3,2,1], np.uint8)
 
-    workflow.nodes["node.same_image.0"].input_ports["image.input"].metadata.image_map = Shape(c=1, z=2, y=3, x=4)
+    workflow.nodes["node.same_image.0"].input_ports["image.input"].metadata.image_map = Shape(c=3, z=2, y=1, x=0)
 
-    workflow.add_connection(source_port = workflow.nodes["node.test_load_image.1"].output_ports["image.output"],
+    workflow.add_connection(source_port = workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"],
                             target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
 
 
-
-    assert workflow.connections["connection.2"].transpose.c == 1
+    assert workflow.connections["connection.2"].transpose.c == 3
     assert workflow.connections["connection.2"].transpose.z == 2
-    assert workflow.connections["connection.2"].transpose.y == 3
-    assert workflow.connections["connection.2"].transpose.x == 4
+    assert workflow.connections["connection.2"].transpose.y == 1
+    assert workflow.connections["connection.2"].transpose.x == 0
+
+    print("SHAPE:",workflow.connections["connection.2"].source_port.data.shape )
+
+    assert workflow.connections["connection.2"].source_port.data.shape == (4,3,2,1)
+    assert workflow.connections["connection.2"].source_port.metadata.image_map.c == 0
+    assert workflow.connections["connection.2"].source_port.metadata.image_map.z == 1
+    assert workflow.connections["connection.2"].source_port.metadata.image_map.y == 2
+    assert workflow.connections["connection.2"].source_port.metadata.image_map.x == 3
    
     workflow.update_graph(test=True)
 
+    assert workflow.nodes["node.same_image.0"].input_ports["image.input"].metadata.image_map.c == 3
+    assert workflow.nodes["node.same_image.0"].input_ports["image.input"].metadata.image_map.z == 2
+    assert workflow.nodes["node.same_image.0"].input_ports["image.input"].metadata.image_map.y == 1
+    assert workflow.nodes["node.same_image.0"].input_ports["image.input"].metadata.image_map.x == 0
+
+    assert workflow.nodes["node.same_image.0"].input_ports["image.input"].data.shape == (1,2,3,4)
+
+
+# check improper image shape caught
+def test_update_graph_shape_check_data():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+    #set up graph with node with undefined output shape going to node with input shape constraints, with incorrect output data
+    # create the following structure:
+    # node1 (test_load_image_int)        
+    #   |             
+    #   v             
+    # node0 (single_channel_input)
+
+    workflow.add_node(directory["single_channel_input"])  # node0: node.single_channel_input.0
+    workflow.add_node(directory["test_load_image_int"]) # node1: node.test_load_image_int.1   
+
+    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.uint8)
+
+    workflow.add_connection(source_port = workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.single_channel_input.0"].input_ports["image.input"])
+
+
+
+    assert workflow.connections["connection.2"]
+
+    workflow.update_graph(test=True)
+
+    assert "node.single_channel_input.0" in [item.identifier for item in workflow.workflow_logger]
     for item in workflow.workflow_logger:
         print(f"{item.identifier}: {item.message}")
-        if item.identifier == "node.same_image.0":
-            assert "new_shape shape dimensions out of range" in item.message
+        if item.identifier == "node.single_channel_input.0":
+            assert "incorrect image shape for 'node.single_channel_input.0'" in item.message
+
 
 # data conversion 
 # Set convert attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error converting data for port{} <br> Node not activated |
-# update_graph
-# create graph with single source, correct input data and connections | all nodes run<br> all nodes needs_update flag set to False <br> all nodes is_ready set to True |
-# create graph with two sources, correct connections and input_data from one source | all expected nodes run<br> all run nodes needs_update flag set to False <br> all run nodes is_ready flag set to True |
+def test_update_graph_convert_improper_value():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+
+    workflow.add_node(directory["same_image"])  # node0: node.same_images.0
+    workflow.add_node(directory["test_load_image_int"]) # node1: node.test_load_image_int.1            
+
+
+    # create the following structure:
+    # node1         
+    #   |             
+    #   v             
+    # node0 
+
+    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.uint8)
+
+    workflow.add_connection(source_port = workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
+
+    workflow.connections["connection.2"].convert = DataPolicy.ValueInt
+    workflow.nodes["node.same_image.0"].needs_update = True
+
+    
+    workflow.update_graph(test=True)
+    assert workflow.connections["connection.2"].convert == DataPolicy.ValueInt
+
+    assert "node.same_image.0" in [item.identifier for item in workflow.workflow_logger]
+
+    for item in workflow.workflow_logger:
+        print(f"\n{item.identifier}: {item.message}")
+        if item.identifier == "node.same_image.0":
+            assert "error converting data for port 'image.input'" in item.message
+
+def test_update_graph_convert():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+
+
+    workflow.add_node(directory["same_image"])  # node0: node.same_images.0
+    workflow.add_node(directory["test_load_image_float"]) # node1: node.test_load_image_float.1            
+
+
+    # create the following structure:
+    # node1         
+    #   |             
+    #   v             
+    # node0 
+
+    workflow.nodes["node.test_load_image_float.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.uint8)
+
+    workflow.add_connection(source_port = workflow.nodes["node.test_load_image_float.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
+   
+    workflow.update_graph(test=True)
+    assert workflow.connections["connection.2"].convert == DataPolicy.ImageInt
+
+
+    for item in workflow.workflow_logger:
+        assert item.identifier != "node.same_image.0"
+

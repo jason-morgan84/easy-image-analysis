@@ -938,7 +938,9 @@ Plugins to make:
 |node input_port check | Node in graph with 1 input port connected and ready, 1 not connected | Node not activated |
 |node ready_state check | Node in graph with where all ports connected but not all previous nodes is_ready flagged as True | Node not activated |
 |node needs_update check | Node in graph with where all ports connected and ready but needs_update set to False| Node not activated |
+|data check| nodes set to is_ready but no data at source_port | 
 |data transposition | Set transpose attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error transposing data for port{} <br> Node not activated |
+|data shape| check improper image shape caught - send data shape c = 4 to port that requires c=1|log: incorrect image shape for... <br>Node not activated |
 |data conversion | Set convert attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error converting data for port{} <br> Node not activated |
 |node activation | Find some way of causing an error on node activation?| log GraphError: error activating node<br> Node not activated |
 |update_graph | create graph with single source, correct input data and connections | all nodes run<br> all nodes needs_update flag set to False <br> all nodes is_ready set to True |
