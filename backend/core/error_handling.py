@@ -65,3 +65,10 @@ class ExportError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
+
+class ShapeError(Exception):
+    """Exception raised when incompatible image shapes"""
+
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
