@@ -3,7 +3,8 @@ import os
 from PIL import Image
 
 lut_folder_location = ".\\frontend\\luts"
-image_output_dimensions = 512
+image_frame_x = 512
+image_frame_y = 512
 
 def import_luts():
     lut_list = {}
@@ -42,7 +43,7 @@ def import_luts():
 
     return lut_list
 
-def create_image(input_image, luts, top=0, left=0, zoom=1.0 ):
+def create_image(input_image, luts, z=0, y_centre=0, x_centre=0, zoom=1.0 ):
     # inputs:
     #   input_image: np.ndarray of np.uint in format CZYX
     #   luts: dictionary of form {channel: lut_name} where channel is an integer representing an input_image channel number and lut_name is a key from lut_lists
@@ -77,58 +78,35 @@ def create_image(input_image, luts, top=0, left=0, zoom=1.0 ):
             raise ValueError(f"expected luts values as np.ndarray of shape (3,256), not {value.shape}")
 
     # check top and left integers within expected range
-    if not isinstance(top, (int, np.integer)):
-        raise TypeError(f"expected top as integer, not {type(top)}")
-    if top < 0 or top > dim_y:
-        raise ValueError(f"top out of range for image size")
-    if not isinstance(left, (int, np.integer)):
-        raise TypeError(f"expected left as integer, not {type(top)}")
-    if left < 0 or left > dim_x:
+    if not isinstance(y_centre, (int, np.integer)):
+        raise TypeError(f"expected top as integer, not {type(y_centre)}")
+    if y_centre < 0 or y_centre > dim_y:
+        raise ValueError(f"y_centre out of range for image size")
+    if not isinstance(x_centre, (int, np.integer)):
+        raise TypeError(f"expected left as integer, not {type(x_centre)}")
+    if x_centre < 0 or x_centre > dim_x:
         raise ValueError(f"left out of range for image size")
     
     # check zoom is a float
     if not isinstance(zoom, (float,np.floating)):
-        raise TypeError(f"expected zoom as float, not {type(top)}")
+        raise TypeError(f"expected zoom as float, not {type(zoom)}")
 
-    # calculate zoom
-    # considerations - 
-    # 
-    # Algorithm:
-    # 1) Pad images smaller than 512 x 512 to 512 x 512 using black pixels
-    # 2) Pad small dimension of rectangular images to square using black pixels
-    # 3) If zoom = 1, image is presented at same scale it was made: crop any padded images larger than 512 x 512 to 512 x 512, starting from (top, left)
-    # 4) if zoom > 1, image will be resized using inter_nearest: take a region starting at (top, left) measuring 512/zoom x 512/zoom and resize to 512 x 512
-    # 5) if zoom < 1, image will be resized using inter_area: take a region starting at (top, left) measuring 512/zoom x 512/zoom and resize to 512 x 512
-    # 6) if resulting image is smaller than 512 x 512, pad using black pixels
-    # nb) panning may interact weirdly with zoom. Depending on UI implementation and feel for the user, the actual top, left values may need to be adjusted according to zoom to keep a consistent user experience.
+    # reduce to required z slices
+    # reduce to required cs
 
+    # adjust viewport dimension by zoom:
+    viewport_y = image_frame_y / zoom
+    viewport_x = image_frame_x / zoom
 
-    # when zoom = 1, image is presented at same scale it was made (so cropped or padded only)
-    #                   If image is 256 x 256, it will need padding, 
-    #                   If image is 1024 x 1024, only a quarter of the image will be visible
-    #                  when zoom > 1, image will be resized using inter_nearest
-    #                   
-    #                   
-    #                  when zoom < 1, image will be resized using inter_area
-    #                       if resulting image < 512 x 512, pad it with black
-    # if image is 512 x 512:
-    #   if zoom is 1, take 512 x 512 image and convert
-    #   if zoom is 0.5, use inter_area to reduce to 256 x 256 - buffer surrounding pixels with black space
-    #   if zoom is 2, use inter_nearest to expand 256 x 256 pixels starting with (top, left) (defined using array splicing) to 512 x 512
-    #   if zoom is n: if n > 1 use inter_nearest to expand original_width/n x original_height/n (rounding where required) starting with (top, left) to 512 x 512
-    #                 if n < 1, use inter_area to reduce to original_width/n x original_height/n (rounding where required) starting with (top, left) to 512 x 512
+    viewport = np.zeros ((len(luts), viewport_y, viewport_x), np.uint8)
 
-    # if image is 1024 x 1024:
-    #   if zoom is 1: use inter_area to reduce to 512 x 512
-    #   if zoom is 0.5: use inter_area to reduce to 256 x 256 - buffer surrounding pixels with black space
+    # create viewport as np.array of 0s
+    # position viewport
+    # if viewport is smaller than image dimension, position as close to centre point that doesn't cause buffering
+    # if viewport is larger than image dimension, position as close to centre point as possible so as not to cut off any image
+    # overwrite any portion of viewport that covers image
 
-    # if image is y x x:
-    #   if zoom is 1:
-    #           1) if y or x < 512: add black pixels to make 512
-    #           2) if y or x > 512: use inter_area to reduce to 512 x 512 starting with (top, left)
-    #   if zoom is n:
-    #           1) 
-                      
+ 
 
     
         
