@@ -131,6 +131,7 @@
 |27/10/27|0.18.6|Update Specification description of WorkFlow class and how this defines and checks data flow through graph|
 |30/10/27|0.18.7|Update error_handling.py description to include ShapeError|
 |01/11/27|0.19.0|Added documentation for import_luts and import_luts unit testing|
+|01/11/27|0.19.0|Added documentation for create_image|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -608,6 +609,13 @@ Plugins to make:
 Imports image files for use as LUTs.
 Image files must be 8bit RGB images of heigh 1 pixel and width 256 pixels.
 The folder scanned is defined in frontend_operations.py.
+
+# 5.2 create_image
+
+Takes input of image, a dictionary of channels: LUTs for output, desired image centre, desired z slice and desired zoom level.
+Returns a numpy uint8 array defining RGB output image for use in front end.
+
+min and max zoom values as well as output frame size are defined in frontend_operations.py (for now.)
 
 # 6 System Frontend and UI
 
