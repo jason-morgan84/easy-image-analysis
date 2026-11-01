@@ -2,6 +2,7 @@ import numpy as np
 import os
 from PIL import Image
 from core.error_handling import log
+import cv2
 
 lut_folder_location = ".\\frontend\\luts"
 image_frame_x = 512
@@ -52,7 +53,7 @@ def import_luts(logger = []):
 
     return lut_list
 
-def create_image(input_image, luts, z=0, y_centre=0, x_centre=0, zoom=1.0 ):
+def create_image(input_image, luts, z=0, centre_y=0, centre_x=0, zoom=1.0 ):
     # inputs:
     #   input_image: np.ndarray of np.uint in format CZYX
     #   luts: dictionary of form {channel: lut_name} where channel is an integer representing an input_image channel number and lut_name is a key from lut_lists
@@ -87,13 +88,13 @@ def create_image(input_image, luts, z=0, y_centre=0, x_centre=0, zoom=1.0 ):
             raise ValueError(f"expected luts values as np.ndarray of shape (3,256), not {value.shape}")
 
     # check top and left integers within expected range
-    if not isinstance(y_centre, (int, np.integer)):
-        raise TypeError(f"expected y_centre as integer, not {type(y_centre)}")
-    if y_centre < 0 or y_centre > dim_y:
+    if not isinstance(centre_y, (int, np.integer)):
+        raise TypeError(f"expected y_centre as integer, not {type(centre_y)}")
+    if centre_y < 0 or centre_y > dim_y:
         raise ValueError(f"y_centre out of range for image size")
-    if not isinstance(x_centre, (int, np.integer)):
-        raise TypeError(f"expected x_centre as integer, not {type(x_centre)}")
-    if x_centre < 0 or x_centre > dim_x:
+    if not isinstance(centre_x, (int, np.integer)):
+        raise TypeError(f"expected x_centre as integer, not {type(centre_x)}")
+    if centre_x < 0 or centre_x > dim_x:
         raise ValueError(f"x_centre out of range for image size")
     
     # check zoom is a float within min, max zoom values and is not < 0
@@ -123,40 +124,60 @@ def create_image(input_image, luts, z=0, y_centre=0, x_centre=0, zoom=1.0 ):
     viewport_y = int(image_frame_y / zoom)
     viewport_x = int(image_frame_x / zoom)
 
-    # create viewport as np.array of 0s
-    viewport = np.zeros ((3, viewport_y, viewport_x), np.uint8)
-
     # position viewport
     # (note, viewport centre is already constrained to within image dimensions)
     # if viewport is smaller than image dimension, position as close to desired point that doesn't cause buffering
-    actual_y_centre = y_centre
-    half_y_viewport = viewport_y // 2
+    actual_centre_y = centre_y
+    half_viewport_y = viewport_y // 2
     if viewport_y <= dim_y:
-        if y_centre + half_y_viewport > dim_y:
-            actual_y_centre = dim_y - half_y_viewport
-        elif y_centre - half_y_viewport < 0:
-            actual_y_centre = half_y_viewport
+        if centre_y + half_viewport_y > dim_y:
+            actual_centre_y = dim_y - half_viewport_y
+        elif centre_y - half_viewport_y < 0:
+            actual_centre_y = half_viewport_y
     # if viewport is larger than image dimension, position as close to centre point as possible so as not to cut off any image
     elif viewport_y > dim_y:
-        actual_y_centre = dim_y // 2
+        actual_centre_y = dim_y // 2
 
     # likewise for x dimension
-    actual_x_centre = x_centre
-    half_x_viewport = viewport_x // 2
+    actual_centre_x = centre_x
+    half_viewport_x = viewport_x // 2
     if viewport_x <= dim_x:
-        if x_centre + half_x_viewport > dim_x:
-            actual_x_centre = dim_x - half_x_viewport
-        elif x_centre - half_x_viewport < 0:
-            actual_x_centre = half_x_viewport
+        if centre_x + half_viewport_x > dim_x:
+            actual_centre_x = dim_x - half_viewport_x
+        elif centre_x - half_viewport_x < 0:
+            actual_centre_x = half_viewport_x
     elif viewport_x > dim_x:
-        actual_x_centre = dim_x // 2
+        actual_centre_x = dim_x // 2
     
-    # overwrite any portion of viewport that covers image
-    processed_image = input_image[:,:,actual_y_centre - half_y_viewport : actual_y_centre + half_y_viewport, actual_x_centre - half_x_viewport : actual_x_centre + half_x_viewport]
-
     # create 3 channel array of 0s as RGB image
-    # create image by looping through channels and adding LUT values for each pixel to image
- 
+    rgb_image = np.zeros((3, viewport_y, viewport_x), np.uint8)
+
+    # get start and end values coordinates of viewport
+    start_y = actual_centre_y - half_viewport_y
+    end_y = start_y + viewport_y
+
+    start_x = actual_centre_x - half_viewport_x
+    end_x = start_x + viewport_x
+
+    # loop through each channel and lut
+    for channel, lut in luts.items():
+        # loop through each pixel
+        for rgb_y, input_y in enumerate(range(start_y, end_y)):
+            for rgb_x, input_x in enumerate(range(start_x, end_x)):
+                # increment RGB image channels by respective LUT RGB value
+                pixel_value = input_image[channel][input_y][input_x]
+                rgb_image[0][rgb_y][rgb_x] += lut[0][pixel_value]
+                rgb_image[1][rgb_y][rgb_x] += lut[1][pixel_value]
+                rgb_image[2][rgb_y][rgb_x] += lut[2][pixel_value]
+
+    # resize rgb_image given zoom value
+    if zoom > 1:
+        rgb_image = cv2.resize(rgb_image, (512, 512), interpolation=cv2.inter_nearest)
+    elif zoom < 1:
+        rgb_image = cv2.resize(rgb_image, (512, 512), interpolation=cv2.inter_area)
+
+
+    return rgb_image
 
     
         
