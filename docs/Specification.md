@@ -131,7 +131,8 @@
 |27/10/27|0.18.6|Update Specification description of WorkFlow class and how this defines and checks data flow through graph|
 |30/10/27|0.18.7|Update error_handling.py description to include ShapeError|
 |01/11/27|0.19.0|Added documentation for import_luts and import_luts unit testing|
-|01/11/27|0.19.0|Added documentation for create_image|
+|01/11/27|0.19.1|Added documentation for create_image|
+|01/11/27|0.19.2|Added unit testing for create_image|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -983,7 +984,7 @@ min and max zoom values as well as output frame size are defined in frontend_ope
 |save image|try to save valid image to valid path|image saved as expected|
 
 ## 8.7 Backend/Frontend functions
-### import_lut
+### 8.7.1 import_lut
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
 |test for png   | import non-png file | logged: lut file not imported as not .png <br> file not imported |
@@ -992,6 +993,27 @@ min and max zoom values as well as output frame size are defined in frontend_ope
 |test png size   | import 1 x 128 pixel png | logged: discarded as not correct shape <br> file not imported |
 |import_lut  | imports expected number of luts correctly | expected number of luts imported |
 
+### 8.7.2 create_image
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|check input image  | send in non np.ndarray| TypeError: expected input_image as np.ndarray |
+|check input image  | send in np.ndarray not of np.uint8| TypeError: expected input_image as np.ndarray of np.uint8 |
+|check luts | send in luts not as dictionary| TypeError: expected luts as dictionary |
+|check luts | send in luts with duplicate keys| ValueError: luts dictionary contains duplicate keys |
+|check luts | send in luts with non-integer key| TypeError: expected luts keys as integers |
+|check luts | send in luts with key that doesn't match channel| ValueError: luts dictionary contains out of range key |
+|check luts | send in luts with non-dictionary value| TypeError: expected luts values as np.ndarray |
+|check luts | send in luts with value that isn't of correct shape| ValueError: expected luts values as np.ndarray of shape (256,3)|
+|check centres| send in centre_y not as integer | TypeError: expected centre_y as integer|
+|check centres| send in centre_y less than 0 or higher than image size | ValueError: centre_y out of range for image sizer|
+|check centres| send in centre_x not as integer | TypeError: expected centre_x as integer|
+|check centres| send in centre_x less than 0 or higher than image size | ValueError: centre_x out of range for image sizer|
+|check zoom| send in zoom not as float | TypeError: expected zoom as float|
+|check zoom| send in zoom less than zoom_min | ValueError: zoom less than minimum allowed value|
+|check zoom| send in zoom greater than zoom_max | ValueError: zoom greater than maximum allowed value|
+|check z|send in z not as integer| TypeError: expected z as integer|
+|check z|send in z outside image z dimension size| ValueError: z outside image dimensions|
+|create_image| send in correct parameters | output image as expected |
 # 9 Versioning
 
 Versioning and changelogs are implemented using the "keep a changelog" 1.1 format (https://keepachangelog.com/en/1.1.0/).
