@@ -1,12 +1,13 @@
 import numpy as np
 import os
 from PIL import Image
+from core.error_handling import log
 
 lut_folder_location = ".\\frontend\\luts"
 image_frame_x = 512
 image_frame_y = 512
 
-def import_luts():
+def import_luts(logger = []):
     lut_list = {}
     # get all files in lut folder
     path = lut_folder_location
@@ -17,29 +18,39 @@ def import_luts():
         name, extension = os.path.splitext(file)
         # check file is a png
         if extension != ".png":
-            print(f"\nfile discarded as not .png: '{file}'")
+            log(logger,ImportError,f"lut file not imported as not .png: '{file}'",None,"import_luts",str(file))
             continue
 
         # open file
         try:
             import_lut = Image.open(os.path.join(path, file))
         except Exception as e:
-            print(f"\nfailed to open file '{file}': {e}")
+            log(logger,ImportError,f"lut file could not be opened '{file}': {e}",None,"import_luts",str(file))
+            continue
+
+        print(f"\n{file}: {import_lut.mode}")
+        if import_lut.mode != 'RGB':
+            log(logger,ImportError,f"lut file not 8-bit RGB image: '{file}'",None,"import_luts",str(file))
             continue
 
         # convert to np.array
         new_lut = np.array(import_lut)
+        # input will be shape (1,256,3), so remove fist dimension
+        new_lut = np.squeeze(new_lut, axis = 0)
+
+
+
 
         # check shape is correct
-        if new_lut.shape != (3,256):
-            print(f"\nfile discarded as not correct shape: {new_lut.shape}")
+        if new_lut.shape != (256, 3):
+            log(logger,ImportError,f"\nlut '{file}' discarded as not correct shape: {new_lut.shape}",None,"import_luts",str(file))
             continue
 
         # convert file name to user-visible name by replacing _ with space and converting to sentence case
         name = name.replace("_", " ").capitalize()
 
         # add to lut_list dictionary
-        lut_list["name"] = new_lut
+        lut_list[name] = new_lut
 
     return lut_list
 
