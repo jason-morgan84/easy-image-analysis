@@ -6,6 +6,8 @@ from core.error_handling import log
 lut_folder_location = ".\\frontend\\luts"
 image_frame_x = 512
 image_frame_y = 512
+zoom_min = 0.1
+zoom_max = 10
 
 def import_luts(logger = []):
     lut_list = {}
@@ -28,7 +30,6 @@ def import_luts(logger = []):
             log(logger,ImportError,f"lut file could not be opened '{file}': {e}",None,"import_luts",str(file))
             continue
 
-        print(f"\n{file}: {import_lut.mode}")
         if import_lut.mode != 'RGB':
             log(logger,ImportError,f"lut file not 8-bit RGB image: '{file}'",None,"import_luts",str(file))
             continue
@@ -37,9 +38,6 @@ def import_luts(logger = []):
         new_lut = np.array(import_lut)
         # input will be shape (1,256,3), so remove fist dimension
         new_lut = np.squeeze(new_lut, axis = 0)
-
-
-
 
         # check shape is correct
         if new_lut.shape != (256, 3):
@@ -90,33 +88,74 @@ def create_image(input_image, luts, z=0, y_centre=0, x_centre=0, zoom=1.0 ):
 
     # check top and left integers within expected range
     if not isinstance(y_centre, (int, np.integer)):
-        raise TypeError(f"expected top as integer, not {type(y_centre)}")
+        raise TypeError(f"expected y_centre as integer, not {type(y_centre)}")
     if y_centre < 0 or y_centre > dim_y:
         raise ValueError(f"y_centre out of range for image size")
     if not isinstance(x_centre, (int, np.integer)):
-        raise TypeError(f"expected left as integer, not {type(x_centre)}")
+        raise TypeError(f"expected x_centre as integer, not {type(x_centre)}")
     if x_centre < 0 or x_centre > dim_x:
-        raise ValueError(f"left out of range for image size")
+        raise ValueError(f"x_centre out of range for image size")
     
-    # check zoom is a float
+    # check zoom is a float within min, max zoom values and is not < 0
     if not isinstance(zoom, (float,np.floating)):
         raise TypeError(f"expected zoom as float, not {type(zoom)}")
+    if zoom <= 0:
+        raise ValueError(f"zoom cannot be 0 or less, got {zoom}")
+    if zoom < zoom_min:
+        raise ValueError(f"zoom less than minimum allowed value: {zoom} < {zoom_min}")
+    if zoom > zoom_max:
+        raise ValueError(f"zoom greater than maximum allowed value: {zoom} > {zoom_max}")
+
+    # check z is an integer and within dimensions of image
+    if not isinstance(z, (int, np.integer)):
+        raise TypeError(f"expected z as integer, not {type(z)}")
+    if z < 0 or z > (dim_z - 1):
+        raise ValueError(f"z outside image dimensions: {z} must be greater than 0 and less than {dim_z - 1}")
 
     # reduce to required z slices
+    input_image = input_image[:,z:z,:,:]
+
     # reduce to required cs
+    desired_channels = luts.keys()
+    input_image = input_image[desired_channels,:,:,:]
 
     # adjust viewport dimension by zoom:
-    viewport_y = image_frame_y / zoom
-    viewport_x = image_frame_x / zoom
-
-    viewport = np.zeros ((len(luts), viewport_y, viewport_x), np.uint8)
+    viewport_y = int(image_frame_y / zoom)
+    viewport_x = int(image_frame_x / zoom)
 
     # create viewport as np.array of 0s
-    # position viewport
-    # if viewport is smaller than image dimension, position as close to centre point that doesn't cause buffering
-    # if viewport is larger than image dimension, position as close to centre point as possible so as not to cut off any image
-    # overwrite any portion of viewport that covers image
+    viewport = np.zeros ((3, viewport_y, viewport_x), np.uint8)
 
+    # position viewport
+    # (note, viewport centre is already constrained to within image dimensions)
+    # if viewport is smaller than image dimension, position as close to desired point that doesn't cause buffering
+    actual_y_centre = y_centre
+    half_y_viewport = viewport_y // 2
+    if viewport_y <= dim_y:
+        if y_centre + half_y_viewport > dim_y:
+            actual_y_centre = dim_y - half_y_viewport
+        elif y_centre - half_y_viewport < 0:
+            actual_y_centre = half_y_viewport
+    # if viewport is larger than image dimension, position as close to centre point as possible so as not to cut off any image
+    elif viewport_y > dim_y:
+        actual_y_centre = dim_y // 2
+
+    # likewise for x dimension
+    actual_x_centre = x_centre
+    half_x_viewport = viewport_x // 2
+    if viewport_x <= dim_x:
+        if x_centre + half_x_viewport > dim_x:
+            actual_x_centre = dim_x - half_x_viewport
+        elif x_centre - half_x_viewport < 0:
+            actual_x_centre = half_x_viewport
+    elif viewport_x > dim_x:
+        actual_x_centre = dim_x // 2
+    
+    # overwrite any portion of viewport that covers image
+    processed_image = input_image[:,:,actual_y_centre - half_y_viewport : actual_y_centre + half_y_viewport, actual_x_centre - half_x_viewport : actual_x_centre + half_x_viewport]
+
+    # create 3 channel array of 0s as RGB image
+    # create image by looping through channels and adding LUT values for each pixel to image
  
 
     
