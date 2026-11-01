@@ -130,6 +130,7 @@
 |27/10/26|0.18.5|Updated specification for ImageOperations and Metadata|
 |27/10/27|0.18.6|Update Specification description of WorkFlow class and how this defines and checks data flow through graph|
 |30/10/27|0.18.7|Update error_handling.py description to include ShapeError|
+|01/11/27|0.19.0|Added documentation for import_luts and import_luts unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -601,8 +602,14 @@ Plugins to make:
 * Segmentation
 * Watershedding
 
+# 5 Functions for backend/frontend communication
+# 5.1 import_lut
 
-# 5 System Frontend and UI
+Imports image files for use as LUTs.
+Image files must be 8bit RGB images of heigh 1 pixel and width 256 pixels.
+The folder scanned is defined in frontend_operations.py.
+
+# 6 System Frontend and UI
 
 ![UI diagram](/docs/UI.svg)
  
@@ -618,7 +625,7 @@ Plugins to make:
 10.	Channel options view toggle (allows selection of LUTs, what channels are visible etc)
 
 *both views can be toggled to view the outputs of other nodes by clicking the node (for the output view) or shift-clicking the node (for the input view). Zoom using mouse wheel, double right clicking/left clicking. Pan by dragging and/or scroll bars. 
-# 6 Development Plan
+# 7 Development Plan
 ## Stage 0 - Planning
 * Plan overall design.
 * Plan class structure.
@@ -654,9 +661,9 @@ Plugins to make:
 ### Stage 2.1 – Frontend Planning
 * Detailed plans for frontend from initial overview.
 * Plan implementation of frontend.
-# 7 Testing
-## 7.1 – Backend Foundation Classes
-### 7.1.1 DataType
+# 8 Testing
+## 8.1 – Backend Foundation Classes
+### 8.1.1 DataType
 **BaseType**
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
@@ -699,7 +706,7 @@ Plugins to make:
 |value constraint check | For array dtype with min, max values, do random values conform to min and max | values conform | values out of range/value error from underlying type |
 |output type checks| Check that output types match expecations for numpy = True and numpy = False | Correct outout types | incorrect output types |
 
-### 7.1.2 Shape
+### 8.1.2 Shape
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |init|Instantiate class with missing attribute|AttributeError: "Shape class instantiated with missing argument" | No error|
@@ -710,7 +717,7 @@ Plugins to make:
 |get_item|Test getting items using either index or dimension string| returns correct values|Returns incorrect values|
 |set_item|Test setting items using either index or dimension string| Sets correct values|Sets incorrect values|
 
-### 7.1.3 Tranpose Function
+### 8.1.3 Tranpose Function
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
 |tranpose | send in non nparray 'value' | TypeError: expected value as np.array|
@@ -718,9 +725,9 @@ Plugins to make:
 |tranpose | send in non new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)| ValueError: new_shape shape dimensions out of range |
 |tranpose | Send in valid new_shape and value| output with expected shape |
 
-## 7.2 – Backend Composition Classes
+## 8.2 – Backend Composition Classes
 
-### 7.2.1 Image
+### 8.2.1 Image
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Use unexpected data type (not ImageInt, ImageFloat or ImageBinary)|	Type Error	| Type converted to correct type<br>Incorrectly type data used anyway</li></ul>|
@@ -733,7 +740,7 @@ Plugins to make:
 |transpose| new_shape arguement has values out of range |Value error | No error given |
 |transpose|transpose test image | resulting image pixel_array has expected Shape | resulting image pixel array has incorrect shape |
 
-### 7.2.2 Parameters
+### 8.2.2 Parameters
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
@@ -741,9 +748,9 @@ Plugins to make:
 |convert| convert arguement for value_type not in value_type class | Type error | No error given |
 |convert| convert test parameter | output of expected type | output not of expected type |
 
-## Stage 7.3 – Backend Excecution Classes
+## Stage 8.3 – Backend Excecution Classes
 
-### 7.3.1 data_checks.py
+### 8.3.1 data_checks.py
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |check_metadata| send metadata not as dictionary | TypeError: expected to be dictionary|No error|
@@ -756,7 +763,7 @@ Plugins to make:
 |check_data\check_image_shape|set image where the shape does not match shape defined in metadata|ValueError: image shape does not match metadata| No Error|
 |check_data\check_parameter_shape|set parameter where shape does not exist in metadata|ValueError: no shape defined in metadata for array type parameter test.input|No Error|
 |check_data\check_parameter_shape|set parameter where the shape does not match shape defined in metadata|ValueError: array shape does not match shape metadata for test.input|No Error|
-### 7.3.2 ImageOperation
+### 8.3.2 ImageOperation
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |input_image_metadata setter| check input_image_metadata exists (input_image_metadata) | ValueError: for ImageOperation, input_metadata is required| No error|
@@ -782,7 +789,7 @@ Plugins to make:
 |run_code|Code provided returns an parameter with array type that doesn't match metadata|TypeError:dictionary value of incorrect type| No error given |
 |run_code|Code provided returns an parameter with array shape that doesn't match metadata|ValueError: array shape does not match shape metadata| No error given |
 
-### 7.3.3 ImageOperationDirectory
+### 8.3.3 ImageOperationDirectory
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |ImportList|Import ImageOperation with correct category| Correct category saved to ImageOperation | Incorrect category|
@@ -803,9 +810,9 @@ Plugins to make:
 |ImportConstraints|Import an ImageOperation with unacceptable import|  ImageOperation rejected and reported | ImageOperation accepted|
 |ImportConstraints|Import an ImageOperation with acceptable import|  ImageOperation imported | ImageOperation accepted|
 
-## 7.4 Backend Interface Classes
+## 8.4 Backend Interface Classes
 
-### 7.4.1 Port Class
+### 8.4.1 Port Class
 
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
@@ -823,13 +830,13 @@ Plugins to make:
 | data setter | Pass in data where metadata.dtype does not define dtype from DataTypes** | TypeError: port MetaData defines unexpected dtype| No error|
 * this error should be impossible to generate given current structure of Shape, it will give an error from Shape class instead. Leave in case of future changes to Shape class
 ** This error should also be impossible to generate given current structure of Metadata classes, wil give an error from ImageMetadata or ParameterMetadata instead.
-### 7.4.2 Connection Class
+### 8.4.2 Connection Class
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
 | source_port     |source_port not Port class|Type error|source_port accepted|
 | target_port |target_port not Port class|Type error|target_port accepted|
 
-### 7.4.2 Node Class
+### 8.4.2 Node Class
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                | 
 | image_operation setter     |Provide image_operation thats not ImageOperation class|Type error|Input accepted|
@@ -850,13 +857,13 @@ Plugins to make:
 | port activation <br> post-tests | ~~Activate node where an ImageOperation output_parameter does not contain value ~~| ActivationError| node activates|
 * final two unit tests removed because this situation raises an error in ImageOperation which will result in it failing at the import stage
 
-## 7.5 WorkFlow Class
+## 8.5 WorkFlow Class
 
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
 |init | Pass arguement thats not mageOperationDirectory to WorkFlow | TypeError: expected ImageOperationDirectory class on WorkFlow instantiation|
 
-### 7.5.1 Node functions
+### 8.5.1 Node functions
 
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
@@ -873,7 +880,7 @@ Plugins to make:
 |edit_node | call edit_node with valid input | sets own "needs_update" flag to True |
 |edit_node | call edit_node with valid input | sets all downstream "needs_update" flags to True |
 
-### 7.5.2 Connection Functions
+### 8.5.2 Connection Functions
 
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
@@ -893,7 +900,7 @@ Plugins to make:
 |delete_connection | call delete_connection with proper arguements | Connection deleted |
 
 
-### 7.5.3 Graph topography functions
+### 8.5.3 Graph topography functions
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
 |get_next_nodes| call get_next_nodes from node with Node class input | get list of next nodes |
@@ -929,7 +936,7 @@ Plugins to make:
 |get_graph_map | call get_graph_map with invalid input - string not nodes key | Logs ValueError: for string inputs, get_graph_map expects a node dictionary key|
 |get_graph_map | call get_graph_map with invalid input - Node not nodes value | Logs ValueError: for node inputs, get_graph_map expects value from nodes dictionary|
 
-### 7.5.5 update_graph Function
+### 8.5.5 update_graph Function
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
 |start_node_list | Set io_image_operation.start_nodes | start_node_list properly updates|
@@ -946,8 +953,8 @@ Plugins to make:
 |update_graph | create graph with single source, correct input data and connections | all nodes run<br> all nodes needs_update flag set to False <br> all nodes is_ready set to True |
 |update_graph | create graph with two sources, correct connections and input_data from one source | all expected nodes run<br> all run nodes needs_update flag set to False <br> all run nodes is_ready flag set to True |
 
-## 7.6 Hardcoded ImageOperations
-### 7.6.1 LoadImage
+## 8.6 Hardcoded ImageOperations
+### 8.6.1 LoadImage
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
 |import image|non-tif path|ImportError: loading of non .tif files not currently implemented|
@@ -960,14 +967,24 @@ Plugins to make:
 |shape checking|import image with dimensions not in order CZYX| output image has dimensions in order CZYX|
 |output image|import image that should work|output image matches image expectations|
 
-### 7.6.2 SaveImage
+### 8.6.2 SaveImage
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
 |check path |Non-tif save path| ExportError: saving of non .tif files not currently implemented|
 |check path |invalid save path| ExportError: failed saving image|
 |save image|try to save valid image to valid path|image saved as expected|
 
-# 8 Versioning
+## 8.7 Backend/Frontend functions
+### import_lut
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|test for png   | import non-png file | logged: lut file not imported as not .png <br> file not imported |
+|test valid png  | import non-png file with png extension | logged: lut file could not be opened<br> file not imported |
+|test png mode  | import png not as RGB | logged: lut file not 8-bit RGB image <br> file not imported |
+|test png size   | import 1 x 128 pixel png | logged: discarded as not correct shape <br> file not imported |
+|import_lut  | imports expected number of luts correctly | expected number of luts imported |
+
+# 9 Versioning
 
 Versioning and changelogs are implemented using the "keep a changelog" 1.1 format (https://keepachangelog.com/en/1.1.0/).
 
@@ -975,7 +992,7 @@ This is unit tested for __version__ existing in __init__.py in the core director
 
 For now, version checks within the code are limited to the ImageOperationDirectory class, which checks the version number in imported modules to use import code that corresponds to the ImageOperation class structure at that defined version.
 
-## 9 Other Notes
+## 10 Other Notes
 * Changes to image shape should always be explicit, never incidental. For example, z-projection will reduce z dimension to 1 because that’s what z projection does, but thresholding a 5 slice z-stack will output 5 thresholds, not just 1.
 * Function code does not deal with type changes, checking of types, displaying images, UI input. The role of each function is purely to take its defined input, process it according to the supplied parameters, and produce an output in defined shape. As part of this role, it should include error handling to minimise/deal with possible errors (with the assumption that the input is of the required format). 
 * To allow for simple additions of new functions without affecting the base code, each function will be in a separate module. Along with the code itself, this module should include other data required to integrate into the software (definitions of parameters required, input and output data types, input and output image shape) and documentation (what the function does, how it affects the image shape, how changes to parameters affect output, any other points of interest). 
