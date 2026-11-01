@@ -70,7 +70,7 @@ def create_image(input_image, luts, z=0, centre_y=0, centre_x=0, zoom=1.0 ):
         raise TypeError(f"expected input_image as np.ndarray of np.uint8, not {input_image.dtype}")
 
     # get dimension sizes of input_image
-    dim_c, dim_z, dim_y, dim_x = input_image.shape
+    image_size_c, image_size_z, image_size_y, image_size_x = input_image.shape
 
     # check luts is a dictionary with integer keys, referencing channels, and np.arrays of shape (3,256) as values
     if not isinstance(luts, dict):
@@ -80,21 +80,21 @@ def create_image(input_image, luts, z=0, centre_y=0, centre_x=0, zoom=1.0 ):
     for key, value in luts.items():
         if not isinstance(key, int):
             raise TypeError(f"expected luts keys as integers, not {type(key)}")
-        if key < 0 or key > dim_c:
+        if key < 0 or key > image_size_c:
             raise ValueError(f"luts dictionary contains out of range key: {key}") 
         if not isinstance(value, np.ndarray):
             raise TypeError(f"expected luts values as np.ndarray, not {type(value)}")
-        if value.shape != (3,256):
-            raise ValueError(f"expected luts values as np.ndarray of shape (3,256), not {value.shape}")
+        if value.shape != (256,3):
+            raise ValueError(f"expected luts values as np.ndarray of shape (256,3), not {value.shape}")
 
     # check top and left integers within expected range
     if not isinstance(centre_y, (int, np.integer)):
         raise TypeError(f"expected y_centre as integer, not {type(centre_y)}")
-    if centre_y < 0 or centre_y > dim_y:
+    if centre_y < 0 or centre_y > image_size_y:
         raise ValueError(f"y_centre out of range for image size")
     if not isinstance(centre_x, (int, np.integer)):
         raise TypeError(f"expected x_centre as integer, not {type(centre_x)}")
-    if centre_x < 0 or centre_x > dim_x:
+    if centre_x < 0 or centre_x > image_size_x:
         raise ValueError(f"x_centre out of range for image size")
     
     # check zoom is a float within min, max zoom values and is not < 0
@@ -110,71 +110,89 @@ def create_image(input_image, luts, z=0, centre_y=0, centre_x=0, zoom=1.0 ):
     # check z is an integer and within dimensions of image
     if not isinstance(z, (int, np.integer)):
         raise TypeError(f"expected z as integer, not {type(z)}")
-    if z < 0 or z > (dim_z - 1):
-        raise ValueError(f"z outside image dimensions: {z} must be greater than 0 and less than {dim_z - 1}")
+    if z < 0 or z > (image_size_z - 1):
+        raise ValueError(f"z outside image dimensions: {z} must be greater than 0 and less than {image_size_z - 1}")
 
+    """shape image"""
     # reduce to required z slices
-    input_image = input_image[:,z:z,:,:]
+    input_image = input_image[:,z,:,:]
 
-    # reduce to required cs
-    desired_channels = luts.keys()
-    input_image = input_image[desired_channels,:,:,:]
+    # adjust viewport dimension by zoom (and adjust to avoid odd values):
+    viewport_size_y = int(image_frame_y / zoom)                     
+    viewport_size_y = viewport_size_y if viewport_size_y % 2 == 0 else viewport_size_y - 1
+    viewport_size_x = int(image_frame_x / zoom)
+    viewport_size_x = viewport_size_x if viewport_size_x % 2 == 0 else viewport_size_x - 1
 
-    # adjust viewport dimension by zoom:
-    viewport_y = int(image_frame_y / zoom)
-    viewport_x = int(image_frame_x / zoom)
-
-    # position viewport
-    # (note, viewport centre is already constrained to within image dimensions)
-    # if viewport is smaller than image dimension, position as close to desired point that doesn't cause buffering
-    actual_centre_y = centre_y
-    half_viewport_y = viewport_y // 2
-    if viewport_y <= dim_y:
-        if centre_y + half_viewport_y > dim_y:
-            actual_centre_y = dim_y - half_viewport_y
-        elif centre_y - half_viewport_y < 0:
-            actual_centre_y = half_viewport_y
-    # if viewport is larger than image dimension, position as close to centre point as possible so as not to cut off any image
-    elif viewport_y > dim_y:
-        actual_centre_y = dim_y // 2
+    # position viewport if viewport is smaller than image dimension 
+    # want to make sure viewport doesn't go past edge of the image 
+    # if viewport is larger or equal to image, the image will just be centred
+    viewport_actual_centre_y = centre_y
+    half_viewport_size_y = viewport_size_y // 2                                        
+    if viewport_size_y < image_size_y:                                                  
+        if centre_y + half_viewport_size_y > image_size_y:                              
+            viewport_actual_centre_y = image_size_y - half_viewport_size_y              
+        elif centre_y - half_viewport_size_y < 0:
+            viewport_actual_centre_y = half_viewport_size_y
 
     # likewise for x dimension
-    actual_centre_x = centre_x
-    half_viewport_x = viewport_x // 2
-    if viewport_x <= dim_x:
-        if centre_x + half_viewport_x > dim_x:
-            actual_centre_x = dim_x - half_viewport_x
-        elif centre_x - half_viewport_x < 0:
-            actual_centre_x = half_viewport_x
-    elif viewport_x > dim_x:
-        actual_centre_x = dim_x // 2
-    
-    # create 3 channel array of 0s as RGB image
-    rgb_image = np.zeros((3, viewport_y, viewport_x), np.uint8)
+    viewport_actual_centre_x = centre_x
+    half_viewport_size_x = viewport_size_x // 2
+    if viewport_size_x < image_size_x:
+        if centre_x + half_viewport_size_x > image_size_x:
+            viewport_actual_centre_x = image_size_x - half_viewport_size_x
+        elif centre_x - half_viewport_size_x < 0:
+            viewport_actual_centre_x = half_viewport_size_x
+   
+    # calculate region of image to be extracted
+    # if y dimension for viewport is bigger than image, get whole image then pad
+    # extracted rgb image size limited to size of input image
+    if viewport_size_y >= image_size_y:                                         
+        start_y = 0
+        end_y = image_size_y
+        rgb_size_y = image_size_y
+        y_pad = (viewport_size_y - image_size_y)//2
+    # if y dimension for viewport is smaller than image, get image on either side of viewport centre and don't pad
+    # extracted rgb image size matches size of viewport
+    elif viewport_size_y < image_size_y:
+        start_y = viewport_actual_centre_y - half_viewport_size_y               
+        end_y = start_y + viewport_size_y                                       
+        rgb_size_y = end_y - start_y                                            
+        y_pad = 0
 
-    # get start and end values coordinates of viewport
-    start_y = actual_centre_y - half_viewport_y
-    end_y = start_y + viewport_y
+    # likewise for x dimension
+    if viewport_size_x >= image_size_x:
+        start_x = 0
+        end_x = image_size_x
+        rgb_size_x = image_size_x
+        x_pad = (viewport_size_x - image_size_x) // 2
+    elif viewport_size_x < image_size_x:
+        start_x = viewport_actual_centre_x - half_viewport_size_x
+        end_x = start_x + viewport_size_x
+        rgb_size_x = end_x - start_x
+        x_pad = 0
 
-    start_x = actual_centre_x - half_viewport_x
-    end_x = start_x + viewport_x
+    # create np.array for extraction
+    # created as uint16 to avoid issues with values over 255
+    rgb_image = np.zeros((rgb_size_y, rgb_size_x, 3), np.uint16)
 
     # loop through each channel and lut
     for channel, lut in luts.items():
-        # loop through each pixel
-        for rgb_y, input_y in enumerate(range(start_y, end_y)):
-            for rgb_x, input_x in enumerate(range(start_x, end_x)):
-                # increment RGB image channels by respective LUT RGB value
-                pixel_value = input_image[channel][input_y][input_x]
-                rgb_image[0][rgb_y][rgb_x] += lut[0][pixel_value]
-                rgb_image[1][rgb_y][rgb_x] += lut[1][pixel_value]
-                rgb_image[2][rgb_y][rgb_x] += lut[2][pixel_value]
+        # get lut values for region of input image to be grabbed (as uint16 to avoid issues with values over 255)
+        lut_mapped = lut[input_image[channel, start_y:end_y, start_x:end_x]].astype(np.uint16)
+        # add each channel lut_map to rgb image and clip to 255
+        rgb_image = np.clip(rgb_image + lut_mapped, 0, 255)
+    # pad as required
+    rgb_image = np.pad(rgb_image, pad_width=((y_pad, y_pad), (x_pad, x_pad), (0,0)))
+    # return to uint8
+    rgb_image = rgb_image.astype(np.uint8)
 
     # resize rgb_image given zoom value
     if zoom > 1:
-        rgb_image = cv2.resize(rgb_image, (512, 512), interpolation=cv2.inter_nearest)
+        rgb_image = cv2.resize(rgb_image, (512, 512), interpolation=cv2.INTER_NEAREST)
     elif zoom < 1:
-        rgb_image = cv2.resize(rgb_image, (512, 512), interpolation=cv2.inter_area)
+        rgb_image = cv2.resize(rgb_image, (512, 512), interpolation=cv2.INTER_AREA)
+    else:
+        rgb_image = cv2.resize(rgb_image, (512, 512))
 
 
     return rgb_image
