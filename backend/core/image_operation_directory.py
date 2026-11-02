@@ -4,7 +4,8 @@ import importlib
 import pkgutil
 import os
 from core.error_handling import log, VersionError
-from core.data_checks import sample_data, check_metadata_dictionary
+from core.data_checks import sample_data, check_metadata_dictionary, check_data_dictionary_value
+from core.metadata import ParameterMetadata
 import ast
 import inspect
 
@@ -16,6 +17,7 @@ class ImageOperationDirectory():
                          "math", 
                          "numpy",
                          "scipy",
+                         "skimage",
                          "ndimage",
                          "pillow"} # defines permitted imports in ImageOperations
  
@@ -219,20 +221,23 @@ class ImageOperationDirectory():
 
         setattr(function,"input_image", input_images)
 
-        # similar process for each input_parameter
-        
-        if function.input_parameter_metadata is not None:
-            if not input_parameter_dictionary:
-                for key, value in function.input_parameter_metadata.items():
-                    # gets dtype and shape from parameter
-                    parameter_dtype = value.dtype
+        # gets test_input_parameter from image_operation
+        # check if test input parameters have been passed
+        input_parameter = function.test_input_parameters if hasattr(function, "test_input_parameters") else None
+        if function.input_image_metadata is not None and input_parameter is None:
+            raise RuntimeError(f"no sample test_input_parameters provided for function: {e}")
 
-                    # sets value to 0/array of 0s of correct dtype and shape using type.sample_data
-                    input_parameters[key] = sample_data(dtype = parameter_dtype,
-                                                        zero = True)
-            else:
-                input_parameters = input_parameter_dictionary
-            setattr(function,"input_parameter",input_parameters)
+        # check if test input parameters are valid
+        if function.input_parameter_metadata is not None:
+            try:
+                check_data_dictionary_value(data = input_parameter, 
+                                            metadata=function.input_parameter_metadata,
+                                            dtype=ParameterMetadata,
+                                            identifier = "input_parameter")
+            except Exception as e:
+                raise RuntimeError(f"error in test parameter data for function: {e}")
+
+            setattr(function,"input_parameter",input_parameter)
        
         
         function.run_code()
