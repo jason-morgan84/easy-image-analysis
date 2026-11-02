@@ -75,8 +75,7 @@ def create_image(input_image, luts, z=0, centre_y=0, centre_x=0, zoom=1.0 ):
     # check luts is a dictionary with integer keys, referencing channels, and np.arrays of shape (3,256) as values
     if not isinstance(luts, dict):
         raise TypeError(f"expected luts as dictionary, not {type(input_image)}")
-    if len(set(luts.keys())) != len(luts.keys()):
-        raise ValueError(f"luts dictionary contains duplicate keys")
+
     for key, value in luts.items():
         if not isinstance(key, int):
             raise TypeError(f"expected luts keys as integers, not {type(key)}")
