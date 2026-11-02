@@ -133,6 +133,7 @@
 |01/11/27|0.19.0|Added documentation for import_luts and import_luts unit testing|
 |01/11/27|0.19.1|Added documentation for create_image|
 |01/11/27|0.19.2|Added unit testing for create_image|
+|02/11/27|0.19.3|Described full WorkFlow unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -958,9 +959,12 @@ min and max zoom values as well as output frame size are defined in frontend_ope
 |data transposition | Set transpose attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error transposing data for port{} <br> Node not activated |
 |data shape| check improper image shape caught - send data shape c = 4 to port that requires c=1|log: incorrect image shape for... <br>Node not activated |
 |data conversion | Set convert attribute for incoming connection to an improper value| log GraphError: error transferring data data for node {}, error converting data for port{} <br> Node not activated |
-|node activation | Find some way of causing an error on node activation?| log GraphError: error activating node<br> Node not activated |
-|update_graph | create graph with single source, correct input data and connections | all nodes run<br> all nodes needs_update flag set to False <br> all nodes is_ready set to True |
-|update_graph | create graph with two sources, correct connections and input_data from one source | all expected nodes run<br> all run nodes needs_update flag set to False <br> all run nodes is_ready flag set to True |
+
+### 8.5.6 Full WorkFlow
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|update_graph | create graph with single source. create nodes to select single channel then parallel routes. One z-projecting the image and calcuating a triangle threshold, the other taking the threshold and applying it to all z-slices, then saving output image | all nodes run<br> no errors <br> output image as expected |
+
 
 ## 8.6 Hardcoded ImageOperations
 ### 8.6.1 LoadImage
@@ -999,7 +1003,6 @@ min and max zoom values as well as output frame size are defined in frontend_ope
 |check input image  | send in non np.ndarray| TypeError: expected input_image as np.ndarray |
 |check input image  | send in np.ndarray not of np.uint8| TypeError: expected input_image as np.ndarray of np.uint8 |
 |check luts | send in luts not as dictionary| TypeError: expected luts as dictionary |
-|check luts | send in luts with duplicate keys| ValueError: luts dictionary contains duplicate keys |
 |check luts | send in luts with non-integer key| TypeError: expected luts keys as integers |
 |check luts | send in luts with key that doesn't match channel| ValueError: luts dictionary contains out of range key |
 |check luts | send in luts with non-dictionary value| TypeError: expected luts values as np.ndarray |
