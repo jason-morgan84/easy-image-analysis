@@ -87,15 +87,15 @@ def create_image(input_image, luts, z=0, centre_y=0, centre_x=0, zoom=1.0 ):
         if value.shape != (256,3):
             raise ValueError(f"expected luts values as np.ndarray of shape (256,3), not {value.shape}")
 
-    # check top and left integers within expected range
+    # check centre_y and centre_x integers within expected range
     if not isinstance(centre_y, (int, np.integer)):
-        raise TypeError(f"expected y_centre as integer, not {type(centre_y)}")
+        raise TypeError(f"expected centre_y as integer, not {type(centre_y)}")
     if centre_y < 0 or centre_y > image_size_y:
-        raise ValueError(f"y_centre out of range for image size")
+        raise ValueError(f"centre_y out of range for image size")
     if not isinstance(centre_x, (int, np.integer)):
-        raise TypeError(f"expected x_centre as integer, not {type(centre_x)}")
+        raise TypeError(f"expected centre_x as integer, not {type(centre_x)}")
     if centre_x < 0 or centre_x > image_size_x:
-        raise ValueError(f"x_centre out of range for image size")
+        raise ValueError(f"centre_x out of range for image size")
     
     # check zoom is a float within min, max zoom values and is not < 0
     if not isinstance(zoom, (float,np.floating)):
