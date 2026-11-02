@@ -184,8 +184,8 @@ def test_sample_data(imported_function):
 
         # check if test input parameters have been passed
         input_parameter = imported_function.test_input_parameters if hasattr(imported_function, "test_input_parameters") else None
-        if imported_function.input_image_metadata is not None and input_parameter is not None:
-            function_has_test_input_parameters = True
+        if imported_function.input_image_metadata is not None and input_parameter is None:
+            raise RuntimeError(f"no sample test_input_parameters provided for function: {e}")
 
         # check if test input parameters are valid
         if imported_function.input_parameter_metadata is not None:
@@ -207,13 +207,14 @@ def test_sample_data(imported_function):
             raise RuntimeError(f"function fails to run with sample data: {e}")
                                                 
         # save output image
-        try:
-            for key, value in output_image.items():
-                
-                SaveImage().save_image(image = imported_function.output_image_metadata[key].dtype._convert(value = value, dtype=DataPolicy.ImageInt), 
-                                       path = os.path.join(".\\backend\\image_operations\\image_operation_test_output", imported_function.id +"_"+ key + "_output.tif"))
-        except Exception as e:
-            raise(ExportError(f"error saving image '{key}': {e}"))
+        if output_image:
+            try:
+                for key, value in output_image.items():
+                    
+                    SaveImage().save_image(image = imported_function.output_image_metadata[key].dtype._convert(value = value, dtype=DataPolicy.ImageInt), 
+                                        path = os.path.join(".\\backend\\image_operations\\image_operation_test_output", imported_function.id +"_"+ key + "_output.tif"))
+            except Exception as e:
+                raise(ExportError(f"error saving image '{key}': {e}"))
 
 if __name__ == "__main__":
     import sys
