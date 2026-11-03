@@ -181,8 +181,7 @@ def test_z_outside_image():
 def test_create_image():
     imported_image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
     loaded_luts = import_luts()
-    print(loaded_luts.keys())
-    print(imported_image.shape)
+
     lut_list = {0:loaded_luts["Magenta hot"],
                 1:loaded_luts["Cyan hot"],
                 2:loaded_luts["Yellow"]}

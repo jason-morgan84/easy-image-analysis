@@ -1358,7 +1358,7 @@ def test_update_graph_shape_check_data():
     for item in workflow.workflow_logger:
         print(f"{item.identifier}: {item.message}")
         if item.identifier == "node.single_channel_input.0":
-            assert "incorrect image shape for 'node.single_channel_input.0'" in item.message
+            assert "error checking image shape for connection between 'node.test_load_image_int.1.image.output' and 'node.single_channel_input.0.image.input'" in item.message
 
 
 # data conversion 

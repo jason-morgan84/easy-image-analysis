@@ -40,7 +40,9 @@ def test_test_image_operation_binary():
 
 def test_test_image_operation_all():
     # imports list of all possible error messages and test files from image_operation_tests
-    tests = copy.copy(import_function_errors)
+
+    tests = copy.deepcopy(import_function_errors)
+
     for n, test in enumerate(tests):
         # where a test_file is present
         if test.test_file != "" and n > 0:

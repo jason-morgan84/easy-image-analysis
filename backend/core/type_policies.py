@@ -151,6 +151,7 @@ class ValueInt(BasePolicy):
     data_type = DataPolicy.ValueInt
     description = "Data type to hold single variables as integers"
     numpy = np.uint8
+    is_image = False
     permitted_conversions = [DataPolicy.ValueFloat]
 
     @classmethod
@@ -166,6 +167,7 @@ class ValueFloat(BasePolicy):
     data_type = DataPolicy.ValueFloat
     description = "Data type to hold single variables as floats"
     numpy = np.float64
+    is_image = False
     permitted_conversions = [DataPolicy.ValueInt]
 
     @classmethod
@@ -182,6 +184,7 @@ class ArrayInt(BasePolicy):
     description = "Data type to hold variables lists as ints"
     numpy = np.uint8
     is_array = True
+    is_image = False
     permitted_conversions = [DataPolicy.ArrayFloat]
 
     @classmethod
@@ -198,6 +201,7 @@ class ArrayFloat(BasePolicy):
     description = "Data type to hold variables lists as floats"
     numpy = np.float64
     is_array = True
+    is_image = False
     permitted_conversions = [DataPolicy.ArrayInt]
 
     @classmethod

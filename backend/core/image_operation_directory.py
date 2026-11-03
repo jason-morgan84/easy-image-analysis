@@ -224,8 +224,8 @@ class ImageOperationDirectory():
         # gets test_input_parameter from image_operation
         # check if test input parameters have been passed
         input_parameter = function.test_input_parameters if hasattr(function, "test_input_parameters") else None
-        if function.input_image_metadata is not None and input_parameter is None:
-            raise RuntimeError(f"no sample test_input_parameters provided for function: {e}")
+        if function.input_parameter_metadata is not None and input_parameter is None:
+            raise RuntimeError(f"no sample test_input_parameters provided for function")
 
         # check if test input parameters are valid
         if function.input_parameter_metadata is not None:

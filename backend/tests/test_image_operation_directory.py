@@ -8,7 +8,10 @@ def test_import_category():
 
     log_output = [str(item) for item in directory.logger]
 
-    assert "same_image" in directory.image_operation_list.keys(), f"log: {log_output} Length dictionary: {len(directory.image_operation_list)}"
+    for item in directory.logger:
+        print(f"{item.identifier}: {item.message}")
+
+    assert "same_image" in directory.image_operation_list.keys()
     assert directory.image_operation_list["same_image"].category == "Testing"
     assert directory["same_image"].category == "Testing"
 

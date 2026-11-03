@@ -23,7 +23,7 @@ class TestItem():
         self.results = results
         self.test_file = test_file
 
-global import_function_errors
+#global import_function_errors
 import_function_errors = [TestItem("Compatible function found","compatible module not found", "N\\A"),
         TestItem("Permitted import checks","module imports", "N\\A", "code_import_invalid"),
         TestItem("Version number checks","version number", "N\\A",  "incorrect_version"),
@@ -57,9 +57,9 @@ import_function_errors = [TestItem("Compatible function found","compatible modul
 
 
 def test_image_operation(image_operation_name, image_operation_folder, sample_image=None):
-    global import_function_errors
+    #global import_function_errors
     # carry out pre-import tests:
-    import_function_errors = copy.copy(import_function_errors)
+    function_errors = copy.deepcopy(import_function_errors)
 
     
     error_text = None
@@ -72,7 +72,7 @@ def test_image_operation(image_operation_name, image_operation_folder, sample_im
     except Exception as import_exception:
         error_text = traceback.format_exc()
 
-    for error in import_function_errors:
+    for error in function_errors:
         if not error_text:
             error.results = "Pass"
         elif error_text and error.exception_text not in error_text:
@@ -92,7 +92,7 @@ def test_image_operation(image_operation_name, image_operation_folder, sample_im
             test_results.results = error_text
 
         # output to file
-        import_function_errors.append(test_results)
+        function_errors.append(test_results)
 
     # get results into readable format
     lines = []
@@ -100,8 +100,8 @@ def test_image_operation(image_operation_name, image_operation_folder, sample_im
     lines.append(first_line)
     lines.append(f"\n{len(first_line)*"-"}\n\n")
 
-    max_length = max(len(item.feedback_text) for item in import_function_errors)
-    for item in import_function_errors:
+    max_length = max(len(item.feedback_text) for item in function_errors)
+    for item in function_errors:
 
         padded_text = item.feedback_text.ljust(max_length)
         if item.results == "Pass" or item.results == "N\\A":
@@ -135,7 +135,7 @@ def test_image_operation(image_operation_name, image_operation_folder, sample_im
     with open(".\\backend\\image_operations\\image_operation_test_output\\test_"+image_operation_name+".txt", "w", encoding="utf-8") as file:
         file.writelines(lines)
 
-    return import_function_errors
+    return function_errors
 
 
 
@@ -184,8 +184,8 @@ def test_sample_data(imported_function):
 
         # check if test input parameters have been passed
         input_parameter = imported_function.test_input_parameters if hasattr(imported_function, "test_input_parameters") else None
-        if imported_function.input_image_metadata is not None and input_parameter is None:
-            raise RuntimeError(f"no sample test_input_parameters provided for function: {e}")
+        if imported_function.input_parameter_metadata is not None and input_parameter is None:
+            raise RuntimeError(f"no sample test_input_parameters provided for function")
 
         # check if test input parameters are valid
         if imported_function.input_parameter_metadata is not None:

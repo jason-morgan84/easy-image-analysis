@@ -32,7 +32,7 @@ def test_transpose_not_shape():
 
 # convert not type
 def test_convert_not_type():
-    with pytest.raises(TypeError, match = "datatype class expected for transpose"):
+    with pytest.raises(TypeError, match = "datatype class expected for convert"):
         Connection(connection_id = "test",
                    source_port = Port(is_input=True, port_id="a", node_id="b", metadata=sample_metadata),
                    target_port = Port(is_input=True, port_id="a", node_id="b", metadata=sample_metadata),

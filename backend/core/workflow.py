@@ -242,7 +242,6 @@ class WorkFlow:
                     target_port.metadata.image_shape_constraints[dimension] != source_port.metadata.image_shape_constraints[dimension]:
                     raise ShapeError(f"target port '{target_port.port_id}' requires {dimension}={target_port.metadata.image_shape_constraints[dimension]}, for source_port '{source_port.port_id}', {dimension}={source_port.metadata.image_shape_constraints[dimension]}")
             
-            print(f"\nsource image map: {source_port.metadata.image_map}; target image map {target_port.metadata.image_map}")
             if str(source_port.metadata.image_map) == str(target_port.metadata.image_map):
                 return None
             else:
@@ -281,8 +280,8 @@ class WorkFlow:
         elif hasattr(source_port.metadata.dtype, "warned_conversions") and \
                 source_port.metadata.dtype.warned_conversions is not None and \
                 target_port.metadata.dtype in source_port.metadata.dtype.warned_conversions:
-                    log(self.workflow_logger, None, f"warning: for connection between '{source_port.port_id}' and '{target_port.port_id}', data of type {source_port.metadata.dtype} converted to {target_port.metadata.dtype}", "WorkFlow", "type_check",".".join((source_port.port_id, target_port.port_id)))
-                    warn(f"warning: for connection between '{source_port.port_id}' and '{target_port.port_id}', data of type {source_port.metadata.dtype} converted to {target_port.metadata.dtype}")
+                    log(self.workflow_logger, None, f"warning: for connection between '{source_port.node_id}.{source_port.port_id}' and '{target_port.node_id}.{target_port.port_id}', data of type {source_port.metadata.dtype} converted to {target_port.metadata.dtype}", "WorkFlow", "type_check",".".join((source_port.port_id, target_port.port_id)))
+                    warn(f"warning: for connection between '{source_port.node_id}.{source_port.port_id}' and '{target_port.node_id}.{target_port.port_id}', data of type {source_port.metadata.dtype} converted to {target_port.metadata.dtype}")
                     return target_port.metadata.dtype
         else:
             raise ConnectionError(f"invalid port data types (source {source_port.metadata.dtype} not compatible with target {target_port.metadata.dtype}); connection not possible between '{source_port.port_id}' and '{target_port.port_id}'")
@@ -354,7 +353,7 @@ class WorkFlow:
     def get_previous_nodes(self, input): 
         # checks for string or Node input
         if not isinstance(input, (str, Node, Port, Connection)):
-            raise TypeError(f"get_previous_nodes requires input of Node, Port or Connection class, or nodes or connections dictionary key, not: {type(input)}")
+            raise TypeError(f"get_previous_nodes requires input of Node, Port or Connection class, or nodes or connections dictionary key, not: '{input}' as {type(input)}")
         if isinstance(input, str):
             # if string is a key in self.nodes, get Node, else raise ValueError
             if input in self.nodes.keys():
@@ -419,7 +418,10 @@ class WorkFlow:
     def get_graph_map(self, start_node):
         # for a start_node as either a node_id in nodes dictionary or Node class, gets graph_map as orderd list of node_ids to run
         def check_nodes(node, node_list):
-            previous_nodes = self.get_previous_nodes(self.nodes[node])
+            try: 
+                previous_nodes = self.get_previous_nodes(self.nodes[node])
+            except Exception as e:
+                raise GraphError(f"cannot get previous nodes for '{node}': {e}")
             for previous_node in previous_nodes:
                 if previous_node not in node_list:
                     check_nodes(previous_node, node_list)
@@ -429,7 +431,7 @@ class WorkFlow:
                 if next_node not in node_list:
                     check_nodes(next_node, node_list)
         # will accept nodes dictionary key (string) or value (Node)
-        if not isinstance(start_node, (str,Node)):
+        if not isinstance(start_node, (str, Node)):
             raise TypeError(f"get_graph_map requires input of Node class, or nodes dictionary key, not: {type(start_node)}")
         if isinstance(start_node, Node):
             if start_node in self.nodes.values():
@@ -446,13 +448,11 @@ class WorkFlow:
         return running_list
 
     def update_graph(self, test = False):
-        print("\nUPDATING GRAPH\n--------------")
-        """1. Generate ordered node list"""
+
         # get list of start nodes by comparing nodes dictionary value to start_nodes list from io_image_operations.py
         start_node_id_list = [node.node_id for node in self.nodes.values() if node.image_operation.id in core.io_image_operations.start_nodes]
         if test: log(self.workflow_logger, None, f"nodes added to start node list","WorkFlow","update_graph",start_node_id_list)
-        # TODO remove after testing
-        print("\nstart node list:",start_node_id_list)
+
         # if no start nodes, log error
         if len(start_node_id_list) == 0:
             log(self.workflow_logger, GraphError, f"cannot update graph without defined start nodes","WorkFlow","update_graph") 
@@ -464,16 +464,13 @@ class WorkFlow:
                 for item in self.get_graph_map(start_node_id):
                     if item not in node_list: node_list.append(item)
             except Exception as e:
-                log(self.workflow_logger, GraphError, f"error generating graph map for start node {start_node_id}: {e}","WorkFlow","update_graph") 
+                log(self.workflow_logger, GraphError, f"error generating graph map for start node '{start_node_id}': {e}","WorkFlow","update_graph") 
         """2. Iterate through node list, update is_ready flags, transfer input data, run nodes"""
         """input data to Node is transferred in but output data is not transferred out: for upstream nodes to exist, connection must exist. No guarantee dowsntream connection exists"""
 
         for node_id in node_list:
             active_node = self.nodes[node_id]
-            print(f"\n\tWorking through node: {node_id}")
             port_connections_dict = {}
-            # TODO: remove after testing
-            print("\n\t\tchecking node readiness")
 
             # 2.1: check that all input Ports are either UI Ports or have connections. If not, not ready
             # generate port_connections_dict of all input_ports of active_node
@@ -490,8 +487,6 @@ class WorkFlow:
             # if any ports are missing a connection, continue to next Node
             if None in port_connections_dict.values():
                 if test is True: log(self.workflow_logger, None, f"node '{node_id}' not activated, missing connections","WorkFlow","update_graph",node_id)
-                # TODO: remove after testing
-                print("\nports missing connections")
                 continue
             
             # 2.2: check that all previous nodes are ready
@@ -508,16 +503,13 @@ class WorkFlow:
                 continue
 
             # 2.3: set node is_ready to True
-            print (f"\n\t\tnode is ready")
             active_node.is_ready = True
 
             # 2.4: check node needs_update is True
             if active_node.needs_update is True:
-                print(f"\n\t\tupdating node")
                 # 2.4.1: copy data from previous nodes
                 try:
                     for input_port, connection in port_connections_dict.items():
-                        print(f"\n\t\t\tworking through port {input_port.port_id}")
                         # if no data at port, skip node
                         if connection == "user_input" and input_port.data is None or \
                         connection != "user_input" and connection.source_port.data is None:
@@ -525,20 +517,17 @@ class WorkFlow:
 
                         # if user input, skip data transfer through graph
                         if connection == "user_input": 
-                            print(f"\n\t\t\t\t{input_port.port_id} is user input")
                             continue
                         # 2.3: check that any image inputs will be of the expected shape
                         try:
                             self.shape_check_data(source_port=connection.source_port, target_port=input_port)
-                            print(f"\n\t\t\t\tinput image matches shape ({connection.source_port.data.shape} = {input_port.metadata.image_shape_constraints})")
                         except Exception as e:
                             
-                            raise GraphError(f"incorrect image shape for '{node_id}': {e}")
+                            raise GraphError(f"error checking image shape for connection between '{connection.source_port.node_id}.{connection.source_port.port_id}' and '{input_port.node_id}.{input_port.port_id}': {e}")
 
                         incoming_data = connection.source_port.data
                         # tranpose data if transposition required
                         if connection.transpose is not None:
-                            print(f"\n\t\t\t\ttransposing data")
                             try:
                                 incoming_data = transpose(value = incoming_data,
                                                 current_shape=connection.source_port.metadata.image_map,
@@ -548,9 +537,7 @@ class WorkFlow:
 
                         
                         # convert data if conversion required
-                        print("\n",connection.convert,connection.connection_id)
                         if connection.convert is not None:
-                            print(f"\n converting {connection.source_port.metadata.dtype} to {connection.convert}")
                             try:
                                 incoming_data = connection.source_port.metadata.dtype.to(value=incoming_data,
                                                                             dtype=connection.convert)
@@ -576,7 +563,6 @@ class WorkFlow:
                 
                 active_node.needs_update = False
                 if test is True: log(self.workflow_logger, None, f"node activated sucessfully","WorkFlow","update_graph",node_id)
-            else: print(f"\n\t\tNode does not need updating")
         
                 
 
