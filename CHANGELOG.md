@@ -5,13 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [unreleased]
 
-## [Unreleased]
+## [1.0.0] - 2029-03-11
+
+### Milestone
+
+- Images can be loaded into a WorkFlow, processed through a series of Nodes and Connections using imported ImageOperations with an expected output image
 
 ### Added
 - Port class to deliver data to/from ImageOperations from WorkFlow
-
+- Node class to hold ImageOperations and Ports
+- Connection class to connect between Nodes via Ports
+- WorkFlow class to:
+    * hold graph Nodes and Connections
+    * add and remove Nodes and Connections
+    * access graph topology
+    * update graph following changes
+- Input/Output ImageOperations for loading and saving images
+- ImageOperation test function to allow testing of new ImageOperations
+    
 ### Changed
+- Changed where ImageOperation expectations are tested. Move testing for inputs/outputs to importing from external files instead of ImageOperation class, to allow loading and saving ImageOperations to be created that don't have inputs or outputs. This breaks backwards compatibility with previous versions for ImageOperation inputs.
+- Refactored `ImageParcel` to `ImageMetadata` and `ParamaterParcel` to `ParameterMetadata`, to dilineate between data and metadata.
+- Removed `shape` from `ParameterMetadata` - this was likely to be hard to define prior to creation in an ImageOperation.
+- Refactored `ImageOperation` to default input and output dictionaries None, to avoid ambiguity about when they were present.
 
 ## [0.2.0] - 2029-09-25
 
