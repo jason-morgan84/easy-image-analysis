@@ -1,0 +1,28 @@
+{
+  "folders": [
+    {
+      "name": "Python Backend",
+      "path": "backend"
+    },
+    {
+      "name": "Flutter Frontend",
+      "path": "frontend"
+    },
+    {
+      "name": "Project Root (Docs/Git)",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "backend": true,
+      "frontend": true,
+      "**/__pycache__": true,
+      "**/.pytest_cache": true,
+      "**/.dart_tool": true
+    },
+    // FORCE FOLDER SPECIFIC TESTING SETTINGS HERE
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+  }
+}
