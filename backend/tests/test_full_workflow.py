@@ -16,7 +16,7 @@ def test_full_workflow():
     log = []
     directory = ImageOperationDirectory(logger = log)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     # create the following structure:
     # load_image

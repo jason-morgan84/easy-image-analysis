@@ -14,13 +14,13 @@ import numpy as np
 def test_initialise_not_image_operation_directory():
     a = "test"
     with pytest.raises(TypeError, match = "expected ImageOperationDirectory class on WorkFlow instantiation"):
-        workflow = WorkFlow(logger = [], image_operation_directiory = a)
+        workflow = WorkFlow(logger = [], image_operation_directory = a)
 
 # call add_node(image_operation) function where image_operation is not ImageOperation class
 def test_add_node_not_image_operation():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node("test")
 
@@ -34,7 +34,7 @@ def test_add_node_existing_key():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["same_image"])
     workflow.max_id -= 1
     workflow.add_node(directory["same_image"])
@@ -48,7 +48,7 @@ def test_add_node_adds_node():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["same_image"])
     assert len(workflow.nodes) == 1
     assert workflow.nodes["node.same_image.0"]
@@ -58,7 +58,7 @@ def test_add_node_has_unique_key():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
     assert len(workflow.nodes) == 2
@@ -70,7 +70,7 @@ def test_delete_node_invalid_key():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["same_image"])
     workflow.delete_node("test")
 
@@ -84,7 +84,7 @@ def test_delete_node_removes_node():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["same_image"])
     workflow.delete_node("node.same_image.0")
     assert "node.same_image.0" not in workflow.nodes.keys()
@@ -95,7 +95,7 @@ def test_node_delete_removes_connections():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
@@ -109,7 +109,7 @@ def test_connection_source_not_port():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
     
@@ -124,7 +124,7 @@ def test_connection_target_not_port():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
     
@@ -142,7 +142,7 @@ def test_connection_add_invalid_types():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["binarised_input"])
@@ -158,7 +158,7 @@ def test_connection_add_conversion_with_warning():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["binarised_output"])
     workflow.add_node(directory["same_image"])
     workflow.add_connection(source_port = workflow.nodes["node.binarised_output.0"].output_ports["image.output"],
@@ -179,7 +179,7 @@ def test_connection_add_with_conversion():
 
     log += directory.logger
 
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["float_input"])
     workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
@@ -193,7 +193,7 @@ def test_connection_wrong_shape():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["multi_channel_output"])
     workflow.add_node(directory["single_channel_input"])
     workflow.add_connection(source_port = workflow.nodes["node.multi_channel_output.0"].output_ports["image.output"],
@@ -211,7 +211,7 @@ def test_connection_add_with_transposition():
     directory.import_operations_dict()
 
     log += directory.logger
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image_reversed_input_image_map"])
     workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
@@ -225,7 +225,7 @@ def test_structure_check_add_connection_same_node():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
 
@@ -243,7 +243,7 @@ def test_structure_check_add_connection_source_input():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
@@ -259,7 +259,7 @@ def test_structure_check_add_connection_already_present():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
@@ -284,7 +284,7 @@ def test_structure_check_add_connection_loop():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     # create the following structure:
     # node0
@@ -339,7 +339,7 @@ def test_connection_add():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
     workflow.add_node(directory["same_image"])
@@ -355,7 +355,7 @@ def test_connection_delete_invalid_key():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
@@ -372,7 +372,7 @@ def test_connection_delete():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
     workflow.add_node(directory["same_image"])
@@ -388,7 +388,7 @@ def test_get_next_nodes():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     # four nodes, node.same_image.0, node.same_image.1, node.same_image.2, node.same_image.3
     workflow.add_node(directory["same_image"])
@@ -484,7 +484,7 @@ def test_get_previous_nodes():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     # four nodes, node.same_image.1, node.same_image.2, node.same_image.3
     workflow.add_node(directory["same_image"])              # node0: node.same_image.0
@@ -578,7 +578,7 @@ def test_get_downstream_nodes():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     # create the following structure:
     # node0
@@ -669,7 +669,7 @@ def test_get_graph_map_structure_1():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     # create the following structure:
     # node0 -------                     node9 ---------
@@ -753,7 +753,7 @@ def test_get_graph_map_structure_2():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 #            node0 -------
 #              |         |
@@ -816,7 +816,7 @@ def test_get_graph_map_structure_3():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
 
@@ -887,7 +887,7 @@ def test_get_graph_map_structure_4():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     #         ----- node0 -----
     #         |       |       |
@@ -944,7 +944,7 @@ def test_edit_node_wrong_type():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
 
@@ -956,7 +956,7 @@ def test_edit_node_string_not_key():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
 
@@ -967,7 +967,7 @@ def test_edit_node_node_not_value():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
     # test with invalid input (Node class but not nodes dictionary value) 
@@ -980,7 +980,7 @@ def test_edit_node_sets_needs_update_to_true():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
     workflow.nodes["node.same_image.0"].needs_update = False
@@ -995,7 +995,7 @@ def test_edit_node_sets_downstream_needs_update_to_true():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     # create the following structure:
     # node0
@@ -1068,7 +1068,7 @@ def test_update_graph_start_node_list():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.0
     workflow.add_node(directory["same_image"]) # node0: node.same_image.1            
@@ -1091,7 +1091,7 @@ def test_update_graph_start_node_list_no_list():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
     workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.0
     workflow.add_node(directory["same_image"]) # node0: node.same_image.1            
     workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.2
@@ -1106,7 +1106,7 @@ def test_update_graph_previous_input_port_not_connected():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
     workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.0
@@ -1139,7 +1139,7 @@ def test_update_graph_previous_input_port_not_ready():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
     workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.0
@@ -1174,7 +1174,7 @@ def test_update_graph_connected_but_needs_update_false():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
     workflow.add_node(directory["same_image_two_inputs"])  # node0: node.same_image_two_inputs.0
@@ -1210,7 +1210,7 @@ def test_update_graph_data_not_present():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
     workflow.add_node(directory["same_image"])  # node0: node.same_images.0
@@ -1246,7 +1246,7 @@ def test_update_graph_tranpose_improper_value():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
     workflow.add_node(directory["same_image"])  # node0: node.same_images.0
@@ -1281,7 +1281,7 @@ def test_update_graph_tranpose():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
     workflow.add_node(directory["same_image"])  # node0: node.same_images.0
@@ -1331,7 +1331,7 @@ def test_update_graph_shape_check_data():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     #set up graph with node with undefined output shape going to node with input shape constraints, with incorrect output data
     # create the following structure:
@@ -1367,7 +1367,7 @@ def test_update_graph_convert_improper_value():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
     workflow.add_node(directory["same_image"])  # node0: node.same_images.0
@@ -1403,7 +1403,7 @@ def test_update_graph_convert():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
-    workflow = WorkFlow(logger = log, image_operation_directiory = directory)
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
 
     workflow.add_node(directory["same_image"])  # node0: node.same_images.0

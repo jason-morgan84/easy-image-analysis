@@ -8,8 +8,8 @@ import core.io_image_operations
 import numpy as np
 
 class WorkFlow:
-    def __init__(self, logger, image_operation_directiory):
-        self.image_operation_directiory = image_operation_directiory
+    def __init__(self, logger, image_operation_directory):
+        self.image_operation_directory = image_operation_directory
 
         self.nodes = {}
         self.connections = {}
@@ -21,11 +21,11 @@ class WorkFlow:
         self.workflow_logger = logger
     
     @property
-    def image_operation_directiory(self):
+    def image_operation_directory(self):
         return self._image_operation_directiory
 
-    @image_operation_directiory.setter
-    def image_operation_directiory(self, directory):
+    @image_operation_directory.setter
+    def image_operation_directory(self, directory):
         if not isinstance(directory,ImageOperationDirectory):
             raise TypeError (f"expected ImageOperationDirectory class on WorkFlow instantiation, got {type(directory)}")
         self._image_operation_directory = directory
