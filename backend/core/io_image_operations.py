@@ -1,7 +1,7 @@
 from core.image_operation import ImageOperation
 from core.metadata import ImageMetadata, ParameterMetadata
 from core.shape import Shape, transpose
-from core.constants import DataPolicy
+from core.constants import DataPolicy, project_root_dir
 import tifffile
 from core.error_handling import ExportError
 from core.data_checks import sample_data

@@ -6,13 +6,16 @@ import os
 from core.error_handling import log, VersionError
 from core.data_checks import sample_data, check_metadata_dictionary, check_data_dictionary_value
 from core.metadata import ParameterMetadata
+from core.constants import project_root_dir
 import ast
 import inspect
+
+
 
 class ImageOperationDirectory():
     """Key constants for importing ImageOperations"""
     package_folder = "image_operations" # name of base folder for ImageOperations packages
-    backend_path = ".\\backend\\" # defines path of backend
+    backend_path = os.path.join(project_root_dir, "backend") # defines path of backend
     permitted_imports = {"core",
                          "math", 
                          "numpy",

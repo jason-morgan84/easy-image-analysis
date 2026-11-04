@@ -8,13 +8,17 @@ from core.image_operation_directory import ImageOperationDirectory
 from core.data_checks import check_data_dictionary_value, check_metadata_dictionary, check_data_dictionary
 from core.metadata import ImageMetadata, ParameterMetadata
 from core.io_image_operations import LoadImage, SaveImage, LoadImageBinary
-from core.constants import DataPolicy
+from core.constants import DataPolicy, project_root_dir
 from core.shape import Shape
 from core.workflow import transpose
 from core.error_handling import ExportError
 import os
 import traceback
 import copy
+
+test_image_location = os.path.join(project_root_dir, "backend", "tests", "test_images")
+test_image_output_location = os.path.join(project_root_dir, "backend", "image_operations", "image_operation_test_output")
+
 
 class TestItem():
     def __init__(self, feedback_text, exception_text = None, results = "N\\A", test_file = ""):
@@ -117,12 +121,14 @@ def test_image_operation(image_operation_name, image_operation_folder, sample_im
                 lines.append("\n")
     lines.append("* where present")
 
+
+    
     # give path to saved output image/give output parameter data for test image
     if test_results:
         if test_results.results == "Pass":
             if imported_function.output_image:
                 for key in imported_function.output_image.keys():
-                    lines.append(f"\nOutput image '{key}' saved to {os.path.join(".\\backend\\image_operations\\image_operation_test_output",imported_function.id +"_"+ key + "_output.tif")}")
+                    lines.append(f"\nOutput image '{key}' saved to {os.path.join(test_image_output_location, imported_function.id + "_" + key + "_output.tif")}")
             if imported_function.output_parameter:
                 for key, value in imported_function.output_parameter.items():
                     if imported_function.output_parameter_metadata[key].dtype.is_array is False:
@@ -132,7 +138,7 @@ def test_image_operation(image_operation_name, image_operation_folder, sample_im
                         for item in value:
                             lines.append(f"\n{item}")
 
-    with open(".\\backend\\image_operations\\image_operation_test_output\\test_"+image_operation_name+".txt", "w", encoding="utf-8") as file:
+    with open(os.path.join(test_image_output_location, f"test_{image_operation_name}.txt"), "w", encoding="utf-8") as file:
         file.writelines(lines)
 
     return function_errors
@@ -149,9 +155,9 @@ def test_sample_data(imported_function):
         for key, value in imported_function.input_image_metadata.items():
             # load input image(s) that matches image_type (binarised or non-binarised) and adjust to image dtype
             if value.dtype == DataPolicy.ImageBinary:
-                image = LoadImageBinary().load_image(".\\backend\\tests\\test_images\\test_image_binary.tif", shape = "ZYX")
+                image = LoadImageBinary().load_image(os.path.join(test_image_location, "test_image_binary.tif"), shape = "ZYX")
             else:
-                image = LoadImage().load_image(path = ".\\backend\\tests\\test_images\\test_image_8bit.tif", shape = "ZCYX")
+                image = LoadImage().load_image(path = os.path.join(test_image_location, "test_image_8bit.tif"), shape = "ZCYX")
                 if value.dtype == DataPolicy.ImageFloat:
                     image = DataPolicy.ImageInt.to(dtype=DataPolicy.ImageFloat, value=image)
 
@@ -212,7 +218,7 @@ def test_sample_data(imported_function):
                 for key, value in output_image.items():
                     
                     SaveImage().save_image(image = imported_function.output_image_metadata[key].dtype._convert(value = value, dtype=DataPolicy.ImageInt), 
-                                        path = os.path.join(".\\backend\\image_operations\\image_operation_test_output", imported_function.id +"_"+ key + "_output.tif"))
+                                        path = os.path.join(test_image_output_location, imported_function.id +"_"+ key + "_output.tif"))
             except Exception as e:
                 raise(ExportError(f"error saving image '{key}': {e}"))
 

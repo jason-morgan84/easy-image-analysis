@@ -1,8 +1,13 @@
 from core.frontend_operations import create_image, import_luts
+from core.constants import project_root_dir
 import tifffile
 from PIL import Image
 import numpy as np
 import pytest
+import os
+
+current_file_dir = os.path.dirname(os.path.abspath(__file__))
+test_file_location = os.path.join(project_root_dir,"backend","tests","test_images")
 
 """check input image """
 # send in non np.ndarray - TypeError: expected input_image as np.ndarray 
@@ -29,7 +34,7 @@ def test_non_npuintt8_image():
 """check luts"""
 # send in luts not as dictionary - TypeError: expected luts as dictionary 
 def test_non_dictionary_luts():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = [0,loaded_luts["Magenta hot"],
@@ -40,7 +45,7 @@ def test_non_dictionary_luts():
 
 # send in luts with non-integer key - TypeError: expected luts keys as integers 
 def test_non_int_lut_keys():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -51,7 +56,7 @@ def test_non_int_lut_keys():
 
 # send in luts with key that doesn't match channel - ValueError: luts dictionary contains out of range key 
 def test_incorrect_lut_keys():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -62,7 +67,7 @@ def test_incorrect_lut_keys():
 
 # send in luts with non-dictionary value - TypeError: expected luts values as np.ndarray 
 def test_incorrect_lut_value():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:"Non-existent LUT",
@@ -72,7 +77,7 @@ def test_incorrect_lut_value():
         outputimage = create_image(image, lut_list, 3, 0, 0, 1.0)
 # send in luts with value that isn't of correct shape - ValueError: expected luts values as np.ndarray of shape (256,3)
 def test_incorrect_lut_shape():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:np.array([1,2,3]),
@@ -83,7 +88,7 @@ def test_incorrect_lut_shape():
 """check centres"""
 # send in centre_y not as integer  - TypeError: expected centre_y as integer
 def test_centre_y_not_integer():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -93,7 +98,7 @@ def test_centre_y_not_integer():
         outputimage = create_image(image, lut_list, 3, "0", 0, 1.0)
 # send in centre_y less than 0 or higher than image size  - ValueError: centre_y out of range for image sizer
 def test_centre_y_not_valid():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -103,7 +108,7 @@ def test_centre_y_not_valid():
         outputimage = create_image(image, lut_list, 3, -5, 0, 1.0)
 # send in centre_y not as integer  - TypeError: expected centre_y as integer
 def test_centre_x_not_integer():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -113,7 +118,7 @@ def test_centre_x_not_integer():
         outputimage = create_image(image, lut_list, 3, 0, "0", 1.0)
 # send in centre_x less than 0 or higher than image size  - ValueError: centre_y out of range for image sizer
 def test_centre_x_not_valid():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -125,7 +130,7 @@ def test_centre_x_not_valid():
 """check zoom"""
 # send in zoom not as float  - TypeError: expected zoom as float
 def test_zoom_not_float():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -135,7 +140,7 @@ def test_zoom_not_float():
         outputimage = create_image(image, lut_list, 3, 0, 50, 1)
 # end in zoom less than zoom_min  - ValueError: zoom less than minimum allowed value
 def test_zoom_too_low():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -145,7 +150,7 @@ def test_zoom_too_low():
         outputimage = create_image(image, lut_list, 3, 0, 50, 0.001)
 # send in zoom greater than zoom_max  - ValueError: zoom greater than maximum allowed value
 def test_zoom_too_high():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -157,7 +162,7 @@ def test_zoom_too_high():
 """check z"""
 # send in z not as integer - TypeError: expected z as integer
 def test_z_not_integer():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -167,7 +172,7 @@ def test_z_not_integer():
         outputimage = create_image(image, lut_list, "3", 0, 50, 1.0)
 # send in z outside image z dimension size - ValueError: z outside image dimensions
 def test_z_outside_image():
-    image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],
@@ -179,7 +184,7 @@ def test_z_outside_image():
 # send in correct parameters  - output image as expected
 
 def test_create_image():
-    imported_image = tifffile.imread(".\\backend\\tests\\test_images\\test_image_8bit.tif").transpose((1,0,2,3))
+    imported_image = tifffile.imread(os.path.join(test_file_location, "test_image_8bit.tif")).transpose((1,0,2,3))
     loaded_luts = import_luts()
 
     lut_list = {0:loaded_luts["Magenta hot"],

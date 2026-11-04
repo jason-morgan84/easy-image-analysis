@@ -1,4 +1,8 @@
 from enum import Enum, auto
+import os
+
+_current_file_dir = os.path.dirname(os.path.abspath(__file__))
+project_root_dir = os.path.abspath(os.path.join(_current_file_dir, "..", ".."))
 
 class DataPolicy(Enum):
     ImageInt = auto()    

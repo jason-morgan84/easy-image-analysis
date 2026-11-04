@@ -3,8 +3,10 @@ import os
 from PIL import Image
 from core.error_handling import log
 import cv2
+from core.constants import project_root_dir
 
-lut_folder_location = ".\\frontend\\luts"
+lut_folder_location = os.path.join(project_root_dir, "frontend", "luts")
+
 image_frame_x = 512
 image_frame_y = 512
 zoom_min = 0.1
