@@ -18,8 +18,9 @@ class BasePolicy:
     max_value = None                # maximum allowed value, if defined
     is_image = False                # does this type define an image? An image is assumed to be mutli-dimensional, is_array does not need to be set to True
     is_array = False                # does this represent a multi-dimensional value?
-    permitted_conversions = []    # list of other DataType classes this can be converted to automatically
-    warned_conversions = []        # list of other DataType classes this can be converted to, with a prompt to user
+    permitted_conversions = []      # list of other DataType classes this can be converted to automatically
+    warned_conversions = []         # list of other DataType classes this can be converted to, with a prompt to user
+    colour = None                   # colour to use for this data type in front-end
 
     @classmethod
     def validate(cls, val):
@@ -93,6 +94,7 @@ class ImageInt(BasePolicy):
     min_value = 0
     max_value = 255
     permitted_conversions = [DataPolicy.ImageFloat]
+    colour = "Colors.indigo[900]"
 
     @classmethod
     def _convert(cls, value, dtype):
@@ -114,7 +116,7 @@ class ImageFloat(BasePolicy):
     min_value = 0.0
     max_value = 1.0
     permitted_conversions = [DataPolicy.ImageInt]
-    
+    colour = "Colors.indigo[900]"
     @classmethod
     def _convert(cls, value, dtype):
         if dtype == DataPolicy.ImageInt:
@@ -135,6 +137,7 @@ class ImageBinary(BasePolicy):
     min_value = 0
     max_value = 1
     warned_conversions = [DataPolicy.ImageInt, DataPolicy.ImageFloat]
+    colour = "Colors.blueGrey[900]"
 
     @classmethod
     def _convert(cls, value, dtype):
@@ -153,6 +156,7 @@ class ValueInt(BasePolicy):
     numpy = np.uint8
     is_image = False
     permitted_conversions = [DataPolicy.ValueFloat]
+    colour = "Colors.teal[900]"
 
     @classmethod
     def _convert(cls, value, dtype):
@@ -169,7 +173,7 @@ class ValueFloat(BasePolicy):
     numpy = np.float64
     is_image = False
     permitted_conversions = [DataPolicy.ValueInt]
-
+    colour = "Colors.teal[900]"
     @classmethod
     def _convert(cls, value, dtype):
         if dtype == DataPolicy.ValueInt:
@@ -186,6 +190,7 @@ class ArrayInt(BasePolicy):
     is_array = True
     is_image = False
     permitted_conversions = [DataPolicy.ArrayFloat]
+    colour = "Colors.green[900]"
 
     @classmethod
     def _convert(cls, value, dtype):
@@ -203,7 +208,7 @@ class ArrayFloat(BasePolicy):
     is_array = True
     is_image = False
     permitted_conversions = [DataPolicy.ArrayInt]
-
+    colour = "Colors.green[900]"
     @classmethod
     def _convert(cls, value, dtype):
         if dtype == DataPolicy.ArrayInt:
@@ -217,4 +222,5 @@ class ValueString(BasePolicy):
     data_type = DataPolicy.ValueString
     description = "Data type to hold variables lists as floats"
     numpy = str
+    colour = "Colors.yellow[900]"
 
