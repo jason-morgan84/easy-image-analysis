@@ -12,6 +12,14 @@ image_frame_y = 512
 zoom_min = 0.1
 zoom_max = 10
 
+class ImageOperationData:
+    def __init__ (self, id, name, category, docs, alerts ):
+        self.id=id
+        self.name=name
+        self.category=category
+        self.docs=docs
+        self.alerts=alerts
+
 def import_luts(logger = []):
     lut_list = {}
     # get all files in lut folder
