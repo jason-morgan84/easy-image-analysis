@@ -20,6 +20,14 @@ class ImageOperationData:
         self.docs=docs
         self.alerts=alerts
 
+
+class TypeData:
+    def __init__ (self, name, color, compatibleWith ):
+        self.id=id
+        self.name=name
+        self.color=color
+        self.compatibleWith=compatibleWith
+
 def import_luts(logger = []):
     lut_list = {}
     # get all files in lut folder
