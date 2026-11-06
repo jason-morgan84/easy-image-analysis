@@ -147,6 +147,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.3"
+  node_program_editor:
+    dependency: "direct main"
+    description:
+      name: node_program_editor
+      sha256: e4d22d08b4c5b8e25d8fd87528f3fc7518cfe2a1a0092b3ffe9b871a91d7654d
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   path:
     dependency: transitive
     description:
@@ -242,4 +250,4 @@ packages:
     version: "1.1.2"
 sdks:
   dart: ">=3.13.7 <4.0.0"
-  flutter: ">=3.18.0-18.0.pre.54"
+  flutter: ">=3.47.0"
