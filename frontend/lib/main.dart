@@ -16,26 +16,46 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
+
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
+}
+
+class TypeListItem{
+  late String id;
+  late String name;
+  late Color color;
+  late List<String> compatibleWith;
+
+  TypeListItem.fromDict(Map<String, dynamic> json) {
+    id = (json['id'] as String?) ?? "";
+    name = (json['name'] as String?) ?? "";
+    color = Color(int.parse('0xFF${json['color'].replaceAll('#', '')}'));
+    compatibleWith = json['compatibleWith'] != null 
+      ? List<String>.from(json['compatibleWith']) 
+      : [];
+
+  }
+}
+
+Future<List<TypeListItem>> getTypeList() async {
+    final response = await http.get(
+    Uri.parse('http://127.0.0.1:8000/types'),
+    headers: {'Accept': 'application/json'},);
+    if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+      final decodedItem = (jsonDecode(response.body) as Map<String, dynamic>);
+      List<TypeListItem> typeList = [for (var value in decodedItem.values) TypeListItem.fromDict(value)];
+      return typeList;
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load TypeListItem');
+    }
 }
 
 class ImageOperationListItem{
@@ -81,7 +101,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  late final Future<List<ImageOperationListItem>> _operationsFuture  = getOperationsList();
+  late final Future<List<TypeListItem>> _operationsFuture  = getTypeList();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         // 3. Use FutureBuilder to watch the network request
-        child: FutureBuilder<List<ImageOperationListItem>>(
+        child: FutureBuilder<List<TypeListItem>>(
           future: _operationsFuture,
           builder: (context, snapshot) {
             // State A: Still fetching data -> Show a loading indicator
@@ -128,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   for (var operation in operations)
                     Text(
                       operation.name,
-                      style: Theme.of(context).textTheme.headlineMedium,
+                      style: TextStyle(color: operation.color)
                     ),
                 ],
               );

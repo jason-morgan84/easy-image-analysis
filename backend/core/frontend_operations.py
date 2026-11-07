@@ -23,7 +23,6 @@ class ImageOperationData:
 
 class TypeData:
     def __init__ (self, name, color, compatibleWith ):
-        self.id=id
         self.name=name
         self.color=color
         self.compatibleWith=compatibleWith

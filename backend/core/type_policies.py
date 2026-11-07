@@ -94,7 +94,7 @@ class ImageInt(BasePolicy):
     min_value = 0
     max_value = 255
     permitted_conversions = [DataPolicy.ImageFloat]
-    colour = "#0055d4ff"
+    colour = "#0055d4"
 
     @classmethod
     def _convert(cls, value, dtype):
@@ -116,7 +116,7 @@ class ImageFloat(BasePolicy):
     min_value = 0.0
     max_value = 1.0
     permitted_conversions = [DataPolicy.ImageInt]
-    colour = "#0055d4ff"
+    colour = "#0055d4"
     @classmethod
     def _convert(cls, value, dtype):
         if dtype == DataPolicy.ImageInt:
@@ -137,7 +137,7 @@ class ImageBinary(BasePolicy):
     min_value = 0
     max_value = 1
     warned_conversions = [DataPolicy.ImageInt, DataPolicy.ImageFloat]
-    colour = "#6f8a91ff"
+    colour = "#6f8a91"
 
     @classmethod
     def _convert(cls, value, dtype):
@@ -156,7 +156,7 @@ class ValueInt(BasePolicy):
     numpy = np.uint8
     is_image = False
     permitted_conversions = [DataPolicy.ValueFloat]
-    colour = "#8800aaff"
+    colour = "#8800aa"
 
     @classmethod
     def _convert(cls, value, dtype):
@@ -173,7 +173,7 @@ class ValueFloat(BasePolicy):
     numpy = np.float64
     is_image = False
     permitted_conversions = [DataPolicy.ValueInt]
-    colour = "#8800aaff"
+    colour = "#8800aa"
     @classmethod
     def _convert(cls, value, dtype):
         if dtype == DataPolicy.ValueInt:
@@ -190,7 +190,7 @@ class ArrayInt(BasePolicy):
     is_array = True
     is_image = False
     permitted_conversions = [DataPolicy.ArrayFloat]
-    colour = "#44aa00ff"
+    colour = "#44aa00"
 
     @classmethod
     def _convert(cls, value, dtype):
@@ -208,7 +208,7 @@ class ArrayFloat(BasePolicy):
     is_array = True
     is_image = False
     permitted_conversions = [DataPolicy.ArrayInt]
-    colour = "#44aa00ff"
+    colour = "#44aa00"
     @classmethod
     def _convert(cls, value, dtype):
         if dtype == DataPolicy.ArrayInt:
@@ -222,5 +222,5 @@ class ValueString(BasePolicy):
     data_type = DataPolicy.ValueString
     description = "Data type to hold variables lists as floats"
     numpy = str
-    colour = "#d4aa00ff"
+    colour = "#d4aa00"
 

@@ -30,7 +30,7 @@ for ImageOperation in image_operation_directory.image_operation_list.values():
         alerts=ImageOperation.alerts
     ))
 
-print(DataPolicy.ImageInt.target_class.__name__)
+
 # get data from all ImageOperations in format to present to frontend
 all_data_types = []
 for policy in DataPolicy.policies():
@@ -41,10 +41,12 @@ for policy in DataPolicy.policies():
         color=policy.colour,
         compatibleWith=permitted_conversions + warned_conversions
     ))
-for type in all_data_types:
-    print(type.name, type.color, type.compatibleWith)
-app = FastAPI()
 
+app = FastAPI()
+types_dict = {}
+for type in all_data_types:
+    types_dict[type.name] = type.__dict__
+print(types_dict)
 
 @app.get("/")
 async def root():
