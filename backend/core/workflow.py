@@ -49,6 +49,9 @@ class WorkFlow:
             else:
                 self.nodes[new_key] = Node(image_operation = image_operation,
                                         node_id = new_key)
+                return new_key
+
+        
 
     """
     edit_node(id) - partial placeholder function. If a node is edited after creation, particularly by parameter changes via the UI, all downstream nodes need to 
