@@ -65,9 +65,10 @@ class Port:
     The port class acts as a buffer between a Node and an ImageOperation. 
     Its role is to hold metadata requirements of the ImageOperation and cache input or output data.
     """
-    def __init__(self, port_id, node_id, metadata, is_input, data = None):
+    def __init__(self, port_id, port_name, node_id, metadata, is_input, data = None):
         self.port_id = port_id                          # own ID value, set during instatiation
         self.node_id = node_id                          # Nodes identifier, set during instantiation
+        self.port_name = port_name                      # Port name, set during instantiation, used for UI
         self.metadata = metadata
         self.data = data
         self.is_input = is_input
@@ -182,6 +183,7 @@ class Node:
             self.input_ports[port_id] = Port(is_input = True,
                                              metadata=value,
                                              port_id = port_id,
+                                             port_name=str(key),
                                              node_id = self.node_id)
         if self.image_operation.input_parameter_metadata is not None:
             for key, value in self.image_operation.input_parameter_metadata.items():
@@ -189,7 +191,10 @@ class Node:
                 self.input_ports[port_id] = Port(is_input = True,
                                                  metadata=value,
                                                  port_id = port_id,
+                                                 port_name=str(key),
                                                  node_id = self.node_id)
+
+        return self.input_ports
     # on Node instantiation, initialises the Node output Ports by creating a Port for each input_image and input_parameter in
     # the associated ImageOperation
     def initialise_output_ports(self):
@@ -202,6 +207,7 @@ class Node:
                 self.output_ports[port_id] = Port(is_input = False,
                                                   metadata=output_metadata,
                                                   port_id = port_id,
+                                                  port_name=str(key), 
                                                   node_id = self.node_id)
         if self.image_operation.output_parameter_metadata is not None:
             for key, value in self.image_operation.output_parameter_metadata.items():
@@ -210,7 +216,10 @@ class Node:
                 self.output_ports[port_id] = Port(is_input = False,
                                                   metadata=output_metadata,
                                                   port_id = port_id,
+                                                  port_name=str(key),
                                                   node_id = self.node_id)
+
+        return self.output_ports
 
     def activate_node(self):
         # only activate node if ready
