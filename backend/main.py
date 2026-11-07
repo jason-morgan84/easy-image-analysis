@@ -1,6 +1,7 @@
 from core.image_operation_directory import ImageOperationDirectory
 from core.workflow import WorkFlow
-from core.frontend_operations import ImageOperationData
+from core.frontend_operations import ImageOperationData, TypeData
+from core.constants import DataPolicy
 from fastapi import FastAPI
 import json
 
@@ -29,7 +30,19 @@ for ImageOperation in image_operation_directory.image_operation_list.values():
         alerts=ImageOperation.alerts
     ))
 
-
+print(DataPolicy.ImageInt.target_class.__name__)
+# get data from all ImageOperations in format to present to frontend
+all_data_types = []
+for policy in DataPolicy.policies():
+    permitted_conversions = [conversion.target_class.__name__ for conversion in policy.permitted_conversions]
+    warned_conversions = [conversion.target_class.__name__ for conversion in policy.warned_conversions]
+    all_data_types.append(TypeData(
+        name=policy.target_class.__name__,
+        color=policy.colour,
+        compatibleWith=permitted_conversions + warned_conversions
+    ))
+for type in all_data_types:
+    print(type.name, type.color, type.compatibleWith)
 app = FastAPI()
 
 
@@ -43,3 +56,10 @@ async def get_operations():
     for image_operation in all_image_operations:
         operations_dict[image_operation.name] = image_operation.__dict__
     return operations_dict
+
+@app.get("/types")
+async def get_types():
+    types_dict = {}
+    for type in all_data_types:
+        types_dict[type.name] = type.__dict__
+    return types_dict
