@@ -2,6 +2,7 @@ import numpy as np
 import os
 from PIL import Image
 from core.error_handling import log
+from core.interface_classes import Node
 import cv2
 from core.constants import project_root_dir
 
@@ -12,20 +13,77 @@ image_frame_y = 512
 zoom_min = 0.1
 zoom_max = 10
 
-class ImageOperationData:
+class FrontendNodeDescription:
     def __init__ (self, id, name, category, docs, alerts ):
         self.id=id
         self.name=name
         self.category=category
+        self.ports={}
+        self.parameters = {}
         self.docs=docs
         self.alerts=alerts
 
-
-class TypeData:
+class FrontendTypeDescription:
     def __init__ (self, name, color, compatibleWith ):
         self.name=name
         self.color=color
         self.compatibleWith=compatibleWith
+
+class FrontendPortDescription:
+    def __init__ (self, name, id, dtype, is_input=True):
+        self.name=name
+        self.id=id
+        self.dtype=dtype
+        self.is_input=is_input
+
+
+def create_frontend_node_description(image_operation):
+    # create a FrontendNodeDescription object for the given ImageOperation
+    # this will be used to send data to the frontend for display in the UI
+
+    # get data from ImageOperation
+    id = image_operation.id
+    name = image_operation.name
+    category = image_operation.category
+    docs = image_operation.docs
+    alerts = image_operation.alerts
+    ports = []
+    parameters = []
+
+    # create FrontendNodeDescription object
+    frontend_node_description = FrontendNodeDescription(id, name, category, docs, alerts)
+
+    test_node = Node(image_operation=image_operation, node_id="test_node")
+    for port in test_node.input_ports.values():
+        if port.metadata.user_input:
+            parameters.append(FrontendPortDescription(id=port.port_id, 
+                                                      name=port.port_name, 
+                                                      dtype=port.metadata.dtype.target_class.__name__, 
+                                                      is_input=True)
+        )
+        else:
+            ports.append(FrontendPortDescription(id=port.port_id, 
+                                                 name=port.port_name, 
+                                                 dtype=port.metadata.dtype.target_class.__name__, 
+                                                 is_input=True)
+        )
+    for port in test_node.output_ports.values():
+        if port.metadata.user_input:
+            parameters.append(FrontendPortDescription(id=port.port_id, 
+                                                      name=port.port_name, 
+                                                      dtype=port.metadata.dtype.target_class.__name__, 
+                                                      is_input=False)
+        )
+        else:
+            ports.append(FrontendPortDescription(id=port.port_id, 
+                                                 name=port.port_name, 
+                                                 dtype=port.metadata.dtype.target_class.__name__, 
+                                                 is_input=False)
+        )
+    frontend_node_description.ports = ports
+    frontend_node_description.parameters = parameters
+
+    return frontend_node_description
 
 def import_luts(logger = []):
     lut_list = {}
