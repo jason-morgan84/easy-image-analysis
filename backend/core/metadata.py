@@ -8,6 +8,7 @@ class ImageMetadata:
         self.dtype = dtype
         self.image_shape_constraints = image_shape_constraints
         self.image_map = image_map
+        self.user_input = False  # always false for ImageMetadata, kept to allow searching for user_input flag in code that handles both ImageMetadata and ParameterMetadata
 
     @property
     def dtype(self):
