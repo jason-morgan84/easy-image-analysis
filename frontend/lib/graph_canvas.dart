@@ -64,8 +64,8 @@ Future<List<NodeDescription>> getNodeDefinitionsList() async {
     if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
-      final decodedItem = (jsonDecode(response.body) as Map<String, dynamic>);
-      List<NodeDescription> imageOperationList = [for (var value in decodedItem.values) NodeDescription.fromDict(value)];
+      final decodedNodeDescription = (jsonDecode(response.body) as Map<String, dynamic>);
+      List<NodeDescription> imageOperationList = [for (var value in decodedNodeDescription.values) NodeDescription.fromDict(value)];
       return imageOperationList;
   } else {
     // If the server did not return a 200 OK response,
@@ -81,8 +81,8 @@ Future<List<TypeListItem>> getTypeList() async {
     if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
-      final decodedItem = (jsonDecode(response.body) as Map<String, dynamic>);
-      List<TypeListItem> typeList = [for (var value in decodedItem.values) TypeListItem.fromDict(value)];
+      final decodedType = (jsonDecode(response.body) as Map<String, dynamic>);
+      List<TypeListItem> typeList = [for (var value in decodedType.values) TypeListItem.fromDict(value)];
       return typeList;
   } else {
     // If the server did not return a 200 OK response,
@@ -122,14 +122,14 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
               } 
               else if (snapshot.hasData) {
                 // get typeList from http
-                final typeList = snapshot.data![0];
+                final typeList = snapshot.data![1];
                 // convert typeList to actual PortType instances
                 final portTypes = {
                   for (var type in typeList)
-                    type.id: PortType(type.name, color: type.color, compatibleWith: Set<String>.from(type.compatibleWith)),
+                    type.name: PortType(type.name, color: type.color, compatibleWith: Set<String>.from(type.compatibleWith)),
                 };
                 // get nodeDefinitionsList from http
-                final nodeDefinitionsList = snapshot.data![1];
+                final nodeDefinitionsList = snapshot.data![0];
 
                 // define node registry based on nodeDefinitionsList
                 final registry = NodeRegistry(definitions: [
@@ -143,9 +143,9 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                       ports: [
                         for (var port in nodeDef.ports)
                           if (port.isInput)
-                            PortSpec.input(port.name, label: port.label, type: portTypes[port.type.id] ?? PortType.any)
+                            PortSpec.input(port.name, label: port.label, type: portTypes[port.type] ?? PortType.any)
                           else
-                            PortSpec.output(port.name, label: port.label, type: portTypes[port.type.id] ?? PortType.any),
+                            PortSpec.output(port.name, label: port.label, type: portTypes[port.type] ?? PortType.any),
                       ],
                     ),
                 ]);
@@ -165,7 +165,12 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                   headerBuilder: null,               // custom category header
                   );
                 final canvas = NodeCanvas(controller: controller);
-                return Row(children: [nodePallete, canvas],);
+                final output = Row(children: [
+                  SizedBox(width: 280, child: nodePallete), 
+                  Expanded(child: canvas),
+                  ],
+                  );
+                return output;
 
                 } 
                 else {

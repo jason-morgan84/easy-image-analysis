@@ -42,7 +42,11 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: WorkflowCanvas()
+        child: SizedBox(
+          width: 800,   // Provide a defined width
+          height: 600,  // Provide a defined height
+          child: WorkflowCanvas()
+        )
       ),
       //floatingActionButton: FloatingActionButton(
       //  onPressed: _incrementCounter,
