@@ -43,8 +43,8 @@ class GuassianFilter(ImageOperation):
                                                   image_map=Shape(c=0, z=1, y=2, x=3))}, # this describes the dimension of the pixel array that corresponds to each image dimension
             input_parameter_metadata={"sigma": ParameterMetadata(dtype=DataPolicy.ValueInt, # dtype describes the format the parameter should be in
                                                                  user_input=True, # if a parameter comes from the UI, this should be True. If its passed from another ImageOperation, it should be False
-                                                                 ui_element="text", # if the parameter comes from user input, this defines what sort of UI element should be used
-                                                                 ui_element_options=None)}, # any UI element options, such as options for a drop-down box, min/max values for a slider etc
+                                                                 ui_element="integer", # if the parameter comes from user input, this defines what sort of UI element should be used
+                                                                 ui_element_options={"type": "slider", "min": 0, "max": 10, "step": 1, "slider": True})}, # any UI element options, such as options for a drop-down box, min/max values for a slider etc
             output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))},

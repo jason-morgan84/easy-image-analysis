@@ -35,6 +35,41 @@ class PortDescription{
   }
 }
 
+
+class ParameterDescription{
+  late String name;
+  late String label;
+  late ParamType type;
+  late Map<String,dynamic> options;
+
+
+  ParameterDescription.fromDict(Map<String, dynamic> json) {
+    name = (json['id'] as String?) ?? "";
+    label = (json['name'] as String?) ?? "";
+    options = (json['user_input_options'] as Map<String,String>);
+    if ((json['user_input_method'] as String?) == "integer")
+    {
+      type = IntParam(min: options["min"] ?? 0, 
+                                                max: options["max"] ?? 10, 
+                                                step: options["step"] ?? 1, 
+                                                slider: options["slider"] ?? false,
+                                                unit: "");
+    }
+    else if ((json['user_input_method'] as String?) == "dropdown")
+    {
+      type = EnumParam.values(options["values"]);
+    }
+    else
+    {
+      type = TextParam();
+    }
+
+
+
+  }
+  
+}
+
 // define class to hold descriptions of Nodes for canvas pallete (distinct from node lists in workflow), imported from backend
 class NodeDescription{
   String id = "";
@@ -43,7 +78,7 @@ class NodeDescription{
   String docs = "";
   String alerts = "";
   late List<PortDescription> ports;
-  late List<PortDescription> parameters;
+  late List<ParameterDescription> parameters;
 
   NodeDescription.fromDict(Map<String, dynamic> json) {
     id = (json['id'] as String?) ?? "";
@@ -53,6 +88,9 @@ class NodeDescription{
     alerts = (json['alerts'] as String?) ?? "";
     ports = json['ports'] != null 
       ? List<PortDescription>.from(json['ports'].map((portJson) => PortDescription.fromDict(portJson))) 
+      : [];
+    parameters = json['parameters'] != null
+      ? List<ParameterDescription>.from(json['parameters'].map((parameterJson) => ParameterDescription.fromDict(parameterJson)))
       : [];
 
   }
@@ -137,29 +175,43 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                     NodeDefinition(
                       type: nodeDef.id,
                       title: nodeDef.name,
-                      category: nodeDef.category,
-                      icon: Icons.extension, // You can customize the icon based on your needs
+                      category: nodeDef.category, 
                       variant: NodeVariant.dynamic,
+                      copyable: false,
+                      style: NodeStyle(headerColor: Color(0xFF888888)),
                       ports: [
                         for (var port in nodeDef.ports)
                           if (port.isInput)
-                            PortSpec.input(port.name, label: port.label, type: portTypes[port.type] ?? PortType.any)
+                            PortSpec.input(port.name, label: port.label, side: PortSide.top, type: portTypes[port.type] ?? PortType.any)
                           else
-                            PortSpec.output(port.name, label: port.label, type: portTypes[port.type] ?? PortType.any),
+                            PortSpec.output(port.name, label: port.label, side: PortSide.bottom, type: portTypes[port.type] ?? PortType.any),
+                      ],
+                      params: [
+                        for (var parameter in nodeDef.parameters)
+                            ParamSpec(parameter.name, parameter.type, label: parameter.label)
                       ],
                     ),
                 ]);
                 // create node pallete based on registry
                 final controller = NodeEditorController(registry: registry);
+                controller.canvasSettings.value = const CanvasSettings(
+                  gridStyle: GridStyle.none,     // none, dots, lines, cross
+                  gridSpacing: 20,                // also the snapping step
+                  majorEvery: 5,                  // major line every 5 cells (≤ 1 disables)
+                  snapToGrid: true,               // node moves and resizes
+                  snapEdgesToGrid: true,          // edge waypoints
+                  defaultEdgeStyle: EdgeStyle(pathType: EdgePathType.smoothStep),
+                  gridColor: null, majorGridColor: null, backgroundColor: null,
+);
                 final nodePallete = NodePalette(
                   controller: controller,
                   mode: NodePaletteMode.both,        // click, drag or both
-                  layout: NodePaletteLayout.list,    // list, grid or compact
+                  layout: NodePaletteLayout.compact,    // list, grid or compact
                   showSearch: true,
-                  showFilters: true,                 // category chips + port type filter
-                  title: 'Nodes',
+                  showFilters: false,                 // category chips + port type filter
+                  title: 'Image Operations',
                   filter: (def) => !def.tags.contains('hidden'),
-                  categoryOrder: ['Triggers', 'Actions', 'Flow'],
+                  categoryOrder: ['Input/Outut', 'Selection', 'Filters'],
                   initiallyCollapsed: {'Advanced'},
                   itemBuilder: null,                 // custom item (tap / drag still handled)
                   headerBuilder: null,               // custom category header

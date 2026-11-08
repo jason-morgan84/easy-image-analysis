@@ -23,18 +23,28 @@ class FrontendNodeDescription:
         self.docs=docs
         self.alerts=alerts
 
+    def __str__(self):
+        return(f"{self.name} - id: {self.id}; category: {self.category}; ports: \n{[str(port) for port in self.ports]}; parameters: \n{[str(parameter) for parameter in self.parameters]};")
 class FrontendTypeDescription:
     def __init__ (self, name, color, compatibleWith ):
         self.name=name
         self.color=color
         self.compatibleWith=compatibleWith
 
+
+
 class FrontendPortDescription:
-    def __init__ (self, name, id, dtype, is_input=True):
+    def __init__ (self, name, id, dtype, user_input_method = "", user_input_options = {}, is_input=True):
         self.name=name
         self.id=id
         self.dtype=dtype
         self.is_input=is_input
+        self.user_input_method = user_input_method
+        self.user_input_options = user_input_options
+    
+    def __str__(self):
+        return(f"     {self.name} - id: {self.id}; dtype: {self.dtype}; is_input: {self.is_input}; user_input_method: {self.user_input_method}; user_input_options: {self.user_input_options}")
+
 
 
 def create_frontend_node_description(image_operation):
@@ -56,11 +66,15 @@ def create_frontend_node_description(image_operation):
     test_node = Node(image_operation=image_operation, node_id="test_node")
     for port in test_node.input_ports.values():
         if port.metadata.user_input:
-            parameters.append(FrontendPortDescription(id=port.port_id, 
+            print(f"{image_operation.name}.{port.port_name} HERE", port.metadata.ui_element)
+            new_parameter = FrontendPortDescription(id=port.port_id, 
                                                       name=port.port_name, 
                                                       dtype=port.metadata.dtype.target_class.__name__, 
-                                                      is_input=True)
-        )
+                                                      is_input=True,
+                                                      user_input_method = port.metadata.ui_element,
+                                                      user_input_options = port.metadata.ui_element_options)
+            parameters.append(new_parameter)
+            print(new_parameter)
         else:
             ports.append(FrontendPortDescription(id=port.port_id, 
                                                  name=port.port_name, 
@@ -82,6 +96,8 @@ def create_frontend_node_description(image_operation):
         )
     frontend_node_description.ports = ports
     frontend_node_description.parameters = parameters
+
+    #print(frontend_node_description)
 
     return frontend_node_description
 
