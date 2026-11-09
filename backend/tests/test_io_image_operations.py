@@ -201,7 +201,7 @@ def test_save_image():
     testload.execute()
 
     testsave = SaveImage()
-    testsave.input_parameter = {"path":".\\backend\\tests\\test_images\\test_image_8bit_saved.tif"}
+    testsave.input_parameter = {"path":".\\tests\\test_images\\test_image_8bit_saved.tif"}
     testsave.input_image = {"input": testload.output_image["output"]}
 
     testsave.run_code()
