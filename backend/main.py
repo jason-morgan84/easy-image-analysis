@@ -3,6 +3,7 @@ from core.workflow import WorkFlow
 from core.frontend_operations import FrontendTypeDescription, create_frontend_node_description
 from core.constants import DataPolicy
 from fastapi import FastAPI
+from core.error_handling import log
 
 # set up logger
 logger = []
@@ -43,8 +44,11 @@ async def root():
 
 # get data from all ImageOperations in format to present to frontend
 all_image_operations = []
-for ImageOperation in image_operation_directory.image_operation_list.values():
-    all_image_operations.append(create_frontend_node_description(ImageOperation))
+for id, ImageOperation in image_operation_directory.image_operation_list.items():
+    try:
+        all_image_operations.append(create_frontend_node_description(ImageOperation))
+    except Exception as e:
+        log(logger, f"failed to generate ImageOperation description for frontend for '{id}: {e}")
 
 @app.get("/operations")
 async def get_operations():

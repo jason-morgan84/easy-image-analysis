@@ -5,6 +5,7 @@ from core.error_handling import log
 from core.interface_classes import Node
 import cv2
 from core.constants import project_root_dir
+from core.image_operation import ImageOperation
 
 lut_folder_location = os.path.join(project_root_dir, "frontend", "luts")
 
@@ -48,8 +49,15 @@ class FrontendPortDescription:
 
 
 def create_frontend_node_description(image_operation):
-    # create a FrontendNodeDescription object for the given ImageOperation
-    # this will be used to send data to the frontend for display in the UI
+    """ 
+    create a FrontendNodeDescription object for the given ImageOperation
+    this will be used to send data to the frontend for display in the UI
+    """
+    # check input is an image_operation
+    if not isinstance(image_operation, ImageOperation):
+        raise TypeError(f"expected image_operation type, not {type(image_operation)}")
+
+    # if input is an image_operation, all relevant attributes will already have been checked, no need to check again here
 
     # get data from ImageOperation
     id = image_operation.id
@@ -66,7 +74,6 @@ def create_frontend_node_description(image_operation):
     test_node = Node(image_operation=image_operation, node_id="test_node")
     for port in test_node.input_ports.values():
         if port.metadata.user_input:
-            print(f"{image_operation.name}.{port.port_name} HERE", port.metadata.ui_element)
             new_parameter = FrontendPortDescription(id=port.port_id, 
                                                       name=port.port_name, 
                                                       dtype=port.metadata.dtype.target_class.__name__, 
@@ -74,7 +81,6 @@ def create_frontend_node_description(image_operation):
                                                       user_input_method = port.metadata.ui_element,
                                                       user_input_options = port.metadata.ui_element_options)
             parameters.append(new_parameter)
-            print(new_parameter)
         else:
             ports.append(FrontendPortDescription(id=port.port_id, 
                                                  name=port.port_name, 
@@ -96,8 +102,6 @@ def create_frontend_node_description(image_operation):
         )
     frontend_node_description.ports = ports
     frontend_node_description.parameters = parameters
-
-    #print(frontend_node_description)
 
     return frontend_node_description
 
