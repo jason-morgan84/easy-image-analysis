@@ -11,6 +11,7 @@ from core.metadata import ParameterMetadata, ImageMetadata
 def test_port_without_port_id():
     with pytest.raises(ValueError, match = "port_id required for port instantiation"):
         Port(port_id=None,
+             port_name="test",
              node_id="node_id",
              is_input=False,
              metadata=ImageMetadata(DataPolicy.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
@@ -20,6 +21,7 @@ def test_port_without_port_id():
 def test_port_without_node_id():
     with pytest.raises(ValueError, match = "node_id required for port instantiation"):
         Port(port_id="port_id", 
+             port_name="test",
              node_id=None,
              is_input=False,
              metadata=ImageMetadata(DataPolicy.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
@@ -29,6 +31,7 @@ def test_port_without_node_id():
 def test_port_without_is_input():
     with pytest.raises(ValueError, match = "is_input flag not set for port"):
         Port(port_id="port_id", 
+             port_name="test",
              node_id="node_id",
              is_input=None,
              metadata=ImageMetadata(DataPolicy.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
@@ -37,6 +40,7 @@ def test_port_without_is_input():
 def test_port_is_input_not_bool():
     with pytest.raises(TypeError, match = "is_input flag expected boolean"):
         Port(port_id="port_id", 
+             port_name="test",
              node_id="node_id",
              is_input="input",
              metadata=ImageMetadata(DataPolicy.ImageInt,Shape(c = -1, z = -1, y = -1, x = -1),Shape(c = 0, z = 0, y = 0, x = 0)))
@@ -46,6 +50,7 @@ def test_port_is_input_not_bool():
 def test_port_without_metadata():
     with pytest.raises(TypeError, match = "meta data expected as ImageMetadata or ParameterMetadata clas"):
         Port(port_id="port_id",
+             port_name="test",
              node_id="node_ide",
               is_input=True,
               metadata=None)
@@ -55,6 +60,7 @@ def test_port_without_metadata():
 def test_unexpected_scalar_data():
 
     test_port = Port (port_id = "test",
+                      port_name="test",
                       node_id = "test",
                       is_input=True,
                       metadata = ParameterMetadata(dtype = DataPolicy.ValueInt))
@@ -65,6 +71,7 @@ def test_unexpected_scalar_data():
 def test_unexpected_array_not_array():
 
     test_port = Port (port_id = "test",
+                      port_name="test",
                       node_id = "test",
                       is_input=True,
                       metadata = ImageMetadata(dtype = DataPolicy.ImageInt,
@@ -77,6 +84,7 @@ def test_unexpected_array_not_array():
 def test_unexpected_array_incorrect_dtype():
 
     test_port = Port (port_id = "test",
+                      port_name="test",
                       node_id = "test",
                       is_input=False,
                       metadata = ImageMetadata(dtype = DataPolicy.ImageInt,
@@ -90,6 +98,7 @@ def test_unexpected_array_incorrect_dtype():
 def test_incorrect_shape_arguement():
     with pytest.raises(AttributeError, match = "Shape class instantiated with unexpected arguement: 't'"):
         test_port = Port (port_id = "test",
+                          port_name="test",
                         node_id = "test",
                         is_input=False,
                         metadata = ImageMetadata(dtype = DataPolicy.ImageInt,
@@ -110,6 +119,7 @@ def test_incorrect_shape_arguement():
 def test_image_incorrect_shape():
 
     test_port = Port (port_id = "test",
+                      port_name="test",
                       node_id = "test",
                       is_input=True,
                       metadata = ImageMetadata(dtype = DataPolicy.ImageInt,
@@ -123,6 +133,7 @@ def test_image_incorrect_shape():
 def test_incorrect_metadata_dtype():
     with pytest.raises(TypeError, match = "expected ImageMetadata dtype from DataType.types"):
         test_port = Port (port_id = "test",
+                          port_name="test",
                         node_id = "test",
                         is_input=True,
                         metadata = ImageMetadata(dtype = int,
@@ -131,6 +142,7 @@ def test_incorrect_metadata_dtype():
         
     with pytest.raises(TypeError, match = "expected ParameterMetadata dtype from DataType.types"):
         test_port = Port (port_id = "test",
+                          port_name="test",
                         node_id = "test",
                         is_input=True,
                         metadata = ParameterMetadata(dtype = int))
