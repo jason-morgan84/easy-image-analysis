@@ -136,6 +136,7 @@
 |02/11/26|0.19.3|Described full WorkFlow unit testing|
 |09/11/26|0.20.0|Added port_name to description of port class |
 |09/11/26|0.20.1|Added description of create_frontend_node_description|
+|09/11/26|0.20.2|Added description of unit testing of create_frontend_node_description|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -1039,6 +1040,12 @@ This uses the class FrontendPortDescription, which includes:
 |check z|send in z not as integer| TypeError: expected z as integer|
 |check z|send in z outside image z dimension size| ValueError: z outside image dimensions|
 |create_image| send in correct parameters | output image as expected |
+
+### 8.7.3 create_frontend_node_description
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+| check input | send in input not as image_operation | TypeError: expected image_operation type|
+|test output| send in corect input | output as expected|
 # 9 Versioning
 
 Versioning and changelogs are implemented using the "keep a changelog" 1.1 format (https://keepachangelog.com/en/1.1.0/).
