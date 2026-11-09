@@ -128,12 +128,13 @@
 |24/10/26|0.18.3|added description of ExportError to Error Handling section|
 |27/10/26|0.18.4|added description of ignore for folders in ImageOperationDirectory|
 |27/10/26|0.18.5|Updated specification for ImageOperations and Metadata|
-|27/10/27|0.18.6|Update Specification description of WorkFlow class and how this defines and checks data flow through graph|
-|30/10/27|0.18.7|Update error_handling.py description to include ShapeError|
-|01/11/27|0.19.0|Added documentation for import_luts and import_luts unit testing|
-|01/11/27|0.19.1|Added documentation for create_image|
-|01/11/27|0.19.2|Added unit testing for create_image|
-|02/11/27|0.19.3|Described full WorkFlow unit testing|
+|27/10/26|0.18.6|Update Specification description of WorkFlow class and how this defines and checks data flow through graph|
+|30/10/26|0.18.7|Update error_handling.py description to include ShapeError|
+|01/11/26|0.19.0|Added documentation for import_luts and import_luts unit testing|
+|01/11/26|0.19.1|Added documentation for create_image|
+|01/11/26|0.19.2|Added unit testing for create_image|
+|02/11/26|0.19.3|Described full WorkFlow unit testing|
+|09/11/26|0.20.0|Added port_name to description of port class |
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -365,6 +366,7 @@ The port class acts as a buffer between a Node and an ImageOperation. Its role i
 Two lists of ports are created with each node, and ports do not exist independently of nodes. Each port has the instance variables:
 * node_id – unique identifier for connected node
 * port_id - id for port within the node (the name of the connected ImageOperation input/output)
+* port_name - label for port in frontend UI - based on key in metadata dictionary describing port.
 * is_input - flag for whether this is an input or output port
 * metadata - ImageMetadata or ParameterMetadata class, holding metadata defined by ImageOperation and created at instantiation. Must be present, cannot be None.
 * data - cached data. None at instantiation.
