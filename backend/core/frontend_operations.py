@@ -6,6 +6,7 @@ from core.interface_classes import Node
 import cv2
 from core.constants import project_root_dir
 from core.image_operation import ImageOperation
+import copy
 
 lut_folder_location = os.path.join(project_root_dir, "frontend", "luts")
 
@@ -74,13 +75,13 @@ def create_frontend_node_description(image_operation):
     test_node = Node(image_operation=image_operation, node_id="test_node")
     for port in test_node.input_ports.values():
         if port.metadata.user_input:
-            new_parameter = FrontendPortDescription(id=port.port_id, 
+            #new_parameter = 
+            parameters.append(FrontendPortDescription(id=port.port_id, 
                                                       name=port.port_name, 
                                                       dtype=port.metadata.dtype.target_class.__name__, 
                                                       is_input=True,
                                                       user_input_method = port.metadata.ui_element,
-                                                      user_input_options = port.metadata.ui_element_options)
-            parameters.append(new_parameter)
+                                                      user_input_options = port.metadata.ui_element_options))
         else:
             ports.append(FrontendPortDescription(id=port.port_id, 
                                                  name=port.port_name, 
