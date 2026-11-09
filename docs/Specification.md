@@ -135,6 +135,7 @@
 |01/11/26|0.19.2|Added unit testing for create_image|
 |02/11/26|0.19.3|Described full WorkFlow unit testing|
 |09/11/26|0.20.0|Added port_name to description of port class |
+|09/11/26|0.20.1|Added description of create_frontend_node_description|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -620,6 +621,25 @@ Takes input of image, a dictionary of channels: LUTs for output, desired image c
 Returns a numpy uint8 array defining RGB output image for use in front end.
 
 min and max zoom values as well as output frame size are defined in frontend_operations.py (for now.)
+
+# 5.3 create_frontend_node_description
+
+Creates an object of class FrontendNodeDescription that generates a description of a sample node for a given ImageOperation, which includes:
+* id: ImageOperation id
+* name: ImageOperation name
+* category: ImageOperation category
+* docs: ImageOperation docs
+* alerts: ImageOperation alerts
+* ports: list of all ports (data input/output via workflow) in format FrontendPortDescription
+* parameters list of all parameters (data input via UI) in format FrontendPortDescription
+
+This uses the class FrontendPortDescription, which includes:
+* name: port_name
+* id: port_id as it would be created by a node
+* dtype: port data dtype
+* is_input = whether port is input or output
+* user_input_method: for parameters. the defined user input method
+* user_input_options: for parameters, any options associated with user input methoduser_input_options
 
 # 6 System Frontend and UI
 
