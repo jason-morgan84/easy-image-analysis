@@ -203,6 +203,7 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                   defaultEdgeStyle: EdgeStyle(pathType: EdgePathType.smoothStep),
                   gridColor: null, majorGridColor: null, backgroundColor: null,
 );
+
                 final nodePallete = NodePalette(
                   controller: controller,
                   mode: NodePaletteMode.both,        // click, drag or both
@@ -217,6 +218,14 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                   headerBuilder: null,               // custom category header
                   );
                 final canvas = NodeCanvas(controller: controller);
+                controller.revision.addListener((){
+                    Future.microtask(() {
+                      final lastCommand = controller.history.undoLabel;
+                      print("Stabilized change: $lastCommand");
+                      final output = controller.history._undo[controller.history.undoDepth - 1];
+                    });
+// if
+                  });
                 final output = Row(children: [
                   SizedBox(width: 280, child: nodePallete), 
                   Expanded(child: canvas),
