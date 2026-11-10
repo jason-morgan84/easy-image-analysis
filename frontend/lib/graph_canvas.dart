@@ -46,7 +46,7 @@ class ParameterDescription{
   ParameterDescription.fromDict(Map<String, dynamic> json) {
     name = (json['id'] as String?) ?? "";
     label = (json['name'] as String?) ?? "";
-    options = (json['user_input_options'] as Map<String,String>);
+    options = (json['user_input_options'] as Map<String,dynamic>);
     if ((json['user_input_method'] as String?) == "integer")
     {
       type = IntParam(min: options["min"] ?? 0, 
@@ -57,7 +57,7 @@ class ParameterDescription{
     }
     else if ((json['user_input_method'] as String?) == "dropdown")
     {
-      type = EnumParam.values(options["values"]);
+      type = EnumParam.values(List<String>.from(options["values"]));
     }
     else
     {

@@ -81,7 +81,7 @@ def create_frontend_node_description(image_operation):
                                                       dtype=port.metadata.dtype.target_class.__name__, 
                                                       is_input=True,
                                                       user_input_method = port.metadata.ui_element,
-                                                      user_input_options = port.metadata.ui_element_options))
+                                                      user_input_options = port.metadata.ui_element_options if port.metadata.ui_element_options != None else {"options" : "default"}))
         else:
             ports.append(FrontendPortDescription(id=port.port_id, 
                                                  name=port.port_name, 

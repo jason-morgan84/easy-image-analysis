@@ -31,7 +31,7 @@ class CalculateAutoThreshold(ImageOperation):
             input_parameter_metadata={"method": ParameterMetadata(dtype=DataPolicy.ValueString, 
                                                                  user_input=True,
                                                                  ui_element="dropdown",
-                                                                 ui_element_options={"values":["Sum intensity", "Mean intensity", "Min intensity", "Max intensity" ]})},
+                                                                 ui_element_options={"values":["Li", "Isodata", "Max Entropy", "Mean", "Minimum", "Triangle", "Otsu", "Yen"]})},
             output_parameter_metadata={ "threshold": ParameterMetadata(dtype=DataPolicy.ValueInt)},
 
             )
