@@ -277,7 +277,7 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                       title: nodeDef.name,
                       category: nodeDef.category, 
                       variant: NodeVariant.dynamic,
-                      copyable: true,
+                      copyable: false,
                       style: NodeStyle(headerColor: Color(0xFF888888)),
                       ports: [
                         for (var port in nodeDef.ports)
