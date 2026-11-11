@@ -34,13 +34,17 @@ class WorkFlow:
     """
     add_node(ImageOperation) function adds a key/value pair to nodes dictionary where dictionary key is node.ImageOperation.UniqueID
     """
-    def add_node(self, image_operation):
+    def add_node(self, image_operation, id = None):
 
         if not isinstance(image_operation,ImageOperation):
             log(self.workflow_logger,TypeError,f"add_node requires ImageOperation class, not {type(image_operation)}","WorkFlow","add_node")
 
         else:
-            new_key = ".".join(("node",image_operation.id,str(self.max_id)))
+            if id:
+                new_key = id
+            else:
+                new_key = ".".join(("node",image_operation.id,str(self.max_id)))
+                
             self.max_id += 1
 
             if new_key in self.nodes.keys():
