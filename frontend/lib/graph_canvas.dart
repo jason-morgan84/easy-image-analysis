@@ -128,7 +128,107 @@ Future<List<TypeListItem>> getTypeList() async {
     throw Exception('Failed to load TypeListItem');
     }
 }
-  
+
+// extends NodeEditorController with custom commands for adding, deleting and editing nodes and
+// adding and deleting connections to call relevant backend functions
+class CustomNodeEditorController extends NodeEditorController
+{
+  int identifier = 0;
+  void onNodeAdd(NodeInstance node)
+  {
+    print(node.id);
+  }
+
+  void onConnectionAdd(Edge Connection)
+  {
+    print(Connection.id);
+  }
+  CustomNodeEditorController({
+    required super.registry,
+    //this.onNodeAdd,
+  });
+
+  // overrides addNode to custom ID on addition and run onNodeAdd
+  @override
+  NodeInstance addNode(
+    String type, {
+    required Offset position,
+    Map<String, Object?>? params,
+    NodeId? id,
+    String? title,
+    bool select = true,
+  }) {
+    // newID in format node.image_operation_name.integer
+    String newID = ["node", type.toString(), identifier].join(".");
+    // increment identifier
+    identifier ++ ;
+
+    // run normal addNode function
+    final newNode = super.addNode(
+      type,
+      position: position,
+      params: params,
+      id: NodeId(newID),
+      title: title,
+      select: select,
+    );
+
+    // call onNodeAdd
+    onNodeAdd(newNode);
+    return(newNode);
+  }
+
+  // overrides undo for changes to nodes/edges
+  // changes to id not needed (or possible here), as custom ID would have been created on initial element addition
+  @override
+  void undo() {
+    final c = history.takeUndo();
+    if (c != null) {
+      batch(() => c.revert(this));
+
+      if (c is RemoveElementsCommand) {
+        for (final node in c.nodes) {
+          onNodeAdd(node);
+        }
+        for (final connection in c.edges){
+          onConnectionAdd(connection);
+        }
+      }
+    }
+  }
+
+  // likewise for redo-ing undone additions
+  @override
+  void redo() {
+    final c = history.takeRedo();
+    if (c != null) {
+      batch(() => c.apply(this));
+
+      if (c is AddElementsCommand) {
+        for (final node in c.nodes) {
+          onNodeAdd.call(node);
+        }
+      }
+    }
+  }
+  @override
+  void addElements(
+    List<NodeInstance> nodes,
+    List<Edge> edges, {
+    String label = 'Add',
+  }) {
+    // 1. Run the parent logic first so nodes and edges are restored to the graph
+    super.addElements(nodes, edges, label: label);
+
+    // 2. Notify your custom handler for each restored/pasted node
+    for (final node in nodes) {
+      onNodeAdd.call(node);
+    }
+  }
+}
+
+
+
 
 class WorkflowCanvas extends StatefulWidget {
   const WorkflowCanvas({super.key});
@@ -177,7 +277,7 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                       title: nodeDef.name,
                       category: nodeDef.category, 
                       variant: NodeVariant.dynamic,
-                      copyable: false,
+                      copyable: true,
                       style: NodeStyle(headerColor: Color(0xFF888888)),
                       ports: [
                         for (var port in nodeDef.ports)
@@ -193,7 +293,7 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                     ),
                 ]);
                 // create node pallete based on registry
-                final controller = NodeEditorController(registry: registry);
+                final controller = CustomNodeEditorController(registry: registry);
                 controller.canvasSettings.value = const CanvasSettings(
                   gridStyle: GridStyle.none,     // none, dots, lines, cross
                   gridSpacing: 20,                // also the snapping step
@@ -206,7 +306,7 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
 
                 final nodePallete = NodePalette(
                   controller: controller,
-                  mode: NodePaletteMode.both,        // click, drag or both
+                  mode: NodePaletteMode.drag,        // click, drag or both
                   layout: NodePaletteLayout.compact,    // list, grid or compact
                   showSearch: true,
                   showFilters: false,                 // category chips + port type filter
@@ -218,14 +318,14 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                   headerBuilder: null,               // custom category header
                   );
                 final canvas = NodeCanvas(controller: controller);
-                controller.revision.addListener((){
-                    Future.microtask(() {
-                      final lastCommand = controller.history.undoLabel;
-                      print("Stabilized change: $lastCommand");
-                      final output = controller.history._undo[controller.history.undoDepth - 1];
-                    });
+                //controller.revision.addListener((){
+                    //Future.microtask(() {
+                      //final lastCommand = controller.history.undoLabel;
+                      //print("Stabilized change: $lastCommand");
+                      //final output = controller.history._undo[controller.history.undoDepth - 1];
+                    //});
 // if
-                  });
+                  //});
                 final output = Row(children: [
                   SizedBox(width: 280, child: nodePallete), 
                   Expanded(child: canvas),
