@@ -149,7 +149,7 @@ class WorkFlow:
     """
     add_connection(source_port, target_port) function adds a key/value pair to connections dictionary where dictionary key is connection.UniqueID
     """
-    def add_connection(self, source_port, target_port):
+    def add_connection(self, source_port, target_port, id = None):
         # checks if source_port and target_port are ports
         if not isinstance(source_port,Port):
             log(self.workflow_logger,TypeError,f"expected source_port as Port, not {type(source_port)}","WorkFlow","add_connection")
@@ -189,7 +189,7 @@ class WorkFlow:
             # if error checking is passed, create connection
 
             # create key in the form connection.ID
-            new_key = ".".join(("connection",str(self.max_id)))
+            new_key = ".".join(("connection",str(self.max_id) if id == None else id))
             self.max_id += 1
             # add new connection to connections dictionary
             self.connections[new_key] = Connection(connection_id = new_key,
