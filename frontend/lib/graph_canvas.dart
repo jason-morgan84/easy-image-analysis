@@ -129,16 +129,57 @@ Future<List<TypeListItem>> getTypeList() async {
     }
 }
 
+
 // extends NodeEditorController with custom commands for adding, deleting and editing nodes and
 // adding and deleting connections to call relevant backend functions
 class CustomNodeEditorController extends NodeEditorController
 {
   int identifier = 0;
-  void onNodeAdd(NodeInstance node)
+
+  // called when a node is added, communicates with backend and creates a node in WorkFlow
+  void onNodeAdd(NodeInstance node) async
   {
-    print(node.id);
+      // tells backend to create a node and awaits response
+      var response = await http.post(
+      Uri.parse('http://127.0.0.1:8000/new_node'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: json.encode({"image_operation": node.definition.type, "id": node.id}),
+    );
+    // decodes response from json to map
+    if (response.statusCode == 200)
+    {
+      var responseDecode = json.decode(response.body);
+
+      // if the response is not that a node with the correct id was created in backend, delete the node from frontend
+      if (responseDecode["status"] != "created" || responseDecode["node"] != node.id)
+      {
+        deleteNode(node.id);
+      }
+    }
   }
 
+
+  void onRemove(Iterable<NodeId> nodes, Iterable edges) async
+  {
+      // tells backend to create a node and awaits response
+      var response = await http.post(
+      Uri.parse('http://127.0.0.1:8000/delete_node'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: json.encode({"nodes": nodes, "edges": edges}),
+    );
+    var responseDecode = json.decode(response.body);
+    if (responseDecode["status"] == "failed")
+    {
+      // if removal wasn't sucessful on backend, undo removal on frontend
+      undo();
+
+    }
+
+  }
   void onConnectionAdd(Edge Connection)
   {
     print(Connection.id);
@@ -148,6 +189,26 @@ class CustomNodeEditorController extends NodeEditorController
     //this.onNodeAdd,
   });
 
+
+  @override
+  // remove is used to remove edges, remove nodes and to remove selections (ie, a node with attached edges, a group of nodes)
+  // This is done with as a single command with a single undo step.
+  // Because this is a single command with a single undo, it needs to be sent to the backend as a single command with a single response
+  void remove({
+    Iterable<NodeId> nodes = const [],
+    Iterable<EdgeId> edges = const [],
+    bool userAction = false,
+  }) {
+
+    super.remove(
+      nodes: nodes,
+      edges: edges,
+      userAction: userAction
+    );
+    onRemove(nodes, edges);
+
+
+  }
   // overrides addNode to custom ID on addition and run onNodeAdd
   @override
   NodeInstance addNode(
@@ -162,7 +223,7 @@ class CustomNodeEditorController extends NodeEditorController
     String newID = ["node", type.toString(), identifier].join(".");
     // increment identifier
     identifier ++ ;
-
+    
     // run normal addNode function
     final newNode = super.addNode(
       type,

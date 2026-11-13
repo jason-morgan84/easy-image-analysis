@@ -2,8 +2,9 @@ from core.image_operation_directory import ImageOperationDirectory
 from core.workflow import WorkFlow
 from core.frontend_operations import FrontendTypeDescription, create_frontend_node_description
 from core.constants import DataPolicy
-from fastapi import FastAPI
-from core.error_handling import log
+from fastapi import FastAPI, Request, BackgroundTasks
+from core.error_handling import log, GraphError
+import json
 
 # set up logger
 logger = []
@@ -34,8 +35,8 @@ for policy in DataPolicy.policies():
 
 app = FastAPI()
 types_dict = {}
-for type in all_data_types:
-    types_dict[type.name] = type.__dict__
+for item in all_data_types:
+    types_dict[item.name] = item.__dict__
 
 @app.get("/")
 async def root():
@@ -60,6 +61,46 @@ async def get_operations():
 @app.get("/types")
 async def get_types():
     types_dict = {}
-    for type in all_data_types:
-        types_dict[type.name] = type.__dict__
+    for item in all_data_types:
+        types_dict[item.name] = item.__dict__
     return types_dict
+
+@app.post("/new_node")
+async def get_new_node(request: Request, background_tasks: BackgroundTasks):
+    data = await request.json()
+    image_operation = data.get('image_operation')
+    id = data.get('id')
+    try:
+        workflow.add_node(image_operation_directory.image_operation_list[image_operation], id)
+    except Exception as e:
+        print(f"error creating node: {e}")
+        log(logger,GraphError,"error creating node: {e}","main.py","get_new_node",id)
+
+    if id in workflow.nodes.keys() and workflow.nodes[id].image_operation.id == image_operation:
+        try:
+            background_tasks.add_task(workflow.update_graph)
+        except Exception as e:
+            print(f"failed to create background task: {e}")
+        return{"status": "created", "node": id}
+    else:
+        return{"status": "failed", "node": id}
+
+@app.post("/remove")
+async def get_remove(request: Request):
+    data = await request.json()
+    nodes = data.get('nodes')
+    edges = data.get('edges')
+    try:
+        output = workflow.remove(node_ids=nodes, connection_ids=edges)
+    except Exception as e:
+        print(f"error removing elements: {e}")
+        log(logger,GraphError,"error removing elements: {e}","main.py","get_remove",id)
+    #print(workflow.nodes.keys())
+    #print(f"id: {id}, {type(id)}, {id in workflow.nodes.keys()}")
+
+    for item in logger:
+        print(f"{item.identifier}: {item.message}")
+    if output:
+        return{"status": "completed"}
+    else:
+        return{"status": "failed"}
