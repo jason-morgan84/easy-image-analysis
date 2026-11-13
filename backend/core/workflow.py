@@ -115,6 +115,21 @@ class WorkFlow:
                 self.delete_connection(connection)
     """
 
+    """remove function removes a list of nodes and conenctions from the relevant dictionaries based on ids"""
+    def remove(self, node_ids=None, connection_ids=None):
+        # first, check node_ids are present in node dictionary and connection_ids are present in connections dictionary
+        nodes_present = True if all(node in self.nodes.keys() for node in node_ids) else False
+        connections_present = True if all(connection in self.connection.keys() for connection in connection_ids) else False
+
+        # if everything is present, delete nodes and connections and return True
+        if nodes_present and connections_present:
+            self.delete_node(node for node in node_ids) 
+            self.delete_connection(connection for connection in connection_ids)
+            return True
+        else:
+        # if not all ids are present, don't delete anything and return false
+            return False
+
 
 
     """
