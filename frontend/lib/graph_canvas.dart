@@ -165,7 +165,7 @@ class CustomNodeEditorController extends NodeEditorController
   {
       // tells backend to create a node and awaits response
       var response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/delete_node'),
+      Uri.parse('http://127.0.0.1:8000/remove'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -180,14 +180,33 @@ class CustomNodeEditorController extends NodeEditorController
     }
 
   }
-  void onConnectionAdd(Edge Connection)
+  void onConnectionAdd(Edge connection) async
   {
-    print(Connection.id);
+      var response = await http.post(
+      Uri.parse('http://127.0.0.1:8000/add_connection'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: json.encode({
+        "id": connection.id,
+        "source_node": connection.source.node, 
+        "source_port": connection.source.port, 
+        "target_node": connection.target.node,
+        "target_port": connection.target.port}),
+    );
+    var responseDecode = json.decode(response.body);
+    if (responseDecode["status"] == "failed")
+    {
+      remove(edges:[connection.id]);
+    }
+
+
   }
   CustomNodeEditorController({
     required super.registry,
     //this.onNodeAdd,
   });
+
 
 
   @override
@@ -223,7 +242,7 @@ class CustomNodeEditorController extends NodeEditorController
     String newID = ["node", type.toString(), identifier].join(".");
     // increment identifier
     identifier ++ ;
-    
+
     // run normal addNode function
     final newNode = super.addNode(
       type,
@@ -239,6 +258,32 @@ class CustomNodeEditorController extends NodeEditorController
     return(newNode);
   }
 
+// overrides the connect function to create a new edge
+// this will have a default id in the form connection.######### which is created by the connect function
+// this id will then be passed to the backend, rather than using the previous iterating integer id method
+// there is an option to copy the entire connect code to the override to adjust how connection ids are generated, but doesn't seem
+// worth the effort
+  @override
+    Edge? connect(
+    PortRef a,
+    PortRef b, {
+    EdgeStyle? style,
+    String? label,
+    bool userAction = false,
+  })
+  {
+    final Edge? edge = super.connect(a, b,
+      style:style,
+      label:label,
+      userAction:userAction);
+
+    if (edge != null){
+      onConnectionAdd(edge);
+    }
+    return edge;
+  }
+
+  //TODO - NEED REDO FOR REMOVE and ADDING CONNECTIONS
   // overrides undo for changes to nodes/edges
   // changes to id not needed (or possible here), as custom ID would have been created on initial element addition
   @override
@@ -269,6 +314,9 @@ class CustomNodeEditorController extends NodeEditorController
         for (final node in c.nodes) {
           onNodeAdd.call(node);
         }
+          for (final connection in c.edges){
+          onConnectionAdd(connection);
+        }
       }
     }
   }
@@ -284,6 +332,10 @@ class CustomNodeEditorController extends NodeEditorController
     // 2. Notify your custom handler for each restored/pasted node
     for (final node in nodes) {
       onNodeAdd.call(node);
+    }
+
+    for (final edge in edges){
+      print("edge added back?");
     }
   }
 }

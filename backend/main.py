@@ -76,6 +76,7 @@ async def get_new_node(request: Request, background_tasks: BackgroundTasks):
         print(f"error creating node: {e}")
         log(logger,GraphError,"error creating node: {e}","main.py","get_new_node",id)
 
+    print(f"NODES: {workflow.nodes.keys()}")
     if id in workflow.nodes.keys() and workflow.nodes[id].image_operation.id == image_operation:
         try:
             background_tasks.add_task(workflow.update_graph)
@@ -91,16 +92,43 @@ async def get_remove(request: Request):
     nodes = data.get('nodes')
     edges = data.get('edges')
     try:
-        output = workflow.remove(node_ids=nodes, connection_ids=edges)
+        output = workflow.remove(node_ids=nodes, connection_ids=[".".join(["connection",connection]) for connection in edges])
     except Exception as e:
         print(f"error removing elements: {e}")
         log(logger,GraphError,"error removing elements: {e}","main.py","get_remove",id)
     #print(workflow.nodes.keys())
     #print(f"id: {id}, {type(id)}, {id in workflow.nodes.keys()}")
 
-    for item in logger:
-        print(f"{item.identifier}: {item.message}")
+    print(f"NODES: {workflow.nodes.keys()}")
+    print(f"CONNECTIONS: {workflow.connections.keys()}")
+
     if output:
         return{"status": "completed"}
     else:
         return{"status": "failed"}
+
+# get data for adding a connection
+@app.post("/add_connection")
+async def get_add_connection(request: Request, background_tasks: BackgroundTasks):
+    data = await request.json()
+    id = data.get('id')
+    source_node = data.get('source_node')
+    source_port = data.get('source_port')
+    target_node = data.get('target_node')
+    target_port = data.get('target_port')
+
+    workflow.add_connection(source_port=workflow.nodes[source_node].output_ports[source_port],
+                            target_port=workflow.nodes[target_node].input_ports[target_port],
+                            id=id)
+
+    for item in logger:
+        print(f"{item.identifier}: {item.message}")
+
+    print(f"CONNECTIONS: {workflow.connections.keys()}")
+
+    if ".".join(["connection", id]) in workflow.connections.keys():
+        return{"status": "completed"}
+    else:
+        return{"status": "failed"}
+
+    
