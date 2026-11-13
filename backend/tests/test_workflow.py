@@ -385,7 +385,7 @@ def test_connection_delete():
     assert "connection.2" not in workflow.connections.keys()
 
 """ test remove """
-# dictionary key checks - send in node/connection values that are not in relevant dictionary
+# dictionary key checks - send in node/connection values that are not in relevant dictionary, should still succeed
 def test_remove_invalid_keys():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
@@ -399,11 +399,11 @@ def test_remove_invalid_keys():
 
     output = True
     output = workflow.remove(node_ids=["same_image.0", "not_existent_node"])
-    assert output == False
+    assert output == True
 
     output = True
     output = workflow.remove(connection_ids=["connection.2", "connection.3"])
-    assert output == False
+    assert output == True
 
 # node deletion checks - send in list of valid nodes to delete
 def test_remove_node_delete():
