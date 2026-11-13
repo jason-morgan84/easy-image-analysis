@@ -93,14 +93,18 @@ class WorkFlow:
 
         # checks if passed id is a value nodes key
         if id not in self.nodes.keys():
-            log(self.workflow_logger,ValueError,f"id not in node list: {id}","WorkFlow","delete_node",id)
+            log(self.workflow_logger,ValueError,f"id for deletion not in node list: {id}","WorkFlow","delete_node",id)
 
         else:
 
             # sets downstream nodes needs_update
             for node in self.get_downstream_nodes(id):
                 self.nodes[node].needs_update = True
+            # removes node from dictionary
+            self.nodes.pop(id)
 
+    # connections no longer automatically removed
+    """
             # checks for connections to/from removed node. Adds to connections_for_deletions list
             connections_for_deletion = []
             for key, value in self.connections.items():
@@ -109,9 +113,8 @@ class WorkFlow:
             # deletes connections
             for connection in connections_for_deletion:
                 self.delete_connection(connection)
+    """
 
-            # removes node from dictionary
-            self.nodes.pop(id)
 
 
     """
@@ -176,7 +179,7 @@ class WorkFlow:
     def delete_connection(self, id):
         # checks if passed id is a value connections key
         if id not in self.connections.keys():
-            log(self.workflow_logger, ValueError, f"id not in node list: {id}", "WorkFlow", "delete_connection", id)
+            log(self.workflow_logger, ValueError, f"id for deletion not in connection list: {id}", "WorkFlow", "delete_connection", id)
         else:
             # get downstream nodes
             for node in self.get_downstream_nodes(self.connections[id].source_port.node_id):
