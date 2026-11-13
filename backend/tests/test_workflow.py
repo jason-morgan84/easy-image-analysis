@@ -77,7 +77,7 @@ def test_delete_node_invalid_key():
     for item in log:
         if item.class_name == "WorkFlow" and item.function_name == "delete_node":
             assert item.identifier == "test"
-            assert "id not in node list" in item.message 
+            assert "id for deletion not in node list" in item.message 
 
 # call delete_node
 def test_delete_node_removes_node():
@@ -89,7 +89,8 @@ def test_delete_node_removes_node():
     workflow.delete_node("node.same_image.0")
     assert "node.same_image.0" not in workflow.nodes.keys()
 
-
+# no longer part of delete_node
+"""
 # check delete_node removes associated connections
 def test_node_delete_removes_connections():
     log = []
@@ -103,6 +104,7 @@ def test_node_delete_removes_connections():
                             target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
     workflow.delete_node("node.same_image.1")
     assert "connection.2" not in workflow.connections.keys()
+"""
 
 # call add_connection where source is not a port
 def test_connection_source_not_port():
@@ -382,6 +384,120 @@ def test_connection_delete():
     
     assert "connection.2" not in workflow.connections.keys()
 
+""" test remove """
+# dictionary key checks - send in node/connection values that are not in relevant dictionary
+def test_remove_invalid_keys():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
+
+    workflow.add_node(directory["same_image"])
+    workflow.add_node(directory["same_image"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+
+    output = True
+    output = workflow.remove(node_ids=["same_image.0", "not_existent_node"])
+    assert output == False
+
+    output = True
+    output = workflow.remove(connection_ids=["connection.2", "connection.3"])
+    assert output == False
+
+# node deletion checks - send in list of valid nodes to delete
+def test_remove_node_delete():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
+
+    workflow.add_node(directory["same_image"]) # node.same_image.0
+    workflow.add_node(directory["same_image"]) # node.same_image.1
+    workflow.add_node(directory["same_image"]) # node.same_image.2
+
+    assert len(workflow.nodes) == 3
+    assert "node.same_image.0" in workflow.nodes.keys()
+    assert "node.same_image.1" in workflow.nodes.keys()
+    assert "node.same_image.2" in workflow.nodes.keys()
+
+    output = workflow.remove(node_ids=["node.same_image.0","node.same_image.1"])
+    assert output == True
+    assert len(workflow.nodes) == 1
+    assert "node.same_image.0" not in workflow.nodes.keys()
+    assert "node.same_image.1" not in workflow.nodes.keys()
+    assert "node.same_image.2" in workflow.nodes.keys()
+# connection deletetion checks - send in list of valid connections to delete
+def test_remove_connection_delete():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
+
+    workflow.add_node(directory["same_image"]) # node.same_image.0
+    workflow.add_node(directory["same_image"]) # node.same_image.1
+    workflow.add_node(directory["same_image"]) # node.same_image.2
+    workflow.add_node(directory["same_image"]) # node.same_image.3
+
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.2"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.2"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.3"].input_ports["image.input"])
+
+    assert len(workflow.connections) == 3
+    assert "connection.4" in workflow.connections.keys()
+    assert "connection.5" in workflow.connections.keys()
+    assert "connection.6" in workflow.connections.keys()
+
+    output = workflow.remove(connection_ids=["connection.4","connection.6"])
+    assert output == True
+    assert len(workflow.connections) == 1
+    assert "connection.4" not in workflow.connections.keys()
+    assert "connection.5" in workflow.connections.keys()
+    assert "connection.6" not in workflow.connections.keys()
+# combined deletion check - send in lists of nodes and connectsions to delete
+def test_remove_combined_delete():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
+
+    workflow.add_node(directory["same_image"]) # node.same_image.0
+    workflow.add_node(directory["same_image"]) # node.same_image.1
+    workflow.add_node(directory["same_image"]) # node.same_image.2
+    workflow.add_node(directory["same_image"]) # node.same_image.3
+
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.2"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.same_image.2"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.same_image.3"].input_ports["image.input"])
+
+    assert len(workflow.connections) == 3
+    assert "connection.4" in workflow.connections.keys()
+    assert "connection.5" in workflow.connections.keys()
+    assert "connection.6" in workflow.connections.keys()
+
+    assert len(workflow.nodes) == 4
+    assert "node.same_image.0" in workflow.nodes.keys()
+    assert "node.same_image.1" in workflow.nodes.keys()
+    assert "node.same_image.2" in workflow.nodes.keys()
+    assert "node.same_image.3" in workflow.nodes.keys()
+
+    output = workflow.remove(connection_ids=["connection.4"], node_ids=["node.same_image.3", "node.same_image.2"])
+    assert output == True
+    assert len(workflow.connections) == 2
+    assert "connection.4" not in workflow.connections.keys()
+    assert "connection.5" in workflow.connections.keys()
+    assert "connection.6" in workflow.connections.keys()
+    assert len(workflow.nodes) == 2
+    assert "node.same_image.0" in workflow.nodes.keys()
+    assert "node.same_image.1" in workflow.nodes.keys()
+    assert "node.same_image.2" not in workflow.nodes.keys()
+    assert "node.same_image.3" not in workflow.nodes.keys()
 
 # test get_next_nodes
 def test_get_next_nodes():

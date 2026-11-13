@@ -90,6 +90,7 @@ class WorkFlow:
     delete_node(id) function adds a key/value pair to nodes dictionary where dictionary key is node.ImageOperation.UniqueID
     """
     def delete_node(self, id):
+        print(f"deleting node: {id}")
 
         # checks if passed id is a value nodes key
         if id not in self.nodes.keys():
@@ -116,15 +117,17 @@ class WorkFlow:
     """
 
     """remove function removes a list of nodes and conenctions from the relevant dictionaries based on ids"""
-    def remove(self, node_ids=None, connection_ids=None):
+    def remove(self, node_ids=[], connection_ids=[]):
         # first, check node_ids are present in node dictionary and connection_ids are present in connections dictionary
         nodes_present = True if all(node in self.nodes.keys() for node in node_ids) else False
-        connections_present = True if all(connection in self.connection.keys() for connection in connection_ids) else False
+        connections_present = True if all(connection in self.connections.keys() for connection in connection_ids) else False
 
         # if everything is present, delete nodes and connections and return True
         if nodes_present and connections_present:
-            self.delete_node(node for node in node_ids) 
-            self.delete_connection(connection for connection in connection_ids)
+            for node in node_ids:
+                self.delete_node(node)
+            for connection in connection_ids:
+                self.delete_connection(connection)
             return True
         else:
         # if not all ids are present, don't delete anything and return false
@@ -346,7 +349,11 @@ class WorkFlow:
             # go through all connections, find connections with input as source_port and append target_port node ids
             for connection in self.connections.values():
                 if connection.source_port == input:
-                    next_node.append(connection.target_port.node_id)
+                    connected_node = connection.target_port.node_id
+                    # to catch edge case where a node has been deleted but a connection has been left hanging, check the node
+                    # actually exists in nodes dictionary
+                    if connected_node in self.nodes.keys():
+                        next_node.append(connected_node)
 
         # if input is a Node
         elif isinstance(input, Node):
