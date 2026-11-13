@@ -138,6 +138,7 @@
 |09/11/26|0.20.1|Added description of create_frontend_node_description|
 |09/11/26|0.20.2|Added description of unit testing of create_frontend_node_description|
 |13/11/26|0.20.3|Added description of remove function to workflow with unit testing|
+|13/11/26|0.20.4|Updated description of remove functionunit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -938,7 +939,7 @@ This uses the class FrontendPortDescription, which includes:
 ### 8.5.3 remove function
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
-|dictionary key checks| send in node/connection values that are not in relevant dictionary | returns False |
+|dictionary key checks| send in node/connection values that are not in relevant dictionary | returns True and removes valid values |
 |node deletion checks|send in list of valid nodes to delete | check they're deleted
 |connection deletetion checks| send in list of valid connections to delete| succesffuly deleted|
 |combined deletion check|send in lists of nodes and connectsions to delete | sucesfully deleted|
