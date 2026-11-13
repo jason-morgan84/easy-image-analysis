@@ -161,7 +161,7 @@ class CustomNodeEditorController extends NodeEditorController
   }
 
 
-  void onRemove(Iterable<NodeId> nodes, Iterable edges) async
+  void onRemove(Iterable<NodeId> nodes, Iterable<EdgeId> edges) async
   {
       // tells backend to create a node and awaits response
       var response = await http.post(
@@ -169,12 +169,13 @@ class CustomNodeEditorController extends NodeEditorController
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: json.encode({"nodes": nodes, "edges": edges}),
+      body: json.encode({"nodes": nodes.toList(), "edges": edges.toList()}),
     );
     var responseDecode = json.decode(response.body);
     if (responseDecode["status"] == "failed")
     {
       // if removal wasn't sucessful on backend, undo removal on frontend
+      //TODO - theres an edge case here where an edge is created, but not allowed on the back end, so its removed
       undo();
 
     }
@@ -197,6 +198,9 @@ class CustomNodeEditorController extends NodeEditorController
     var responseDecode = json.decode(response.body);
     if (responseDecode["status"] == "failed")
     {
+      //TODO - theres an edge case here where an edge is created, but creates a loop so is removed, but remove can't remove it because
+      //it never existed in the first place, so it calls undo, which tries to add the connection back, but thats not allowed
+      // simple fix is probably to log if a non-existant object is deleted, but be happy as long as the object id isn't present in the list
       remove(edges:[connection.id]);
     }
 
@@ -283,11 +287,14 @@ class CustomNodeEditorController extends NodeEditorController
     return edge;
   }
 
-  //TODO - NEED REDO FOR REMOVE and ADDING CONNECTIONS
+  
   // overrides undo for changes to nodes/edges
   // changes to id not needed (or possible here), as custom ID would have been created on initial element addition
   @override
   void undo() {
+    // logic:
+    // if undoing an add command, c = AddElementsCommand -> opposite is remove
+    // if undoing a remove command, c = RemoveElementsCommand -> opposite is add
     final c = history.takeUndo();
     if (c != null) {
       batch(() => c.revert(this));
@@ -300,10 +307,19 @@ class CustomNodeEditorController extends NodeEditorController
           onConnectionAdd(connection);
         }
       }
+      else if (c is AddElementsCommand){
+        final nodeIDs = [for (final node in c.nodes) node.id];
+        final edgeIDs = [for (final edge in c.edges) edge.id];
+        onRemove(nodeIDs, edgeIDs);
+
+      }
     }
   }
 
   // likewise for redo-ing undone additions
+  // logic:
+  // redoing an add command results in an c=AddElementsCommand
+  // redoing a delete command results in c=RemoveElementsCommand
   @override
   void redo() {
     final c = history.takeRedo();
@@ -318,18 +334,24 @@ class CustomNodeEditorController extends NodeEditorController
           onConnectionAdd(connection);
         }
       }
+      else if (c is RemoveElementsCommand){
+        final nodeIDs = [for (final node in c.nodes) node.id];
+        final edgeIDs = [for (final edge in c.edges) edge.id];
+        onRemove(nodeIDs, edgeIDs);
+        
+      }
     }
   }
   @override
+  // logically, this might at some point be used to addElements, but I've not yet found a
+  // situation where its called
   void addElements(
     List<NodeInstance> nodes,
     List<Edge> edges, {
     String label = 'Add',
   }) {
-    // 1. Run the parent logic first so nodes and edges are restored to the graph
     super.addElements(nodes, edges, label: label);
 
-    // 2. Notify your custom handler for each restored/pasted node
     for (final node in nodes) {
       onNodeAdd.call(node);
     }
