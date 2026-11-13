@@ -119,8 +119,18 @@ class WorkFlow:
     """remove function removes a list of nodes and conenctions from the relevant dictionaries based on ids"""
     def remove(self, node_ids=[], connection_ids=[]):
         # first, check node_ids are present in node dictionary and connection_ids are present in connections dictionary
-        nodes_present = True if all(node in self.nodes.keys() for node in node_ids) else False
-        connections_present = True if all(connection in self.connections.keys() for connection in connection_ids) else False
+        nodes_present = True
+        for node in node_ids:
+            if node not in self.nodes.keys():
+                nodes_present = False
+                log(self.workflow_logger,ValueError,f"id for deletion not in node list: {node}","WorkFlow","remove",id)
+
+        connections_present = True
+        for connection in connection_ids:
+            if connection not in self.connections.keys():
+                connections_present = False
+                log(self.workflow_logger,ValueError,f"id for deletion not in connections list: {connection}","WorkFlow","remove",id)
+                
 
         # if everything is present, delete nodes and connections and return True
         if nodes_present and connections_present:
@@ -131,6 +141,7 @@ class WorkFlow:
             return True
         else:
         # if not all ids are present, don't delete anything and return false
+
             return False
 
 
