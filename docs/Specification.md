@@ -137,6 +137,7 @@
 |09/11/26|0.20.0|Added port_name to description of port class |
 |09/11/26|0.20.1|Added description of create_frontend_node_description|
 |09/11/26|0.20.2|Added description of unit testing of create_frontend_node_description|
+|13/11/26|0.20.3|Added description of remove function to workflow with unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -454,7 +455,8 @@ It also contains the following functions:
   - type_check - checks type of source metadata is compatible with target metadata
   - shape_check - checks image shape of source metadata is compatible with target metadata
   - structure_check - checks connection is appropriate for graph structure
-* remove_connection - removes a connection from connections dictionary
+* delete_connection - removes a connection from connections dictionary
+* remove - removes a list of connections and/or nodes from dictionaries as single unit
 * get_next_nodes - returns a list of node ids of node(s) immediately after an input Node, Port or Connection
 * get_previous_nodes - returns a list of node ids of node(s) immediately before an input Node, Port or Connection
 * get_downstream_nodes - returns a list of node ids of nodes downstream of a given Node, Port or Connection
@@ -933,6 +935,13 @@ This uses the class FrontendPortDescription, which includes:
 |delete_connection | call delete_connection with proper arguements | Connection deleted |
 
 
+### 8.5.3 remove function
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |
+|dictionary key checks| send in node/connection values that are not in relevant dictionary | returns False |
+|node deletion checks|send in list of valid nodes to delete | check they're deleted
+|connection deletetion checks| send in list of valid connections to delete| succesffuly deleted|
+|combined deletion check|send in lists of nodes and connectsions to delete | sucesfully deleted|
 ### 8.5.3 Graph topography functions
 |Component  | Test  | Expected Outcome  | 
 |:--        |:--    |:--                |
