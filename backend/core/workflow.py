@@ -118,31 +118,33 @@ class WorkFlow:
 
     """remove function removes a list of nodes and conenctions from the relevant dictionaries based on ids"""
     def remove(self, node_ids=[], connection_ids=[]):
-        # first, check node_ids are present in node dictionary and connection_ids are present in connections dictionary
-        nodes_present = True
-        for node in node_ids:
-            if node not in self.nodes.keys():
-                nodes_present = False
-                log(self.workflow_logger,ValueError,f"id for deletion not in node list: {node}","WorkFlow","remove",id)
 
-        connections_present = True
-        for connection in connection_ids:
-            if connection not in self.connections.keys():
-                connections_present = False
-                log(self.workflow_logger,ValueError,f"id for deletion not in connections list: {connection}","WorkFlow","remove",id)
                 
+        # previously, if any objects weren't present then the function returned a failure state. Changed to return a log if
+        # not present, but count a success as long as the nodes aren't present at the end.
+        for node in node_ids:
+            self.delete_node(node)
+        for connection in connection_ids:
+            self.delete_connection(connection)
 
-        # if everything is present, delete nodes and connections and return True
-        if nodes_present and connections_present:
-            for node in node_ids:
-                self.delete_node(node)
-            for connection in connection_ids:
-                self.delete_connection(connection)
-            return True
-        else:
-        # if not all ids are present, don't delete anything and return false
+        # first, check node_ids are present in node dictionary and connection_ids are present in connections dictionary
+        nodes_present = False
+        for node in node_ids:
+            if node in self.nodes.keys():
+                nodes_present = True
+                log(self.workflow_logger,ValueError,f"remove failed to delete node: {node}","WorkFlow","remove",id)
 
+        connections_present = False
+        for connection in connection_ids:
+            if connection in self.connections.keys():
+                connections_present = True
+                log(self.workflow_logger,ValueError,f"remove failed to delete connection: {connection}","WorkFlow","remove",id)
+        
+        # if any ids are present, return false
+        if nodes_present or connections_present:
             return False
+        else:
+            return True
 
 
 

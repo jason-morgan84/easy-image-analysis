@@ -175,7 +175,6 @@ class CustomNodeEditorController extends NodeEditorController
     if (responseDecode["status"] == "failed")
     {
       // if removal wasn't sucessful on backend, undo removal on frontend
-      //TODO - theres an edge case here where an edge is created, but not allowed on the back end, so its removed
       undo();
 
     }
@@ -198,9 +197,6 @@ class CustomNodeEditorController extends NodeEditorController
     var responseDecode = json.decode(response.body);
     if (responseDecode["status"] == "failed")
     {
-      //TODO - theres an edge case here where an edge is created, but creates a loop so is removed, but remove can't remove it because
-      //it never existed in the first place, so it calls undo, which tries to add the connection back, but thats not allowed
-      // simple fix is probably to log if a non-existant object is deleted, but be happy as long as the object id isn't present in the list
       remove(edges:[connection.id]);
     }
 
