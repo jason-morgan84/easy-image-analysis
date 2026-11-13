@@ -85,8 +85,6 @@ class WorkFlow:
         for node in downstream_list:
             setattr(self.nodes[node], "needs_update", True)
 
-        # updates graph
-        self.update_graph()
 
     """
     delete_node(id) function adds a key/value pair to nodes dictionary where dictionary key is node.ImageOperation.UniqueID
@@ -115,8 +113,6 @@ class WorkFlow:
             # removes node from dictionary
             self.nodes.pop(id)
 
-            # updates graph
-            self.update_graph()
 
     """
     add_connection(source_port, target_port) function adds a key/value pair to connections dictionary where dictionary key is connection.UniqueID
@@ -173,7 +169,6 @@ class WorkFlow:
             # update downstream nodes to need update then update graph
             for node in self.get_downstream_nodes(target_port.node_id):
                 self.nodes[node].needs_update = True
-            self.update_graph()
 
     """
     delete_connection(id) function deletes a key/value pair of key "id" from connections dictionary
@@ -189,8 +184,6 @@ class WorkFlow:
             # removes node from dictionary
             self.connections.pop(id)
 
-            # updates graph
-            self.update_graph()
     """
     Checks for add_connection.
         - structure_check checks how the connection interacts with the shape of the graph
