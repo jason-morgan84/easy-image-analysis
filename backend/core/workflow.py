@@ -61,29 +61,32 @@ class WorkFlow:
     edit_node(id) - partial placeholder function. If a node is edited after creation, particularly by parameter changes via the UI, all downstream nodes need to 
     have needs_update flag set to true
     """
-    def edit_node(self, input):
+    def edit_node(self, node_id, values):
         # checks for string or Node input
-        if not isinstance(input, (str,Node)):
-            raise TypeError(f"edit_node requires input of Node class, or nodes dictionary key, not: {type(input)}")
-        if isinstance(input, str):
-            # if string is a key in self.nodes, get Node, else raise ValueError
-            if input in self.nodes.keys():
-                input = self.nodes[input]
-            else: 
-                raise ValueError(f"for string inputs, edit_node expects a node dictionary key: {input}")
-        # if id is not of Node class, raise TypeError           
-        if input not in self.nodes.values():
-            raise ValueError(f"for node inputs, edit_node expects value from nodes dictionary")
+        if not isinstance(node_id, str):
+            log(self.workflow_logger,TypeError,f"edit_node requires node_id as string: {type(node_id)}","WorkFlow","edit_node",node_id)
 
-        # set needs_update to True
-        setattr(input, "needs_update", True)
+        # if string is a key in self.nodes, get Node, else raise ValueError
+        elif node_id not in self.nodes.keys():
+            log(self.workflow_logger,TypeError,f"node_id not found as key in nodes dictionary: '{node_id}'","WorkFlow","edit_node",node_id)
 
-        # get list of all donstream nodes
-        downstream_list = self.get_downstream_nodes(input)
+        else:
+            # update node values based on values
+            for key, value in values.items():
+                try:
+                    self.nodes[node_id].input_ports[key].data = self.nodes[node_id].input_ports[key].metadata.dtype.numpy(value)
+                except Exception as e:
+                    log(self.workflow_logger,TypeError,f"edited node parameter failed validation: '{e}'","WorkFlow","edit_node",node_id)
 
-        # set needs_update flag for all downstream nodes to True
-        for node in downstream_list:
-            setattr(self.nodes[node], "needs_update", True)
+            # set needs_update to True
+            setattr(self.nodes[node_id], "needs_update", True)
+
+            # get list of all donstream nodes
+            downstream_list = self.get_downstream_nodes(node_id)
+
+            # set needs_update flag for all downstream nodes to True
+            for node in downstream_list:
+                setattr(self.nodes[node], "needs_update", True)
 
 
     """
