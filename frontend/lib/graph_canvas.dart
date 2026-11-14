@@ -160,7 +160,6 @@ class CustomNodeEditorController extends NodeEditorController
     }
   }
 
-
   void onRemove(Iterable<NodeId> nodes, Iterable<EdgeId> edges) async
   {
       // tells backend to create a node and awaits response
@@ -180,6 +179,7 @@ class CustomNodeEditorController extends NodeEditorController
     }
 
   }
+  
   void onConnectionAdd(Edge connection) async
   {
       var response = await http.post(
@@ -207,17 +207,32 @@ class CustomNodeEditorController extends NodeEditorController
     //this.onNodeAdd,
   });
 
+  void onSetParams(NodeId id, Map<String, Object?> values) async
+  {
+    var response = await http.post(
+    Uri.parse('http://127.0.0.1:8000/set_params'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: json.encode({"node_id": id.value, "values": values}),
+  );
+  var responseDecode = json.decode(response.body);
+  if (responseDecode["status"] == "failed")
+  {
+    undo();
+  }
 
+  }
 
   @override
-  // remove is used to remove edges, remove nodes and to remove selections (ie, a node with attached edges, a group of nodes)
-  // This is done with as a single command with a single undo step.
-  // Because this is a single command with a single undo, it needs to be sent to the backend as a single command with a single response
   void remove({
     Iterable<NodeId> nodes = const [],
     Iterable<EdgeId> edges = const [],
     bool userAction = false,
   }) {
+    // remove is used to remove edges, remove nodes and to remove selections (ie, a node with attached edges, a group of nodes)
+    // This is done with as a single command with a single undo step.
+    // Because this is a single command with a single undo, it needs to be sent to the backend as a single command with a single response
 
     super.remove(
       nodes: nodes,
@@ -228,7 +243,7 @@ class CustomNodeEditorController extends NodeEditorController
 
 
   }
-  // overrides addNode to custom ID on addition and run onNodeAdd
+  
   @override
   NodeInstance addNode(
     String type, {
@@ -238,6 +253,7 @@ class CustomNodeEditorController extends NodeEditorController
     String? title,
     bool select = true,
   }) {
+    // overrides addNode to custom ID on addition and run onNodeAdd
     // newID in format node.image_operation_name.integer
     String newID = ["node", type.toString(), identifier].join(".");
     // increment identifier
@@ -258,19 +274,19 @@ class CustomNodeEditorController extends NodeEditorController
     return(newNode);
   }
 
-// overrides the connect function to create a new edge
-// this will have a default id in the form connection.######### which is created by the connect function
-// this id will then be passed to the backend, rather than using the previous iterating integer id method
-// there is an option to copy the entire connect code to the override to adjust how connection ids are generated, but doesn't seem
-// worth the effort
   @override
-    Edge? connect(
+  Edge? connect(
     PortRef a,
     PortRef b, {
     EdgeStyle? style,
     String? label,
     bool userAction = false,
   })
+  // overrides the connect function to create a new edge
+  // this will have a default id in the form connection.######### which is created by the connect function
+  // this id will then be passed to the backend, rather than using the previous iterating integer id method
+  // there is an option to copy the entire connect code to the override to adjust how connection ids are generated, but doesn't seem
+  // worth the effort
   {
     final Edge? edge = super.connect(a, b,
       style:style,
@@ -283,11 +299,18 @@ class CustomNodeEditorController extends NodeEditorController
     return edge;
   }
 
-  
-  // overrides undo for changes to nodes/edges
-  // changes to id not needed (or possible here), as custom ID would have been created on initial element addition
+  @override
+  void setParams(NodeId id, Map<String, Object?> values) 
+  {
+    super.setParams(id, values);
+
+    onSetParams(id, values);
+  }
+
   @override
   void undo() {
+    // overrides undo for changes to nodes/edges
+    // changes to id not needed (or possible here), as custom ID would have been created on initial element addition
     // logic:
     // if undoing an add command, c = AddElementsCommand -> opposite is remove
     // if undoing a remove command, c = RemoveElementsCommand -> opposite is add
@@ -312,12 +335,12 @@ class CustomNodeEditorController extends NodeEditorController
     }
   }
 
-  // likewise for redo-ing undone additions
-  // logic:
-  // redoing an add command results in an c=AddElementsCommand
-  // redoing a delete command results in c=RemoveElementsCommand
   @override
   void redo() {
+    // likewise for redo-ing undone additions
+    // logic:
+    // redoing an add command results in an c=AddElementsCommand
+    // redoing a delete command results in c=RemoveElementsCommand
     final c = history.takeRedo();
     if (c != null) {
       batch(() => c.apply(this));
@@ -338,14 +361,15 @@ class CustomNodeEditorController extends NodeEditorController
       }
     }
   }
+  
   @override
-  // logically, this might at some point be used to addElements, but I've not yet found a
-  // situation where its called
   void addElements(
     List<NodeInstance> nodes,
     List<Edge> edges, {
     String label = 'Add',
   }) {
+    // logically, this function might at some point be used to addElements, but I've not yet found a
+    // situation where its called
     super.addElements(nodes, edges, label: label);
 
     for (final node in nodes) {

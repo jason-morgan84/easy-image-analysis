@@ -127,8 +127,39 @@ async def get_add_connection(request: Request, background_tasks: BackgroundTasks
     print(f"CONNECTIONS: {workflow.connections.keys()}")
 
     if ".".join(["connection", id]) in workflow.connections.keys():
+        try:
+            background_tasks.add_task(workflow.update_graph)
+        except Exception as e:
+            print(f"failed to create background task: {e}")
         return{"status": "completed"}
     else:
         return{"status": "failed"}
 
-    
+@app.post("/set_params")
+async def get_set_params(request: Request, background_tasks: BackgroundTasks):
+    data = await request.json()
+    node_id = data.get('node_id')
+    values = data.get('values')
+
+    for key, value in values.items():
+        print(f"EDITED NODE BEFORE\n{key}: {workflow.nodes[node_id].input_ports[key].data}")
+
+    workflow.edit_node(node_id, values)
+
+    for item in logger:
+        print(f"{item.identifier}: {item.message}")
+
+    validated = True
+    for key, value in values.items():
+        print(f"EDITED NODE AFTER\n{key}: {workflow.nodes[node_id].input_ports[key].data}")
+        if workflow.nodes[node_id].input_ports[key].data != value: validated = False
+
+    if validated:
+        try:
+            background_tasks.add_task(workflow.update_graph)
+        except Exception as e:
+            print(f"failed to create background task: {e}")
+        return{"status": "completed", "node": node_id}
+    else:
+        return{"status": "failed", "node": node_id}
+        
