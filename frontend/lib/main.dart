@@ -5,6 +5,27 @@ void main() {
   runApp(const MyApp());
 }
 
+class ImageStateController extends ChangeNotifier {
+  String? canvas1NodeID;
+  String? canvas2NodeID;
+  String? canvas1PortID;
+  String? canvas2PortID;
+
+  void imageSelectionCanvas1(String nodeID, String portID)
+  {
+    canvas1NodeID = nodeID; 
+    canvas1PortID = portID; 
+    notifyListeners();
+  }
+
+  void imageSelectionCanvas2(String nodeID, String portID)
+  {
+    canvas2NodeID = nodeID; 
+    canvas2PortID = portID; 
+    notifyListeners();
+  }
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
