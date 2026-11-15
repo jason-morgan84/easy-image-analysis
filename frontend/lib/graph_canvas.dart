@@ -59,6 +59,14 @@ class ParameterDescription{
     {
       type = EnumParam.values(List<String>.from(options["values"]));
     }
+    else if ((json['user_input_method'] as String?) == "file_open")
+    {
+      type = FilePathParam(extensions: List<String>.from(options["extensions"]), mode: FilePickMode.open);
+    }
+        else if ((json['user_input_method'] as String?) == "file_save")
+    {
+      type = FilePathParam(extensions: List<String>.from(options["extensions"]), mode: FilePickMode.open);
+    }
     else
     {
       type = TextParam();
