@@ -43,7 +43,7 @@ Future <ImageData> getImageData(String nodeID, String portID, int z, int c, int 
     throw Exception('Failed to load ImageOperationListItem');
     }
 }
-/*
+
 class ImageCanvas extends StatefulWidget {
   final ImageStateController imageController;
   const ImageCanvas({super.key, required this.imageController});
@@ -59,22 +59,6 @@ class _ImageCanvasState extends State<ImageCanvas> {
   double _zoom = 1.0;
 
   late Future _imageFuture;
-
-
-  /*@override
-  void initState() {
-    super.initState();
-    _triggerFetch();
-  }*/
-
-  @override
-  void didUpdateWidget(covariant ImageCanvas oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Re-fetch if either nodeID or portID changed from parent
-    if (widget.imageController.nodeID != oldWidget.nodeID || widget.portID != oldWidget.portID) {
-      _imageFuture = getImageData(widget.nodeID, widget.portID, _z, _c, _centre_x, _centre_y, _zoom);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +76,7 @@ class _ImageCanvasState extends State<ImageCanvas> {
 
                 // get data from snapshot
 
-                final output = Text("Image to come");
+                final output = Text(this.imageController);
                 return output;
 
                 } 
@@ -104,4 +88,4 @@ class _ImageCanvasState extends State<ImageCanvas> {
 
     );
   } 
-}*/
+}

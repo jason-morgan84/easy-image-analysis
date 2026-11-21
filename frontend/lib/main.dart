@@ -47,12 +47,18 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Row(
-        children: [SizedBox(
-          width: 800,   // Provide a defined width
-          height: 600,  // Provide a defined height
-          child: WorkflowCanvas()
-        ),
-        //ImageCanvas(imageController: leftCanvas)
+        children: [
+          SizedBox(
+            width: 800,   // Provide a defined width
+            height: 600,  // Provide a defined height
+            child: WorkflowCanvas()
+          ),
+            ListenableBuilder(
+              listenable: leftCanvas,
+              builder: (BuildContext context, Widget? child) {
+                return ImageCanvas(imageController: leftCanvas);
+              },
+            ),
         
         ]),
       //floatingActionButton: FloatingActionButton(

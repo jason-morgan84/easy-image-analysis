@@ -14,4 +14,4 @@ class ImageStateController extends ChangeNotifier {
 
 ImageStateController leftCanvas = ImageStateController();
 
-late ImageStateController rightCanvas = ImageStateController();
+ImageStateController rightCanvas = ImageStateController();
