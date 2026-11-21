@@ -149,7 +149,7 @@ def import_luts(logger = []):
 
     return lut_list
 
-def create_image(input_image, luts, z=0, centre_y=0, centre_x=0, zoom=1.0 ):
+def create_image(input_image, luts = None, z=0, centre_y=0, centre_x=0, zoom=1.0 ):
     # inputs:
     #   input_image: np.ndarray of np.uint in format CZYX
     #   luts: dictionary of form {channel: lut_name} where channel is an integer representing an input_image channel number and lut_name is a key from lut_lists
@@ -157,7 +157,13 @@ def create_image(input_image, luts, z=0, centre_y=0, centre_x=0, zoom=1.0 ):
     #   left: for panning, x value of left of image to be generated as an int
     #   zoom: how zoomed in the image is as a float
 
-
+    # set default luts if luts not defined
+    if not luts:
+        loaded_luts = import_luts()
+        luts = {0:loaded_luts["Magenta hot"],
+                1:loaded_luts["Cyan hot"],
+                2:loaded_luts["Yellow"],
+                3:loaded_luts["greys"]}
     """check input types"""
     # check input image is an np.array of np.uint8
     if not isinstance(input_image, np.ndarray):
