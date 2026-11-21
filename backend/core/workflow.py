@@ -499,17 +499,17 @@ class WorkFlow:
             log(self.workflow_logger, GraphError, f"cannot update graph without defined start nodes","WorkFlow","update_graph") 
 
         # get node_list from graph map from each start_node
-        node_list = []
+        ordered_node_list = []
         for start_node_id in start_node_id_list:
             try:
                 for item in self.get_graph_map(start_node_id):
-                    if item not in node_list: node_list.append(item)
+                    if item not in ordered_node_list: ordered_node_list.append(item)
             except Exception as e:
                 log(self.workflow_logger, GraphError, f"error generating graph map for start node '{start_node_id}': {e}","WorkFlow","update_graph") 
         """2. Iterate through node list, update is_ready flags, transfer input data, run nodes"""
         """input data to Node is transferred in but output data is not transferred out: for upstream nodes to exist, connection must exist. No guarantee dowsntream connection exists"""
 
-        for node_id in node_list:
+        for node_id in ordered_node_list:
             active_node = self.nodes[node_id]
             port_connections_dict = {}
 
@@ -598,13 +598,14 @@ class WorkFlow:
                 # 2.4.2: activate node
                 try:
                     active_node.activate_node()
+                    active_node.needs_update = False
+                    if test is True: log(self.workflow_logger, None, f"node activated sucessfully","WorkFlow","update_graph",node_id)
+                            
                 except Exception as e:
                     log(self.workflow_logger, GraphError, f"error activating node '{node_id}': {e}","WorkFlow","update_graph",node_id)
                     continue
                 
-                active_node.needs_update = False
-                if test is True: log(self.workflow_logger, None, f"node activated sucessfully","WorkFlow","update_graph",node_id)
-        
+               
                 
 
     
