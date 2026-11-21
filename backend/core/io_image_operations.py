@@ -18,7 +18,7 @@ class LoadImage(ImageOperation):
             docs="Loads an image given a path (as string) and shape as array of integers defining array dimensions of c, z, y and x in order",
             alerts=None,
             input_image_metadata={},
-            input_parameter_metadata={"path": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True, ui_element="load"), 
+            input_parameter_metadata={"path": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True, ui_element="file_open",ui_element_options={"extensions":[".tif",".tiff"]}), 
                                       "shape": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True,ui_element = "text"),},
             output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
