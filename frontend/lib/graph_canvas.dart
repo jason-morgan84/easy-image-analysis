@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:node_program_editor/node_program_editor.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'notifiers.dart';
 
 
 
@@ -109,6 +110,8 @@ class NodeDescription{
               parameter.name: parameter,
       }
       : {};
+    // checks if node has multiple output ports - if so, adds parameter "primary_output" to 
+    // allow user to define the output they want presented to image views 
     List<String> outputPort = [];
     for (var port in ports.values)
     {
@@ -117,7 +120,7 @@ class NodeDescription{
         outputPort.add(port.label);
       }
     }
-    if (outputPort.length >1)
+    if (outputPort.length > 1)
     {
       parameters["primary_output"] = (ParameterDescription.fromDict({'id': "primary_output", 'name': "Primary Output", 'user_input_method': "dropdown", 'user_input_options':{'values':outputPort}, 'ui_only': true}));
     }
@@ -525,7 +528,18 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                 // menus contains NodeMenuAction, a custom action of the node menu.
                 void showNode(NodeId node, String direction)
                 {
-
+                  final Map<String,ImageStateController> imageControllerMap = {'left': leftCanvas, 'right': rightCanvas}; 
+                  late String portId;
+                  if (controller.graph.node(node)!.params.containsKey("primary_output"))
+                  {
+                    portId = controller.graph.node(node)!.params["primary_output"].toString();
+                  }
+                  else
+                  {
+                    portId = "output";
+                  }
+                  imageControllerMap[direction]!.NodeID = node.value;
+                  imageControllerMap[direction]!.PortID = portId;
                 }
                 final leftCanvasCommand = NodeMenuAction(icon: Icons.arrow_left, 
                                                           label: "View Left", 

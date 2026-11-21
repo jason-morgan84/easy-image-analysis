@@ -1,30 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/image_canvas.dart';
 import 'graph_canvas.dart';
+import 'notifiers.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class ImageStateController extends ChangeNotifier {
-  String? canvas1NodeID;
-  String? canvas2NodeID;
-  String? canvas1PortID;
-  String? canvas2PortID;
 
-  void imageSelectionCanvas1(String nodeID, String portID)
-  {
-    canvas1NodeID = nodeID; 
-    canvas1PortID = portID; 
-    notifyListeners();
-  }
-
-  void imageSelectionCanvas2(String nodeID, String portID)
-  {
-    canvas2NodeID = nodeID; 
-    canvas2PortID = portID; 
-    notifyListeners();
-  }
-}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -38,7 +21,7 @@ class MyApp extends StatelessWidget {
 
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Easy Image Analysis'),
     );
   }
 }
@@ -63,17 +46,21 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: SizedBox(
+        child: Row(
+        children: [SizedBox(
           width: 800,   // Provide a defined width
           height: 600,  // Provide a defined height
           child: WorkflowCanvas()
-        )
-      ),
+        ),
+        //ImageCanvas(imageController: leftCanvas)
+        
+        ]),
       //floatingActionButton: FloatingActionButton(
       //  onPressed: _incrementCounter,
        // tooltip: 'Increment',
        // child: const Icon(Icons.add),
       //),
+    )
     );
   }
 }

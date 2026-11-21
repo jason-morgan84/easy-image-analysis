@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:frontend/notifiers.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -42,11 +43,10 @@ Future <ImageData> getImageData(String nodeID, String portID, int z, int c, int 
     throw Exception('Failed to load ImageOperationListItem');
     }
 }
-
+/*
 class ImageCanvas extends StatefulWidget {
-  final String nodeID;
-  final String portID;
-  const ImageCanvas({super.key, required this.nodeID, required this.portID});
+  final ImageStateController imageController;
+  const ImageCanvas({super.key, required this.imageController});
   @override
     State<ImageCanvas> createState() => _ImageCanvasState();
 }
@@ -71,7 +71,7 @@ class _ImageCanvasState extends State<ImageCanvas> {
   void didUpdateWidget(covariant ImageCanvas oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Re-fetch if either nodeID or portID changed from parent
-    if (widget.nodeID != oldWidget.nodeID || widget.portID != oldWidget.portID) {
+    if (widget.imageController.nodeID != oldWidget.nodeID || widget.portID != oldWidget.portID) {
       _imageFuture = getImageData(widget.nodeID, widget.portID, _z, _c, _centre_x, _centre_y, _zoom);
     }
   }
@@ -104,4 +104,4 @@ class _ImageCanvasState extends State<ImageCanvas> {
 
     );
   } 
-}
+}*/
