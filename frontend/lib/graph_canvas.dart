@@ -4,8 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 
-//NOTE: canvas contains nodeMenuActions: Extra actions of the node overlay / context menu.
-// menus contains NodeMenuAction, a custom action of the node menu.
+
 
 
 // define a class to Type data imported from backend
@@ -493,6 +492,7 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                 ]);
                 // create node pallete based on registry
                 final controller = CustomNodeEditorController(registry: registry);
+
                 controller.canvasSettings.value = const CanvasSettings(
                   gridStyle: GridStyle.none,     // none, dots, lines, cross
                   gridSpacing: 20,                // also the snapping step
@@ -501,7 +501,8 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                   snapEdgesToGrid: true,          // edge waypoints
                   defaultEdgeStyle: EdgeStyle(pathType: EdgePathType.smoothStep),
                   gridColor: null, majorGridColor: null, backgroundColor: null,
-);
+                );
+
 
                 final nodePallete = NodePalette(
                   controller: controller,
@@ -516,15 +517,25 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                   itemBuilder: null,                 // custom item (tap / drag still handled)
                   headerBuilder: null,               // custom category header
                   );
-                final canvas = NodeCanvas(controller: controller);
-                //controller.revision.addListener((){
-                    //Future.microtask(() {
-                      //final lastCommand = controller.history.undoLabel;
-                      //print("Stabilized change: $lastCommand");
-                      //final output = controller.history._undo[controller.history.undoDepth - 1];
-                    //});
-// if
-                  //});
+                
+                
+                //Once the canvas is defined, need to add nodeMenuActions for right click context menu for nodes,
+                // to allow option to present image in either left or right canvas.
+                //NOTE: canvas contains nodeMenuActions: Extra actions of the node overlay / context menu.
+                // menus contains NodeMenuAction, a custom action of the node menu.
+                void showNode(NodeId node, String direction)
+                {
+
+                }
+                final leftCanvasCommand = NodeMenuAction(icon: Icons.arrow_left, 
+                                                          label: "View Left", 
+                                                          onSelected: (controller, node) => showNode(node.id,"left"),);
+                final rightCanvasCommand = NodeMenuAction(icon: Icons.arrow_right, 
+                                                          label: "View Right", 
+                                                          onSelected: (controller, node) => showNode(node.id,"right"),);
+                final canvas = NodeCanvas(controller: controller, nodeMenuActions: [leftCanvasCommand, rightCanvasCommand],);
+
+                                
                 final output = Row(children: [
                   SizedBox(width: 280, child: nodePallete), 
                   Expanded(child: canvas),
@@ -542,9 +553,6 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
     );
   } 
 }
-
-
-
 
 final registry = NodeRegistry(definitions: [
   NodeDefinition(
