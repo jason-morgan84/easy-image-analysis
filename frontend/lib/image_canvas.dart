@@ -17,6 +17,7 @@ class ImageData {
   ImageData.fromDict(Map<String, dynamic> json) {
     zMax = (json['z_max'] as int?) ?? 0;
     cMax = (json['c_max'] as int?) ?? 0;
+    imageBytes = (json['image_bytes']);
   }
 }
 
@@ -58,7 +59,13 @@ class _ImageCanvasState extends State<ImageCanvas> {
   int _centre_x = 256;
   double _zoom = 1.0;
 
-  late Future _imageFuture;
+  late Future<ImageData> _imageFuture;
+  @override
+  void initState() {
+    super.initState();
+    // Fires both network calls simultaneously in isolation
+    _imageFuture = getImageData(widget.imageController.NodeID!, widget.imageController.PortID!, _z, _c, _centre_x, _centre_y, _zoom);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +83,7 @@ class _ImageCanvasState extends State<ImageCanvas> {
 
                 // get data from snapshot
 
-                final output = Text(this.imageController);
+                final output = Text("image goes here");
                 return output;
 
                 } 
