@@ -4,6 +4,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 
+//NOTE: canvas contains nodeMenuActions: Extra actions of the node overlay / context menu.
+// menus contains NodeMenuAction, a custom action of the node menu.
+
+
 // define a class to Type data imported from backend
 class TypeListItem{
   late String name;
@@ -41,12 +45,14 @@ class ParameterDescription{
   late String label;
   late ParamType type;
   late Map<String,dynamic> options;
+  late bool uiOnly;
 
 
   ParameterDescription.fromDict(Map<String, dynamic> json) {
     name = (json['id'] as String?) ?? "";
     label = (json['name'] as String?) ?? "";
     options = (json['user_input_options'] as Map<String,dynamic>);
+    uiOnly = (json['ui_only'] as bool?) ?? false;
     if ((json['user_input_method'] as String?) == "integer")
     {
       type = IntParam(min: options["min"] ?? 0, 
@@ -71,9 +77,6 @@ class ParameterDescription{
     {
       type = TextParam();
     }
-
-
-
   }
   
 }
@@ -85,8 +88,8 @@ class NodeDescription{
   String category = "";
   String docs = "";
   String alerts = "";
-  late List<PortDescription> ports;
-  late List<ParameterDescription> parameters;
+  late Map<String, PortDescription> ports;
+  late Map<String, ParameterDescription> parameters;
 
   NodeDescription.fromDict(Map<String, dynamic> json) {
     id = (json['id'] as String?) ?? "";
@@ -94,16 +97,35 @@ class NodeDescription{
     category = (json['category'] as String?) ?? "";
     docs = (json['docs'] as String?) ?? "";
     alerts = (json['alerts'] as String?) ?? "";
-    ports = json['ports'] != null 
-      ? List<PortDescription>.from(json['ports'].map((portJson) => PortDescription.fromDict(portJson))) 
-      : [];
+    ports = json['ports'] != null
+        ? {
+            for (final portJson in json['ports'] as List)
+              for (final port in [PortDescription.fromDict(portJson)])
+                port.name: port,
+          }
+        : {};
     parameters = json['parameters'] != null
-      ? List<ParameterDescription>.from(json['parameters'].map((parameterJson) => ParameterDescription.fromDict(parameterJson)))
-      : [];
+      ? { for (final parameterJSON in json['parameters'] as List)
+            for (final parameter in [ParameterDescription.fromDict(parameterJSON)])
+              parameter.name: parameter,
+      }
+      : {};
+    List<String> outputPort = [];
+    for (var port in ports.values)
+    {
+      if (!port.isInput)
+      {
+        outputPort.add(port.label);
+      }
+    }
+    if (outputPort.length >1)
+    {
+      parameters["primary_output"] = (ParameterDescription.fromDict({'id': "primary_output", 'name': "Primary Output", 'user_input_method': "dropdown", 'user_input_options':{'values':outputPort}, 'ui_only': true}));
+    }
 
   }
 }
-Future<List<NodeDescription>> getNodeDefinitionsList() async {
+Future<Map<String,NodeDescription>> getNodeDefinitionsList() async {
     final response = await http.get(
     Uri.parse('http://127.0.0.1:8000/operations'),
     headers: {'Accept': 'application/json'},);
@@ -111,8 +133,14 @@ Future<List<NodeDescription>> getNodeDefinitionsList() async {
     // If the server did return a 200 OK response,
     // then parse the JSON.
       final decodedNodeDescription = (jsonDecode(response.body) as Map<String, dynamic>);
-      List<NodeDescription> imageOperationList = [for (var value in decodedNodeDescription.values) NodeDescription.fromDict(value)];
-      return imageOperationList;
+      Map<String, NodeDescription> imageOperationMap = {};
+      for (var node in decodedNodeDescription.values)
+      {
+        var value = NodeDescription.fromDict(node);
+        imageOperationMap[value.id] = value;
+      }
+      //Map<String, NodeDescription> imageOperationMap = {for (var value in decodedNodeDescription.values) NodeDescription.fromDict(value)};
+      return imageOperationMap;
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
@@ -137,7 +165,7 @@ Future<List<TypeListItem>> getTypeList() async {
     }
 }
 
-
+late Map<String,NodeDescription> nodeDefinitionsList;
 // extends NodeEditorController with custom commands for adding, deleting and editing nodes and
 // adding and deleting connections to call relevant backend functions
 class CustomNodeEditorController extends NodeEditorController
@@ -311,8 +339,16 @@ class CustomNodeEditorController extends NodeEditorController
   void setParams(NodeId id, Map<String, Object?> values) 
   {
     super.setParams(id, values);
-
-    onSetParams(id, values);
+    final String nodeName = id.value.split(".")[1];
+    Map<String, Object?> backendParameters = {};
+    for (var parameter in values.keys)
+    {
+      if (nodeDefinitionsList[nodeName]?.parameters[parameter]?.uiOnly == false)
+      {
+        backendParameters[parameter] = values[parameter];
+      }
+    }
+    onSetParams(id, backendParameters);
   }
 
   @override
@@ -430,11 +466,11 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                     type.name: PortType(type.name, color: type.color, compatibleWith: Set<String>.from(type.compatibleWith)),
                 };
                 // get nodeDefinitionsList from http
-                final nodeDefinitionsList = snapshot.data![0];
+                nodeDefinitionsList = snapshot.data![0];
 
                 // define node registry based on nodeDefinitionsList
                 final registry = NodeRegistry(definitions: [
-                  for (var nodeDef in nodeDefinitionsList)
+                  for (var nodeDef in nodeDefinitionsList.values)
                     NodeDefinition(
                       type: nodeDef.id,
                       title: nodeDef.name,
@@ -443,14 +479,14 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                       copyable: false,
                       style: NodeStyle(headerColor: Color(0xFF888888)),
                       ports: [
-                        for (var port in nodeDef.ports)
+                        for (var port in nodeDef.ports.values)
                           if (port.isInput)
                             PortSpec.input(port.name, label: port.label, side: PortSide.top, type: portTypes[port.type] ?? PortType.any)
                           else
                             PortSpec.output(port.name, label: port.label, side: PortSide.bottom, type: portTypes[port.type] ?? PortType.any),
                       ],
                       params: [
-                        for (var parameter in nodeDef.parameters)
+                        for (var parameter in nodeDef.parameters.values)
                             ParamSpec(parameter.name, parameter.type, label: parameter.label)
                       ],
                     ),
