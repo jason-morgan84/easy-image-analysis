@@ -5,6 +5,9 @@ from core.constants import DataPolicy
 from fastapi import FastAPI, Request, BackgroundTasks
 from core.error_handling import log, GraphError, ExportError
 import json
+from PIL import Image
+import io
+import base64
 
 # set up logger
 logger = []
@@ -165,24 +168,33 @@ async def get_set_params(request: Request, background_tasks: BackgroundTasks):
         
 @app.post("/image")
 async def get_image(request: Request):
+
     data = await request.json()
-    node_id = data.get('node_id')
-    port_id = data.get('port_id')
+    node_id = data.get('node')
+    port_id = ".".join(["image",data.get('port')])
     z = data.get('z')
     c = data.get('c')
     zoom = data.get('zoom')
-    centre_x = data.get('centreX')
-    centre_y = data.get('centreY')
+    centre_x = data.get('centre_x')
+    centre_y = data.get('centre_y')
 
-    image = workflow.nodes[node_id].output_ports[port_id].data
+    if node_id in workflow.nodes.keys() and port_id in workflow.nodes[node_id].output_ports.keys():
+        image = workflow.nodes[node_id].output_ports[port_id].data
+    
     try:
         return_image, image_size = create_image(input_image=image,
                                                 z = z,
-                                                c = c,
+                                                #c = c,
                                                 centre_x=centre_x,
                                                 centre_y=centre_y,
                                                 zoom=zoom)
-        return {"status":"completed", "z_max": image_size["z"], "c_max": image_size["c"], "image_bytes": return_image}
+        img = Image.fromarray(return_image)
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        base64_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        
+        return {"status":"completed", "z_max": image_size["z"], "c_max": image_size["c"], "image_bytes": base64_str}
     except Exception as e:
+        print(f"Exception: {e}")
         log(logger,ExportError,"error creating image: {e}","main.py","get_image",".".join([node_id,port_id]))
-        return {"status": "failed"}
+        #return {"status": "failed"}
