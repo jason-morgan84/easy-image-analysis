@@ -173,6 +173,10 @@ def create_image(input_image, luts = None, z=0, centre_y=0, centre_x=0, zoom=1.0
 
     # get dimension sizes of input_image
     image_size_c, image_size_z, image_size_y, image_size_x = input_image.shape
+    image_size = {"c": image_size_c,
+                  "z": image_size_z,
+                  "y": image_size_y,
+                  "x": image_size_x}
 
     # check luts is a dictionary with integer keys, referencing channels, and np.arrays of shape (3,256) as values
     if not isinstance(luts, dict):
@@ -296,7 +300,7 @@ def create_image(input_image, luts = None, z=0, centre_y=0, centre_x=0, zoom=1.0
         rgb_image = cv2.resize(rgb_image, (512, 512))
 
 
-    return rgb_image
+    return rgb_image, image_size
 
     
         
