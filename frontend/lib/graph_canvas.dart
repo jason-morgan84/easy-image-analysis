@@ -538,8 +538,8 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                   {
                     portId = "output";
                   }
-                  imageControllerMap[direction]!.NodeID = node.value;
-                  imageControllerMap[direction]!.PortID = portId;
+                  imageControllerMap[direction]!.updateImageSelection(node.value, portId);
+
                 }
                 final leftCanvasCommand = NodeMenuAction(icon: Icons.arrow_left, 
                                                           label: "View Left", 
