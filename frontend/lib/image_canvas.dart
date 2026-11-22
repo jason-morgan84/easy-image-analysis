@@ -17,11 +17,11 @@ class ImageData {
   ImageData.fromDict(Map<String, dynamic> json) {
     zMax = (json['z_max'] as int?) ?? 0;
     cMax = (json['c_max'] as int?) ?? 0;
-    imageBytes = (json['image_bytes']);
+    imageBytes = base64Decode(json['image_bytes']);
   }
 }
 
-Future <ImageData> getImageData(String nodeID, String portID, int z, int c, int centerX, int centerY, double zoom) async {
+Future <ImageData> getImageData(String nodeID, String portID, int z, int c, int centreX, int centreY, double zoom) async {
     final response = await http.post(
     Uri.parse('http://127.0.0.1:8000/image'),
     headers: <String, String>{
@@ -32,8 +32,8 @@ Future <ImageData> getImageData(String nodeID, String portID, int z, int c, int 
       "port": portID, 
       "z": z, 
       "c": c, 
-      "center_x": centerX, 
-      "center_y": centerY, 
+      "centre_x": centreX, 
+      "centre_y": centreY, 
       "zoom": zoom}),
     );
     if (response.statusCode == 200) {
@@ -63,9 +63,13 @@ class _ImageCanvasState extends State<ImageCanvas> {
   @override
   void initState() {
     super.initState();
-    // Fires both network calls simultaneously in isolation
-    _imageFuture = getImageData(widget.imageController.NodeID!, widget.imageController.PortID!, _z, _c, _centre_x, _centre_y, _zoom);
+    _imageFuture = getImageData(widget.imageController.NodeID ?? "", widget.imageController.PortID ?? "", _z, _c, _centre_x, _centre_y, _zoom);
   }
+  @override
+  void didUpdateWidget(covariant ImageCanvas oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _imageFuture = getImageData(widget.imageController.NodeID ?? "", widget.imageController.PortID ?? "", _z, _c, _centre_x, _centre_y, _zoom);
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +87,8 @@ class _ImageCanvasState extends State<ImageCanvas> {
 
                 // get data from snapshot
 
-                final output = Text("image goes here");
+                final output = Image.memory(snapshot.data!.imageBytes);
+                //final output = Text("image goes here");
                 return output;
 
                 } 
