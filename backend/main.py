@@ -1,9 +1,9 @@
 from core.image_operation_directory import ImageOperationDirectory
 from core.workflow import WorkFlow
-from core.frontend_operations import FrontendTypeDescription, create_frontend_node_description
+from core.frontend_operations import FrontendTypeDescription, create_frontend_node_description, create_image
 from core.constants import DataPolicy
 from fastapi import FastAPI, Request, BackgroundTasks
-from core.error_handling import log, GraphError
+from core.error_handling import log, GraphError, ExportError
 import json
 
 # set up logger
@@ -163,3 +163,26 @@ async def get_set_params(request: Request, background_tasks: BackgroundTasks):
     else:
         return{"status": "failed", "node": node_id}
         
+@app.post("/image")
+async def get_image(request: Request):
+    data = await request.json()
+    node_id = data.get('node_id')
+    port_id = data.get('port_id')
+    z = data.get('z')
+    c = data.get('c')
+    zoom = data.get('zoom')
+    centre_x = data.get('centreX')
+    centre_y = data.get('centreY')
+
+    image = workflow.nodes[node_id].output_ports[port_id].data
+    try:
+        return_image, image_size = create_image(input_image=image,
+                                                z = z,
+                                                c = c,
+                                                centre_x=centre_x,
+                                                centre_y=centre_y,
+                                                zoom=zoom)
+        return {"status":"completed", "z_max": image_size["z"], "c_max": image_size["c"], "image_bytes": return_image}
+    except Exception as e:
+        log(logger,ExportError,"error creating image: {e}","main.py","get_image",".".join([node_id,port_id]))
+        return {"status": "failed"}
