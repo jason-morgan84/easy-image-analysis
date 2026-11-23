@@ -191,7 +191,7 @@ def test_create_image():
                 1:loaded_luts["Cyan hot"],
                 2:loaded_luts["Yellow"]}
 
-    outputimage = create_image(imported_image, lut_list, 3, 0, 0, 1.0)
+    outputimage, _= create_image(imported_image, lut_list, 3, 0, 0, 1.0)
 
     img = Image.fromarray(outputimage, mode='RGB')
     img.save("output.png")
