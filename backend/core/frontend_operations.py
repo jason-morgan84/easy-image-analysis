@@ -156,6 +156,13 @@ def create_image(input_image, luts = None, z=0, centre_y=0, centre_x=0, zoom=1.0
     #   left: for panning, x value of left of image to be generated as an int
     #   zoom: how zoomed in the image is as a float
 
+    """check input types"""
+    # check input image is an np.array of np.uint8
+    if not isinstance(input_image, np.ndarray):
+        raise TypeError(f"expected input_image as np.ndarray, not {type(input_image)}")
+    if input_image.dtype != np.uint8:
+        raise TypeError(f"expected input_image as np.ndarray of np.uint8, not {input_image.dtype}")
+    
     # get dimension sizes of input_image
     image_size_c, image_size_z, image_size_y, image_size_x = input_image.shape
     image_size = {"c": image_size_c,
@@ -175,14 +182,6 @@ def create_image(input_image, luts = None, z=0, centre_y=0, centre_x=0, zoom=1.0
                         5:loaded_luts["Cyan hot"]}
         for c in range(image_size_c):
             luts[c] = default_luts[c]
-    """check input types"""
-    # check input image is an np.array of np.uint8
-    if not isinstance(input_image, np.ndarray):
-        raise TypeError(f"expected input_image as np.ndarray, not {type(input_image)}")
-    if input_image.dtype != np.uint8:
-        raise TypeError(f"expected input_image as np.ndarray of np.uint8, not {input_image.dtype}")
-
-
 
     # check luts is a dictionary with integer keys, referencing channels, and np.arrays of shape (3,256) as values
     if not isinstance(luts, dict):
