@@ -106,10 +106,9 @@ def create_frontend_node_description(image_operation):
 
     return frontend_node_description
 
-def import_luts(logger = []):
+def import_luts(logger = [], path = lut_folder_location):
     lut_list = {}
     # get all files in lut folder
-    path = lut_folder_location
     files = os.listdir(path)
 
     # loop through files
