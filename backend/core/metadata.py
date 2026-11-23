@@ -51,8 +51,6 @@ class ParameterMetadata:
         self.ui_element = ui_element                    # definition of UI element required for user input, if relevant
         self.ui_element_options = ui_element_options    # any options associated with that UI element (such as min/max values for sliders, list options for lists)        
 
-    type_name = "ParameterParcel"
-
     @property
     def dtype(self):
         return self._dtype
