@@ -18,6 +18,7 @@ class LogItem():
 def log(log, error, message, class_name, function_name, identifier = None):
     new_log_item = LogItem(time.time(),error,message,class_name,function_name,identifier)
     log.append(new_log_item)
+    print(new_log_item)
     #return new_log_item
 
 def warn(message):
