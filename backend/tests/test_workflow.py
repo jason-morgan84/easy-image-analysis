@@ -1064,10 +1064,12 @@ def test_edit_node_wrong_type():
 
     workflow.add_node(directory["same_image"])
 
-    with pytest.raises(TypeError, match = "edit_node requires input of Node class, or nodes dictionary key"):
-        workflow.edit_node(25)
+    workflow.edit_node(workflow.nodes["node.same_image.0"],{"test": 2})
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "edit_node":
+            assert "edit_node requires node_id as string" in item.message 
 
-# pass in wrong data type, expect TypeError
+# pass in string for non-existent key, expect ValueError
 def test_edit_node_string_not_key():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
@@ -1075,41 +1077,59 @@ def test_edit_node_string_not_key():
     workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
+    workflow.edit_node("non-existent node",{"test": 2})
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "edit_node":
+            assert item.identifier == "non-existent node"
+            assert "node_id not found as key in nodes dictionary" in item.message 
 
-    with pytest.raises(ValueError, match = "for string inputs, edit_node expects a node dictionary key"):
-        workflow.edit_node("same_image")
-
-def test_edit_node_node_not_value():
+# send non-dictionary value attribute
+def test_edit_node_values_not_dict():
     log = []
     directory = ImageOperationDirectory(logger = log, testing = True)
     directory.import_operations_dict()
     workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
     workflow.add_node(directory["same_image"])
-    # test with invalid input (Node class but not nodes dictionary value) 
-    test_node = copy.copy(workflow.nodes["node.same_image.0"])
-    with pytest.raises(ValueError, match = "for node inputs, edit_node expects value from nodes dictionary"):
-        nodes = workflow.edit_node(test_node)
+    workflow.edit_node("node.same_image.0","2")
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "edit_node":
+            assert item.identifier == "node.same_image.0"
+            assert "expect values as dictionary" in item.message 
 
-# pass in string for non-existent key, expect ValueError
+# value attribute with incorrect key
+def test_edit_node_values_invalid_key():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = False)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
+
+    workflow.add_node(directory["select_channel"])
+    workflow.edit_node("node.select_channel.0",{"output":2})
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "edit_node":
+            assert item.identifier == "node.select_channel.0"
+            assert "values key not valid port_id" in item.message       
+                 
+# check edit node sets need update flag to true
 def test_edit_node_sets_needs_update_to_true():
     log = []
-    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory = ImageOperationDirectory(logger = log)
     directory.import_operations_dict()
     workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
-    workflow.add_node(directory["same_image"])
-    workflow.nodes["node.same_image.0"].needs_update = False
+    workflow.add_node(directory["select_channel"])
+    workflow.nodes["node.select_channel.0"].needs_update = False
 
-    assert workflow.nodes["node.same_image.0"].needs_update == False
+    assert workflow.nodes["node.select_channel.0"].needs_update == False
 
-    workflow.edit_node("node.same_image.0")
-    assert workflow.nodes["node.same_image.0"].needs_update == True
+    workflow.edit_node("node.select_channel.0",{"parameter.channel": 2})
+    assert workflow.nodes["node.select_channel.0"].needs_update == True
 
 # test edit node sets needs_update flag of downstream nodes to True
 def test_edit_node_sets_downstream_needs_update_to_true():
     log = []
-    directory = ImageOperationDirectory(logger = log, testing = True)
+    directory = ImageOperationDirectory(logger = log, testing = False)
     directory.import_operations_dict()
     workflow = WorkFlow(logger = log, image_operation_directory = directory)
 
@@ -1125,55 +1145,55 @@ def test_edit_node_sets_downstream_needs_update_to_true():
     #   V             V
     # node6         node7
 
-    workflow.add_node(directory["same_image"]) # node0: node.same_image.0
-    workflow.add_node(directory["same_image"]) # node1: node.same_image.1
-    workflow.add_node(directory["same_image"]) # node2: node.same_image.2
-    workflow.add_node(directory["same_image"]) # node3: node.same_image.3
-    workflow.add_node(directory["same_image"]) # node4: node.same_image.4
-    workflow.add_node(directory["same_image"]) # node5: node.same_image.5
-    workflow.add_node(directory["same_image"]) # node6: node.same_image.6
-    workflow.add_node(directory["same_image"]) # node7: node.same_image.7
+    workflow.add_node(directory["select_channel"]) # node0: node.same_image.0
+    workflow.add_node(directory["select_channel"]) # node1: node.select_channel.1
+    workflow.add_node(directory["select_channel"]) # node2: node.same_image.2
+    workflow.add_node(directory["select_channel"]) # node3: node.same_image.3
+    workflow.add_node(directory["select_channel"]) # node4: node.same_image.4
+    workflow.add_node(directory["select_channel"]) # node5: node.same_image.5
+    workflow.add_node(directory["select_channel"]) # node6: node.same_image.6
+    workflow.add_node(directory["select_channel"]) # node7: node.same_image.7
 
-    workflow.add_connection(source_port = workflow.nodes["node.same_image.0"].output_ports["image.output"],
-                            target_port = workflow.nodes["node.same_image.1"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.select_channel.0"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.select_channel.1"].input_ports["image.input"])
     
-    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
-                            target_port = workflow.nodes["node.same_image.2"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.select_channel.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.select_channel.2"].input_ports["image.input"])
     
-    workflow.add_connection(source_port = workflow.nodes["node.same_image.1"].output_ports["image.output"],
-                            target_port = workflow.nodes["node.same_image.3"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.select_channel.1"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.select_channel.3"].input_ports["image.input"])
     
-    workflow.add_connection(source_port = workflow.nodes["node.same_image.2"].output_ports["image.output"],
-                            target_port = workflow.nodes["node.same_image.4"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.select_channel.2"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.select_channel.4"].input_ports["image.input"])
     
-    workflow.add_connection(source_port = workflow.nodes["node.same_image.3"].output_ports["image.output"],
-                            target_port = workflow.nodes["node.same_image.6"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.select_channel.3"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.select_channel.6"].input_ports["image.input"])
     
-    workflow.add_connection(source_port = workflow.nodes["node.same_image.4"].output_ports["image.output"],
-                            target_port = workflow.nodes["node.same_image.5"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.select_channel.4"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.select_channel.5"].input_ports["image.input"])
 
-    workflow.add_connection(source_port = workflow.nodes["node.same_image.4"].output_ports["image.output"],
-                            target_port = workflow.nodes["node.same_image.7"].input_ports["image.input"])
+    workflow.add_connection(source_port = workflow.nodes["node.select_channel.4"].output_ports["image.output"],
+                            target_port = workflow.nodes["node.select_channel.7"].input_ports["image.input"])
 
-    workflow.nodes["node.same_image.0"].needs_update = False
-    workflow.nodes["node.same_image.1"].needs_update = False
-    workflow.nodes["node.same_image.2"].needs_update = False
-    workflow.nodes["node.same_image.3"].needs_update = False
-    workflow.nodes["node.same_image.4"].needs_update = False
-    workflow.nodes["node.same_image.5"].needs_update = False
-    workflow.nodes["node.same_image.6"].needs_update = False
-    workflow.nodes["node.same_image.7"].needs_update = False
+    workflow.nodes["node.select_channel.0"].needs_update = False
+    workflow.nodes["node.select_channel.1"].needs_update = False
+    workflow.nodes["node.select_channel.2"].needs_update = False
+    workflow.nodes["node.select_channel.3"].needs_update = False
+    workflow.nodes["node.select_channel.4"].needs_update = False
+    workflow.nodes["node.select_channel.5"].needs_update = False
+    workflow.nodes["node.select_channel.6"].needs_update = False
+    workflow.nodes["node.select_channel.7"].needs_update = False
 
-    workflow.edit_node("node.same_image.1")
+    workflow.edit_node("node.select_channel.1",{"parameter.channel":2})
 
-    assert workflow.nodes["node.same_image.0"].needs_update == False
-    assert workflow.nodes["node.same_image.1"].needs_update == True
-    assert workflow.nodes["node.same_image.2"].needs_update == True
-    assert workflow.nodes["node.same_image.3"].needs_update == True
-    assert workflow.nodes["node.same_image.4"].needs_update == True
-    assert workflow.nodes["node.same_image.5"].needs_update == True
-    assert workflow.nodes["node.same_image.6"].needs_update == True
-    assert workflow.nodes["node.same_image.7"].needs_update == True
+    assert workflow.nodes["node.select_channel.0"].needs_update == False
+    assert workflow.nodes["node.select_channel.1"].needs_update == True
+    assert workflow.nodes["node.select_channel.2"].needs_update == True
+    assert workflow.nodes["node.select_channel.3"].needs_update == True
+    assert workflow.nodes["node.select_channel.4"].needs_update == True
+    assert workflow.nodes["node.select_channel.5"].needs_update == True
+    assert workflow.nodes["node.select_channel.6"].needs_update == True
+    assert workflow.nodes["node.select_channel.7"].needs_update == True
 
     """update_graph function"""
 # start_node_list

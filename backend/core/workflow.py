@@ -62,15 +62,31 @@ class WorkFlow:
     have needs_update flag set to true
     """
     def edit_node(self, node_id, values):
-        # checks for string or Node input
+
+        update = True
+        # checks for string input
         if not isinstance(node_id, str):
-            log(self.workflow_logger,TypeError,f"edit_node requires node_id as string: {type(node_id)}","WorkFlow","edit_node",node_id)
+            log(self.workflow_logger,TypeError,f"edit_node requires node_id as string, not {type(node_id)}","WorkFlow","edit_node",node_id)
+            update = False
 
         # if string is a key in self.nodes, get Node, else raise ValueError
         elif node_id not in self.nodes.keys():
             log(self.workflow_logger,TypeError,f"node_id not found as key in nodes dictionary: '{node_id}'","WorkFlow","edit_node",node_id)
+            update = False
 
+        # check values is a dictionary
+        elif not isinstance(values, dict):
+            log(self.workflow_logger,TypeError,f"for edit_node, expect values as dictionary of port_ids and values, not {type(node_id)}","WorkFlow","edit_node",node_id)
+            update = False
+
+        # check values keys are ports and values are of compatible type
         else:
+            for key, value in values.items():
+                if key not in self.nodes[node_id].input_ports.keys():
+                    update = False
+                    log(self.workflow_logger,TypeError,f"for edit_node, values key not valid port_id: '{key}'","WorkFlow","edit_node",node_id)
+
+        if update:
             # update node values based on values
             for key, value in values.items():
                 try:
