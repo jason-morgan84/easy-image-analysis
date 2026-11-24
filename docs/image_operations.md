@@ -142,7 +142,7 @@ It is defined in metadata.py and contains the following attributes:
 * shape - if dtype defines an array, this gives the expected shape of that array as a list/tuple/np.ndarray.
 * user_input - a boolean flag. If set to true, data will be gathered from the user
 * ui_element - the type of UI element to be used to get this data (eg, text box, drop down box etc). This is described in more detail in the UI input section below. It is required if user_input is set to True.
-* ui_element_options - any other options associated with the UI element. This varies per element and may include min/max slider values, drop-down box options etc. It is described in more detail in the UI input section below.
+* ui_element_options - any other options associated with the UI element. This varies per element and may include min/max slider values, drop-down box options etc. A default value (key = default, value is compatible with dtype) is required as a ui_element_options dictionary item if user_input is flagged as true. These options are described in more detail in the UI input section below.
 
 #### Type policies
 
@@ -207,6 +207,9 @@ The code to be executed should be defined in the execute function within the Ima
 The code will be run on import given sample data matching that defined in the metadata. Any exceptions will result in the ImageOperation not being imported.
 
 In general, as long as the code only uses the permitted imports, doesn't generate an exception, provides some output and that output matches what is defined in the metadata, the software is indifferent to the code thats executed by the ImageOperation. 
+
+### UI Inputs
+
 
 ## Testing ImageOperations
 
