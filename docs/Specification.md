@@ -141,6 +141,7 @@
 |13/11/26|0.20.4|Updated description of remove functionunit testing|
 |24/11/26|0.21.0|Updated description of WorkFlow edit_node unit testing|
 |24/11/26|0.21.1|Updated description of ParameterMetaData to include requirement for a default parameter value for user input|
+|24/11/26|0.21.2|Updated description unit testing description for ParameterMetaData|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -763,9 +764,9 @@ This uses the class FrontendPortDescription, which includes:
 |tranpose | send in non new_shape with inproper value (less than 0, greater than Shape.max_image_dimensions)| ValueError: new_shape shape dimensions out of range |
 |tranpose | Send in valid new_shape and value| output with expected shape |
 
-## 8.2 – Backend Composition Classes
+## 8.2 – Metadata Classes
 
-### 8.2.1 Image
+### 8.2.1 ImageMetadata
 |Component  | Test  | Expected Outcome  | Undesired Outcome |
 |:--        |:--    |:--                |:--                |  
 |Type constraints|	Use unexpected data type (not ImageInt, ImageFloat or ImageBinary)|	Type Error	| Type converted to correct type<br>Incorrectly type data used anyway</li></ul>|
@@ -778,13 +779,14 @@ This uses the class FrontendPortDescription, which includes:
 |transpose| new_shape arguement has values out of range |Value error | No error given |
 |transpose|transpose test image | resulting image pixel_array has expected Shape | resulting image pixel array has incorrect shape |
 
-### 8.2.2 Parameters
-|Component  | Test  | Expected Outcome  | Undesired Outcome |
-|:--        |:--    |:--                |:--                |  
-|Type constraints|	Input data type not a member of DataType.value_type|	Type Error	| <ul><li>Incorrect type accepted</li></ul>|
-|convert| convert arguement for array_type not in array_type class | Type error | No error given |
-|convert| convert arguement for value_type not in value_type class | Type error | No error given |
-|convert| convert test parameter | output of expected type | output not of expected type |
+### 8.2.2 ParameterMetadata
+|Component  | Test  | Expected Outcome  | 
+|:--        |:--    |:--                |  
+|Type constraints|	Input data type not a member of DataType.value_type/DataType.array_type|	Type Error: expected ParameterMetadata dtype from DataType.types	|
+|is_input| give non boolean is_input value | Type error: user_input flag expected to be boolean |
+|is_input| test user_input true without user_interface element| Value error: defined UI element required where user_input flag is True |
+|is_input| test user_input true without user_interface_optoins default value| Value error: ui_element_options missing 'default' dictionary item for user_input |
+
 
 ## Stage 8.3 – Backend Excecution Classes
 
