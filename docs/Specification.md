@@ -139,6 +139,7 @@
 |09/11/26|0.20.2|Added description of unit testing of create_frontend_node_description|
 |13/11/26|0.20.3|Added description of remove function to workflow with unit testing|
 |13/11/26|0.20.4|Updated description of remove functionunit testing|
+|24/11/26|0.21.0|Updated description of WorkFlow edit_node unit testing|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -910,9 +911,11 @@ This uses the class FrontendPortDescription, which includes:
 |delete_node | call delete_node with an invalid key    | Logged ValueError: id not in node list   |
 |delete_node | call delete_node with proper parameters   | node deleted from nodes dictionary   |
 |delete_node | call delete_node with proper parameters   | associated connections removed from connection dictionary |
-|edit_node | call edit_node with invalid input - not Node or string | Logs TypeError: edit_node requires input of Node class, or nodes dictionary key|
+|edit_node | pass in wrong data type, not string| Logs TypeError: edit_node requires input of Node class, or nodes dictionary key|
 |edit_node | call edit_node with invalid input - string not nodes key | Logs ValueError: for string inputs, edit_node expects a node dictionary key|
-|edit_node | call edit_node with invalid input - Node not nodes value | Logs ValueError: for node inputs, edit_node expects value from nodes dictionary|
+|edit_node | call edit_node with invalid input - values not dict | Logs ValueError: expect values as dictionary|
+|edit_node | call edit_node with invalid input - values dict with invalid key | Logs ValueError: values key not valid port_id|
+|edit_node | call edit_node with invalid input - values value incompatible | Logs ValueError: value not of compatible type|
 |edit_node | call edit_node with valid input | sets own "needs_update" flag to True |
 |edit_node | call edit_node with valid input | sets all downstream "needs_update" flags to True |
 
