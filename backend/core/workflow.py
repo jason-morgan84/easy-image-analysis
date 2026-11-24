@@ -84,7 +84,14 @@ class WorkFlow:
             for key, value in values.items():
                 if key not in self.nodes[node_id].input_ports.keys():
                     update = False
-                    log(self.workflow_logger,TypeError,f"for edit_node, values key not valid port_id: '{key}'","WorkFlow","edit_node",node_id)
+                    log(self.workflow_logger,TypeError,f"{self.nodes[node_id].input_ports.keys()}for edit_node, values key not valid port_id: '{key}'","WorkFlow","edit_node",f"{node_id}.{key}")
+                else:
+                    try:
+                        self.nodes[node_id].input_ports[key].metadata.dtype.numpy(value)
+                    except Exception as E:
+                        update = False
+                        log(self.workflow_logger,TypeError,f"for edit_node, value not of compatible type: '{key}: {value}'","WorkFlow","edit_node",f"{node_id}.{key}")
+
 
         if update:
             # update node values based on values
