@@ -18,8 +18,14 @@ class LoadImage(ImageOperation):
             docs="Loads an image given a path (as string) and shape as array of integers defining array dimensions of c, z, y and x in order",
             alerts=None,
             input_image_metadata={},
-            input_parameter_metadata={"path": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True, ui_element="file_open",ui_element_options={"extensions":[".tif",".tiff"]}), 
-                                      "shape": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True,ui_element = "text"),},
+            input_parameter_metadata={"path": ParameterMetadata(dtype=DataPolicy.ValueString, 
+                                                                user_input=True, ui_element="file_open",
+                                                                ui_element_options={"extensions":[".tif",".tiff"],
+                                                                                    "default": str(os.path.join(project_root_dir,"backend","tests","test_images","test_image_8bit.tif" ))}), 
+                                      "shape": ParameterMetadata(dtype=DataPolicy.ValueString, 
+                                                                 user_input=True,
+                                                                 ui_element = "text",
+                                                                 ui_element_options={"default":"ZCYX"}),},
             output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))}, 
@@ -112,8 +118,14 @@ class LoadImageBinary(LoadImage):
         self.docs="Loads a binary image given a path (as string) and shape as array of integers defining array dimensions of c, z, y and x in order"
         self.alerts=None
         self.input_image_metadata={}
-        self.input_parameter_metadata={"path": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True, ui_element="load"), 
-                                      "shape": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True,ui_element = "text"),}
+        input_parameter_metadata={"path": ParameterMetadata(dtype=DataPolicy.ValueString, 
+                                                            user_input=True, ui_element="file_open",
+                                                            ui_element_options={"extensions":[".tif",".tiff"],
+                                                                                "default": str(os.path.join(project_root_dir,"backend","tests","test_images","test_image_binary.tif" ))}), 
+                                    "shape": ParameterMetadata(dtype=DataPolicy.ValueString, 
+                                                                user_input=True,
+                                                                ui_element = "text",
+                                                                ui_element_options={"default":"ZCYX"}),},
         self.output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageBinary,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))}
@@ -130,7 +142,7 @@ class TestLoadImageInt(ImageOperation):
             docs="creates sample data based on input_parameters",
             alerts=None,
             input_image_metadata={},
-            input_parameter_metadata={"shape": ParameterMetadata(dtype=DataPolicy.ArrayInt, user_input=True, ui_element = "text")},
+            input_parameter_metadata={"shape": ParameterMetadata(dtype=DataPolicy.ArrayInt, user_input=False)},
             output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))}, 
@@ -153,7 +165,7 @@ class TestLoadImageFloat(ImageOperation):
             docs="creates sample data based on input_parameters",
             alerts=None,
             input_image_metadata={},
-            input_parameter_metadata={"shape": ParameterMetadata(dtype=DataPolicy.ArrayInt, user_input=True, ui_element = "text")},
+            input_parameter_metadata={"shape": ParameterMetadata(dtype=DataPolicy.ArrayInt, user_input=False)},
             output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageFloat,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))}, 
@@ -179,8 +191,14 @@ class SaveImage(ImageOperation):
                 input_image_metadata={"input": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                         image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                         image_map=Shape(c=0, z=1, y=2, x=3))}, 
-                input_parameter_metadata={"path": ParameterMetadata(dtype=DataPolicy.ValueString, user_input=True, ui_element="load")},
+                input_parameter_metadata={"path": ParameterMetadata(dtype=DataPolicy.ValueString, 
+                                                                    user_input=True, 
+                                                                    ui_element="load",
+                                                                    ui_element_options={"extensions":[".tif",".tiff"],
+                                                                                        "default": str(os.path.join(project_root_dir,"output.tif" ))}), 
+                }
                 )
+            
 
         def execute(self):
             path = self.input_parameter["path"]
