@@ -1108,8 +1108,23 @@ def test_edit_node_values_invalid_key():
     workflow.edit_node("node.select_channel.0",{"output":2})
     for item in log:
         if item.class_name == "WorkFlow" and item.function_name == "edit_node":
-            assert item.identifier == "node.select_channel.0"
+            assert item.identifier == "node.select_channel.0.output"
             assert "values key not valid port_id" in item.message       
+
+# value attribute with incompatible value
+def test_edit_node_values_incompatible_value():
+    log = []
+    directory = ImageOperationDirectory(logger = log, testing = False)
+    directory.import_operations_dict()
+    workflow = WorkFlow(logger = log, image_operation_directory = directory)
+
+    workflow.add_node(directory["select_channel"])
+    workflow.edit_node("node.select_channel.0",{"parameter.channel":"two"})
+    for item in log:
+        if item.class_name == "WorkFlow" and item.function_name == "edit_node":
+            print(f"{item.message}")
+            assert item.identifier == "node.select_channel.0.parameter.channel"
+            assert "value not of compatible type" in item.message  
                  
 # check edit node sets need update flag to true
 def test_edit_node_sets_needs_update_to_true():
