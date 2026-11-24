@@ -153,7 +153,7 @@ class ImageBinary(BasePolicy):
 class ValueInt(BasePolicy):
     data_type = DataPolicy.ValueInt
     description = "Data type to hold single variables as integers"
-    numpy = np.uint8
+    numpy = np.int64
     is_image = False
     permitted_conversions = [DataPolicy.ValueFloat]
     colour = "#8800aa"
@@ -186,7 +186,7 @@ class ValueFloat(BasePolicy):
 class ArrayInt(BasePolicy):
     data_type = DataPolicy.ArrayInt
     description = "Data type to hold variables lists as ints"
-    numpy = np.uint8
+    numpy = np.int64
     is_array = True
     is_image = False
     permitted_conversions = [DataPolicy.ArrayFloat]
