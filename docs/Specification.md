@@ -140,6 +140,7 @@
 |13/11/26|0.20.3|Added description of remove function to workflow with unit testing|
 |13/11/26|0.20.4|Updated description of remove functionunit testing|
 |24/11/26|0.21.0|Updated description of WorkFlow edit_node unit testing|
+|24/11/26|0.21.1|Updated description of ParameterMetaData to include requirement for a default parameter value for user input|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -319,7 +320,7 @@ Contains:
     - Type checks for member of DataPolicy.
 * user_input - boolean flag to say if value is expected via WorkFlow (False) or via (UI).
 * ui_element – the desired UI element for input, where relevant (text box, drop down box, check box, slider etc) - setter checks this is present if user_input is True
-* ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc).
+* ui_element_options – Dictionary of other options related to that UI element, where relevant (slider min/max, drop down box options etc). An item with key "default" and value compatible with expected parameter data type *required* where user_input flag is True.
 
 ### 3.4.4 ImageOperationDirectory Class
 This class holds for a list of all ImageOperation classes, along with the code required to import them.
