@@ -20,7 +20,7 @@ def test_ImageMetadata(dtype, image_shape_constraints, image_map, message):
                     image_shape_constraints = image_shape_constraints, 
                     image_map = image_map)
 
-"""Test ParameterParcel Class"""
+"""Test ParameterMetadata Class"""
 # test valid inputs
 @pytest.mark.parametrize("dtype, message", [
     # Supply dtype as not member of DataTypes.image_types
@@ -44,3 +44,8 @@ def test_ParameterParcel_user_input_no_ui_element():
         ParameterMetadata(dtype = DataPolicy.ValueInt,  
                     user_input = True)
 
+# test user_input true without user_interface_option default value
+def test_ParameterParcel_user_input_no_default_value():
+    with pytest.raises(ValueError, match = "ui_element_options missing 'default' dictionary item for user_input"):
+        ParameterMetadata(dtype = DataPolicy.ValueInt,  
+                    user_input = True, ui_element="text")
