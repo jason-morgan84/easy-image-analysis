@@ -9,6 +9,7 @@ from core.metadata import ParameterMetadata
 from core.constants import project_root_dir
 import ast
 import inspect
+import numpy as np
 
 
 
@@ -226,12 +227,35 @@ class ImageOperationDirectory():
 
         # gets test_input_parameter from image_operation
         # check if test input parameters have been passed
-        input_parameter = function.test_input_parameters if hasattr(function, "test_input_parameters") else None
-        if function.input_parameter_metadata is not None and input_parameter is None:
-            raise RuntimeError(f"no sample test_input_parameters provided for function")
+        # new logic:
+        # loop through input_parameter_metadata
+        # for each parameter, check if its a user input
+        # if its a user input, get respective default value
+        # if its not, generate a random value that matches dtype
+        # set value
 
-        # check if test input parameters are valid
+        # unit tests:
+        # does it work when user_input == False?
+        # does it work when user_input == True and value.dtype.is_array == True?
+        # does it work when user_input == True and value.dtype.is_array == False?
         if function.input_parameter_metadata is not None:
+            input_parameter = {}
+            for key, value in function.input_parameter_metadata.items():
+                if value.user_input:
+                    if value.dtype.is_array:
+                        input_parameter[key] = np.array(value.ui_element_options["default"], value.dtype.numpy)
+                    else:
+                        input_parameter[key] = value.dtype.numpy(value.ui_element_options["default"])
+                else:
+                    input_parameter[key] = sample_data(dtype=value.dtype)
+
+            # remove once above section tested
+            """
+            input_parameter = function.test_input_parameters if hasattr(function, "test_input_parameters") else None
+            if function.input_parameter_metadata is not None and input_parameter is None:
+                raise RuntimeError(f"no sample test_input_parameters provided for function")
+            """
+            # check if generated input parameters are valid
             try:
                 check_data_dictionary_value(data = input_parameter, 
                                             metadata=function.input_parameter_metadata,
