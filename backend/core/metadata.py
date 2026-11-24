@@ -83,3 +83,14 @@ class ParameterMetadata:
             if element == None:
                 raise ValueError(f"defined UI element required where user_input flag is True")
         self._ui_element = element
+
+    @property
+    def ui_element_options(self):
+        return self._ui_element_options
+    @ui_element.setter
+    def ui_element_options(self, options):
+        # check if user_input flag is set, check ui_element exists
+        if self.user_input:
+            if options == None or "default" not in options.keys():
+                raise ValueError(f"ui_element_options missing 'default' dictionary item for user_input")
+        self._ui_element_options = options
