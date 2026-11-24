@@ -784,8 +784,9 @@ This uses the class FrontendPortDescription, which includes:
 |:--        |:--    |:--                |  
 |Type constraints|	Input data type not a member of DataType.value_type/DataType.array_type|	Type Error: expected ParameterMetadata dtype from DataType.types	|
 |is_input| give non boolean is_input value | Type error: user_input flag expected to be boolean |
-|is_input| test user_input true without user_interface element| Value error: defined UI element required where user_input flag is True |
-|is_input| test user_input true without user_interface_optoins default value| Value error: ui_element_options missing 'default' dictionary item for user_input |
+|ui_element| test user_input true without user_interface element| Value error: defined UI element required where user_input flag is True |
+|ui_element_options| test user_input true without user_interface_optoins default value| Value error: ui_element_options missing 'default' dictionary item for user_input |
+|ui_element_options| test user_input true without incompatible user_interface_optoins default value| Value error: ui_element_options default value of incompatible type |
 
 
 ## Stage 8.3 – Backend Excecution Classes

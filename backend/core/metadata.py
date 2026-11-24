@@ -93,4 +93,9 @@ class ParameterMetadata:
         if self.user_input:
             if options == None or "default" not in options.keys():
                 raise ValueError(f"ui_element_options missing 'default' dictionary item for user_input")
+            else:
+                try: 
+                    self.dtype.numpy(options["default"])
+                except:
+                    raise ValueError(f"ui_element_options default value of incompatible type")
         self._ui_element_options = options

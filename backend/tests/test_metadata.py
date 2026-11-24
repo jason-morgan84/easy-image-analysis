@@ -49,3 +49,9 @@ def test_ParameterParcel_user_input_no_default_value():
     with pytest.raises(ValueError, match = "ui_element_options missing 'default' dictionary item for user_input"):
         ParameterMetadata(dtype = DataPolicy.ValueInt,  
                     user_input = True, ui_element="text")
+
+# test user_input true with incompatible user_interface_option default value
+def test_ParameterParcel_user_input_incompatible_default_value():
+    with pytest.raises(ValueError, match = "ui_element_options default value of incompatible type"):
+        ParameterMetadata(dtype = DataPolicy.ValueInt,  
+                    user_input = True, ui_element="text", ui_element_options={"default": "two"})
