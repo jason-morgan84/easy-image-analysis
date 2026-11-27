@@ -87,7 +87,7 @@ class ParameterMetadata:
     @property
     def ui_element_options(self):
         return self._ui_element_options
-    @ui_element.setter
+    @ui_element_options.setter
     def ui_element_options(self, options):
         # check if user_input flag is set, check ui_element exists
         if self.user_input:
