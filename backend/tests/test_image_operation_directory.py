@@ -85,7 +85,7 @@ def test_incorrect_code(function_name, error_message):
             assert error_message in item.message, f"{item.message}"
 
 
-# Importing ImageOperations with correct code
+# Importing ImageOperations with no user inputs with correct code
 # - outputs image only
 # - outputs parameter only
 # - outputs image and parameter
@@ -104,6 +104,25 @@ def test_correct_code(function_name):
 
     assert function_name in directory.image_operation_list.keys()
 
+# Importing ImageOperations with user input with correct code
+@pytest.mark.parametrize("function_name", [
+    # Supply dtype as not member of DataTypes.image_types
+    ("code_correct_user_input"),
+    ("code_correct_user_input_array")])
+def test_correct_code_user_input(function_name):
+    directory = ImageOperationDirectory(testing = True)
+    directory.import_operations_dict()
+
+    for item in directory.logger:
+        print(f"{item}")
+        assert item.identifier != function_name, f"{item.message}"
+
+    assert function_name in directory.image_operation_list.keys()
+
+
+
+        # does it work when user_input == True and value.dtype.is_array == True?
+        # does it work when user_input == True and value.dtype.is_array == False?
 
 # Import an ImageOperation with unacceptable import
 @pytest.mark.parametrize("function_name, error_message", [
