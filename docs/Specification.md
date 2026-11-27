@@ -142,6 +142,7 @@
 |24/11/26|0.21.0|Updated description of WorkFlow edit_node unit testing|
 |24/11/26|0.21.1|Updated description of ParameterMetaData to include requirement for a default parameter value for user input|
 |24/11/26|0.21.2|Updated description unit testing description for ParameterMetaData|
+|27/11/26|0.21.3|Updated description unit testing description for ImageOperationDirectory|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -845,9 +846,11 @@ This uses the class FrontendPortDescription, which includes:
 |ImportTesting|Test load an ImageOperation which produces an image output in the correct format with missing mapping data|ImageOperation rejected and logged | ImageOperation accepted|
 |ImportTesting|Test load an ImageOperation which produces an image output in the correct format with incompatible shape and mapping data| ImageOperation accepted|
 |ImportTesting|Test load an ImageOperation which produces a parameter output in the correct format with a missing value|ImageOperation rejected and logged | ImageOperation accepted|
-|ImportTesting|ImageOperation which only produces an image output|ImageOperation accepted | ImageOperation rejected|
-|ImportTesting|ImageOperation which only produces a parameter output|ImageOperation accepted | ImageOperation rejected|
-|ImportTesting|ImageOperation which produces a parameter and image output|ImageOperation accepted | ImageOperation rejected|
+|ImportTesting|Correct ImageOperation which only produces an image output|ImageOperation accepted | ImageOperation rejected|
+|ImportTesting|Correct ImageOperation which only produces a parameter output|ImageOperation accepted | ImageOperation rejected|
+|ImportTesting|Correct ImageOperation which produces a parameter and image output|ImageOperation accepted | ImageOperation rejected|
+|ImportTesting|Correct ImageOperation with a user_input = True parameter and correct default value |ImageOperation accepted | ImageOperation rejected|
+|ImportTesting|Correct ImageOperation with a user_input = True parameter and correct Array default value|ImageOperation accepted | ImageOperation rejected|
 |ImportConstraints|Import an ImageOperation with unacceptable import|  ImageOperation rejected and reported | ImageOperation accepted|
 |ImportConstraints|Import an ImageOperation with acceptable import|  ImageOperation imported | ImageOperation accepted|
 
