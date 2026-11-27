@@ -71,7 +71,7 @@ test_operation_2 = ImageOperation(name = "Test Operation 1",
 )
 def function2(self):
     self.output_image = {'output 1': self.input_image['image 1']}
-    self.output_parameter = {"out_param_1": np.float64(0.5), "out_param_2": np.uint8(3)}
+    self.output_parameter = {"out_param_1": np.float64(0.5), "out_param_2": np.int64(3)}
 
 setattr(test_operation_2, 'execute', types.MethodType(function2, test_operation_2))
 

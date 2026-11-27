@@ -99,6 +99,7 @@ def test_correct_code(function_name):
     directory.import_operations_dict()
 
     for item in directory.logger:
+        print(f"{item}")
         assert item.identifier != function_name, f"{item.message}"
 
     assert function_name in directory.image_operation_list.keys()

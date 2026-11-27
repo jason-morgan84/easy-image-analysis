@@ -19,8 +19,8 @@ def test_array_validation(dtype, invalid_input, message):
 
 # test scalar class with list/tuple/np.array
 @pytest.mark.parametrize("dtype, invalid_input, message", [
-    (ValueInt, [1,2], "expected data type of <class 'numpy.uint8'> for DataPolicy.ValueInt, got <class 'list'>"), # unexpected array
-    (ValueInt, np.array([1,2,3]), "expected data type of <class 'numpy.uint8'> for DataPolicy.ValueInt, got <class 'numpy.ndarray'>"), # unexpected np array
+    (ValueInt, [1,2], "expected data type of <class 'numpy.int64'> for DataPolicy.ValueInt, got <class 'list'>"), # unexpected array
+    (ValueInt, np.array([1,2,3]), "expected data type of <class 'numpy.int64'> for DataPolicy.ValueInt, got <class 'numpy.ndarray'>"), # unexpected np array
     (ValueFloat, (1,2),"expected data type of <class 'numpy.float64'> for DataPolicy.ValueFloat, got <class 'tuple'>"), # unexpected tuple
 ])
 def test_scalar_validation(dtype, invalid_input, message):
@@ -29,9 +29,9 @@ def test_scalar_validation(dtype, invalid_input, message):
 
 # test class with incorrect data type
 @pytest.mark.parametrize("dtype, invalid_input, message", [
-    (ValueInt, "2.0", "expected data type of <class 'numpy.uint8'> for DataPolicy.ValueInt, got <class 'str'>"), # not an array
+    (ValueInt, "2.0", "expected data type of <class 'numpy.int64'> for DataPolicy.ValueInt, got <class 'str'>"), # not an array
     (ImageBinary, np.array([1,2,3],np.float64), "expected np.array of <class 'numpy.uint8'> for DataPolicy.ImageBinary, got float64"), # not an array
-    (ArrayInt, np.array([1.0,1.1,1.2],np.float64),"expected np.array of <class 'numpy.uint8'> for DataPolicy.ArrayInt, got float64"), # unexpected list
+    (ArrayInt, np.array([1.0,1.1,1.2],np.float64),"expected np.array of <class 'numpy.int64'> for DataPolicy.ArrayInt, got float64"), # unexpected list
     (ArrayFloat, np.array([1,2,3], np.uint8),"expected np.array of <class 'numpy.float64'> for DataPolicy.ArrayFloat, got uint8"), #unexpected dict
 ])
 def test_incorrect_data_type(dtype, invalid_input, message):

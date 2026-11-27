@@ -24,4 +24,4 @@ class CodeCorrectParameterOnly(ImageOperation):
             output_parameter_metadata = {"output2": ParameterMetadata(dtype = DataPolicy.ValueInt)}
             )
     def execute(self):
-        self.output_parameter = {"output2": np.uint8(2)}
+        self.output_parameter = {"output2": np.int64(2)}

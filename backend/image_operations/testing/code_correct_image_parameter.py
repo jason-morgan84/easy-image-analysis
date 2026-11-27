@@ -27,4 +27,4 @@ class CodeCorrectImageParameter(ImageOperation):
     def execute(self):
         input_image_array = self.input_image["input"]
         self.output_image = {"output": input_image_array.copy()}
-        self.output_parameter={"output2": np.uint8(2)}
+        self.output_parameter={"output2": np.int64(2)}
