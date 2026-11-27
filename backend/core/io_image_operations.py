@@ -142,7 +142,7 @@ class TestLoadImageInt(ImageOperation):
             docs="creates sample data based on input_parameters",
             alerts=None,
             input_image_metadata={},
-            input_parameter_metadata={"shape": ParameterMetadata(dtype=DataPolicy.ArrayInt, user_input=False)},
+            input_parameter_metadata={"shape": ParameterMetadata(dtype=DataPolicy.ArrayInt, user_input=True, ui_element="text", ui_element_options={"default":[4,3,2,1]})},
             output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))}, 
