@@ -40,8 +40,6 @@ class SelectChannel(ImageOperation):
                                                      image_map=Shape(c=0, z=1, y=2, x=3))},
 
             )
-        
-        self.test_input_parameters = {"channel": np.uint8(1)} 
             
     def execute(self):
         """ get inputs from input dictionaries:"""
