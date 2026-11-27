@@ -1375,7 +1375,7 @@ def test_update_graph_data_not_present():
     # node0 
 
     
-    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([4,3,2,1], np.uint8)
+    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([4,3,2,1], np.int64)
 
     workflow.add_connection(source_port = workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"],
                             target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
@@ -1415,7 +1415,7 @@ def test_update_graph_tranpose_improper_value():
     #   v             
     # node0 
 
-    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.uint8)
+    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.int64)
     workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"].metadata.image_map = Shape(c=3, z=2, y=1, x=0)
 
     workflow.add_connection(source_port = workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"],
@@ -1451,7 +1451,7 @@ def test_update_graph_tranpose():
     # node0 
 
     
-    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([4,3,2,1], np.uint8)
+    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([4,3,2,1], np.int64)
 
     workflow.nodes["node.same_image.0"].input_ports["image.input"].metadata.image_map = Shape(c=3, z=2, y=1, x=0)
 
@@ -1499,7 +1499,7 @@ def test_update_graph_shape_check_data():
     workflow.add_node(directory["single_channel_input"])  # node0: node.single_channel_input.0
     workflow.add_node(directory["test_load_image_int"]) # node1: node.test_load_image_int.1   
 
-    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.uint8)
+    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.int64)
 
     workflow.add_connection(source_port = workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"],
                             target_port = workflow.nodes["node.single_channel_input.0"].input_ports["image.input"])
@@ -1536,7 +1536,7 @@ def test_update_graph_convert_improper_value():
     #   v             
     # node0 
 
-    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.uint8)
+    workflow.nodes["node.test_load_image_int.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.int64)
 
     workflow.add_connection(source_port = workflow.nodes["node.test_load_image_int.1"].output_ports["image.output"],
                             target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
@@ -1574,7 +1574,7 @@ def test_update_graph_convert():
     #   v             
     # node0 
 
-    workflow.nodes["node.test_load_image_float.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.uint8)
+    workflow.nodes["node.test_load_image_float.1"].input_ports["parameter.shape"].data = np.array([3,4,5,6], np.int64)
 
     workflow.add_connection(source_port = workflow.nodes["node.test_load_image_float.1"].output_ports["image.output"],
                             target_port = workflow.nodes["node.same_image.0"].input_ports["image.input"])
