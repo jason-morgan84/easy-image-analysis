@@ -193,6 +193,8 @@ class Node:
                                                  port_id = port_id,
                                                  port_name=str(key),
                                                  node_id = self.node_id)
+                if value.user_input:
+                    self.input_ports[port_id].data = value.dtype.numpy(value.ui_element_options["default"])
 
         return self.input_ports
     # on Node instantiation, initialises the Node output Ports by creating a Port for each input_image and input_parameter in
