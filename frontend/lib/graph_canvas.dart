@@ -47,7 +47,6 @@ class ParameterDescription{
   late Map<String,dynamic> options;
   late bool uiOnly;
 
-
   ParameterDescription.fromDict(Map<String, dynamic> json) {
     name = (json['id'] as String?) ?? "";
     label = (json['name'] as String?) ?? "";
@@ -191,7 +190,7 @@ class CustomNodeEditorController extends NodeEditorController
       var responseDecode = json.decode(response.body);
 
       // if the response is not that a node with the correct id was created in backend, delete the node from frontend
-      if (responseDecode["status"] != "created" || responseDecode["node"] != node.id)
+      if (responseDecode["status"] != "completed" || responseDecode["node"] != node.id)
       {
         deleteNode(node.id);
       }
@@ -259,6 +258,18 @@ class CustomNodeEditorController extends NodeEditorController
   {
     undo();
   }
+  else
+    {
+      // update image if it currently shows an updated downstream node
+      if (responseDecode["downstream_nodes"].contains(leftCanvas.NodeID) || leftCanvas.NodeID == id)
+      {
+        leftCanvas.updateImageSelection(leftCanvas.NodeID!, leftCanvas.PortID!);
+      }
+      if (responseDecode["downstream_nodes"].contains(rightCanvas.NodeID)|| rightCanvas.NodeID == id)
+      {
+        rightCanvas.updateImageSelection(rightCanvas.NodeID!, rightCanvas.PortID!);
+      }
+    }
 
   }
 
@@ -422,9 +433,6 @@ class CustomNodeEditorController extends NodeEditorController
       onNodeAdd.call(node);
     }
 
-    for (final edge in edges){
-      print("edge added back?");
-    }
   }
 }
 
@@ -489,7 +497,7 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                       ],
                       params: [
                         for (var parameter in nodeDef.parameters.values)
-                            ParamSpec(parameter.name, parameter.type, label: parameter.label)
+                            ParamSpec(parameter.name, parameter.type, label: parameter.label, defaultValue: parameter.options["default"])
                       ],
                     ),
                 ]);
