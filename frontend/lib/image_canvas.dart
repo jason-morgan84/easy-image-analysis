@@ -4,11 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
-//TODO:
-// update load and save image nodes to actually load and save images
-// implement means of changing ImageStateController values from graph
-// test if it works
-
 class ImageData {
   late int zMax;
   late int cMax;
