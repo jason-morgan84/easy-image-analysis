@@ -68,6 +68,7 @@ async def get_types():
         types_dict[item.name] = item.__dict__
     return types_dict
 
+# where a change results in update_graph being called, return all nodes that might be affected by that change
 @app.post("/new_node")
 async def get_new_node(request: Request, background_tasks: BackgroundTasks):
     data = await request.json()
@@ -85,7 +86,7 @@ async def get_new_node(request: Request, background_tasks: BackgroundTasks):
             background_tasks.add_task(workflow.update_graph)
         except Exception as e:
             print(f"failed to create background task: {e}")
-        return{"status": "created", "node": id}
+        return{"status": "completed", "node": id, "downstream_nodes": workflow.get_downstream_nodes(id)}
     else:
         return{"status": "failed", "node": id}
 
@@ -120,21 +121,19 @@ async def get_add_connection(request: Request, background_tasks: BackgroundTasks
     target_node = data.get('target_node')
     target_port = data.get('target_port')
 
+    new_connection_id = ".".join(["connection", id])
     workflow.add_connection(source_port=workflow.nodes[source_node].output_ports[source_port],
                             target_port=workflow.nodes[target_node].input_ports[target_port],
-                            id=id)
-
-    for item in logger:
-        print(f"{item.identifier}: {item.message}")
+                            id=new_connection_id)
 
     print(f"CONNECTIONS: {workflow.connections.keys()}")
 
-    if ".".join(["connection", id]) in workflow.connections.keys():
+    if new_connection_id in workflow.connections.keys():
         try:
             background_tasks.add_task(workflow.update_graph)
         except Exception as e:
             print(f"failed to create background task: {e}")
-        return{"status": "completed"}
+        return{"status": "completed", "downstream_nodes": workflow.get_downstream_nodes(source_node)}
     else:
         return{"status": "failed"}
 
@@ -159,7 +158,7 @@ async def get_set_params(request: Request, background_tasks: BackgroundTasks):
             background_tasks.add_task(workflow.update_graph)
         except Exception as e:
             print(f"failed to create background task: {e}")
-        return{"status": "completed", "node": node_id}
+        return{"status": "completed", "node": node_id, "downstream_nodes": workflow.get_downstream_nodes(node_id)}
     else:
         return{"status": "failed", "node": node_id}
         
