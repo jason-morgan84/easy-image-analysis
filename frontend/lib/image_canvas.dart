@@ -63,35 +63,54 @@ class _ImageCanvasState extends State<ImageCanvas> {
   @override
   void didUpdateWidget(covariant ImageCanvas oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _imageFuture = getImageData(widget.imageController.NodeID ?? "", widget.imageController.PortID ?? "", _z, _c, _centre_x, _centre_y, _zoom);
+    _imageFuture = getImageData(widget.imageController.NodeID ?? "", widget.imageController.PortID ?? "", widget.imageController.Z ?? 0, _c, _centre_x, _centre_y, _zoom);
     }
 
+  double _currentSliderValue = 1;
   @override
   Widget build(BuildContext context) {
   return Center(
       child: FutureBuilder(
         future: _imageFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-            } 
-            else if (snapshot.hasError) {
+            if (snapshot.hasError) 
+            {
               return Text('Error: ${snapshot.error}');
-              } 
-              else if (snapshot.hasData) {
-
-                // get data from snapshot
-
-                final output = Image.memory(snapshot.data!.imageBytes);
-                //final output = Text("image goes here");
-                return output;
-
-                } 
-                else {
-                  return const Text('No data available');
-                } 
-              },
-            )
+            } 
+            else if (snapshot.hasData) 
+            {
+              // get data from snapshot
+              return Center(child: Stack(
+                children: [
+                  Image.memory(snapshot.data!.imageBytes, width: 512, height: 512, gaplessPlayback: true,),
+                  if (snapshot.data!.zMax != 1)
+                    Positioned(bottom:0, left:0, right:0, child: Opacity(
+                      opacity: 0.3,
+                      child: Slider(
+                        activeColor: Colors.grey.shade100,
+                        max: snapshot.data!.zMax.toDouble(),
+                        min: 1,
+                        divisions: snapshot.data!.zMax,
+                        value:_currentSliderValue,
+                        onChanged: (double value)
+                        {
+                          setState(() 
+                          {
+                          _currentSliderValue = value;
+                          widget.imageController.updateImageSelection(widget.imageController.NodeID!, widget.imageController.PortID!, value.toInt()-1);
+                          });
+                        }
+                        )
+                      )
+                    )
+                ] ));
+            }
+            else 
+            {
+              return const Text('No data available');
+            } 
+          },
+        )
 
     );
   } 

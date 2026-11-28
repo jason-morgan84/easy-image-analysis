@@ -263,11 +263,11 @@ class CustomNodeEditorController extends NodeEditorController
       // update image if it currently shows an updated downstream node
       if (responseDecode["downstream_nodes"].contains(leftCanvas.NodeID) || leftCanvas.NodeID == id)
       {
-        leftCanvas.updateImageSelection(leftCanvas.NodeID!, leftCanvas.PortID!);
+        leftCanvas.updateImageSelection(leftCanvas.NodeID!, leftCanvas.PortID!,leftCanvas.Z!);
       }
       if (responseDecode["downstream_nodes"].contains(rightCanvas.NodeID)|| rightCanvas.NodeID == id)
       {
-        rightCanvas.updateImageSelection(rightCanvas.NodeID!, rightCanvas.PortID!);
+        rightCanvas.updateImageSelection(rightCanvas.NodeID!, rightCanvas.PortID!, leftCanvas.Z!);
       }
     }
 
@@ -546,7 +546,7 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                   {
                     portId = "output";
                   }
-                  imageControllerMap[direction]!.updateImageSelection(node.value, portId);
+                  imageControllerMap[direction]!.updateImageSelection(node.value, portId, imageControllerMap[direction]!.Z ?? 0);
 
                 }
                 final leftCanvasCommand = NodeMenuAction(icon: Icons.arrow_left, 
