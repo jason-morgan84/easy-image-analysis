@@ -34,15 +34,14 @@ class ZProject(ImageOperation):
             input_parameter_metadata={"method": ParameterMetadata(dtype=DataPolicy.ValueString, 
                                                                  user_input=True,
                                                                  ui_element="dropdown",
-                                                                 ui_element_options={"values":["Sum intensity", "Mean intensity", "Min intensity", "Max intensity" ]})},
+                                                                 ui_element_options={"values":["Sum intensity", "Mean intensity", "Min intensity", "Max intensity" ], "default": "Max intensity"})},
             output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=-1, z=1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))},
 
             )
         
-        self.test_input_parameters = {"method": "Mean intensity"} 
-            
+           
     def execute(self):
         """ get inputs from input dictionaries:"""
         input_image = self.input_image["input"]

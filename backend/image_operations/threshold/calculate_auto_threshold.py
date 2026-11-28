@@ -31,7 +31,7 @@ class CalculateAutoThreshold(ImageOperation):
             input_parameter_metadata={"method": ParameterMetadata(dtype=DataPolicy.ValueString, 
                                                                  user_input=True,
                                                                  ui_element="dropdown",
-                                                                 ui_element_options={"values":["Li", "Isodata", "Max Entropy", "Mean", "Minimum", "Triangle", "Otsu", "Yen"]})},
+                                                                 ui_element_options={"values":["Li", "Isodata", "Max Entropy", "Mean", "Minimum", "Triangle", "Otsu", "Yen"], "default": "Otsu"})},
             output_parameter_metadata={ "threshold": ParameterMetadata(dtype=DataPolicy.ValueInt)},
 
             )
@@ -57,7 +57,7 @@ class CalculateAutoThreshold(ImageOperation):
         if method not in threshold_methods.keys():
             raise ValueError(f"invalid threshold method provided")
 
-        threshold = threshold_methods[method](input_image[0][0]).astype(np.uint8)           
+        threshold = threshold_methods[method](input_image[0][0]).astype(np.int64)           
 
         self.output_parameter = {"threshold": threshold}
 

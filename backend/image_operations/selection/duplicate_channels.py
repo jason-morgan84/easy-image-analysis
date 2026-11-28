@@ -33,7 +33,7 @@ class DuplicateChannel(ImageOperation):
             input_parameter_metadata={"channel": ParameterMetadata(dtype=DataPolicy.ValueInt, 
                                                                  user_input=True,
                                                                  ui_element="text",
-                                                                 ui_element_options=None)},
+                                                                 ui_element_options={"default": 0})},
             output_image_metadata={ "Output 1": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3)),

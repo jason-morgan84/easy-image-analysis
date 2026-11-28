@@ -44,7 +44,7 @@ class GuassianFilter(ImageOperation):
             input_parameter_metadata={"sigma": ParameterMetadata(dtype=DataPolicy.ValueInt, # dtype describes the format the parameter should be in
                                                                  user_input=True, # if a parameter comes from the UI, this should be True. If its passed from another ImageOperation, it should be False
                                                                  ui_element="integer", # if the parameter comes from user input, this defines what sort of UI element should be used
-                                                                 ui_element_options={"type": "slider", "min": 0, "max": 10, "step": 1, "slider": True})}, # any UI element options, such as options for a drop-down box, min/max values for a slider etc
+                                                                 ui_element_options={"type": "slider", "min": 0, "max": 10, "step": 1, "slider": True, "default": 3})}, # any UI element options, such as options for a drop-down box, min/max values for a slider etc
             output_image_metadata={ "output": ImageMetadata(dtype=DataPolicy.ImageInt,
                                                      image_shape_constraints=Shape(c=-1, z=-1, y=-1, x=-1),
                                                      image_map=Shape(c=0, z=1, y=2, x=3))},
@@ -53,8 +53,7 @@ class GuassianFilter(ImageOperation):
             input_parameter=None,
 
             )
-        self.test_input_parameters = {"sigma": np.uint8(3)} # when testing this function, input images are generated but input parameters need to be provided
-            
+                   
     # the execute function defines the code that will be run when the ImageOperation is executed
     def execute(self):
         """ get inputs from input dictionaries:"""
