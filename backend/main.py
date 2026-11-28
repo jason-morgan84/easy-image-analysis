@@ -175,12 +175,20 @@ async def get_image(request: Request):
     centre_x = data.get('centre_x')
     centre_y = data.get('centre_y')
 
+
     # generate empty image if no node passed in (for instantiation)
     if node_id == "":
         image = sample_data(DataPolicy.ImageInt,[1,1,512,512],True)
 
     elif node_id in workflow.nodes.keys() and port_id in workflow.nodes[node_id].output_ports.keys():
-        image = workflow.nodes[node_id].output_ports[port_id].data
+        # get port of interest for image
+        image_port = workflow.nodes[node_id].output_ports[port_id]
+
+        # convert whatever data type data is held in to ImageInt for create_image
+        try:
+            image = image_port.metadata.dtype.to(value=image_port.data, dtype=DataPolicy.ImageInt)
+        except Exception as E:
+            log(logger,ExportError,f"error converting image: {e}","main.py","get_image",".".join([node_id,port_id]))
     
     try:
         return_image, image_size = create_image(input_image=image,
