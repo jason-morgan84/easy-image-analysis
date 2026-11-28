@@ -558,11 +558,25 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                 final canvas = NodeCanvas(controller: controller, nodeMenuActions: [leftCanvasCommand, rightCanvasCommand],);
 
                                 
-                final output = Row(children: [
-                  SizedBox(width: 280, child: nodePallete), 
-                  Expanded(child: canvas),
-                  ],
-                  );
+                final output = Row(spacing: 2, children: [
+                  Expanded(child:
+                    Container(decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                                          shape: BoxShape.rectangle,
+                                          border: Border.all(
+                                            color: Colors.grey.shade600,
+                                            width: 2,)
+                                            ),
+                                          child: canvas,)),
+                  SizedBox(width: 200, 
+                  child: 
+                    Container(decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                      shape: BoxShape.rectangle,
+                      border: Border.all(color: Colors.grey.shade600, width:2)),
+                      child: nodePallete
+                    )),                  
+                  ]);
                 return output;
 
                 } 
@@ -576,7 +590,7 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
   } 
 }
 
-final registry = NodeRegistry(definitions: [
+/*final registry = NodeRegistry(definitions: [
   NodeDefinition(
     type: 'math.add',
     title: 'Add',
@@ -592,5 +606,5 @@ final registry = NodeRegistry(definitions: [
       ParamSpec('bias', DoubleParam(min: -10, max: 10, slider: true), showInNode: true),
     ],
   ),
-]);
+]);*/
 
