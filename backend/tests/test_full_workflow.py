@@ -17,6 +17,8 @@ def test_full_workflow():
     directory = ImageOperationDirectory(logger = log)
     directory.import_operations_dict()
     workflow = WorkFlow(logger = log, image_operation_directory = directory)
+    for item in log:
+        print(f"{item}")
 
     # create the following structure:
     # load_image
@@ -74,12 +76,12 @@ def test_full_workflow():
 
     workflow.nodes["node.z_project.2"].input_ports["parameter.method"].data = "Max intensity"
 
-    workflow.nodes["node.select_channel.1"].input_ports["parameter.channel"].data = np.uint8(1)
+    workflow.nodes["node.select_channel.1"].input_ports["parameter.channel"].data = np.int64(1)
 
-    workflow.nodes["node.select_slice.5"].input_ports["parameter.slice"].data = np.uint8(3)
+    workflow.nodes["node.select_slice.5"].input_ports["parameter.slice"].data = np.int64(3)
 
-    workflow.nodes["node.gaussian_filter.3"].input_ports["parameter.sigma"].data = np.uint8(3)
-    workflow.nodes["node.gaussian_filter.6"].input_ports["parameter.sigma"].data = np.uint8(3)
+    workflow.nodes["node.gaussian_filter.3"].input_ports["parameter.sigma"].data = np.int64(3)
+    workflow.nodes["node.gaussian_filter.6"].input_ports["parameter.sigma"].data = np.int64(3)
 
     workflow.nodes["node.calculate_auto_threshold.4"].input_ports["parameter.method"].data = "Yen"
 
