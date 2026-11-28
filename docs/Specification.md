@@ -141,8 +141,9 @@
 |13/11/26|0.20.4|Updated description of remove functionunit testing|
 |24/11/26|0.21.0|Updated description of WorkFlow edit_node unit testing|
 |24/11/26|0.21.1|Updated description of ParameterMetaData to include requirement for a default parameter value for user input|
-|24/11/26|0.21.2|Updated description unit testing description for ParameterMetaData|
-|27/11/26|0.21.3|Updated description unit testing description for ImageOperationDirectory|
+|24/11/26|0.21.2|Updated unit testing description for ParameterMetaData|
+|27/11/26|0.21.3|Updated unit testing description for ImageOperationDirectory|
+|28/11/26|0.21.4|Updated unit testing description for Node instantiation with default user_input port value|
 
 # 2. Premise and Aims
 Over the last 10 years, a lot of my research has been based on image analysis. I have developed my own workflows using one or a combination of FIJI, Python and C#. With the ease of high-definition microscopy at various levels, thorough, repeatable and robust image analysis is becoming more and more important – even with the advent of AI, there will always be a role for classical image analysis. However, getting into analysing your own images can have quite a high barrier to entry. This is exacerbated by some of the weaknesses in the image analysis tools mentioned above:
@@ -886,6 +887,7 @@ This uses the class FrontendPortDescription, which includes:
 | image_operation setter     |Provide image_operation thats not ImageOperation class|Type error|Input accepted|
 | port initiation     |Associate Node with ImageOperations with varying numbers of input_images and input_parameters|Total input ports equals sum of length of ImageOperation input_image and input_parameter directories<br>Input ports have expected IDs|Incorrect number of input ports<br>Incorrect port names|
 | port initiation     |Associate Node with ImageOperations with varying numbers of output_images and output_parameters|Total output ports equals sum of length of ImageOperation output_image and output_parameter directories<br>Output ports have expected IDs|Incorrect number of output ports<br>Incorrect port names|
+| port initiation     |Check port data set for a user_input input Parameter|port.data set correctly| port.data not set|
 | port activation <br> pre-tests | Activate node where is_ready is false | ActivationError | node activates|
 | port activation <br> pre-tests | Activate node where an input port_id is in an incorrect format (not type.name) | ActivationError | node activates|
 | port activation <br> pre-tests | Activate node where an input port_id name does not correctly reference a ImageOperation input_image dictionary key | ActivationError | node activates|
