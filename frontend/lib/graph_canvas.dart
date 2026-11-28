@@ -239,11 +239,7 @@ class CustomNodeEditorController extends NodeEditorController
 
 
   }
-  CustomNodeEditorController({
-    required super.registry,
-    //this.onNodeAdd,
-  });
-
+  
   void onSetParams(NodeId id, Map<String, Object?> values) async
   {
     var response = await http.post(
@@ -272,6 +268,11 @@ class CustomNodeEditorController extends NodeEditorController
     }
 
   }
+  
+  CustomNodeEditorController({
+    required super.registry,
+    //this.onNodeAdd,
+  });
 
   @override
   void remove({
@@ -484,9 +485,12 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
                     NodeDefinition(
                       type: nodeDef.id,
                       title: nodeDef.name,
+                      defaultSize: Size(175,1),
+                      minSize: Size(50,1),
                       category: nodeDef.category, 
                       variant: NodeVariant.dynamic,
                       copyable: false,
+
                       style: NodeStyle(headerColor: Color(0xFF888888)),
                       ports: [
                         for (var port in nodeDef.ports.values)
@@ -590,21 +594,4 @@ class _WorkflowCanvasState extends State<WorkflowCanvas> {
   } 
 }
 
-/*final registry = NodeRegistry(definitions: [
-  NodeDefinition(
-    type: 'math.add',
-    title: 'Add',
-    category: 'Math',
-    icon: Icons.add,
-    variant: NodeVariant.dynamic,
-    ports: const [
-      PortSpec.input('a', label: 'a', type: PortType.number),
-      PortSpec.input('b', label: 'b', type: PortType.number),
-      PortSpec.output('sum', label: 'sum', type: PortType.number),
-    ],
-    params: const [
-      ParamSpec('bias', DoubleParam(min: -10, max: 10, slider: true), showInNode: true),
-    ],
-  ),
-]);*/
 
