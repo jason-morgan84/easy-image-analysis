@@ -3,7 +3,7 @@ import 'package:frontend/image_canvas.dart';
 import 'graph_canvas.dart';
 import 'notifiers.dart';
 
-void main() {
+void main(){
   runApp(const MyApp());
 }
 
@@ -16,10 +16,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Easy Image Analysis',
       theme: ThemeData(
 
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: .fromSeed(seedColor: Colors.grey),
       ),
       home: const MyHomePage(title: 'Easy Image Analysis'),
     );
@@ -40,13 +40,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
+        toolbarHeight: 50,
+        backgroundColor: Colors.blueGrey.shade400,//Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
       body: Center(
-        child: Row(
+        child: Row(spacing: 5, mainAxisAlignment: MainAxisAlignment.center,
         children: [
                       ListenableBuilder(
               listenable: leftCanvas,
@@ -61,8 +60,8 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
           SizedBox(
-            width: 800,   // Provide a defined width
-            height: 600,  // Provide a defined height
+            width: 600,   // Provide a defined width
+            height: 512,  // Provide a defined height
             child: WorkflowCanvas()
           ),
 
