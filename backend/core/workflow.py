@@ -217,7 +217,7 @@ class WorkFlow:
             # if error checking is passed, create connection
 
             # create key in the form connection.ID
-            new_key = ".".join(("connection",str(self.max_id) if id == None else id))
+            new_key = ".".join(("connection",str(self.max_id))) if id == None else id
             self.max_id += 1
             # add new connection to connections dictionary
             self.connections[new_key] = Connection(connection_id = new_key,
