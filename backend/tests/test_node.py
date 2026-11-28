@@ -33,12 +33,12 @@ def test_initiation_not_image_operation():
                          node_id = "id")
 
 
-
 test_image_metadata = ImageMetadata(dtype = DataPolicy.ImageInt,
                                     image_shape_constraints= Shape(c=-1, z=-1, y=-1, x=-1),
                                     image_map = Shape(c=0, z=1, y=2, x=3))
 test_image = sample_data(dtype = DataPolicy.ImageInt, shape = (1,2,3,4))
 test_parameter_metadata = ParameterMetadata(dtype = DataPolicy.ValueInt)
+test_user_input_parameter_metadata = ParameterMetadata(dtype = DataPolicy.ValueInt, user_input=True,ui_element="integer",ui_element_options={"default":2})
 test_parameter = sample_data(dtype=DataPolicy.ValueInt)
 test_operation_1 = ImageOperation(name="Test Operation 1",
                                   id="test_operation_1",
@@ -64,7 +64,7 @@ test_operation_2 = ImageOperation(name = "Test Operation 1",
                                 docs = None,
                                 alerts = None,
                                 input_image_metadata = {"image 1": test_image_metadata, "image 2": test_image_metadata, "image 3": test_image_metadata},
-                                input_parameter_metadata = {"parameter 1": test_parameter_metadata, "parameter 2": test_parameter_metadata},
+                                input_parameter_metadata = {"parameter 1": test_parameter_metadata, "parameter 2": test_user_input_parameter_metadata},
                                 output_image_metadata = {"output 1": test_image_metadata},
                                 output_parameter_metadata= {"out_param_1": ParameterMetadata(dtype=DataPolicy.ValueFloat),
                                                             "out_param_2": ParameterMetadata(dtype=DataPolicy.ValueInt)}
@@ -77,6 +77,7 @@ setattr(test_operation_2, 'execute', types.MethodType(function2, test_operation_
 
 # Associate Node with ImageOperations with varying numbers of input_images and input_parameters
 # Associate Node with ImageOperations with varying numbers of output_images and output_parameters
+# test input ports where user_input == True have correct default value set
 def test_initiation_number_inputs():
     test_node1 = Node(test_operation_1,"test 1")
     assert len(test_node1.input_ports) == 3
@@ -91,6 +92,8 @@ def test_initiation_number_inputs():
     assert "image.output 1" in test_node2.output_ports.keys()
     assert "parameter.out_param_1" in test_node2.output_ports.keys()
     assert "parameter.out_param_1" in test_node2.output_ports.keys()
+    assert test_node2.input_ports["parameter.parameter 2"].data == test_node2.input_ports["parameter.parameter 2"].metadata.dtype.numpy(
+        test_node2.input_ports["parameter.parameter 2"].metadata.ui_element_options["default"])
 
 """pre tests"""
 # Activate node where is_ready is false | ActivationError | node activates|
