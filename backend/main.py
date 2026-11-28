@@ -2,6 +2,7 @@ from core.image_operation_directory import ImageOperationDirectory
 from core.workflow import WorkFlow
 from core.frontend_operations import FrontendTypeDescription, create_frontend_node_description, create_image
 from core.constants import DataPolicy
+from core.data_checks import sample_data
 from fastapi import FastAPI, Request, BackgroundTasks
 from core.error_handling import log, GraphError, ExportError
 import json
@@ -174,7 +175,11 @@ async def get_image(request: Request):
     centre_x = data.get('centre_x')
     centre_y = data.get('centre_y')
 
-    if node_id in workflow.nodes.keys() and port_id in workflow.nodes[node_id].output_ports.keys():
+    # generate empty image if no node passed in (for instantiation)
+    if node_id == "":
+        image = sample_data(DataPolicy.ImageInt,[1,1,512,512],True)
+
+    elif node_id in workflow.nodes.keys() and port_id in workflow.nodes[node_id].output_ports.keys():
         image = workflow.nodes[node_id].output_ports[port_id].data
     
     try:
